@@ -3060,9 +3060,9 @@ class core( QObject ) :
 		self.nln_res_plas['v0_x'] = fit[0]
 		self.nln_res_plas['v0_y'] = fit[1]
 		self.nln_res_plas['v0_z'] = fit[2]
-		self.nln_res_plas['s_v0_x'] = sigma[0]
-		self.nln_res_plas['s_v0_y'] = sigma[1]
-		self.nln_res_plas['s_v0_z'] = sigma[2]
+		self.nln_res_plas['sig_v0_x'] = sigma[0]
+		self.nln_res_plas['sig_v0_y'] = sigma[1]
+		self.nln_res_plas['sig_v0_z'] = sigma[2]
 		c = 3
 
 		for i in pop :
@@ -3093,40 +3093,40 @@ class core( QObject ) :
 			pop_sym   = self.nln_pyon.arr_pop[i]['sym']
 
 			pop_n   = fit[c]
-			pop_s_n = sigma[c]
+			pop_sig_n = sigma[c]
 			c += 1
 
 			if ( pop_drift ) :
 				pop_dv = fit[c]
-				pop_s_dv = sigma[c]
+				pop_sig_dv = sigma[c]
 				c += 1
 			else :
 				pop_dv = None
-				pop_s_dv = None
+				pop_sig_dv = None
 
 			if ( pop_aniso ) :
 				pop_w     = None
 				pop_w_per = fit[c  ]
 				pop_w_par = fit[c+1]
-				pop_s_w     = None
-				pop_s_w_per = sigma[c  ]
-				pop_s_w_par = sigma[c+1]
+				pop_sig_w     = None
+				pop_sig_w_per = sigma[c  ]
+				pop_sig_w_par = sigma[c+1]
 				c += 2
 			else :
 				pop_w     = fit[c]
 				pop_w_per = None
 				pop_w_par = None
-				pop_s_w     = sigma[c]
-				pop_s_w_per = None
-				pop_s_w_par = None
+				pop_sig_w     = sigma[c]
+				pop_sig_w_per = None
+				pop_sig_w_par = None
 				c += 1
 
 			self.nln_res_plas.add_pop(
 			       spc=spc_name, drift=pop_drift, aniso=pop_aniso,
 			       name=pop_name, sym=pop_sym, n=pop_n, dv=pop_dv,
 			       w=pop_w, w_per=pop_w_per, w_par=pop_w_par,
-			       s_n=pop_s_n, s_dv=pop_s_dv, s_w=pop_s_w,
-			       s_w_per=pop_s_w_per, s_w_par=pop_s_w_par        )
+			       sig_n=pop_sig_n, sig_dv=pop_sig_dv, sig_w=pop_sig_w,
+			       sig_w_per=pop_sig_w_per, sig_w_par=pop_sig_w_par        )
 
 		# Save the results of the this non-linear analysis to the
 		# results log.
@@ -3502,9 +3502,9 @@ class core( QObject ) :
 			fl.write( txt_num.format( plas['v0_z'] ) )
 			fl.write( '\n' )
 			fl.write( txt_spc )
-			fl.write( txt_num.format( plas['s_v0_x'] ) )
-			fl.write( txt_num.format( plas['s_v0_y'] ) )
-			fl.write( txt_num.format( plas['s_v0_z'] ) )
+			fl.write( txt_num.format( plas['sig_v0_x'] ) )
+			fl.write( txt_num.format( plas['sig_v0_y'] ) )
+			fl.write( txt_num.format( plas['sig_v0_z'] ) )
 
 			# Write the values for each species.
 
@@ -3556,7 +3556,7 @@ class core( QObject ) :
 					fl.write( txt_spc )
 					fl.write( txt_spc )
 					fl.write( '  ' )
-					fl.write( txt_num.format( pop['s_n'] ) )
+					fl.write( txt_num.format( pop['sig_n'] ) )
 
 					# If applicable, write the populations's
 					# drift (and uncertainty therin).
@@ -3575,7 +3575,7 @@ class core( QObject ) :
 						fl.write( txt_spc )
 						fl.write( '  ' )
 						fl.write( txt_num.format(
-						                 pop['s_dv'] ) )
+						                 pop['sig_dv'] ) )
 
 					# Write the population's thermal
 					# speed(s) (and uncertainty therin).
@@ -3600,12 +3600,12 @@ class core( QObject ) :
 					fl.write( '  ' )
 					if ( pop.aniso ) :
 						fl.write( txt_num.format(
-						              pop['s_w_per'] ) )
+						              pop['sig_w_per'] ) )
 						fl.write( txt_num.format(
-						              pop['s_w_par'] ) )
+						              pop['sig_w_par'] ) )
 					else :
 						fl.write( txt_num.format(
-						                  pop['s_w'] ) )
+						                  pop['sig_w'] ) )
 
 			# Write a seperator.
 

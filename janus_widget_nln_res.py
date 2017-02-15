@@ -161,7 +161,7 @@ class widget_nln_res( format_TextEdit ) :
 				self.prnt_htm( lab_n + ' = ' )
 				self.prnt_dcm( pop['n'], dcm )
 				self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-				self.prnt_dcm( pop['s_n'], dcm,
+				self.prnt_dcm( pop['sig_n'], dcm,
 				               'cm<sup>-3</sup>' )
 
 				# If this is the first population of the first
@@ -184,7 +184,7 @@ class widget_nln_res( format_TextEdit ) :
 					     self.core.nln_res_plas['v0_x'], 0 )
 					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
 					self.prnt_dcm(
-					     self.core.nln_res_plas['s_v0_x'],
+					     self.core.nln_res_plas['sig_v0_x'],
 					     0, 'km/s'                         )
 					self.prnt_brk( )
 					self.prnt_tab( 3 )
@@ -193,7 +193,7 @@ class widget_nln_res( format_TextEdit ) :
 					     self.core.nln_res_plas['v0_y'], 0 )
 					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
 					self.prnt_dcm(
-					     self.core.nln_res_plas['s_v0_y'],
+					     self.core.nln_res_plas['sig_v0_y'],
 					     0, 'km/s'                         )
 					self.prnt_brk( )
 					self.prnt_tab( 3 )
@@ -202,7 +202,7 @@ class widget_nln_res( format_TextEdit ) :
 					     self.core.nln_res_plas['v0_z'], 0 )
 					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
 					self.prnt_dcm(
-					     self.core.nln_res_plas['s_v0_z'],
+					     self.core.nln_res_plas['sig_v0_z'],
 					     0, 'km/s'                         )
 
 				elif ( pop['drift'] ) :
@@ -212,7 +212,7 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_htm( lab_dv + ' = ' )
 					self.prnt_dcm( pop['dv'], 1 )
 					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm( pop['s_dv'], 1, 'km/s' )
+					self.prnt_dcm( pop['sig_dv'], 1, 'km/s' )
 
 				# Print the population's thermal speed(s).
 
@@ -227,14 +227,14 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_htm( lab_w_per + ' = ' )
 					self.prnt_dcm( pop['w_per'], 1 )
 					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm( pop['s_w_per'],
+					self.prnt_dcm( pop['sig_w_per'],
 					               1, 'km/s'       )
 					self.prnt_brk( )
 					self.prnt_tab( 3 )
 					self.prnt_htm( lab_w_par + ' = ' )
 					self.prnt_dcm( pop['w_par'], 1 )
 					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm( pop['s_w_par'],
+					self.prnt_dcm( pop['sig_w_par'],
 					               1, 'km/s'       )
 					self.prnt_brk( )
 					self.prnt_tab( 3 )
@@ -248,7 +248,7 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_htm( lab_w + ' = ' )
 					self.prnt_dcm( pop['w'], 1 )
 					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm( pop['s_w'], 1, 'km/s' )
+					self.prnt_dcm( pop['sig_w'], 1, 'km/s' )
 
 
 
@@ -264,11 +264,11 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_brk( )
 					self.prnt_tab( 3 )
 					self.prnt_htm( lab_t_per + ' = ' )
-					self.prnt_dcm( pop['t_per'], 1, 'km/s' )
+					self.prnt_dcm( pop['t_per'], 1, 'kK' )
 					self.prnt_brk( )
 					self.prnt_tab( 3 )
 					self.prnt_htm( lab_t_par + ' = ' )
-					self.prnt_dcm( pop['t_par'], 1, 'km/s' )
+					self.prnt_dcm( pop['t_par'], 1, 'kK' )
 					self.prnt_brk( )
 					self.prnt_tab( 3 )
 					self.prnt_htm( lab_r + ' = ' )
