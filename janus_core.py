@@ -1260,45 +1260,6 @@ class core( QObject ) :
 
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR CHANGING A NLN POPULATION.
-	#-----------------------------------------------------------------------
-
-	def chng_mom_win_azm( self, val ) :
-
-		# Try to convert the "val" argument to an integer and store it.
-		# If this fails, store "None".
-
-		if ( val is None ) :
-			self.mom_win_azm = None
-		else :
-			try :
-				self.mom_win_azm = int( val )
-			except :
-				self.mom_win_azm = None
-
-		# Call "auto_mom_sel"
-
-		# FIXME
-
-		# TODO
-
-		# Make a similar function "chng_mom_win_cur"
-
-		# Remove "self.mom_win_*_*" variables (here and in 
-		# "janus_widget_mom_ctrl.py").
-
-		# Add thread-start function for "chng_mom_win_*" functions to
-		# "janus_thread.py"
-
-		# Have "janus_widget_mom_ctrl.py" use new thread-start functions.
-			# In "make_text" function, if a variable is None, don't
-			# clear the existing text, just turn it red.
-
-		# Remove arguments from "auto_mom_sel" have it automatically call "anls_mom" and check that "self.mom_win_*" variables are not None (raise error if they are).
-
-		# Have "load_spec" call "auto_mom_sel" instead of "anls_mom".
-
-	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR AUTOMATIC DATA SELECTION FOR THE MOMENTS ANAL.
 	#-----------------------------------------------------------------------
 
