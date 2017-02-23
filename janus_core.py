@@ -1294,7 +1294,9 @@ class core( QObject ) :
 			# In "make_text" function, if a variable is None, don't
 			# clear the existing text, just turn it red.
 
-		# Remove arguments from "auto_mom_sel" have it automatically call "anls_mom" and check that "self.mom_win_*" variables are not None (raise error if they are).
+		# Remove arguments from "auto_mom_sel" have it automatically call
+		# call "anls_mom" and check that "self.mom_win_*" variables are
+		# not None (raise error if they are).
 
 		# Have "load_spec" call "auto_mom_sel" instead of "anls_mom".
 

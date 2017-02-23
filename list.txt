@@ -1,0 +1,512 @@
+ramiz@Shadowfax:~$ cd Desktop/Research/GIT_Personal/
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ ls
+development  janus_core.py  janus_pyon.py            readme.txt
+FC           janus.dat      janus_widget_nln_res.py  user_guide.pdf
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ cd development/
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/development$ ls
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/development$ git init
+Reinitialized existing Git repository in /home/ramiz/Dropbox/Studies/Research/GIT_Personal/development/.git/
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/development$ git clone https://github.com/JanusWind/FC/tree/development
+Cloning into 'development'...
+remote: Not Found
+fatal: repository 'https://github.com/JanusWind/FC/tree/development/' not found
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/development$ git clone -b https://github.com/JanusWind/FC/tree/development
+You must specify a repository to clone.
+
+usage: git clone [<options>] [--] <repo> [<dir>]
+
+    -v, --verbose         be more verbose
+    -q, --quiet           be more quiet
+    --progress            force progress reporting
+    -n, --no-checkout     don't create a checkout
+    --bare                create a bare repository
+    --mirror              create a mirror repository (implies bare)
+    -l, --local           to clone from a local repository
+    --no-hardlinks        don't use local hardlinks, always copy
+    -s, --shared          setup as shared repository
+    --recursive           initialize submodules in the clone
+    --recurse-submodules  initialize submodules in the clone
+    --template <template-directory>
+                          directory from which templates will be used
+    --reference <repo>    reference repository
+    --dissociate          use --reference only while cloning
+    -o, --origin <name>   use <name> instead of 'origin' to track upstream
+    -b, --branch <branch>
+                          checkout <branch> instead of the remote's HEAD
+    -u, --upload-pack <path>
+                          path to git-upload-pack on the remote
+    --depth <depth>       create a shallow clone of that depth
+    --single-branch       clone only one branch, HEAD or --branch
+    --separate-git-dir <gitdir>
+                          separate git dir from working tree
+    -c, --config <key=value>
+                          set config inside the new repository
+
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/development$ ls 
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/development$ cd ..
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ rmdir development/
+rmdir: failed to remove 'development/': Directory not empty
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ cd development/
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/development$ ls
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/development$ ls -al
+total 24
+drwxrwxr-x 3 ramiz ramiz 4096 Feb 21 15:59 .
+drwxrwxr-x 5 ramiz ramiz 4096 Feb 21 15:42 ..
+drwxrwxr-x 7 ramiz ramiz 4096 Feb 21 15:58 .git
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/development$ cd ..
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ rmdir -r development/
+rmdir: invalid option -- 'r'
+Try 'rmdir --help' for more information.
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ rm -r development/
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ ls
+FC             janus.dat      janus_widget_nln_res.py  user_guide.pdf
+janus_core.py  janus_pyon.py  readme.txt
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ git clone -b development https://github.com/JanusWind/FC
+fatal: destination path 'FC' already exists and is not an empty directory.
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ git clone -b development https://github.com/JanusWind
+Cloning into 'JanusWind'...
+remote: Not Found
+fatal: repository 'https://github.com/JanusWind/' not found
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ git clone -b development https://github.com/JanusWind/FC
+fatal: destination path 'FC' already exists and is not an empty directory.
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ mkdir temp
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ cd temp
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/temp$ git clone -b development https://github.com/JanusWind/FC
+Cloning into 'FC'...
+remote: Counting objects: 82, done.
+remote: Compressing objects: 100% (24/24), done.
+remote: Total 82 (delta 4), reused 0 (delta 0), pack-reused 55
+Unpacking objects: 100% (82/82), done.
+Checking connectivity... done.
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/temp$ ls
+FC
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/temp$ cd FC
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/temp/FC$ ls
+janus                        janus_helper.py              janus_widget_mfi_info.py
+janus_const.py               janus_mfi_arcv.py            janus_widget_mfi_plot.py
+janus_core.py                janus.py                     janus_widget_mfi.py
+janus_custom_Application.py  janus_pyon.py                janus_widget_mom_ctrl.py
+janus_custom_MainWindow.py   janus_save.py                janus_widget_mom.py
+janus.dat                    janus_step.py                janus_widget_mom_res.py
+janus_dialog_auto_ctrl.py    janus.svg                    janus_widget_nln_gss.py
+janus_dialog_auto_prog.py    janus_thread.py              janus_widget_nln_pop.py
+janus_dialog_missing.py      janus_time.py                janus_widget_nln.py
+janus_dialog_save.py         janus_widget_ctrl_dspdyn.py  janus_widget_nln_res.py
+janus_event_CheckBox.py      janus_widget_ctrl_info.py    janus_widget_nln_set.py
+janus_event_ComboBox.py      janus_widget_ctrl.py         janus_widget_nln_spc.py
+janus_event_LineEdit.py      janus_widget_ctrl_run.py     LICENSE
+janus_event_PushButton.py    janus_widget_ctrl_save.py    readme.txt
+janus_event_ViewBox.py       janus_widget_ctrl_time.py    user_guide.pdf
+janus_fc_arcv.py             janus_widget_fc_cup.py
+janus_format_TextEdit.py     janus_widget_fc.py
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/temp/FC$ cat janus.dat
+0.3.1 (modified)
+2017-02-15
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/temp/FC$ cd ..
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/temp$ ls
+FC
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/temp$ man git-clone
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/temp$ mv FC ../development
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/temp$ ls
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/temp$ cd ..
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ ls 
+development  janus_core.py  janus_pyon.py            readme.txt  user_guide.pdf
+FC           janus.dat      janus_widget_nln_res.py  temp
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ rmdir temp
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ mv FC master
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ mkdir FC
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ mv master/ FC
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ mv development/ FC
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ ls
+FC             janus.dat      janus_widget_nln_res.py  user_guide.pdf
+janus_core.py  janus_pyon.py  readme.txt
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal$ cd FC
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC$ ls
+development  master
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC$ cd development/
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ ls
+janus                        janus_helper.py              janus_widget_mfi_info.py
+janus_const.py               janus_mfi_arcv.py            janus_widget_mfi_plot.py
+janus_core.py                janus.py                     janus_widget_mfi.py
+janus_custom_Application.py  janus_pyon.py                janus_widget_mom_ctrl.py
+janus_custom_MainWindow.py   janus_save.py                janus_widget_mom.py
+janus.dat                    janus_step.py                janus_widget_mom_res.py
+janus_dialog_auto_ctrl.py    janus.svg                    janus_widget_nln_gss.py
+janus_dialog_auto_prog.py    janus_thread.py              janus_widget_nln_pop.py
+janus_dialog_missing.py      janus_time.py                janus_widget_nln.py
+janus_dialog_save.py         janus_widget_ctrl_dspdyn.py  janus_widget_nln_res.py
+janus_event_CheckBox.py      janus_widget_ctrl_info.py    janus_widget_nln_set.py
+janus_event_ComboBox.py      janus_widget_ctrl.py         janus_widget_nln_spc.py
+janus_event_LineEdit.py      janus_widget_ctrl_run.py     LICENSE
+janus_event_PushButton.py    janus_widget_ctrl_save.py    readme.txt
+janus_event_ViewBox.py       janus_widget_ctrl_time.py    user_guide.pdf
+janus_fc_arcv.py             janus_widget_fc_cup.py
+janus_format_TextEdit.py     janus_widget_fc.py
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ vi janus.dat 
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git add janus.dat 
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git commit -m
+error: switch `m' requires a value
+usage: git commit [<options>] [--] <pathspec>...
+
+    -q, --quiet           suppress summary after successful commit
+    -v, --verbose         show diff in commit message template
+
+Commit message options
+    -F, --file <file>     read message from file
+    --author <author>     override author for commit
+    --date <date>         override date for commit
+    -m, --message <message>
+                          commit message
+    -c, --reedit-message <commit>
+                          reuse and edit message from specified commit
+    -C, --reuse-message <commit>
+                          reuse message from specified commit
+    --fixup <commit>      use autosquash formatted message to fixup specified commit
+    --squash <commit>     use autosquash formatted message to squash specified commit
+    --reset-author        the commit is authored by me now (used with -C/-c/--amend)
+    -s, --signoff         add Signed-off-by:
+    -t, --template <file>
+                          use specified template file
+    -e, --edit            force edit of commit
+    --cleanup <default>   how to strip spaces and #comments from message
+    --status              include status in commit message template
+    -S, --gpg-sign[=<key-id>]
+                          GPG sign commit
+
+Commit contents options
+    -a, --all             commit all changed files
+    -i, --include         add specified files to index for commit
+    --interactive         interactively add files
+    -p, --patch           interactively add changes
+    -o, --only            commit only specified files
+    -n, --no-verify       bypass pre-commit hook
+    --dry-run             show what would be committed
+    --short               show status concisely
+    --branch              show branch information
+    --porcelain           machine-readable output
+    --long                show status in long format (default)
+    -z, --null            terminate entries with NUL
+    --amend               amend previous commit
+    --no-post-rewrite     bypass post-rewrite hook
+    -u, --untracked-files[=<mode>]
+                          show untracked files, optional modes: all, normal, no. (Default: all)
+
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git commit -a
+[development 2251e23] 	modified:   janus.dat
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git push https://github.com/JanusWind/FC
+warning: push.default is unset; its implicit value has changed in
+Git 2.0 from 'matching' to 'simple'. To squelch this message
+and maintain the traditional behavior, use:
+
+  git config --global push.default matching
+
+To squelch this message and adopt the new behavior now, use:
+
+  git config --global push.default simple
+
+When push.default is set to 'matching', git will push local branches
+to the remote branches that already exist with the same name.
+
+Since Git 2.0, Git defaults to the more conservative 'simple'
+behavior, which only pushes the current branch to the corresponding
+remote branch that 'git pull' uses to update the current branch.
+
+See 'git help config' and search for 'push.default' for further information.
+(the 'simple' mode was introduced in Git 1.7.11. Use the similar mode
+'current' instead of 'simple' if you sometimes use older versions of Git)
+
+Username for 'https://github.com': ahmadryan
+Password for 'https://ahmadryan@github.com': 
+To https://github.com/JanusWind/FC
+ ! [rejected]        development -> development (fetch first)
+error: failed to push some refs to 'https://github.com/JanusWind/FC'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first integrate the remote changes
+hint: (e.g., 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git pull https://github.com/JanusWind/FC
+From https://github.com/JanusWind/FC
+ * branch            HEAD       -> FETCH_HEAD
+Already up-to-date.
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git pull https://github.com/JanusWind/FC/tree/development
+remote: Not Found
+fatal: repository 'https://github.com/JanusWind/FC/tree/development/' not found
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ vi janus.
+janus.dat  janus.py   janus.svg  
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ vi janus.dat 
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git add 
+.git/                        janus_format_TextEdit.py     janus_widget_fc.py
+janus                        janus_helper.py              janus_widget_mfi_info.py
+janus_const.py               janus_mfi_arcv.py            janus_widget_mfi_plot.py
+janus_core.py                janus.py                     janus_widget_mfi.py
+janus_custom_Application.py  janus_pyon.py                janus_widget_mom_ctrl.py
+janus_custom_MainWindow.py   janus_save.py                janus_widget_mom.py
+janus.dat                    janus_step.py                janus_widget_mom_res.py
+janus_dialog_auto_ctrl.py    janus.svg                    janus_widget_nln_gss.py
+janus_dialog_auto_prog.py    janus_thread.py              janus_widget_nln_pop.py
+janus_dialog_missing.py      janus_time.py                janus_widget_nln.py
+janus_dialog_save.py         janus_widget_ctrl_dspdyn.py  janus_widget_nln_res.py
+janus_event_CheckBox.py      janus_widget_ctrl_info.py    janus_widget_nln_set.py
+janus_event_ComboBox.py      janus_widget_ctrl.py         janus_widget_nln_spc.py
+janus_event_LineEdit.py      janus_widget_ctrl_run.py     LICENSE
+janus_event_PushButton.py    janus_widget_ctrl_save.py    readme.txt
+janus_event_ViewBox.py       janus_widget_ctrl_time.py    user_guide.pdf
+janus_fc_arcv.py             janus_widget_fc_cup.py       
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git pull https://github.com/JanusWind/FC
+
+From https://github.com/JanusWind/FC
+ * branch            HEAD       -> FETCH_HEAD
+Already up-to-date.
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ 
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git push https://github.com/JanusWind/FC
+warning: push.default is unset; its implicit value has changed in
+Git 2.0 from 'matching' to 'simple'. To squelch this message
+and maintain the traditional behavior, use:
+
+  git config --global push.default matching
+
+To squelch this message and adopt the new behavior now, use:
+
+  git config --global push.default simple
+
+When push.default is set to 'matching', git will push local branches
+to the remote branches that already exist with the same name.
+
+Since Git 2.0, Git defaults to the more conservative 'simple'
+behavior, which only pushes the current branch to the corresponding
+remote branch that 'git pull' uses to update the current branch.
+
+See 'git help config' and search for 'push.default' for further information.
+(the 'simple' mode was introduced in Git 1.7.11. Use the similar mode
+'current' instead of 'simple' if you sometimes use older versions of Git)
+
+Username for 'https://github.com': ahmadryan
+Password for 'https://ahmadryan@github.com': 
+To https://github.com/JanusWind/FC
+ ! [rejected]        development -> development (fetch first)
+error: failed to push some refs to 'https://github.com/JanusWind/FC'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first integrate the remote changes
+hint: (e.g., 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ man git-pull
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git push --all https://github.com/JanusWind/FC
+Username for 'https://github.com': 
+Password for 'https://github.com': 
+remote: Anonymous access to JanusWind/FC.git denied.
+fatal: Authentication failed for 'https://github.com/JanusWind/FC/'
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git pull --all https://github.com/JanusWind/FC
+fatal: fetch --all does not take a repository argument
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git pull https://github.com/JanusWind/FC --all
+fatal: fetch --all does not take a repository argument
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$   git config --global push.default simple
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$   git config --global push.default matching
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ ls
+janus                        janus_helper.py              janus_widget_mfi_info.py
+janus_const.py               janus_mfi_arcv.py            janus_widget_mfi_plot.py
+janus_core.py                janus.py                     janus_widget_mfi.py
+janus_custom_Application.py  janus_pyon.py                janus_widget_mom_ctrl.py
+janus_custom_MainWindow.py   janus_save.py                janus_widget_mom.py
+janus.dat                    janus_step.py                janus_widget_mom_res.py
+janus_dialog_auto_ctrl.py    janus.svg                    janus_widget_nln_gss.py
+janus_dialog_auto_prog.py    janus_thread.py              janus_widget_nln_pop.py
+janus_dialog_missing.py      janus_time.py                janus_widget_nln.py
+janus_dialog_save.py         janus_widget_ctrl_dspdyn.py  janus_widget_nln_res.py
+janus_event_CheckBox.py      janus_widget_ctrl_info.py    janus_widget_nln_set.py
+janus_event_ComboBox.py      janus_widget_ctrl.py         janus_widget_nln_spc.py
+janus_event_LineEdit.py      janus_widget_ctrl_run.py     LICENSE
+janus_event_PushButton.py    janus_widget_ctrl_save.py    readme.txt
+janus_event_ViewBox.py       janus_widget_ctrl_time.py    user_guide.pdf
+janus_fc_arcv.py             janus_widget_fc_cup.py
+janus_format_TextEdit.py     janus_widget_fc.py
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ vi janus.dat 
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git push janus.dat
+fatal: Invalid gitfile format: janus.dat
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git push janus.dat https://github.com/JanusWind/FC/tree/development
+fatal: remote part of refspec is not a valid name in https://github.com/JanusWind/FC/tree/development
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git push https://github.com/JanusWind/FC/tree/development
+remote: Not Found
+fatal: repository 'https://github.com/JanusWind/FC/tree/development/' not found
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ vi janus.dat 
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git add janus.dat 
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git commit --all
+[development c66b65e] 	modified:   janus.dat
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git push
+Username for 'https://github.com': ahmadryan
+Password for 'https://ahmadryan@github.com': 
+To https://github.com/JanusWind/FC
+ ! [rejected]        development -> development (fetch first)
+error: failed to push some refs to 'https://github.com/JanusWind/FC'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first integrate the remote changes
+hint: (e.g., 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git fetch
+remote: Counting objects: 1, done.
+remote: Total 1 (delta 0), reused 0 (delta 0), pack-reused 0
+Unpacking objects: 100% (1/1), done.
+From https://github.com/JanusWind/FC
+   3e9be99..743fe6e  development -> origin/development
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ vi janus.dat 
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git add 
+.git/                        janus_format_TextEdit.py     janus_widget_fc.py
+janus                        janus_helper.py              janus_widget_mfi_info.py
+janus_const.py               janus_mfi_arcv.py            janus_widget_mfi_plot.py
+janus_core.py                janus.py                     janus_widget_mfi.py
+janus_custom_Application.py  janus_pyon.py                janus_widget_mom_ctrl.py
+janus_custom_MainWindow.py   janus_save.py                janus_widget_mom.py
+janus.dat                    janus_step.py                janus_widget_mom_res.py
+janus_dialog_auto_ctrl.py    janus.svg                    janus_widget_nln_gss.py
+janus_dialog_auto_prog.py    janus_thread.py              janus_widget_nln_pop.py
+janus_dialog_missing.py      janus_time.py                janus_widget_nln.py
+janus_dialog_save.py         janus_widget_ctrl_dspdyn.py  janus_widget_nln_res.py
+janus_event_CheckBox.py      janus_widget_ctrl_info.py    janus_widget_nln_set.py
+janus_event_ComboBox.py      janus_widget_ctrl.py         janus_widget_nln_spc.py
+janus_event_LineEdit.py      janus_widget_ctrl_run.py     LICENSE
+janus_event_PushButton.py    janus_widget_ctrl_save.py    readme.txt
+janus_event_ViewBox.py       janus_widget_ctrl_time.py    user_guide.pdf
+janus_fc_arcv.py             janus_widget_fc_cup.py       
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git add janus.dat 
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git commit --all
+On branch development
+Your branch and 'origin/development' have diverged,
+and have 2 and 1 different commit each, respectively.
+  (use "git pull" to merge the remote branch into yours)
+nothing to commit, working directory clean
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git pull
+Auto-merging janus.dat
+CONFLICT (content): Merge conflict in janus.dat
+Automatic merge failed; fix conflicts and then commit the result.
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git push
+Username for 'https://github.com': ahmadryan
+Password for 'https://ahmadryan@github.com': 
+To https://github.com/JanusWind/FC
+ ! [rejected]        development -> development (non-fast-forward)
+error: failed to push some refs to 'https://github.com/JanusWind/FC'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. Integrate the remote changes (e.g.
+hint: 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git fetch
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ cat janus.dat
+<<<<<<< HEAD
+0.3.1 (modified)
+17-02-21
+=======
+0.3.1 (development)
+2017-02-15
+>>>>>>> 743fe6e6f76ee2039d5d5e33230f919ca9234d21
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ vi janus.
+janus.dat  janus.py   janus.svg  
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ vi janus.dat 
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git mergetool
+4
+This message is displayed because 'merge.tool' is not configured.
+See 'git mergetool --tool-help' or 'git help config' for more details.
+'git mergetool' will now attempt to use one of the following tools:
+meld opendiff kdiff3 tkdiff xxdiff tortoisemerge gvimdiff diffuse diffmerge ecmerge p4merge araxis bc codecompare emerge vimdiff
+Merging:
+janus.dat
+
+Normal merge conflict for 'janus.dat':
+  {local}: modified file
+  {remote}: modified file
+Hit return to start merge resolution tool (meld): 
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git mergetool
+
+This message is displayed because 'merge.tool' is not configured.
+See 'git mergetool --tool-help' or 'git help config' for more details.
+'git mergetool' will now attempt to use one of the following tools:
+meld opendiff kdiff3 tkdiff xxdiff tortoisemerge gvimdiff diffuse diffmerge ecmerge p4merge araxis bc codecompare emerge vimdiff
+No files need merging
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git add --all
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git commit --all
+[development 5f6ce7f] Merge branch 'development' of https://github.com/JanusWind/FC into development
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ cd ..
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC$ rm -r development/
+rm: remove write-protected regular file 'development/.git/objects/10/9d4ca3f57ed9345168f69240db1ded60f00324'? ^C
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC$ rm -rf development/
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC$ ls
+master
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC$ git clone -b development https://github.com/JanusWind/FC
+Cloning into 'FC'...
+remote: Counting objects: 83, done.
+remote: Compressing objects: 100% (25/25), done.
+remote: Total 83 (delta 5), reused 0 (delta 0), pack-reused 55
+Unpacking objects: 100% (83/83), done.
+Checking connectivity... done.
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC$ ls
+FC  master
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC$ mv FC development
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC$ cd development/
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ ls
+janus                        janus_helper.py              janus_widget_mfi_info.py
+janus_const.py               janus_mfi_arcv.py            janus_widget_mfi_plot.py
+janus_core.py                janus.py                     janus_widget_mfi.py
+janus_custom_Application.py  janus_pyon.py                janus_widget_mom_ctrl.py
+janus_custom_MainWindow.py   janus_save.py                janus_widget_mom.py
+janus.dat                    janus_step.py                janus_widget_mom_res.py
+janus_dialog_auto_ctrl.py    janus.svg                    janus_widget_nln_gss.py
+janus_dialog_auto_prog.py    janus_thread.py              janus_widget_nln_pop.py
+janus_dialog_missing.py      janus_time.py                janus_widget_nln.py
+janus_dialog_save.py         janus_widget_ctrl_dspdyn.py  janus_widget_nln_res.py
+janus_event_CheckBox.py      janus_widget_ctrl_info.py    janus_widget_nln_set.py
+janus_event_ComboBox.py      janus_widget_ctrl.py         janus_widget_nln_spc.py
+janus_event_LineEdit.py      janus_widget_ctrl_run.py     LICENSE
+janus_event_PushButton.py    janus_widget_ctrl_save.py    readme.txt
+janus_event_ViewBox.py       janus_widget_ctrl_time.py    user_guide.pdf
+janus_fc_arcv.py             janus_widget_fc_cup.py
+janus_format_TextEdit.py     janus_widget_fc.py
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ cat janus.dat
+0.3.1 (development)
+2017-02-15
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ vim janus.dat 
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git add.
+git: 'add.' is not a git command. See 'git --help'.
+
+Did you mean this?
+	add
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git add .
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git commit .
+[development 66cbb7f] 	modified:   janus.dat
+ 1 file changed, 1 insertion(+)
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git push
+Username for 'https://github.com': ahmadryan
+Password for 'https://ahmadryan@github.com': 
+Counting objects: 3, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (2/2), done.
+Writing objects: 100% (3/3), 297 bytes | 0 bytes/s, done.
+Total 3 (delta 1), reused 0 (delta 0)
+remote: Resolving deltas: 100% (1/1), completed with 1 local objects.
+To https://github.com/JanusWind/FC
+   743fe6e..66cbb7f  development -> development
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git pull
+Already up-to-date.
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git pull https://github.com/JanusWind/FC development
+From https://github.com/JanusWind/FC
+ * branch            development -> FETCH_HEAD
+Already up-to-date.
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ vi janus.dat 
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ git pull https://github.com/JanusWind/FC development
+remote: Counting objects: 6, done.
+remote: Compressing objects: 100% (4/4), done.
+remote: Total 6 (delta 1), reused 0 (delta 0), pack-reused 0
+Unpacking objects: 100% (6/6), done.
+From https://github.com/JanusWind/FC
+ * branch            development -> FETCH_HEAD
+Updating 66cbb7f..3074350
+Fast-forward
+ janus.dat | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ vi janus.dat ramiz@Shadowfax:~/Desktop/Research/GIT_Personal/FC/development$ 
+
