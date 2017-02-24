@@ -205,21 +205,21 @@ class core( QObject ) :
 		# area, "eff_area", as a function of inflow angle, "deg".
 
 		self.eff_deg  = arange( 0., 91., dtype=float )
-
-		self.eff_area = 1.e-5 * array( [
-		      3382000.0, 3383000.0, 3383000.0, 3382000.0, 3381000.0,
-		      3380000.0, 3378000.0, 3377000.0, 3376000.0, 3374000.0,
-		      3372000.0, 3369000.0, 3368000.0, 3364000.0, 3362000.0,
-		      3359000.0, 3355000.0, 3351000.0, 3347000.0, 3343000.0,
-		      3338700.0, 3334100.0, 3329300.0, 3324300.0, 3318200.0,
-		      3312800.0, 3306300.0, 3299600.0, 3292800.0, 3285900.0,
-		      3277800.0, 3270700.0, 3261600.0, 3253500.0, 3244500.0,
-		      3234600.0, 3224900.0, 3200100.0, 3161500.0, 3114000.0,
-		      3058820.0, 2997170.0, 2930000.0, 2857000.0, 2779000.0,
-		      2694000.0, 2586999.7, 2465000.0, 2329999.6, 2183000.0,
-		      2025999.6, 1859000.1, 1682999.6, 1497000.1, 1301999.6,
-		      1099000.1, 887799.56, 668500.16, 452099.62, 257500.16,
-		      96799.784, 539.96863, 0.0000000, 0.0000000, 0.0000000,
+		
+		self.eff_area = array( [
+		      33.820000, 33.830000, 33.830000, 33.820000, 33.810000,
+		      33.800000, 33.780000, 33.770000, 33.760000, 33.740000,
+		      33.720000, 33.690000, 33.680000, 33.640000, 33.620000,
+		      33.590000, 33.550000, 33.510000, 33.470000, 33.430000,
+		      33.387000, 33.341000, 33.293000, 33.243000, 33.182000,
+		      33.128000, 33.063000, 32.996000, 32.928000, 32.859000,
+		      32.778000, 32.707000, 32.616000, 32.535000, 32.445000,
+		      32.346000, 32.249000, 32.001000, 31.615000, 31.140000,
+		      30.588200, 29.971700, 29.300000, 28.570000, 27.790000,
+		      26.940000, 25.869997, 24.650000, 23.299996, 21.830000,
+		      20.259996, 18.590001, 16.829996, 14.970001, 13.019996,
+		      10.990001, 8.8779956, 6.6850016, 4.5209962, 2.5750016,
+		      0.96799784, 0.0053996863, 0.0000000, 0.0000000, 0.0000000,
 		      0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000,
 		      0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000,
 		      0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000,
@@ -227,6 +227,7 @@ class core( QObject ) :
 		      0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000,
 		      0.0000000                                              ] )
 
+		
 		# Initialize the value of the indicator variable of whether the
 		# automatic analysis should be aborted.
 
@@ -257,6 +258,7 @@ class core( QObject ) :
 
 		if ( var_swe ) :
 
+			self.fc_spec = None
 			self.time_epc = None
 			self.time_val = None
 			self.time_txt = ''
@@ -545,8 +547,7 @@ class core( QObject ) :
 	#-----------------------------------------------------------------------
 
 	def load_spec( self, time_req=None,
-	               get_prev=False, get_next=False,
-	               tmin=None, tmax=None            ) :
+	               get_prev=False, get_next=False ) :
 
 
 		# Reset the variables that contain the Wind/FC ion spectrum's
@@ -636,30 +637,38 @@ class core( QObject ) :
 		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'fc' )
 
 
+
 		# Load the Wind/FC ion spectrum with a timestamp closest to that
 		# requested.
 
-		spec = self.fc_arcv.load_spec( self.time_txt,
-		                               get_prev=get_prev,
-		                               get_next=get_next,
-		                               tmin=tmin, tmax=tmax )
-
+		self.fc_spec = self.fc_arcv.load_spec( self.time_txt,
+		                                       get_prev=get_prev,
+		                                       get_next=get_next )
 
 		# If no spectrum was found, abort.
 
-		if ( spec is None ) :
-
+		if ( self.fc_spec is None ) :
 			self.emit( SIGNAL('janus_chng_spc') )
-
 			return
 
 
+		# Message the user that a new Wind/FC ion spectrum is about to
+		# be loaded.
+
+		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'fc' )
+
 		# Extract the parameters of the loaded Wind/FC ion spectrum.
+		  
+		time_epc = self.fc_spec[ 'time' ] 
+		#n_dir    = self.fc_spec[ 'n_dir' ]
+		#n_bin    = self.fc_spec[ 'n_bin' ]
+		#n_cup    = self.fc_spec[ 'n_cup' ]
 
-		( time_epc,
-		  cup1_azm  , cup2_azm  , cup1_c_vol, cup2_c_vol,
-		  cup1_d_vol, cup2_d_vol, cup1_cur  , cup2_cur    ) = spec
-
+		self.alt     = array( self.fc_spec['elev'] )	# cup 1 at 15 degree??
+		self.azm     = array( self.fc_spec['azim'] )
+		self.vel_cen = array( self.fc_spec['vel_cen'][0] )
+		self.vel_wid = array( self.fc_spec['vel_del'][0] )
+		self.cur = array( self.fc_spec['curr'])
 
 		# Calculate and store the spectrum's properly formatted
 		# timestamp both as a float and as a string.
@@ -669,132 +678,22 @@ class core( QObject ) :
 		self.time_txt = calc_time_sec( time_epc )
 		self.time_vld = True
 
-
-		# Convert bin centers and widths from voltages [V] to velocities
-		# [km/s].
-
-		cup1_vol_a = cup1_c_vol - ( cup1_d_vol / 2. )
-		cup1_vol_b = cup1_c_vol + ( cup1_d_vol / 2. )
-
-		cup2_vol_a = cup2_c_vol - ( cup2_d_vol / 2. )
-		cup2_vol_b = cup2_c_vol + ( cup2_d_vol / 2. )
-
-		cup1_c_vel = 1E-3 * sqrt( 2 * const['q_p'] * cup1_c_vol /
-		                          const['m_p']                    )
-		cup1_vel_a = 1E-3 * sqrt( 2 * const['q_p'] * cup1_vol_a /
-		                          const['m_p']                    )
-		cup1_vel_b = 1E-3 * sqrt( 2 * const['q_p'] * cup1_vol_b /
-		                          const['m_p']                    )
-
-		cup2_c_vel = 1E-3 * sqrt( 2 * const['q_p'] * cup2_c_vol /
-		                          const['m_p']                    )
-		cup2_vel_a = 1E-3 * sqrt( 2 * const['q_p'] * cup2_vol_a /
-		                          const['m_p']                    )
-		cup2_vel_b = 1E-3 * sqrt( 2 * const['q_p'] * cup2_vol_b /
-		                          const['m_p']                    )
-
-		cup1_d_vel = cup1_vel_b - cup1_vel_a
-		cup2_d_vel = cup2_vel_b - cup2_vel_a
-
-
-		# Determine the number of valid speed windows by searching
-		# through the "c_vel_?" arrays and indentifying the first time
-		# that an element is immediately followed by an element with a
-		# smaller value.
-
-		# Note.  The velocity windows should be assending order, and
-		#        unused windows sould occur at the end of the "?_vel_?"
-		#        and be indicated by having their corresponding elements
-		#        in these arrays set to the instrument's minimum value
-		#        for that parameter.
-
-		n_vel = 1
-
-		while ( ( n_vel < len( cup1_c_vel ) ) and
-		        ( n_vel < len( cup2_c_vel ) )     ) :
-
-			if ( ( cup1_c_vel[n_vel] < cup1_c_vel[n_vel-1] ) or
-			     ( cup2_c_vel[n_vel] < cup2_c_vel[n_vel-1] )    ) :
-				break
-			else :
-				n_vel += 1
-
-
-		# Truncate the arrays to remove fill data.
-
-		cup1_c_vel = cup1_c_vel[0:n_vel]
-		cup1_d_vel = cup1_d_vel[0:n_vel]
-		cup1_cur   = cup1_cur[:,0:n_vel]
-
-		cup2_c_vel = cup2_c_vel[0:n_vel]
-		cup2_d_vel = cup2_d_vel[0:n_vel]
-		cup2_cur   = cup2_cur[:,0:n_vel]
-
-
-		# Merge and store the arrays from the two cups.  As part of this
-		# step, define the array of altitudes.
-
-		# CAUTION!  There is currently no check to ensure that "c_vel_1"
-		#           and "c_vel_2" are (to with floating point precision)
-		#           identical.  Likewise, there is no check on "d_vel_1"
-		#           and "d_vel_2".
-
-		self.alt     = array( [ 15., -15. ] )           # deg
-		self.azm     = array( [ cup1_azm, cup2_azm ] )  # deg
-		self.vel_cen = cup1_c_vel                       # km/s
-		self.vel_wid = cup1_d_vel                       # km/s
-		self.cur     = array( [ cup1_cur, cup2_cur ] )  # pA
-
-
 		# Store the counts of velocity bins and angles.
 
-		self.n_alt =  2
-		self.n_azm = 20
-		self.n_vel = n_vel
-
+		#self.n_alt = n_cup
+		#self.n_azm = n_dir
+		#self.n_vel = n_bin
+		#????... why can't we write this way
+		#self.time_epc = self.fc_spec['time']
+		self.n_alt = self.fc_spec[ 'n_cup' ]
+		self.n_azm = self.fc_spec['n_dir']
+		self.n_vel = self.fc_spec['n_bin']
 
 		# Examine each measured current value and determine whether or
 		# not it's valid for use in the proceding analyses.
 
 		self.cur_vld = tile( True,
 		                     [ self.n_alt, self.n_azm, self.n_vel ] )
-
-		for t in range( self.n_alt ) :
-
-			if ( n_vel < 2 ) :
-				continue
-
-			for p in range( self.n_azm ) :
-
-				for v in range( self.n_vel ) :
-
-					if ( self.cur[t,p,v] < self.cur_min ) :
-						self.cur_vld[t,p,v] = False
-						continue
-
-					if ( v == 0 ) :
-						if ( self.cur[t,p,v] >
-						     ( self.cur_jmp *
-						       self.cur[t,p,v+1] ) ) :
-							self.cur_vld[t,p,v] = \
-							                   False
-							continue
-
-					if ( v == ( self.n_vel - 1 ) ) :
-						if ( self.cur[t,p,v] >
-						     ( self.cur_jmp *
-						       self.cur[t,p,v-1] ) ) :
-							self.cur_vld[t,p,v] = \
-							                   False
-							continue
-
-					if ( ( self.cur[t,p,v] >
-					       ( self.cur_jmp *
-					         self.cur[t,p,v-1] ) ) and
-					     ( self.cur[t,p,v] >
-					       ( self.cur_jmp *
-					         self.cur[t,p,v+1] ) )     ) :
-						self.cur_vld[t,p,v] = False
 
 
 		# Estimate the duration of each spectrum and the mean time
@@ -829,41 +728,6 @@ class core( QObject ) :
 
 		if ( self.dyn_mom ) :
 			self.anls_mom( )
-
-
-
-
-
-
-
-		# FIXME
-		"""
-		# If requested (and required), generate an initial guess for
-		# the non-linear analysis.
-
-		if ( ( self.dyn_gss                 ) and 
-		     ( len( self.nln_gss_prm ) == 0 )     ) :
-			self.auto_nln_gss( )
-
-
-		# If requested (and required), select data for the non-linear
-		# analysis.
-
-		if ( ( self.dyn_sel         ) and 
-		     ( self.nln_sel is None )     ) :
-			self.auto_nln_sel( )
-
-
-		# If requested (and required), run the non-linear analysis.
-
-		if ( ( self.dyn_nln            ) and 
-		     ( self.nln_res_n_ion == 0 )     ) :
-			self.anls_nln( )
-		"""
-
-
-
-
 
 
 
@@ -1077,11 +941,11 @@ class core( QObject ) :
 
 	def calc_dir_look( self, alt, azm ) :
 
-
+		#FIXME
 		# Convert altitude and azimuth the spherical coordinates.
 
-		the = - alt + 90.
-		phi = - azm
+		the =  -( alt - 90.)
+		phi =  -  azm
 
 
 		# Convert from spherical to rectangular coordinates and return
@@ -1258,11 +1122,10 @@ class core( QObject ) :
 
 		return ret
 
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR CHANGING A NLN POPULATION.
-	#-----------------------------------------------------------------------
-
+         #-----------------------------------------------------------------------
+         # DEFINE THE FUNCTION FOR CHANGING A NLN POPULATION.
+         #-----------------------------------------------------------------------
+ 
 	def chng_mom_win_azm( self, val ) :
 
 		# Try to convert the "val" argument to an integer and store it.
@@ -1275,30 +1138,30 @@ class core( QObject ) :
 				self.mom_win_azm = int( val )
 			except :
 				self.mom_win_azm = None
-
-		# Call "auto_mom_sel"
-
-		# FIXME
-
-		# TODO
-
-		# Make a similar function "chng_mom_win_cur"
-
-		# Remove "self.mom_win_*_*" variables (here and in 
-		# "janus_widget_mom_ctrl.py").
-
-		# Add thread-start function for "chng_mom_win_*" functions to
-		# "janus_thread.py"
-
-		# Have "janus_widget_mom_ctrl.py" use new thread-start functions.
-			# In "make_text" function, if a variable is None, don't
-			# clear the existing text, just turn it red.
-
-		# Remove arguments from "auto_mom_sel" have it automatically call
-		# call "anls_mom" and check that "self.mom_win_*" variables are
-		# not None (raise error if they are).
-
-		# Have "load_spec" call "auto_mom_sel" instead of "anls_mom".
+ 
+                 # Call "auto_mom_sel"
+ 
+                 # FIXME
+ 
+                 # TODO
+ 
+                 # Make a similar function "chng_mom_win_cur"
+ 
+                 # Remove "self.mom_win_*_*" variables (here and in 
+                 # "janus_widget_mom_ctrl.py").
+ 
+                 # Add thread-start function for "chng_mom_win_*" functions to
+                 # "janus_thread.py"
+ 
+                 # Have "janus_widget_mom_ctrl.py" use new thread-start functions.
+                         # In "make_text" function, if a variable is None, don't
+                         # clear the existing text, just turn it red.
+ 
+                 # Remove arguments from "auto_mom_sel" have it automatically call
+                 # call "anls_mom" and check that "self.mom_win_*" variables are
+                 # not None (raise error if they are).
+ 
+                 # Have "load_spec" call "auto_mom_sel" instead of "anls_mom".
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR AUTOMATIC DATA SELECTION FOR THE MOMENTS ANAL.
@@ -1446,8 +1309,7 @@ class core( QObject ) :
 		#        seen in each velocity window.  The latter (the min-max
 		#        array) will be populated with the minimum value over a
 		#        running, circular "p"-window of "self.mom_win_azm"
-		#        elements from the "max_cur" array.
-
+		#        elements from the "max_cur" array.		
 		max_cur = zeros( [ self.n_alt, self.n_azm ] )
 		mm_cur  = zeros( [ self.n_alt, self.n_azm ] )
 
@@ -1635,7 +1497,7 @@ class core( QObject ) :
 		#        in "self.mom_sel_cur[t,p,:]" are "True".  However, if
 		#        fewer than "self.mom_min_sel_azm" sets of "t"- and
 		#        "p"-values satisfy this criterion, all elements of
-		#        "self.mom_sel_azm" are given the value "False".
+		#        "self.mom_sel_azm" are given the value "False".		
 		#
 		#        Additionally, this functions serves to update the
 		#        "self.mom_n_sel_???" counters.
@@ -1659,7 +1521,7 @@ class core( QObject ) :
 		# "self.mom_n_sel_azm".
 
 		self.mom_sel_azm = array( [ [
-		           self.mom_n_sel_cur[t,p] >= self.mom_min_sel_cur
+		           self.mom_n_sel_cur[t,p] >= self.mom_min_sel_cur	
 		                              for p in range( self.n_azm ) ]
 		                                for t in range( self.n_alt ) ] )
 
@@ -1670,7 +1532,7 @@ class core( QObject ) :
 		# this number is less than the minimum "self.mom_min_sel_azm",
 		# deselect all pointing directions.
 
-		mom_n_sel_azm = len( where( self.mom_sel_azm )[0] )
+		mom_n_sel_azm = len( where( self.mom_sel_azm )[0] )		
 
 		if ( mom_n_sel_azm < self.mom_min_sel_azm ) :
 
@@ -1837,6 +1699,7 @@ class core( QObject ) :
 
 			eta_eca[k] = self.calc_eff_area( eta_dlk[k,:],
 			                                 mom_v_vec     )
+			#eta_eca1[k] = self.fc_spec.
 
 			# Extract the "v" indices of the selected data from this
 			# look direction.
@@ -3665,4 +3528,3 @@ class core( QObject ) :
 
 		if ( exit ) :
 			self.emit( SIGNAL('janus_exit') )
-
