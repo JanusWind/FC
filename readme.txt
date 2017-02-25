@@ -1,4 +1,4 @@
-Changes from the previous version: (Development)
+Changes from the previous version: 
 
 1. Updated janus_pyon.py.
 2. Fixed some existing bugs.
