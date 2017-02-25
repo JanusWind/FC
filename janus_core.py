@@ -560,7 +560,7 @@ class core( QObject ) :
 
 		self.emit( SIGNAL('janus_rset') )
 
-		self.rset_var( var_swe=True, var_mfi=True,
+		self.rset_var( var_swe=True,     var_mfi=True,
 		               var_mom_sel=True, var_mom_res=True,
 		               var_nln_gss=True, var_nln_sel=True,
 		               var_nln_res=True                    )
@@ -942,7 +942,7 @@ class core( QObject ) :
 	def calc_dir_look( self, alt, azm ) :
 
 		#FIXME
-		# Convert altitude and azimuth the spherical coordinates.
+		# Convert altitude and azimuth to spherical coordinates.
 
 		the =  -( alt - 90.)
 		phi =  -  azm
