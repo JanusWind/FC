@@ -194,12 +194,12 @@ class core( QObject ) :
 		# and the settings, data selections, and results from all 
 		# analyses.
 
-		self.rset_var( var_swe=True, var_mfi=True,
+		self.rset_var( var_swe=True,     var_mfi=True,
 		               var_mom_win=True, var_mom_sel=True,
 		               var_mom_res=True, var_nln_ion=True,
 		               var_nln_set=True, var_nln_gss=True,
 		               var_nln_sel=True, var_nln_res=True, 
-		               var_dsp=True, var_dyn=True          )
+		               var_dsp=True,     var_dyn=True       )
 
 		# Define the data array with values for effective collecting
 		# area, "eff_area", as a function of inflow angle, "deg".
@@ -246,19 +246,19 @@ class core( QObject ) :
 	#-----------------------------------------------------------------------
 
 	def rset_var( self,
-	              var_swe=False, var_mfi=False,
+	              var_swe=False,     var_mfi=False,
 	              var_mom_win=False, var_mom_sel=False,
 	              var_mom_res=False, var_nln_ion=False,
 	              var_nln_set=False, var_nln_gss=False,
 	              var_nln_sel=False, var_nln_res=False, 
-	              var_dsp=False, var_dyn=False          ) :
+	              var_dsp=False,     var_dyn=False      ) :
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion spectrum's data.
 
 		if ( var_swe ) :
 
-			self.fc_spec = None
+			self.fc_spec  = None
 			self.time_epc = None
 			self.time_val = None
 			self.time_txt = ''
