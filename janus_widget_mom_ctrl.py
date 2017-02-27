@@ -103,8 +103,8 @@ class widget_mom_ctrl( QWidget ) :
 
 		# Clear any existing text from the text areas.
 
-		self.txt_win_azm.setTextUpdate( '' )
-		self.txt_win_cur.setTextUpdate( '' )
+#		self.txt_win_azm.setTextUpdate( '' )
+#		self.txt_win_cur.setTextUpdate( '' )
 
 		# Set the text of "self.txt_win_???" to be the string
 		# representation of the value "self.core.mom_win_???_req" unless

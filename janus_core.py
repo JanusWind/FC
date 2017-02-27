@@ -1139,6 +1139,19 @@ class core( QObject ) :
 			except :
 				self.mom_win_azm = None
  
+  
+	def chng_mom_win_cur( self, val ) :
+
+		# Try to convert the "val" argument to an integer and store it.
+		# If this fails, store "None".
+
+		if ( val is None ) :
+			self.mom_win_cur = None
+		else :
+			try :
+				self.mom_win_cur = int( val )
+			except :
+				self.mom_win_cur = None
                  # Call "auto_mom_sel"
  
                  # FIXME
