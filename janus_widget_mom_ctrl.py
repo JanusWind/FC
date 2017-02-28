@@ -38,7 +38,8 @@ from janus_event_LineEdit import event_LineEdit
 # Load the necessary threading modules.
 
 from threading import Thread
-from janus_thread import n_thread, thread_auto_mom_sel
+from janus_thread import n_thread, thread_chng_mom_win_dir, \
+                         thread_chng_mom_win_bin
 
 
 ################################################################################
@@ -64,8 +65,8 @@ class widget_mom_ctrl( QWidget ) :
 		# Prepare to respond to signals received from the Janus core.
 
 		self.connect( self.core, SIGNAL('janus_rset'), self.resp_rset )
-		self.connect( self.core, SIGNAL('janus_chng_mom_sel_all'),
-		                                    self.resp_chng_mom_sel_all )
+		self.connect( self.core, SIGNAL('janus_chng_mom_win'),
+		                                       self.resp_chng_mom_win )
 
 		# Give this widget a grid layout, "self.grd".
 
@@ -76,20 +77,20 @@ class widget_mom_ctrl( QWidget ) :
 		# Initialize the text areas, buttons, and labels that comprise
 		# this control panel.
 
-		self.txt_win_azm = event_LineEdit( self, 'win_azm' )
-		self.txt_win_cur = event_LineEdit( self, 'win_cur' )
+		self.txt_win_dir = event_LineEdit( self, 'win_dir' )
+		self.txt_win_bin = event_LineEdit( self, 'win_bin' )
 
-		self.lab_win_azm = QLabel( 'Directions per cup:'    )
-		self.lab_win_cur = QLabel( 'Bins per direction:'    )
+		self.lab_win_dir = QLabel( 'Directions per cup:'    )
+		self.lab_win_bin = QLabel( 'Bins per direction:'    )
 
 		# Row by row, add the text areas, buttons, and labels to this
 		# widget's grid.
 
-		self.grd.addWidget( self.lab_win_azm, 0, 0, 1, 1 )
-		self.grd.addWidget( self.txt_win_azm, 0, 1, 1, 1 )
+		self.grd.addWidget( self.lab_win_dir, 0, 0, 1, 1 )
+		self.grd.addWidget( self.txt_win_dir, 0, 1, 1, 1 )
 
-		self.grd.addWidget( self.lab_win_cur, 1, 0, 1, 1 )
-		self.grd.addWidget( self.txt_win_cur, 1, 1, 1, 1 )
+		self.grd.addWidget( self.lab_win_bin, 1, 0, 1, 1 )
+		self.grd.addWidget( self.txt_win_bin, 1, 1, 1, 1 )
 
 		# Populate the text areas.
 
@@ -101,42 +102,33 @@ class widget_mom_ctrl( QWidget ) :
 
 	def make_txt( self ) :
 
-		# Clear any existing text from the text areas.
+		# Update the "win_dir" text-box based on the value stored in
+		# "core". 
 
-#		self.txt_win_azm.setTextUpdate( '' )
-#		self.txt_win_cur.setTextUpdate( '' )
+		if ( self.core.mom_win_dir is None ) :
 
-		# Set the text of "self.txt_win_???" to be the string
-		# representation of the value "self.core.mom_win_???_req" unless
-		# that value is "None", in which case, revert to
-		# "self.core.mom_win_???_txt".
+			self.txt_win_dir.setStyleSheet( "color: red;" )
 
-		if ( self.core.mom_win_azm_req is None ) :
-			self.txt_win_azm.setTextUpdate(
-			                             self.core.mom_win_azm_txt )
 		else :
-			self.txt_win_azm.setTextUpdate(
-			                      str( self.core.mom_win_azm_req ) )
 
-		if ( self.core.mom_win_cur_req is None ) :
-			self.txt_win_cur.setTextUpdate(
-			                             self.core.mom_win_cur_txt )
+			self.txt_win_dir.setTextUpdate(
+			                          str( self.core.mom_win_dir ) )
+
+			self.txt_win_dir.setStyleSheet( "color: black;" )
+
+		# Update the "win_bin" text-box based on the value stored in
+		# "core". 
+
+		if ( self.core.mom_win_bin is None ) :
+
+			self.txt_win_bin.setStyleSheet( "color: red;" )
+
 		else :
-			self.txt_win_cur.setTextUpdate(
-			                      str( self.core.mom_win_cur_req ) )
 
-		# If the user-requested value for each "self.core.mom_win_???"
-		# was invalid, color the text red; otherwise, use black.
+			self.txt_win_bin.setTextUpdate(
+			                          str( self.core.mom_win_bin ) )
 
-		if ( self.core.mom_win_azm_req == self.core.mom_win_azm ) :
-			self.txt_win_azm.setStyleSheet( "color: black;" )
-		else :
-			self.txt_win_azm.setStyleSheet( "color: red;" )
-
-		if ( self.core.mom_win_cur_req == self.core.mom_win_cur ) :
-			self.txt_win_cur.setStyleSheet( "color: black;" )
-		else :
-			self.txt_win_cur.setStyleSheet( "color: red;" )
+			self.txt_win_bin.setStyleSheet( "color: black;" )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
@@ -159,15 +151,17 @@ class widget_mom_ctrl( QWidget ) :
 		# analysis has been set for "dyanmic" mode (since the user
 		# presumably wants it this way).
 
-		if ( ( fnc == 'win_azm' ) or ( fnc == 'win_cur' ) ) :
+		if ( fnc == 'win_dir' ) :
 
-			win_azm = self.txt_win_azm.text( )
-			win_cur = self.txt_win_cur.text( )
+			Thread( target=thread_chng_mom_win_dir,
+				args=( self.core,
+			               self.txt_win_dir.text( ) ) ).start( )
 
-			self.core.chng_dyn( 'mom', True, rerun=False )
+		elif ( fnc == 'win_bin' ) :
 
-			Thread( target=thread_auto_mom_sel,
-			        args=( self.core, win_azm, win_cur ) ).start()
+			Thread( target=thread_chng_mom_win_bin,
+				args=( self.core,
+			               self.txt_win_bin.text( ) ) ).start( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "rset" SIGNAL.
@@ -180,10 +174,10 @@ class widget_mom_ctrl( QWidget ) :
 		self.make_txt( )
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_mom_sel_all" SIGNAL.
+	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_mom_win" SIGNAL.
 	#-----------------------------------------------------------------------
 
-	def resp_chng_mom_sel_all( self ) :
+	def resp_chng_mom_win( self ) :
 
 		# Update the text area.
 

@@ -217,3 +217,60 @@ class fc_spec():
 					           > self.curr_jump
 					              * self.arr[c][d][b+1]['curr'] )     ) :
 						self.arr[c][d][b]._valid = False
+
+	def calc_curr( c, d, b, win=1 ) :
+
+		# Validate the cup, direction, and bin indices.
+
+		if ( ( c < 0 ) or ( c >= self['n_cup'] ) ) :
+			raise ValueError( 'Cup index out of range.' )
+
+		if ( ( d < 0 ) or ( d >= self['n_dir'] ) ) :
+			raise ValueError( 'Direction index out of range.' )
+
+		if ( ( b < 0 ) or ( b >= self['n_bin'] ) ) :
+			raise ValueError( 'Direction index out of range.' )
+
+		# Validate the window size.
+
+		if ( ( win < 1 ) or ( b + win > self['n_bin'] ) ) :
+			raise ValueError( 'Window out of range.' ) 
+
+		# Return the total (valid) current in the specified window.
+
+		return sum( [ self.arr[c][d][b+w]['curr_valid']
+		                                       for w in range( win ) ] )
+
+	def find_max_curr( c, d, win=1 ) :
+
+		# Validate the cup and direction indices.
+
+		if ( ( c < 0 ) or ( c >= self['n_cup'] ) ) :
+			raise ValueError( 'Cup index out of range.' )
+
+		if ( ( d < 0 ) or ( d >= self['n_dir'] ) ) :
+			raise ValueError( 'Direction index out of range.' )
+
+		# Validate the window size.
+
+		if ( ( win < 1 ) or ( win > self['n_bin'] ) ) :
+			raise ValueError( 'Window out of range.' ) 
+
+		# Search the specified direction for the "win"-bin range that
+		# contains the maximum total current.
+
+		b_max   = 0
+		curr_max = 0.
+
+		for b in range( 0, self['n_bin'] - win + 1 ) :
+
+			curr = sum( [ self.arr[c][d][b+w]['curr_valid']
+			                               for w in range( win ) ] )
+
+			if ( curr > curr_max ) :
+				b_max   = b
+				curr_max = curr
+
+		# Return the location of the window with the maximum current.
+
+		return b_max

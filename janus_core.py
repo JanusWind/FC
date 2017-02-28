@@ -92,6 +92,7 @@ class core( QObject ) :
 	# | rset              |                              |
 	# | chng_spc          |                              |
 	# | chng_mfi          |                              |
+	# | chng_mom_win      |                              |
 	# | chng_mom_sel_cur  | t, p, v                      |
 	# | chng_mom_sel_azm  | t, p                         |
 	# | chng_mom_sel_all  |                              |
@@ -313,28 +314,19 @@ class core( QObject ) :
 
 		if ( var_mom_win ) :
 
-			self.mom_win_azm_req = 7
-			self.mom_win_cur_req = 7
-
-			self.mom_win_azm_txt = ''
-			self.mom_win_cur_txt = ''
-
-			self.mom_win_azm = self.mom_win_azm_req
-			self.mom_win_cur = self.mom_win_azm_req
+			self.mom_win_dir = 7
+			self.mom_win_bin = 7
 
 		# If requested, (re-)initialize the variables associated with
 		# the data seleciton for the moments analysis.
 
 		if ( var_mom_sel ) :
 
-			self.mom_n_sel_azm = 0
-			self.mom_n_sel_cur = None
+			self.mom_min_sel_dir = 5
+			self.mom_min_sel_bin = 3
 
-			self.mom_min_sel_azm = 5
-			self.mom_min_sel_cur = 3
-
-			self.mom_sel_azm = None
-			self.mom_sel_cur = None
+			self.mom_sel_dir = []
+			self.mom_sel_bin = []
 
 		# If requested, (re-)initialize and store the variables
 		# associated with the results of the moments analysis.
@@ -723,13 +715,10 @@ class core( QObject ) :
 
 		self.load_mfi( )
 
-
 		# If requested, run the moments analysis.
 
 		if ( self.dyn_mom ) :
-			self.anls_mom( )
-
-
+			self.auto_mom_sel( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING THE Wind/MFI MAGNETIC FIELD DATA.
@@ -1123,156 +1112,106 @@ class core( QObject ) :
 		return ret
 
          #-----------------------------------------------------------------------
-         # DEFINE THE FUNCTION FOR CHANGING A NLN POPULATION.
+         # DEFINE THE FUNCTION FOR CHANGING THE MOM. SELCTION DIRECTION WINDOW.
          #-----------------------------------------------------------------------
  
-	def chng_mom_win_azm( self, val ) :
+	def chng_mom_win_dir( self, val ) :
 
 		# Try to convert the "val" argument to an integer and store it.
 		# If this fails, store "None".
 
 		if ( val is None ) :
-			self.mom_win_azm = None
+			self.mom_win_dir = None
 		else :
 			try :
-				self.mom_win_azm = int( val )
+				self.mom_win_dir = int( val )
+				if ( self.mom_win_dir < self.mom_min_sel_dir ) :
+					self.mom_win_dir = None
 			except :
-				self.mom_win_azm = None
- 
+				self.mom_win_dir = None
+
+		# Emit a signal that a change has occured to the moments window
+		# parameters.
+
+		self.emit( SIGNAL('janus_chng_mom_win') )
+
+		# Call the automatic selection of data for the moments analysis.
+
+		self.auto_mom_sel( )
+
+         #-----------------------------------------------------------------------
+         # DEFINE THE FUNCTION FOR CHANGING THE MOMENTS SELCTION BIN WINDOW.
+         #-----------------------------------------------------------------------
   
-	def chng_mom_win_cur( self, val ) :
+	def chng_mom_win_bin( self, val ) :
 
 		# Try to convert the "val" argument to an integer and store it.
 		# If this fails, store "None".
 
 		if ( val is None ) :
-			self.mom_win_cur = None
+			self.mom_win_bin = None
 		else :
 			try :
-				self.mom_win_cur = int( val )
+				self.mom_win_bin = int( val )
+				if ( self.mom_win_bin < self.mom_min_sel_bin ) :
+					self.mom_win_bin = None
 			except :
-				self.mom_win_cur = None
-                 # Call "auto_mom_sel"
- 
-                 # FIXME
- 
-                 # TODO
- 
-                 # Make a similar function "chng_mom_win_cur"
- 
-                 # Remove "self.mom_win_*_*" variables (here and in 
-                 # "janus_widget_mom_ctrl.py").
- 
-                 # Add thread-start function for "chng_mom_win_*" functions to
-                 # "janus_thread.py"
- 
-                 # Have "janus_widget_mom_ctrl.py" use new thread-start functions.
-                         # In "make_text" function, if a variable is None, don't
-                         # clear the existing text, just turn it red.
- 
-                 # Remove arguments from "auto_mom_sel" have it automatically call
-                 # call "anls_mom" and check that "self.mom_win_*" variables are
-                 # not None (raise error if they are).
- 
-                 # Have "load_spec" call "auto_mom_sel" instead of "anls_mom".
+				self.mom_win_bin = None
+
+		# Emit a signal that a change has occured to the moments window
+		# parameters.
+
+		self.emit( SIGNAL('janus_chng_mom_win') )
+
+		# Call the automatic selection of data for the moments analysis.
+
+		self.auto_mom_sel( )
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR AUTOMATIC DATA SELECTION FOR THE MOMENTS ANAL.
+	# DEFINE THE FUNCTION FOR AUTOMATIC DATA SELECTION FOR THE MOMENTS ANLS.
 	#-----------------------------------------------------------------------
 
-	def auto_mom_sel( self,
-	                  win_azm=None, win_cur=None, no_anls_mom=False ) :
-
-
-		# Note.  The each of the "win_???" keywords is expected to be
-		#        either an integer or a string-expression of an integer.
-
+	def auto_mom_sel( self ) :
 
 		# Re-initialize the data-selection variables for the moments
 		# analysis.
 
 		self.rset_var( var_nln_sel=True )
 
-		# If it exists, store the value of each of the "win_???"
-		# keywords as a string.
+		# Initially, deselect all look directions and bins.
 
-		# Note.  This step is used to provide a record of keyword
-		#        input that cannot be converted to an integer.  In
-		#        such cases, the corresponding variable 
-		#        "self.req_win_???" is given a value of "None".  This
-		#        invalid input is principally saved so that it can be
-		#        displayed in the user-input text-box.
+		self.mom_sel_dir = [ [ False for d in self.fc_spec['n_dir'] ]
+		                             for c in self.fc_spec['n_cup'] ]
 
-		if ( win_azm is not None ) :
-			self.mom_win_azm_txt = str( win_azm )
+		self.mom_sel_bin = [ [ False for b in self.fc_spec['n_bin'] ]
+		                             for d in self.fc_spec['n_dir'] ]
+		                             for c in self.fc_spec['n_cup'] ]
 
-		if ( win_cur is not None ) :
-			self.mom_win_cur_txt = str( win_cur )
+		# Find the maximum current window (of "self.mom_win_bin" bins)
+		# for each direction
 
+		dir_max_ind = [ [ self.fc_spec.find_max_curr( c, d,
+		                              win=self.mom_win_bin )
+		                                for d in self.fc_spec['n_dir'] ]
+		                                for c in self.fc_spec['n_cup'] ]
 
-		# Attempt to extract any user-provided widths.
-
-		# Note.  No change is made to the value of a given
-		#        "self.mom_win_???_req" variable if the value of the
-		#        corresponding "win_???" keyword is "None" (either 
-		#        because the user passed no value or passed a value of
-		#        "None").  If the user passes an invalid value, though,
-		#        "self.mom_win_???_req" is set to "None" and no change
-		#        is made to the corresponding "self.mom_win_???" value.
-
-		if ( win_azm is not None ) :
-			try :
-				self.mom_win_azm_req = int( win_azm )
-			except :
-				self.mom_win_azm_req = None
-
-		if ( win_cur is not None ) :
-			try :
-				self.mom_win_cur_req = int( win_cur )
-			except :
-				self.mom_win_cur_req = None
+		dir_max_curr = [ [ self.fc_spec.calc_curr( c, d,
+		                              dir_max_ind[c][d],
+		                              win=self.mom_win_bin )
+		                                for d in self.fc_spec['n_dir'] ]
+		                                for c in self.fc_spec['n_cup'] ]
 
 
-		# Begin by setting the window sizes to those requested by the
-		# user (if available).
 
-		if ( self.mom_win_azm_req is not None ) :
-			self.mom_win_azm = self.mom_win_azm_req
+		# Compute "cup_max_ind" (two element list)
 
-		if ( self.mom_win_cur_req is not None ) :
-			self.mom_win_cur = self.mom_win_cur_req
+		# Populate "self.mom_sel_???" appropriately
 
 
-		# Now, validate (and, if necessary, adjust) the sizes of the
-		# automatic selection windows.
-
-		self.mom_win_azm = max( self.mom_win_azm, self.mom_min_sel_azm )
-		self.mom_win_azm = min( self.mom_win_azm, self.n_azm           )
-
-		self.mom_win_cur = max( self.mom_win_cur, self.mom_min_sel_cur )
-		self.mom_win_cur = min( self.mom_win_cur, self.n_vel           )
 
 
-		# First, select the look directions with the strongest signal,
-		# which are indicated in the "self.mom_sel_azm" array.
-
-		self.auto_mom_sel_azm( )
 
 
-		# Second, for each selected look direction, select the data with
-		# the strongest signal and indicate this selection in the
-		# "self.mom_sel_cur" array.
-
-		self.auto_mom_sel_cur( )
-
-
-		# Instruct each of the registered widgets to update based on the
-		# potential change in selection status of each datum.
-
-		# Emit a signal that indicates that the selection status of all
-		# data for the moments analysis has changed.
-
-		self.emit( SIGNAL('janus_chng_mom_sel_all') )
 
 
 		# Validate the new data selection (i.e., make sure that the two
@@ -1280,39 +1219,33 @@ class core( QObject ) :
 
 		self.vldt_mom_sel( )
 
+		# Emit a signal that indicates that the selection status of all
+		# data for the moments analysis has changed.
 
-		# Unless requested otherwise, run the moments analysis (and
-		# then, if the non-linear analysis is set to be dynamically
-		# updated, run that analysis as well).
+		self.emit( SIGNAL('janus_chng_mom_sel_all') )
 
-		if ( not no_anls_mom ) :
+		# Run the moments analysis (and then, if the non-linear analysis
+		# is set to be dynamically updated, run that analysis as well).
 
-			self.anls_mom( )
-
-
+		self.anls_mom( )
+"""
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR AUTO-SELECTING LOOK DIRECTIONS FOR MOMENTS.
 	#-----------------------------------------------------------------------
 
-	def auto_mom_sel_azm( self ) :
-
+	def auto_mom_sel_dir( self ) :
 
 		# CAUTION!  It is strongly recommended that this function only
 		#           be called by "self.auto_mom_sel( )", which first
 		#           calls "self.auto_mom_sel_azm( )" and then calls
 		#           "self.auto_mom_sel_cur( )".  Neither of the calls
 		#           to the "self.auto_mom_sel_???( )" functions
-		#           validates the data or updates the
-		#           "self.n_mom_sel_???" counters; this is instead
-		#           handled by "self.auto_mom_sel( )" with a call to
+		#           validates the selection which is instead handled
+		#           by "self.auto_mom_sel( )" with a call to
 		#           "self.vldt_mom_sel( )".
 
 
-		# Initially, deselect all look directions.
 
-		self.mom_sel_azm = tile( False, [ self.n_alt, self.n_azm ] )
-
-		self.mom_n_sel_azm = 0
 
 
 		# Initialize the "max_cur" and "mm_cur" arrays.
@@ -1455,7 +1388,7 @@ class core( QObject ) :
 		                              for p in range( self.n_azm ) ]
 		                                for t in range( self.n_alt ) ] )
 
-
+"""
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CHANGING THE SELECTION OF A SINGLE POINT.
 	#-----------------------------------------------------------------------

@@ -88,6 +88,11 @@ class fc_dat( ) :
 			return self._vel_del
 		elif ( key == 'curr' ) :
 			return self._curr
+		elif ( key == 'curr_valid' ) :
+			if ( self['valid'] ) :
+				return self['curr']
+			else :
+				return 0.
 		elif ( key == 'the' ) :
 			return self._the
 		elif ( key == 'phi' ) :

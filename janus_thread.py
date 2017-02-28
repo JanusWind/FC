@@ -51,15 +51,14 @@ def n_thread( ) :
 		     ( thr._Thread__target is thread_auto_run         ) or
 		     ( thr._Thread__target is thread_save_res         ) or
 		     ( thr._Thread__target is thread_xprt_res         ) or
-		     ( thr._Thread__target is thread_auto_mom_sel     ) or
 		     ( thr._Thread__target is thread_chng_mom_sel     ) or
 		     ( thr._Thread__target is thread_chng_nln_spc     ) or
 		     ( thr._Thread__target is thread_chng_nln_pop     ) or
 		     ( thr._Thread__target is thread_chng_nln_set     ) or
 		     ( thr._Thread__target is thread_chng_nln_gss     ) or
 		     ( thr._Thread__target is thread_chng_nln_sel     ) or
-		     ( thr._Thread__target is thread_chng_mom_win_azm ) or
-		     ( thr._Thread__target is thread_chng_mom_win_cur )   ) :
+		     ( thr._Thread__target is thread_chng_mom_win_dir ) or
+		     ( thr._Thread__target is thread_chng_mom_win_bin )   ) :
 			n += 1
 
 	return n
@@ -181,20 +180,6 @@ def thread_xprt_res( core, nm_fl, exit=False ) :
 
 
 ################################################################################
-## DEFINE THE WRAPPER FOR THE FUNCTION "core.auto_mom_sel".
-################################################################################
-
-def thread_auto_mom_sel( core, win_azm, win_cur ) :
-
-	core.emit( SIGNAL('janus_busy_end') )
-	core.emit( SIGNAL('janus_busy_beg') )
-
-	core.auto_mom_sel( win_azm=win_azm, win_cur=win_cur )
-
-	core.emit( SIGNAL('janus_busy_end') )
-
-
-################################################################################
 ## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_mom_sel".
 ################################################################################
 
@@ -280,28 +265,28 @@ def thread_chng_nln_sel( core, t, p, v ) :
 
 
 ################################################################################
-## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_mom_win_azm".
+## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_mom_win_dir".
 ################################################################################
 
-def thread_chng_mom_win_azm( core, win_azm, win_cur ) :
+def thread_chng_mom_win_dir( core, val ) :
 
 	core.emit( SIGNAL('janus_busy_end') )
 	core.emit( SIGNAL('janus_busy_beg') )
 
-	core.chng_mom_win_azm( win_azm=win_azm, win_cur=win_cur )
+	core.chng_mom_win_dir( val )
 
 	core.emit( SIGNAL('janus_busy_end') )
 
 
 ################################################################################
-## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_mom_win_cur".
+## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_mom_win_bin".
 ################################################################################
 
-def thread_chng_mom_win_cur( core, win_azm, win_cur ) :
+def thread_chng_mom_win_bin( core, val ) :
 
 	core.emit( SIGNAL('janus_busy_end') )
 	core.emit( SIGNAL('janus_busy_beg') )
 
-	core.chng_mom_win_cur( win_azm=win_azm, win_cur=win_cur )
+	core.chng_mom_win_bin( val )
 
 	core.emit( SIGNAL('janus_busy_end') )
