@@ -1193,7 +1193,6 @@ class core( QObject ) :
 
 		self.rset_var( var_nln_sel=True )
 
-
 		# If it exists, store the value of each of the "win_???"
 		# keywords as a string.
 
