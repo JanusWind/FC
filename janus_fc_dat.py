@@ -113,8 +113,6 @@ class fc_dat( ) :
 			return self._ndir_z
 		elif ( key == 'ndir' ) :
 			return (self._ndir_x, self._ndir_y, self._ndir_z )
-
-
 		else :
 			raise KeyError( 'Invalid key for "fc_dat ".' )
 
@@ -138,7 +136,6 @@ class fc_dat( ) :
 
 		vn = calc_vec_norm( v )
 		nvn = tuple( [ -c for c in vn ] )
-		
 
 		# Calculate the particle inflow angle (in degrees) relative to
 		# the cup normal (i.e., the cup pointing direction).
@@ -149,7 +146,4 @@ class fc_dat( ) :
  		
 		# Return the effective collecting area corresponding to "psi".
 
-		
 		return interp( psi, self._spec._eff_deg, self._spec._eff_area )
-
-	

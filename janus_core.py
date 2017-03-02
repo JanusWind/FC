@@ -325,8 +325,8 @@ class core( QObject ) :
 			self.mom_min_sel_dir = 5
 			self.mom_min_sel_bin = 3
 
-			self.mom_sel_dir = []
-			self.mom_sel_bin = []
+			self.mom_sel_dir = None
+			self.mom_sel_bin = None
 
 		# If requested, (re-)initialize and store the variables
 		# associated with the results of the moments analysis.
@@ -838,74 +838,14 @@ class core( QObject ) :
 
 		self.emit( SIGNAL('janus_chng_mfi') )
 
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR COMPUTING A DOT PRODUCT OR ARRAY THEREOF.
-	#-----------------------------------------------------------------------
-
-	def calc_arr_dot( self, a, b ) :
-
-
-		# CAUTION!  It is assumed that "a" and "b" are "numpy" arrays.
-		#           For increased speed, no checks are made of this.
-
-
-		# If "a" and "b" are arrays of vectors, return an array where
-		# each element is the dot product between the corresponding
-		# element of "a" and that of "b".  If one of the arguments is
-		# an array of vectors and the other is simply a vector, each an
-		# array of the dot product between each element of the former
-		# with the latter.  Otherwise, return the dot product between
-		# "a" and "b".
-
-		if ( hasattr( a[0], '__iter__' ) and
-		     hasattr( b[0], '__iter__' )     ) :
-
-			return array( [ dot( a[i], b[i] )
-			                for i in range(
-			                         min( [ len(a), len(b) ] ) ) ] )
-
-		elif ( hasattr( a[0], '__iter__' ) ) :
-
-			return array( [ dot( v, b ) for v in a ] )
-
-		elif ( hasattr( b[0], '__iter__' ) ) :
-
-			return array( [ dot( a, v ) for v in b ] )
-
-		else :
-
-			return dot( a, b )
-
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR COMPUTING A UNIT VECTOR OR ARRAY THEREOF.
-	#-----------------------------------------------------------------------
-
-	def calc_arr_nrm( self, a ) :
-
-
-		# CAUTION!  It is assumed that "a" is a "numpy" array.  For
-		#           increased speed, no check are made of this.
-
-
-		# If "a" is an array of vectors, return an array where each
-		# element is the normalized version of the corresponding
-		# elements of "a".  Otherwise, return the normalized version of
-		# "a".
-
-		if ( hasattr( a[0], '__iter__' ) ) :
-
-			return array( [ v / sqrt( sum( v**2 ) ) for v in a ] )
-
-		else :
-
-			return a / sqrt( sum( a**2 ) )
-
-
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CLIPPING A VALUE OR ARRAY OF VALUES.
 	#-----------------------------------------------------------------------
+
+	# FIXME
+
+	# TODO: Transition away from using this funciton.  If needed, consider
+	#       adding to "janus_helper.py"
 
 	def calc_arr_clp( self, a, lwr, upr ) :
 
@@ -923,10 +863,14 @@ class core( QObject ) :
 
 			return min( [ max( [ a, lwr ] ), upr ] )
 
-
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CONVERT ALT-AZM TO A CARTESIAN UNIT VECTOR.
 	#-----------------------------------------------------------------------
+
+	#FIXME
+
+	#TODO Migrate to "fc_dat" (have this happen automatically when the
+	#     altitude and azimuth are provided in the initialization).
 
 	def calc_dir_look( self, alt, azm ) :
 
@@ -935,7 +879,6 @@ class core( QObject ) :
 
 		the =  -( alt - 90.)
 		phi =  -  azm
-
 
 		# Convert from spherical to rectangular coordinates and return
 		# the result.
@@ -950,13 +893,15 @@ class core( QObject ) :
 		else :
 			return ret
 
-
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CALCULATING THE EFFECTIVE AREA OF THE CUP.
 	#-----------------------------------------------------------------------
 
-	def calc_eff_area( self, d, v ) :
+	#FIXME
 
+	#TODO Migrate to "fc_dat"
+
+	def calc_eff_area( self, d, v ) :
 
 		# Note.  The argument "d" is a vector (in a Cartesian coordinate
 		#        system) that indicates the look direction of the cup.
@@ -967,19 +912,16 @@ class core( QObject ) :
 		#        value of the effective collecting area is in units of
 		#        square centimeters.
 
-
 		# Normalize the look direction and particle velocity.
 
 		dn = self.calc_arr_nrm( d )
 		vn = self.calc_arr_nrm( v )
-
 
 		# Calculate the particle inflow angle (in degrees) relative to
 		# the cup normal (i.e., the cup pointing direction).
 
 		psi = rad2deg( arccos( self.calc_arr_dot( dn, -vn ) ) )
 		psi = self.calc_arr_clp( psi, 0., 90. )
-
 
 		# Return the effective collecting area corresponding to "psi".
 
@@ -997,6 +939,12 @@ class core( QObject ) :
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT (MAXWELLIAN).
 	#-----------------------------------------------------------------------
+
+	#FIXME
+
+	#TODO Make this not a stupid hack of the bi-Maxwellian version.
+
+	#TODO Migrate to "fc_dat"
 
 	def calc_cur_max( self,
 	                  vel_cen, vel_wid,
@@ -1017,6 +965,10 @@ class core( QObject ) :
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT (BI-MAXWELLIAN).
 	#-----------------------------------------------------------------------
+
+	#FIXME
+
+	#TODO Migrate to "fc_dat"
 
 	def calc_cur_bmx( self,
 	                  vel_cen, vel_wid,
@@ -1201,21 +1153,29 @@ class core( QObject ) :
 		                                for d in self.fc_spec['n_dir'] ]
 		                                for c in self.fc_spec['n_cup'] ]
 
-
-
 		# Compute "cup_max_ind" (two element list)
 
-		# Populate "self.mom_sel_???" appropriately
+		# FIXME
 
+		# TODO Populate "cup_max_ind" = [ ?, ? ]
 
+		# Populate "self.mom_sel_bin" appropriately
 
+		for c in range( self.fc_spec['n_cup'] ) :
 
+			for pd in range( cup_max_ind[c],
+			                 cup_max_ind[c] + self.mom_win_dir ) :
 
+				d = pd % self.fc_spec['n_dir']
 
+				for b in range( dir_max_ind[c][d],
+				                dir_max_ind[c][d]
+				                          + self.mom_win_bin ) :
 
+					self.mom_sel_bin[c][d][b] = True
 
-		# Validate the new data selection (i.e., make sure that the two
-		# "self.mom_sel_???" arrays are self consistent).
+		# Validate the new data selection (which includes populating the
+		# "self.mom_sel_dir" array).
 
 		self.vldt_mom_sel( )
 
@@ -1228,191 +1188,33 @@ class core( QObject ) :
 		# is set to be dynamically updated, run that analysis as well).
 
 		self.anls_mom( )
-"""
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR AUTO-SELECTING LOOK DIRECTIONS FOR MOMENTS.
-	#-----------------------------------------------------------------------
 
-	def auto_mom_sel_dir( self ) :
-
-		# CAUTION!  It is strongly recommended that this function only
-		#           be called by "self.auto_mom_sel( )", which first
-		#           calls "self.auto_mom_sel_azm( )" and then calls
-		#           "self.auto_mom_sel_cur( )".  Neither of the calls
-		#           to the "self.auto_mom_sel_???( )" functions
-		#           validates the selection which is instead handled
-		#           by "self.auto_mom_sel( )" with a call to
-		#           "self.vldt_mom_sel( )".
-
-
-
-
-
-		# Initialize the "max_cur" and "mm_cur" arrays.
-
-		# Note.  The former will be populated with the maximum current
-		#        seen in each velocity window.  The latter (the min-max
-		#        array) will be populated with the minimum value over a
-		#        running, circular "p"-window of "self.mom_win_azm"
-		#        elements from the "max_cur" array.		
-		max_cur = zeros( [ self.n_alt, self.n_azm ] )
-		mm_cur  = zeros( [ self.n_alt, self.n_azm ] )
-
-
-		# Populate the "max_cur" array.
-
-		for t in range( self.n_alt ) :
-
-			for p in range( self.n_azm ) :
-
-				tk = where( self.cur_vld[t,p,:] )[0]
-
-				if ( len( tk ) > 0 ) :
-					max_cur[t,p] = max( self.cur[t,p,tk] )
-				else :
-					max_cur[t,p] = 0.
-
-
-		# Populate the "mm_cur" array.
-
-		for t in range( self.n_alt ) :
-
-			for p in range( self.n_azm ) :
-
-				for w in range( self.mom_win_azm ) :
-
-					mm_cur[t,p] += \
-					             max_cur[t,(p+w)%self.n_azm]
-
-
-		# Find the location of the maximum value of each row of the
-		# "mm_cur" array and use this location to update the
-		# corresponding row of "self.mom_sel_azm".
-
-		for t in range( self.n_alt ) :
-
-			p0 = where( mm_cur[t,:] == 
-			                 amax( mm_cur[t,:] ) )[0][0]
-
-			for p in range( p0, p0+self.mom_win_azm ) :
-
-				self.mom_sel_azm[t,p%self.n_azm] = True
-
-
-		# Record the number of selected look directions.
-
-		self.mom_n_sel_azm = len( where( self.mom_sel_azm )[0] )
-
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNC. FOR AUTO-SELECTING INDIVIDUAL DATA FOR MOMENTS ALAL.
-	#-----------------------------------------------------------------------
-
-	def auto_mom_sel_cur( self ) :
-
-
-		# CAUTION!  It is strongly recommended that this function only
-		#           be called by "self.auto_mom_sel( )", which first
-		#           calls "self.auto_mom_sel_azm( )" and then calls
-		#           "self.auto_mom_sel_cur( )".  Neither of the calls
-		#           to the "self.auto_mom_sel_???( )" functions
-		#           validates the data or updates the
-		#           "self.n_mom_sel_???" counters; this is instead
-		#           handled by "self.auto_mom_sel( )" with a call to
-		#           "self.vldt_mom_sel( )".
-
-
-		# CAUTION!  This function only selects data from look directions
-		#           that have already been selected (i.e., those for
-		#           which their corresponding elements of
-		#           "self.mom_sel_azm" is "True".  It is assumed that
-		#           the function "self.auto_sel_azm( )" is called
-		#           immediately prior a call of this function.
-
-
-		# Initially, de-select all data.
-
-		self.mom_sel_cur = tile( False, [ self.n_alt, self.n_azm,
-		                                  self.n_vel              ] )
-
-		self.mom_n_sel_cur = tile( 0, [ self.n_alt, self.n_azm ] )
-
-
-		# Loop through all look directions.  For each that has been
-		# selected, select a portion of the data therefrom.
-
-		v_rng = arange( self.n_vel )
-
-		for t in range( self.n_alt ) :
-
-			for p in range( self.n_azm ) :
-
-				# If the current look direction was not
-				# selected, move on to the next one as clearly
-				# no data should be selected from this one.
-
-				if ( not self.mom_sel_azm[t,p] ) :
-					continue
-
-				# Consider all spans of "self.mom_win_cur"
-				# indices and select the data from the one with
-				# the highest total current.
-
-				v_0   = 0
-				cur_0 = 0.
-
-				for v in range( self.n_vel - self.mom_win_cur) :
-
-					tk = where( ( v_rng >= v           ) &
-					            ( v_rng < ( v +
-					                self.mom_win_cur ) ) &
-					            ( self.cur_vld[t,p,:]  )   )
-
-					if ( len( tk ) > 0 ) :
-						cur_v = sum( self.cur[t,p,tk] )
-					else :
-						cur_v = 0.
-
-					if ( cur_v > cur_0 ) :
-						v_0   = v
-						cur_0 = cur_v
-
-				self.mom_sel_cur[
-				          t,p,v_0:(v_0+self.mom_win_cur)] = True
-
-
-		# Record the number of data selected in each look direction.
-
-		self.mom_n_sel_cur = array( [ [
-		                len( where( self.mom_sel_cur[t,p,:] )[0] )
-		                              for p in range( self.n_azm ) ]
-		                                for t in range( self.n_alt ) ] )
-
-"""
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CHANGING THE SELECTION OF A SINGLE POINT.
 	#-----------------------------------------------------------------------
 
 	def chng_mom_sel( self, t, p, v ) :
 
+		#FIXME
+
+		#TODO Verify that this code still works (under the new variable
+		#     names).  Consider changing (t,p,v) to (c,d,b) (both here
+		#     and in "janus_thread.py").
 
 		# Change the selection of the requested datum.
 
 		self.mom_sel_cur[t,p,v] = not self.mom_sel_cur[t,p,v]
-
 
 		# Emit a signal that indicates that the datum's selection status
 		# for the moments analysis has changed.
 
 		self.emit( SIGNAL('janus_chng_mom_sel_cur'), t, p, v )
 
-
 		# Validate the new data selection (i.e., make sure that the two
 		# "self.sel_???" arrays are mutually-consistent) and update the
 		# "self.n_sel_???" counters.
 
 		self.vldt_mom_sel( )
-
 
 		# Ensure that the moments analysis has been set for "dyanmic"
 		# mode (since the user presumably wants it this way).  Rerun the
@@ -1427,12 +1229,17 @@ class core( QObject ) :
 
 		self.anls_mom( )
 
-
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR VALIDATING THE DATA SELECTION.
 	#-----------------------------------------------------------------------
 
 	def vldt_mom_sel( self ) :
+
+
+		#FIXME
+
+		#TODO Don't forget to populate the "self.mom_sel_dir" array.
+
 
 
 		# Note.  This function ensures that the two "self.mom_sel_???"
@@ -1507,6 +1314,17 @@ class core( QObject ) :
 	#-----------------------------------------------------------------------
 
 	def anls_mom( self ) :
+
+
+
+		#FIXME
+
+		#TODO Transition from data arrays to use of "self.fc_spec"
+
+		#TODO Store results in a "plas" object (e.g.,
+		#     "self.mom_res = plas()", which you should add to
+		#     "self.rset_var" under the "var_mom_res" section).
+
 
 
 		# Re-initialize and the output of the moments analysis.
@@ -1868,10 +1686,16 @@ class core( QObject ) :
 		#        last run (since no changes to the inital guess or to
 		#        the point selection would have been made since then).
 
-		if ( self.dyn_gss ) :
-			self.auto_nln_gss( )
-		else :
-			self.chng_dsp( 'mom' )
+		#FIXME
+
+		# WARNING!  THIS CODE HAS BEEN DISABLED TO FOR DEBUGGING. 
+
+		self.chng_dsp( 'mom' )     # TODO: DELETE
+
+		#####if ( self.dyn_gss ) :
+		#####	self.auto_nln_gss( )
+		#####else :
+		#####	self.chng_dsp( 'mom' )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CHANGING A NLN SPECIES.
