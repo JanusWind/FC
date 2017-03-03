@@ -842,7 +842,7 @@ class core( QObject ) :
 	# DEFINE THE FUNCTION FOR CLIPPING A VALUE OR ARRAY OF VALUES.
 	#-----------------------------------------------------------------------
 
-	# FIXME
+	# FIXME 1
 
 	# TODO: Transition away from using this funciton.  If needed, consider
 	#       adding to "janus_helper.py"
@@ -867,14 +867,14 @@ class core( QObject ) :
 	# DEFINE THE FUNCTION FOR CONVERT ALT-AZM TO A CARTESIAN UNIT VECTOR.
 	#-----------------------------------------------------------------------
 
-	#FIXME
+	#FIXME 2
 
 	#TODO Migrate to "fc_dat" (have this happen automatically when the
 	#     altitude and azimuth are provided in the initialization).
 
 	def calc_dir_look( self, alt, azm ) :
 
-		#FIXME
+		#FIXME 3
 		# Convert altitude and azimuth to spherical coordinates.
 
 		the =  -( alt - 90.)
@@ -897,7 +897,7 @@ class core( QObject ) :
 	# DEFINE THE FUNCTION FOR CALCULATING THE EFFECTIVE AREA OF THE CUP.
 	#-----------------------------------------------------------------------
 
-	#FIXME
+	#FIXME 4
 
 	#TODO Migrate to "fc_dat"
 
@@ -940,7 +940,7 @@ class core( QObject ) :
 	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT (MAXWELLIAN).
 	#-----------------------------------------------------------------------
 
-	#FIXME
+	#FIXME 5
 
 	#TODO Make this not a stupid hack of the bi-Maxwellian version.
 
@@ -966,7 +966,7 @@ class core( QObject ) :
 	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT (BI-MAXWELLIAN).
 	#-----------------------------------------------------------------------
 
-	#FIXME
+	#FIXME 6
 
 	#TODO Migrate to "fc_dat"
 
@@ -1155,7 +1155,7 @@ class core( QObject ) :
 
 		# Compute "cup_max_ind" (two element list)
 
-		# FIXME
+		# FIXME 7
 
 		# TODO Populate "cup_max_ind" = [ ?, ? ]
 
@@ -1195,7 +1195,7 @@ class core( QObject ) :
 
 	def chng_mom_sel( self, t, p, v ) :
 
-		#FIXME
+		#FIXME 8
 
 		#TODO Verify that this code still works (under the new variable
 		#     names).  Consider changing (t,p,v) to (c,d,b) (both here
@@ -1236,7 +1236,7 @@ class core( QObject ) :
 	def vldt_mom_sel( self ) :
 
 
-		#FIXME
+		#FIXME 9
 
 		#TODO Don't forget to populate the "self.mom_sel_dir" array.
 
@@ -1317,7 +1317,7 @@ class core( QObject ) :
 
 
 
-		#FIXME
+		#FIXME 10
 
 		#TODO Transition from data arrays to use of "self.fc_spec"
 
@@ -1686,7 +1686,7 @@ class core( QObject ) :
 		#        last run (since no changes to the inital guess or to
 		#        the point selection would have been made since then).
 
-		#FIXME
+		#FIXME 11
 
 		# WARNING!  THIS CODE HAS BEEN DISABLED TO FOR DEBUGGING. 
 
@@ -2243,7 +2243,7 @@ class core( QObject ) :
 
 		# Calculate the expected currents based on the initial geuss.
 
-		# FIXME: This code (and that in "self.calc_nln_cur") may not be
+		# FIXME:12  This code (and that in "self.calc_nln_cur") may not be
 		#        especially efficient.
 
 		( tk_t, tk_p, tk_v ) = indices( ( self.n_alt, self.n_azm,
