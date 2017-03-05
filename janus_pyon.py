@@ -32,11 +32,11 @@ from janus_const import const
 ################################################################################
 
 PARAM = [ 'b0', 'v0', 'n', 'v', 'dv', 'v0', 'w', 'w2', 'r', 't', 'beta',
-          'ac', 'time'                                                   ]
+          'ac', 'time', 's','m','q'                                            ]
 
 COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat' ]
 
-SIGMA = [ 's', 'sigma' ]
+SIGMA = [ 'sig', 'sigma' ]
 
 
 ################################################################################
@@ -153,9 +153,9 @@ class plas( object ) :
 		self.v0_y = None
 		self.v0_z = None
 
-		self.s_v0_x = None
-		self.s_v0_y = None
-		self.s_v0_z = None
+		self.sig_v0_x = None
+		self.sig_v0_y = None
+		self.sig_v0_z = None
 
 		self.b0_x = None
 		self.b0_y = None
@@ -204,15 +204,18 @@ class plas( object ) :
 
 		# Attempting to split the "key" string into substrings based on
 		# the "_" token.  If this fails, abort.
+		# Also ensuring that 
 
 		try :
-			arr = key.split( '_' )
+			arr=key.split('_')
 		except :
 			return None
 
 		# For each element from the key, attempt to identify and record
 		# what it represents.  If this fails for any given element or if
-		# elements are in conflict, abort.
+		# elements are in conflict, abort. The parameters, components
+		# and sigma are all changed to lower case independent of the
+		# type of case used for input.
 
 		# Note.  Additional verification is required for "ret['pop']" at
 		#        the end of this loop.  It's value cannot be confirmed
@@ -222,24 +225,24 @@ class plas( object ) :
 
 		for e in arr :
 
-			if ( e in PARAM ) :
+			if ( e.lower() in PARAM ) :
 
 				if ( elem['param'] is None ) :
-					elem['param'] = e
+					elem['param'] = e.lower()
 				else :
 					return None
 
-			elif ( e in COMP ) :
+			elif ( e.lower() in COMP ) :
 
 				if ( elem['comp'] is None ) :
-					elem['comp'] = e
+					elem['comp'] = e.lower()
 				else :
 					return None
 
-			elif ( e in SIGMA ) :
+			elif ( e.lower() in SIGMA ) :
 
 				if ( elem['sigma'] is None ) :
-					elem['sigma'] = e
+					elem['sigma'] = e.lower()
 				else :
 					return None
 
@@ -273,12 +276,12 @@ class plas( object ) :
 	#-----------------------------------------------------------------------
 
 	def __getitem__( self, key ) :
-
+		
 		# Attempt to parse the key.  If this fails, abort.
 
 		elem = self.parse( key )
 
-		if ( elem is None ) : 
+		if ( elem is None ) :
 			return None
 
 		# If no parameter has been specified but a species (and possibly
@@ -352,16 +355,16 @@ class plas( object ) :
 			else :
 
 				if   ( elem['comp'] == 'x' ) :
-					return self.s_v0_x
+					return self.sig_v0_x
 				elif ( elem['comp'] == 'y' ) :
-					return self.s_v0_y
+					return self.sig_v0_y
 				elif ( elem['comp'] == 'z' ) :
-					return self.s_v0_z
+					return self.sig_v0_z
 				else :
 					return None
 
 		# Note.  If this point is reached, the parameter is one to be
-		#        by the species or population.
+		#        handled by the species or population.
 
 		# If no species has been specified, abort.
 
@@ -377,7 +380,7 @@ class plas( object ) :
 			arg = arg + '_' + elem['comp']
 
 		if ( elem['sigma'] is not None ) :
-			arg = 's_' + arg
+			arg = 'sig_' + arg
 
 		# Pass the string to the either the "spec" or "pop" class for
 		# processing.  If an error is raised, catch it and abort quietly
@@ -407,6 +410,10 @@ class plas( object ) :
 		# Based on the "key" in question, validate the "value".  If it
 		# is valid, store the new value (and make any appropriate
 		# changes to other parameters).
+		# Change all keys to lower case independent of the input type
+		# used.
+		
+		key=key.lower()
 
 		if ( key == 'time' ) :
 
@@ -441,29 +448,29 @@ class plas( object ) :
 
 				self.v0_z = float( value )
 
-		elif ( key == 's_v0_x' ) :
+		elif ( key == 'sig_v0_x' ) :
 
-			self.s_v0_x = None
-
-			if ( value is not None ) :
-
-				self.s_v0_x = float( value )
-
-		elif ( key == 's_v0_y' ) :
-
-			self.s_v0_y = None
+			self.sig_v0_x = None
 
 			if ( value is not None ) :
 
-				self.s_v0_y = float( value )
+				self.sig_v0_x = float( value )
 
-		elif ( key == 's_v0_z' ) :
+		elif ( key == 'sig_v0_y' ) :
 
-			self.s_v0_z = None
+			self.sig_v0_y = None
 
 			if ( value is not None ) :
 
-				self.s_v0_z = float( value )
+				self.sig_v0_y = float( value )
+
+		elif ( key == 'sig_v0_z' ) :
+
+			self.sig_v0_z = None
+
+			if ( value is not None ) :
+
+				self.sig_v0_z = float( value )
 
 		elif   ( key == 'b0_x' ) :
 
@@ -604,8 +611,8 @@ class plas( object ) :
 	             drift=False, aniso=False,
 	             name=None, sym=None, n=None, dv=None,
 	             w=None, w_per=None, w_par=None,
-	             s_n=None, s_dv=None, s_w=None,
-	             s_w_per=None, s_w_par=None            ) :
+	             sig_n=None, sig_dv=None, sig_w=None,
+	             sig_w_per=None, sig_w_par=None            ) :
 
 		self.arr_pop.append( pop( self,
 		                          self.get_spec( spc ),
@@ -613,8 +620,8 @@ class plas( object ) :
 		                          name=name, sym=sym,
 		                          n=n, dv=dv, w=w,
 		                          w_per=w_per, w_par=w_par,
-		                          s_n=s_n, s_dv=s_dv, s_w=s_w,
-		                          s_w_per=s_w_per, s_w_par=s_w_par ) )
+		                          sig_n=sig_n, sig_dv=sig_dv, sig_w=sig_w,
+		                          sig_w_per=sig_w_per, sig_w_par=sig_w_par ) )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RETREIVING A SPECIES.
@@ -770,7 +777,7 @@ class spec( object ) :
 
 	def __getitem__( self, key ) :
 
-
+		key=key.lower()
 		# Return the appropriate value for the provided "key".
 
 		if ( key == 'plas' ) :
@@ -1013,6 +1020,7 @@ class spec( object ) :
 
 	def __setitem__( self, key, value ) :
 
+		key=key.lower()
 
 		# Based on the "key" in question, validate the "value".  If it
 		# is valid, store the new value (and make any appropriate
@@ -1043,6 +1051,15 @@ class spec( object ) :
 
 					ValueError(
 					    'Name cannot contain underscores.' )
+
+				elif ( ( value.lower( ) in PARAM ) or
+				       ( value.lower( ) in COMP  ) or
+				       ( value.lower( ) in SIGMA )    ) :
+
+					self.name = None
+
+					raise ValueError(
+					    'Name cannot be a reserved value.' )
 
 				elif ( ( self.name == value ) or
 				       ( self.sym  == value )    ) :
@@ -1089,6 +1106,16 @@ class spec( object ) :
 
 					ValueError(
 					       'Symbol cannot contain spaces.' )
+
+				elif ( ( value.lower( ) in PARAM ) or
+				       ( value.lower( ) in COMP  ) or
+				       ( value.lower( ) in SIGMA )    ) :
+
+					self.name = None
+
+					raise ValueError(
+					    'Name cannot be a reserved value.' )
+
 
 				elif ( ( self.name == value ) or
 				       ( self.sym  == value )    ) :
@@ -1193,8 +1220,8 @@ class pop( object ) :
 	              name=None, sym=None,
 	              n=None, dv=None, w=None,
 	              w_per=None, w_par=None,
-	              s_n=None, s_dv=None, s_w=None,
-	              s_w_per=None, s_w_par=None     ) :
+	              sig_n=None, sig_dv=None, sig_w=None,
+	              sig_w_per=None, sig_w_par=None     ) :
 
 		self.my_plas = my_plas
 		self.my_spec = my_spec
@@ -1211,11 +1238,11 @@ class pop( object ) :
 		self.w_per   = None
 		self.w_par   = None
 
-		self.s_n     = None
-		self.s_dv    = None
-		self.s_w     = None
-		self.s_w_per = None
-		self.s_w_par = None
+		self.sig_n     = None
+		self.sig_dv    = None
+		self.sig_w     = None
+		self.sig_w_per = None
+		self.sig_w_par = None
 
 		self["name"   ] = name
 		self["sym"    ] = sym
@@ -1226,11 +1253,11 @@ class pop( object ) :
 		self["w_per"  ] = w_per
 		self["w_par"  ] = w_par
 
-		self["s_n"    ] = s_n
-		self["s_dv"   ] = s_dv
-		self["s_w"    ] = s_w
-		self["s_w_per"] = s_w_per
-		self["s_w_par"] = s_w_par
+		self["sig_n"    ] = sig_n
+		self["sig_dv"   ] = sig_dv
+		self["sig_w"    ] = sig_w
+		self["sig_w_per"] = sig_w_per
+		self["sig_w_par"] = sig_w_par
 
 
 	#-----------------------------------------------------------------------
@@ -1239,7 +1266,7 @@ class pop( object ) :
 
 	def __getitem__( self, key ) :
 
-
+		key=key.lower()	
 		# Return the appropriate value for the provided "key".
 
 		if   ( key == 'plas' ) :
@@ -1485,35 +1512,35 @@ class pop( object ) :
 				return ( 1.E-3 / const['k_b'] ) * \
 				       m * const['m_p'] * ( 1.E6 * w_par**2 )
 
-		elif ( key == 's_n' ) :
+		elif ( key == 'sig_n' ) :
 
-			return self.s_n
+			return self.sig_n
 
-		elif ( key == 's_dv' ) :
+		elif ( key == 'sig_dv' ) :
 
 			if ( self.drift ) :
-				return self.s_dv
+				return self.sig_dv
 			else :
 				return None
 
-		elif ( key == 's_w' ) :
+		elif ( key == 'sig_w' ) :
 
 			if ( self.aniso ) :
 				return None
 			else :
-				return self.s_w
+				return self.sig_w
 
-		elif ( key == 's_w_per' ) :
+		elif ( key == 'sig_w_per' ) :
 
 			if ( self.aniso ) :
-				return self.s_w_per
+				return self.sig_w_per
 			else :
 				return None
 
-		elif ( key == 's_w_par' ) :
+		elif ( key == 'sig_w_par' ) :
 
 			if ( self.aniso ) :
-				return self.s_w_par
+				return self.sig_w_par
 			else :
 				return None
 
@@ -1526,12 +1553,16 @@ class pop( object ) :
 	#-----------------------------------------------------------------------
 
 	def __setitem__( self, key, value ) :
-
+	
 
 		# Based on the "key" in question, validate the "value".  If it
 		# is valid, store the new value (and make any appropriate
 		# changes to other parameters).
-
+		# Change all keys to lower case independent of the input type
+		# used.
+		
+		key=key.lower()
+		
 		if ( key == 'plas' ) :
 
 			raise KeyError(
@@ -1821,18 +1852,18 @@ class pop( object ) :
 
 			self.w_par = value
 
-		elif ( key == 's_n' ) :
+		elif ( key == 'sig_n' ) :
 
 			if ( value is None ) :
-				self.s_n = None
+				self.sig_n = None
 			else :
-				self.s_n = float( value )
+				self.sig_n = float( value )
 
-		elif ( key == 's_dv' ) :
+		elif ( key == 'sig_dv' ) :
 
 			if ( value is None ) :
 
-				self.s_dv = None
+				self.sig_dv = None
 
 				return
 
@@ -1842,13 +1873,13 @@ class pop( object ) :
 
 				return
 
-			self.s_dv = float( value )
+			self.sig_dv = float( value )
 
-		elif ( key == 's_w' ) :
+		elif ( key == 'sig_w' ) :
 
 			if ( value is None ) :
 
-				self.s_w = None
+				self.sig_w = None
 
 				return
 
@@ -1858,13 +1889,13 @@ class pop( object ) :
 
 				return
 
-			self.s_w = float( value )
+			self.sig_w = float( value )
 
-		elif ( key == 's_w_per' ) :
+		elif ( key == 'sig_w_per' ) :
 
 			if ( value is None ) :
 
-				self.s_w_per = None
+				self.sig_w_per = None
 
 				return
 
@@ -1875,13 +1906,13 @@ class pop( object ) :
 
 				return
 
-			self.s_w_per = float( value )
+			self.sig_w_per = float( value )
 
-		elif ( key == 's_w_par' ) :
+		elif ( key == 'sig_w_par' ) :
 
 			if ( value is None ) :
 
-				self.s_w_par = None
+				self.sig_w_par = None
 
 				return
 
@@ -1892,7 +1923,7 @@ class pop( object ) :
 
 				return
 
-			self.s_w_par = float( value )
+			self.sig_w_par = float( value )
 
 		else :
 
@@ -1956,7 +1987,5 @@ class pop( object ) :
 			if ( self.w is None ) :
 
 				return False
-
-		# Return "True".
 
 		return True
