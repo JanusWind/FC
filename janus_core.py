@@ -1,4 +1,4 @@
-################################################################################
+###############################################################################
 ##
 ## Janus -- GUI Software for Processing Thermal-Ion Measurements from the
 ##          Wind Spacecraft's Faraday Cups
