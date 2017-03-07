@@ -1136,8 +1136,8 @@ class core( QObject ) :
 		                             for c in self.fc_spec['n_cup'] ]
 
 		self.mom_sel_bin = [ [ False for b in self.fc_spec['n_bin'] ]
-		                             for d in self.fc_spec['n_dir'] ]
-		                             for c in self.fc_spec['n_cup'] ]
+                                    for d in self.fc_spec['n_dir'] ]
+                                    for c in self.fc_spec['n_cup'] ]
 
 		# Find the maximum current window (of "self.mom_win_bin" bins)
 		# for each direction
