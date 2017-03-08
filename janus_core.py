@@ -68,6 +68,8 @@ from scipy.stats import pearsonr, spearmanr
 
 from janus_helper import round_sig
 
+from janus_fc_spec import fc_spec
+
 # Load the "pyon" module.
 
 from janus_pyon import plas, series
@@ -1136,8 +1138,8 @@ class core( QObject ) :
 		                             for c in self.fc_spec['n_cup'] ]
 
 		self.mom_sel_bin = [ [ False for b in self.fc_spec['n_bin'] ]
-                                    for d in self.fc_spec['n_dir'] ]
-                                    for c in self.fc_spec['n_cup'] ]
+                                   for d in self.fc_spec['n_dir']
+                                   for c in self.fc_spec['n_cup'] ]
 
 		# Find the maximum current window (of "self.mom_win_bin" bins)
 		# for each direction
@@ -1155,6 +1157,7 @@ class core( QObject ) :
 
 		# Compute "cup_max_ind" (two element list)
 
+      cup_max_ind = [self.
 		# FIXME 7
 
 		# TODO Populate "cup_max_ind" = [ ?, ? ]

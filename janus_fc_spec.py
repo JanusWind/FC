@@ -1,7 +1,7 @@
 from janus_fc_dat import fc_dat
 
 	#-----------------------------------------------------------------------
-				# DEFINE THE Class FOR spec
+	# DEFINE THE Class FOR spec
 	#-----------------------------------------------------------------------
 
 
@@ -218,6 +218,10 @@ class fc_spec():
 					              * self.arr[c][d][b+1]['curr'] )     ) :
 						self.arr[c][d][b]._valid = False
 
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR CALCULATING TOTAL CURRENT IN A GIVEN WINDOW
+	#-----------------------------------------------------------------------
+
 	def calc_curr( c, d, b, win=1 ) :
 
 		# Validate the cup, direction, and bin indices.
@@ -240,6 +244,10 @@ class fc_spec():
 
 		return sum( [ self.arr[c][d][b+w]['curr_valid']
 		                                       for w in range( win ) ] )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION TO FIND THE MAXIMUM CURRENT IN A GIVEN WINDOW
+	#-----------------------------------------------------------------------
 
 	def find_max_curr( c, d, win=1 ) :
 
