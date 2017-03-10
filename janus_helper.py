@@ -50,6 +50,7 @@ def round_sig( val, sig ) :
 		return round( val,
 		              sig - int( floor( log10( abs( val ) ) ) ) - 1 )
 
+
 ################################################################################
 ## DEFINE THE FUNCTION FOR computing unit vector 
 ################################################################################
@@ -57,8 +58,11 @@ def round_sig( val, sig ) :
 # Define the function for computing unit vector
 
 def calc_vec_norm( v ):
+
 	mag = sqrt( fsum( [ c**2 for c in v ]) )
+
 	return tuple( [ ( c/mag) for c in v ] )
+
 
 ################################################################################
 ## DEFINE THE FUNCTION FOR computing dot product
@@ -70,26 +74,6 @@ def calc_vec_dot( u,v ) :
 	if ( len(u) != len(v) ) :
 		raise TypeError( 'Unequal lengths.' )
 	return fsum([ x[0]*x[1] for x in zip(u,v) ]) 
-
-#-----------------------------------------------------------------------
-# DEFINE THE FUNCTION FOR CLIPPING A VALUE OR ARRAY OF VALUES.
-#-----------------------------------------------------------------------
-
-def calc_arr_clp( self, a, lwr, upr ) :
-
-
-	# If "a" is an array of vectors, return a clipped version of
-	# "a" where each element falls between "lwr" and "upr".
-	# Otherwise, clip "a" as a scalar.
-
-	if hasattr( a, '__iter__' ) :
-
-		return array( [ min( [ max( [ v, lwr ] ), upr ] )
-			        for v in a                        ] )
-
-	else :
-
-		return min( [ max( [ a, lwr ] ), upr ] )
 
 
 """

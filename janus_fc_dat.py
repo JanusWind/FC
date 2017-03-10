@@ -30,20 +30,16 @@ class fc_dat( ) :
 		self._vel_del   = (  self['vel_stop']-self['vel_strt'] )
 		self._curr = curr
 
-		self._the = 90 - self._elev
+		self._the = 90 - self._elev     # TODO: Confirm these two formulae
 		self._phi =    - self._azim
-		self._dir_x =  sin( deg2rad( self._the ) ) * cos( deg2rad( self._phi ) )
-		self._dir_y =  sin( deg2rad( self._the ) ) * sin( deg2rad( self._phi ) )
-		self._dir_z =  cos( deg2rad( self._the ) )
-		
-		ndir = calc_vec_norm( self['dir'] )
-		self._ndir_x = ndir[0]
-		self._ndir_y = ndir[1]
-		self._ndir_z = ndir[2]
 
-		self._nb_x = None
-		self._nb_y = None
-		self._nb_z = None
+		self._dir_x = sin( deg2rad( self._the ) ) * cos( deg2rad( self._phi ) )
+		self._dir_y = sin( deg2rad( self._the ) ) * sin( deg2rad( self._phi ) )
+		self._dir_z = cos( deg2rad( self._the ) )
+
+		self._norm_b_x = None
+		self._norm_b_y = None
+		self._norm_b_z = None
 
 		if ( ( self._azim     is None ) or
 		     ( self._elev     is None ) or
@@ -104,15 +100,16 @@ class fc_dat( ) :
 		elif ( key == 'dir_z' ) :
 			return self._dir_z
 		elif ( key == 'dir' ) :
-			return (self._dir_x, self._dir_y, self._dir_z )
-		elif ( key == 'ndir_x' ) :
-			return self._ndir_x
-		elif ( key == 'ndir_y' ) :
-			return self._ndir_y
-		elif ( key == 'ndir_z' ) :
-			return self._ndir_z
-		elif ( key == 'ndir' ) :
-			return (self._ndir_x, self._ndir_y, self._ndir_z )
+			return ( self._dir_x, self._dir_y, self._dir_z )
+		elif ( key == 'norm_b_x' ) :
+			return self._norm_b_x
+		elif ( key == 'norm_b_y' ) :
+			return self._norm_b_y
+		elif ( key == 'norm_b_z' ) :
+			return self._norm_b_z
+		elif ( key == 'norm_b' ) :
+			return ( self._norm_b_x, self._norm_b_y, self._norm_b_z )
+
 		else :
 			raise KeyError( 'Invalid key for "fc_dat ".' )
 
@@ -120,6 +117,23 @@ class fc_dat( ) :
 	def __setitem__( self, key, val ) :
 
 		raise KeyError( 'Reassignment not permitted after initialization.' )
+
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR SETIING THE MAGNETIC FIELD DIRECTION.
+	#-----------------------------------------------------------------------
+
+	def set_mag( self, b_vec ) :
+
+		# Normalize the magnetic-field vector.
+
+		norm_b = calc_vec_norm( b_vec )
+
+		# Store the components of the normalized magnetic-field vector.
+
+		self._norm_b_x = norm_b[0]
+		self._norm_b_y = norm_b[1]
+		self._norm_b_z = norm_b[2]
 
 
 	#-----------------------------------------------------------------------
@@ -140,31 +154,13 @@ class fc_dat( ) :
 		# Calculate the particle inflow angle (in degrees) relative to
 		# the cup normal (i.e., the cup pointing direction).
 
-		psi = acos( calc_vec_dot( self['ndir'], nvn ) )*pi/180.
+		psi = acos( calc_vec_dot( self['dir'], nvn ) )*pi/180.
 		if ( psi > 90. ) :
 			return 0. 
  		
 		# Return the effective collecting area corresponding to "psi".
 
 		return interp( psi, self._spec._eff_deg, self._spec._eff_area )
-
-	#-----------------------------------------------------------------------
-	#DEFINE THE FUNCTION TI RETURN CARTESIAN UNIT VECTOR FOR LOOK DIRECTION.
-	#-----------------------------------------------------------------------
-
-	#FIXME 2
-
-	#TODO Returns look direction automatically when the
-	#     altitude and azimuth are provided in the initialization.
-
-	def calc_dir_look( self ) :
-	
-		ret = array( self['dir'] )
-
-		if ( ret.ndim > 1 ) :		#ndim ?????
-			return transpose( ret )
-		else :
-			return ret
 
 
 	#-----------------------------------------------------------------------
@@ -182,7 +178,6 @@ class fc_dat( ) :
 	                  dir_alt, dir_azm,
 	                  prm_n, prm_v_x, prm_v_y, prm_v_z, prm_w ) :
 
-
 		# Return the equivalent bi-Maxwellian response for equal
 		# perpendicular and parallel thermal speeds and a dummy
 		# magnetic field.
@@ -191,7 +186,6 @@ class fc_dat( ) :
 		                          dir_alt, dir_azm, 1., 0., 0.,
 		                          prm_n, prm_v_x, prm_v_y, prm_v_z,
 		                          prm_w, prm_w                      )
-
 
 
 	#-----------------------------------------------------------------------
