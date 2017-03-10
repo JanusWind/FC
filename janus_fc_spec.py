@@ -300,11 +300,11 @@ class fc_spec():
       dir_max = 0
       curr_max = 0.
 
-		for di in range( 0, self['n_dir'] ) :
+		for di in range( 0, self['n_dir']- self.mom_win_dir + 1 ) :
 
          curr = sum( [ self.arr[c][d+di][b_max+w]['curr_valid'] 
-                                        for w  in range( win ) ] )
-                                        for di in range( self['n_dir'] )
+                                        for w  in range( self.mom_win_bin ) ] )
+                                        for di in range( self.mom_win_dir )
          if (curr > curr_max) :
             dir_max = di
             curr_max = curr

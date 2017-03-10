@@ -96,7 +96,7 @@ class core( QObject ) :
 	# | chng_mfi          |                              |
 	# | chng_mom_win      |                              |
 	# | chng_mom_sel_cur  | t, p, v                      |
-	# | chng_mom_sel_azm  | t, p                         |
+	# | chng_mom_sel_dir  | t, p                         |
 	# | chng_mom_sel_all  |                              |
 	# | chng_mom_res      |                              |
 	# | chng_nln_ion      |                              |
@@ -271,7 +271,7 @@ class core( QObject ) :
 			self.dur_sec = 0.
 
 			self.alt     = None
-			self.azm     = None
+			self.dir     = None
 			self.vel_cen = None
 			self.vel_wid = None
 			self.cur     = None
@@ -286,7 +286,7 @@ class core( QObject ) :
 			self.mag_z = None
 
 			self.n_alt = 0
-			self.n_azm = 0
+			self.n_dir = 0
 			self.n_vel = 0
 
 		# If requested, (re-)initialize the varaibles for the Wind/MFI
@@ -659,7 +659,7 @@ class core( QObject ) :
 		#n_cup    = self.fc_spec[ 'n_cup' ]
 
 		self.alt     = array( self.fc_spec['elev'] )	# cup 1 at 15 degree??
-		self.azm     = array( self.fc_spec['azim'] )
+		self.dir     = array( self.fc_spec['azim'] )
 		self.vel_cen = array( self.fc_spec['vel_cen'][0] )
 		self.vel_wid = array( self.fc_spec['vel_del'][0] )
 		self.cur = array( self.fc_spec['curr'])
@@ -675,19 +675,19 @@ class core( QObject ) :
 		# Store the counts of velocity bins and angles.
 
 		#self.n_alt = n_cup
-		#self.n_azm = n_dir
+		#self.n_dir = n_dir
 		#self.n_vel = n_bin
 		#????... why can't we write this way
 		#self.time_epc = self.fc_spec['time']
 		self.n_alt = self.fc_spec[ 'n_cup' ]
-		self.n_azm = self.fc_spec['n_dir']
+		self.n_dir = self.fc_spec['n_dir']
 		self.n_vel = self.fc_spec['n_bin']
 
 		# Examine each measured current value and determine whether or
 		# not it's valid for use in the proceding analyses.
 
 		self.cur_vld = tile( True,
-		                     [ self.n_alt, self.n_azm, self.n_vel ] )
+		                     [ self.n_alt, self.n_dir, self.n_vel ] )
 
 
 		# Estimate the duration of each spectrum and the mean time
@@ -805,9 +805,9 @@ class core( QObject ) :
 		# magnetic field and each look direction.
 
 		self.mfi_hat_dir = array( [ [
-		          dot( self.calc_dir_look( self.alt[t], self.azm[t,p] ),
+		          dot( self.calc_dir_look( self.alt[t], self.dir[t,p] ),
 		               self.mfi_avg_nrm )
-		          for p in range( self.n_azm ) ]
+		          for p in range( self.n_dir ) ]
 		        for t in range( self.n_alt ) ] )
 
 
@@ -950,7 +950,7 @@ class core( QObject ) :
 
 	def calc_cur_max( self,
 	                  vel_cen, vel_wid,
-	                  dir_alt, dir_azm,
+	                  dir_alt, dir_dir,
 	                  prm_n, prm_v_x, prm_v_y, prm_v_z, prm_w ) :
 
 
@@ -959,7 +959,7 @@ class core( QObject ) :
 		# magnetic field.
 
 		return self.calc_cur_bmx( vel_cen, vel_wid,
-		                          dir_alt, dir_azm, 1., 0., 0.,
+		                          dir_alt, dir_dir, 1., 0., 0.,
 		                          prm_n, prm_v_x, prm_v_y, prm_v_z,
 		                          prm_w, prm_w                      )
 
@@ -974,7 +974,7 @@ class core( QObject ) :
 
 	def calc_cur_bmx( self,
 	                  vel_cen, vel_wid,
-	                  dir_alt, dir_azm,
+	                  dir_alt, dir_dir,
 	                  mag_x, mag_y, mag_z,
 	                  prm_n, prm_v_x, prm_v_y, prm_v_z,
 	                  prm_w_per, prm_w_par              ) :
@@ -996,7 +996,7 @@ class core( QObject ) :
 
 		# Calculate the look direction as a cartesian unit vector.
 
-		dlk = self.calc_dir_look( dir_alt, dir_azm )
+		dlk = self.calc_dir_look( dir_alt, dir_dir )
 
 
 		# Calculate the direction of the magnetic field as a cartesian
@@ -1251,12 +1251,12 @@ class core( QObject ) :
 
 		# Note.  This function ensures that the two "self.mom_sel_???"
 		#        arrays are mutually consistent.  For each set of "t"-
-		#        and "p"-values, "self.mom_sel_azm[t,p]" can only be
+		#        and "p"-values, "self.mom_sel_dir[t,p]" can only be
 		#        "True" if at least "self.min_sel_cur" of the elements
 		#        in "self.mom_sel_cur[t,p,:]" are "True".  However, if
-		#        fewer than "self.mom_min_sel_azm" sets of "t"- and
+		#        fewer than "self.mom_min_sel_dir" sets of "t"- and
 		#        "p"-values satisfy this criterion, all elements of
-		#        "self.mom_sel_azm" are given the value "False".		
+		#        "self.mom_sel_dir" are given the value "False".		
 		#
 		#        Additionally, this functions serves to update the
 		#        "self.mom_n_sel_???" counters.
@@ -1264,7 +1264,7 @@ class core( QObject ) :
 
 		# Save the initial selection of pointing directions.
 
-		old_mom_sel_azm = self.mom_sel_azm
+		old_mom_sel_dir = self.mom_sel_dir
 
 
 		# Update the counter "self.mom_n_sel_cur" (i.e., the number of
@@ -1272,47 +1272,47 @@ class core( QObject ) :
 
 		self.mom_n_sel_cur = array( [ [
 		                len( where( self.mom_sel_cur[t,p,:] )[0] )
-		                              for p in range( self.n_azm ) ]
+		                              for p in range( self.n_dir ) ]
 		                                for t in range( self.n_alt ) ] )
 
 		# Create a new selection of pointing directions based on the
 		# data selection, and then update the counter
-		# "self.mom_n_sel_azm".
+		# "self.mom_n_sel_dir".
 
-		self.mom_sel_azm = array( [ [
+		self.mom_sel_dir = array( [ [
 		           self.mom_n_sel_cur[t,p] >= self.mom_min_sel_cur	
-		                              for p in range( self.n_azm ) ]
+		                              for p in range( self.n_dir ) ]
 		                                for t in range( self.n_alt ) ] )
 
-		self.mom_n_sel_azm = len( where( self.mom_sel_azm )[0] )
+		self.mom_n_sel_dir = len( where( self.mom_sel_dir )[0] )
 
 
 		# Determine the total number of selected pointing directions; if
-		# this number is less than the minimum "self.mom_min_sel_azm",
+		# this number is less than the minimum "self.mom_min_sel_dir",
 		# deselect all pointing directions.
 
-		mom_n_sel_azm = len( where( self.mom_sel_azm )[0] )		
+		mom_n_sel_dir = len( where( self.mom_sel_dir )[0] )		
 
-		if ( mom_n_sel_azm < self.mom_min_sel_azm ) :
+		if ( mom_n_sel_dir < self.mom_min_sel_dir ) :
 
-			self.mom_sel_azm = tile( False,
-			                         [ self.n_alt, self.n_azm ] )
+			self.mom_sel_dir = tile( False,
+			                         [ self.n_alt, self.n_dir ] )
 
-			self.mom_n_sel_azm = 0
+			self.mom_n_sel_dir = 0
 
 
 		# Identify differences between the new and old versions of
-		# "self.mom_sel_azm".  For each pointing direction whose
+		# "self.mom_sel_dir".  For each pointing direction whose
 		# selection status for the moments analysis has changed, emit a
 		# signal indicating this.
 
-		( tk_t, tk_p ) = where( self.mom_sel_azm != old_mom_sel_azm )
+		( tk_t, tk_p ) = where( self.mom_sel_dir != old_mom_sel_dir )
 
 		n_tk = len( tk_t )
 
 		for k in range( n_tk ) :
 
-			self.emit( SIGNAL('janus_chng_mom_sel_azm'),
+			self.emit( SIGNAL('janus_chng_mom_sel_dir'),
 			           tk_t[k], tk_p[k]                  )
 
 
@@ -1342,7 +1342,7 @@ class core( QObject ) :
 		# If the point-selection arrays have not been populated, run
 		# the automatic point selection.
 
-		if ( ( self.mom_sel_azm is None ) or
+		if ( ( self.mom_sel_dir is None ) or
 		     ( self.mom_sel_cur is None )    ) :
 
 			self.auto_mom_sel( no_anls_mom=True )
@@ -1359,7 +1359,7 @@ class core( QObject ) :
 
 		if ( ( self.time_epc is None                     ) or
 		     ( self.n_vel == 0                           ) or
-		     ( self.mom_n_sel_azm < self.mom_min_sel_azm )    ) :
+		     ( self.mom_n_sel_dir < self.mom_min_sel_dir )    ) :
 
 			self.emit( SIGNAL('janus_mesg'),
 			           'core', 'norun', 'mom' )
@@ -1377,7 +1377,7 @@ class core( QObject ) :
 		# Extract the "t"- and "p"-indices of each selected pointing
 		# direction.
 
-		( tk_t, tk_p ) = where( self.mom_sel_azm )
+		( tk_t, tk_p ) = where( self.mom_sel_dir )
 
 
 		# Initialize the "eta_*" arrays.
@@ -1388,7 +1388,7 @@ class core( QObject ) :
 		#        thermal speed, and temperature derived for each of the
 		#        analyzed look directions.
 
-		n_eta = self.mom_n_sel_azm
+		n_eta = self.mom_n_sel_dir
 
 		eta_phi = tile( 0., n_eta )
 		eta_the = tile( 0., n_eta )
@@ -1426,13 +1426,13 @@ class core( QObject ) :
 			# direction.
 
 			eta_the[k] = - self.alt[t] + 90.
-			eta_phi[k] = - self.azm[t,p]
+			eta_phi[k] = - self.dir[t,p]
 
 			# Convert the look direction from altitude-azimuth to a
 			# Cartesian unit vector.
 
 			eta_dlk[k,:] = self.calc_dir_look( self.alt[t],
-			                                   self.azm[t,p] )
+			                                   self.dir[t,p] )
 
 			# Extract the "v" values of the selected data from this
 			# look direction.
@@ -1606,14 +1606,14 @@ class core( QObject ) :
 		# Calculate the expected currents based on the results of the
 		# (linear) moments analysis.
 
-		mom_cur = tile( 0., [ self.n_alt, self.n_azm, self.n_vel ] )
+		mom_cur = tile( 0., [ self.n_alt, self.n_dir, self.n_vel ] )
 
 		if ( aniso ) :
 			for t in range( self.n_alt ) :
-				for p in range( self.n_azm ) :
+				for p in range( self.n_dir ) :
 					mom_cur[t,p,:] = self.calc_cur_bmx(
 					           self.vel_cen, self.vel_wid,
-					           self.alt[t], self.azm[t,p],
+					           self.alt[t], self.dir[t,p],
 					           self.mfi_avg_nrm[0],
 					           self.mfi_avg_nrm[1],
 					           self.mfi_avg_nrm[2],
@@ -1622,10 +1622,10 @@ class core( QObject ) :
 					           mom_w_per, mom_w_par        )
 		else :
 			for t in range( self.n_alt ) :
-				for p in range( self.n_azm ) :
+				for p in range( self.n_dir ) :
 					mom_cur[t,p,:] = self.calc_cur_max(
 					           self.vel_cen, self.vel_wid,
-					           self.alt[t], self.azm[t,p],
+					           self.alt[t], self.dir[t,p],
 					           mom_n, mom_v_vec[0],
 					           mom_v_vec[1], mom_v_vec[2],
 					           mom_w                       )
@@ -2253,7 +2253,7 @@ class core( QObject ) :
 		# FIXME:12  This code (and that in "self.calc_nln_cur") may not be
 		#        especially efficient.
 
-		( tk_t, tk_p, tk_v ) = indices( ( self.n_alt, self.n_azm,
+		( tk_t, tk_p, tk_v ) = indices( ( self.n_alt, self.n_dir,
 		                                  self.n_vel              ) )
 
 		tk_t = tk_t.flatten( )
@@ -2263,19 +2263,19 @@ class core( QObject ) :
 		x_vel_cen = self.vel_cen[ tk_v ]
 		x_vel_wid = self.vel_wid[ tk_v ]
 		x_alt     = self.alt[ tk_t ]
-		x_azm     = self.azm[ tk_t, tk_p ]
+		x_dir     = self.dir[ tk_t, tk_p ]
 		x_mag_x   = self.mag_x[ tk_v ]
 		x_mag_y   = self.mag_y[ tk_v ]
 		x_mag_z   = self.mag_z[ tk_v ]
 
-		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_azm,
+		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_dir,
 		             x_mag_x, x_mag_y, x_mag_z           ] )
 
 		self.nln_gss_cur_ion = reshape(
 		      self.calc_nln_cur( self.nln_gss_pop, x,
 		                         self.nln_gss_prm,
 		                         ret_comp=True        ),
-		      ( self.n_alt, self.n_azm, self.n_vel,
+		      ( self.n_alt, self.n_dir, self.n_vel,
 		        len( self.nln_gss_pop )             )    )
 
 		self.nln_gss_cur_tot = sum( self.nln_gss_cur_ion, axis=3 )
@@ -2325,7 +2325,7 @@ class core( QObject ) :
 
 		# Intially deselect all data.
 
-		self.nln_sel = tile( False, [ self.n_alt, self.n_azm,
+		self.nln_sel = tile( False, [ self.n_alt, self.n_dir,
 		                              self.n_vel              ] )
 
 		# Determine which ion species have been selected for analysis
@@ -2350,7 +2350,7 @@ class core( QObject ) :
 		# Select data based on the selection windows from each of the
 		# look directions selected for the moments analysis.
 
-		( tk_t, tk_p ) = where( self.mom_sel_azm )
+		( tk_t, tk_p ) = where( self.mom_sel_dir )
 
 		n_tk = len( tk_t )
 
@@ -2363,9 +2363,9 @@ class core( QObject ) :
 			p = tk_p[j]
 
 			alt = self.alt[t]
-			azm = self.azm[t,p]
+			dir = self.dir[t,p]
 
-			dlk = self.calc_dir_look( alt, azm )
+			dlk = self.calc_dir_look( alt, dir )
 
 			# Select data for each species.
 
@@ -2446,7 +2446,7 @@ class core( QObject ) :
 
 		if ( self.nln_sel is None ) :
 			self.nln_sel = tile( False,
-			                     [ self.n_alt, self.n_azm,
+			                     [ self.n_alt, self.n_dir,
 			                       self.n_vel              ] )
 
 		# Change the selection of the requested point.
@@ -2498,7 +2498,7 @@ class core( QObject ) :
 		d_vel_cen = x[0]
 		d_vel_wid = x[1]
 		d_alt     = x[2]
-		d_azm     = x[3]
+		d_dir     = x[3]
 		d_mag_x   = x[4]
 		d_mag_y   = x[5]
 		d_mag_z   = x[6]
@@ -2578,7 +2578,7 @@ class core( QObject ) :
 				        self.calc_cur_bmx(
 					            d_vel_cen * sqm,
 					            d_vel_wid * sqm,
-				                    d_alt, d_azm,
+				                    d_alt, d_dir,
 					            d_nrm_x, d_nrm_y, d_nrm_z,
 				                    prm_n, prm_v_x,
 				                    prm_v_y, prm_v_z,
@@ -2587,7 +2587,7 @@ class core( QObject ) :
 				cur_p = self.nln_pyon.arr_pop[p]['q'] * \
 				        self.calc_cur_max( d_vel_cen * sqm,
 					                   d_vel_wid * sqm,
-				                           d_alt, d_azm,
+				                           d_alt, d_dir,
 				                           prm_n, prm_v_x,
 				                           prm_v_y, prm_v_z,
 				                           prm_w             )
@@ -2669,12 +2669,12 @@ class core( QObject ) :
 		x_vel_cen = self.vel_cen[ tk_v ]
 		x_vel_wid = self.vel_wid[ tk_v ]
 		x_alt     = self.alt[ tk_t ]
-		x_azm     = self.azm[ tk_t, tk_p ]
+		x_dir     = self.dir[ tk_t, tk_p ]
 		x_mag_x   = self.mag_x[ tk_v ]
 		x_mag_y   = self.mag_y[ tk_v ]
 		x_mag_z   = self.mag_z[ tk_v ]
 
-		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_azm,
+		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_dir,
 		             x_mag_x, x_mag_y, x_mag_z           ] )
 
 		y = self.cur[ tk_t, tk_p, tk_v ]
@@ -2702,7 +2702,7 @@ class core( QObject ) :
 		# Calculate the expected currents based on the results of the
 		# non-linear analysis.
 
-		( tk_t, tk_p, tk_v ) = indices( ( self.n_alt, self.n_azm,
+		( tk_t, tk_p, tk_v ) = indices( ( self.n_alt, self.n_dir,
 		                                  self.n_vel              ) )
 
 		tk_t = tk_t.flatten( )
@@ -2712,17 +2712,17 @@ class core( QObject ) :
 		x_vel_cen = self.vel_cen[ tk_v ]
 		x_vel_wid = self.vel_wid[ tk_v ]
 		x_alt     = self.alt[ tk_t ]
-		x_azm     = self.azm[ tk_t, tk_p ]
+		x_dir     = self.dir[ tk_t, tk_p ]
 		x_mag_x   = self.mag_x[ tk_v ]
 		x_mag_y   = self.mag_y[ tk_v ]
 		x_mag_z   = self.mag_z[ tk_v ]
 
-		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_azm,
+		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_dir,
 		             x_mag_x, x_mag_y, x_mag_z           ] )
 
 		self.nln_res_cur_ion = \
 		   reshape( self.calc_nln_cur( pop, x, fit, ret_comp=True ),
-		            ( self.n_alt, self.n_azm, self.n_vel, len( pop ) ) )
+		            ( self.n_alt, self.n_dir, self.n_vel, len( pop ) ) )
 
 		self.nln_res_cur_tot = sum( self.nln_res_cur_ion, axis=3 )
 
