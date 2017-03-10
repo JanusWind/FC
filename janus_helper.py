@@ -71,6 +71,25 @@ def calc_vec_dot( u,v ) :
 		raise TypeError( 'Unequal lengths.' )
 	return fsum([ x[0]*x[1] for x in zip(u,v) ]) 
 
+#-----------------------------------------------------------------------
+# DEFINE THE FUNCTION FOR CLIPPING A VALUE OR ARRAY OF VALUES.
+#-----------------------------------------------------------------------
+
+def calc_arr_clp( self, a, lwr, upr ) :
+
+
+	# If "a" is an array of vectors, return a clipped version of
+	# "a" where each element falls between "lwr" and "upr".
+	# Otherwise, clip "a" as a scalar.
+
+	if hasattr( a, '__iter__' ) :
+
+		return array( [ min( [ max( [ v, lwr ] ), upr ] )
+			        for v in a                        ] )
+
+	else :
+
+		return min( [ max( [ a, lwr ] ), upr ] )
 
 
 """

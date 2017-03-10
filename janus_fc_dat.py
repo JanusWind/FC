@@ -147,3 +147,151 @@ class fc_dat( ) :
 		# Return the effective collecting area corresponding to "psi".
 
 		return interp( psi, self._spec._eff_deg, self._spec._eff_area )
+
+	#-----------------------------------------------------------------------
+	#DEFINE THE FUNCTION TI RETURN CARTESIAN UNIT VECTOR FOR LOOK DIRECTION.
+	#-----------------------------------------------------------------------
+
+	#FIXME 2
+
+	#TODO Returns look direction automatically when the
+	#     altitude and azimuth are provided in the initialization.
+
+	def calc_dir_look( self ) :
+	
+		ret = array( self['dir'] )
+
+		if ( ret.ndim > 1 ) :		#ndim ?????
+			return transpose( ret )
+		else :
+			return ret
+
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT (MAXWELLIAN).
+	#-----------------------------------------------------------------------
+
+	#FIXME 5
+
+	#TODO Make this not a stupid hack of the bi-Maxwellian version.
+
+	#TODO Migrate to "fc_dat"
+
+	def calc_cur_max( self,
+	                  vel_cen, vel_wid,
+	                  dir_alt, dir_azm,
+	                  prm_n, prm_v_x, prm_v_y, prm_v_z, prm_w ) :
+
+
+		# Return the equivalent bi-Maxwellian response for equal
+		# perpendicular and parallel thermal speeds and a dummy
+		# magnetic field.
+
+		return self.calc_cur_bmx( vel_cen, vel_wid,
+		                          dir_alt, dir_azm, 1., 0., 0.,
+		                          prm_n, prm_v_x, prm_v_y, prm_v_z,
+		                          prm_w, prm_w                      )
+
+
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT (BI-MAXWELLIAN).
+	#-----------------------------------------------------------------------
+
+	#FIXME 6
+
+	#TODO Migrate to "fc_dat"
+
+	def calc_cur_bmx( self,
+	                  vel_cen, vel_wid,
+	                  dir_alt, dir_azm,
+	                  mag_x, mag_y, mag_z,
+	                  prm_n, prm_v_x, prm_v_y, prm_v_z,
+	                  prm_w_per, prm_w_par              ) :
+
+
+		# Note.  This function is based on Equation 2.34 from Maruca
+		#        (PhD thesis, 2012), but differs by a factor of $2$
+		#        (i.e., the factor of $2$ from Equation 2.13, which is
+		#        automatically calibrated out of the Wind/FC data).
+
+
+		# Calcualte the vector bulk velocity.
+
+		prm_v = array( [ prm_v_x, prm_v_y, prm_v_z ] )
+
+		if ( prm_v.ndim > 1 ) :
+			prm_v = transpose( prm_v )
+
+
+		# Calculate the look direction as a cartesian unit vector.
+
+		dlk = self.calc_dir_look( )
+
+
+		# Calculate the direction of the magnetic field as a cartesian
+		# unit vector.
+
+		mag = array( [ mag_x, mag_y, mag_z ] )
+
+		if ( mag.ndim > 1 ) :
+			mag = transpose( mag )
+
+		dmg = self.calc_arr_nrm( mag )
+
+
+		# Calculate the component of the magnetic field unit vector
+		# along that lies along the look direction.
+
+		dmg_dlk = self.calc_arr_dot( dmg, dlk )
+
+
+		# Compute the effective thermal speed along this look direction.
+
+
+		prm_w = sqrt( ( ( 1. - dmg_dlk**2 ) * prm_w_per**2 ) + 
+		              (        dmg_dlk**2   * prm_w_par**2 )   )
+
+
+		# Calcuate the exponential terms of the current.
+
+		ret_exp_1 = 1.e3 * prm_w * sqrt( 2. / pi ) * exp(
+		            - ( ( vel_cen - ( vel_wid / 2. )
+		            - self.calc_arr_dot( dlk, -prm_v ) )
+		            / prm_w )**2 / 2. )
+		ret_exp_2 = 1.e3 * prm_w * sqrt( 2. / pi ) * exp(
+		            - ( ( vel_cen + ( vel_wid / 2. )
+		            - self.calc_arr_dot( dlk, -prm_v ) )
+		            / prm_w )**2 / 2. )
+
+
+		# Calculate the "erf" terms.
+
+		ret_erf_1 = 1.e3 * self.calc_arr_dot( dlk, -prm_v ) * erf(
+		            ( vel_cen - ( vel_wid / 2. )
+		            - self.calc_arr_dot( dlk, -prm_v ) )
+		            / ( sqrt(2.) * prm_w ) )
+		ret_erf_2 = 1.e3 * self.calc_arr_dot( dlk, -prm_v ) * erf(
+		            ( vel_cen + ( vel_wid / 2. )
+		            - self.calc_arr_dot( dlk, -prm_v ) )
+		            / ( sqrt(2.) * prm_w ) )
+
+
+		# Calculate the parenthetical expression.
+
+		ret_prn = ( ( ret_exp_2 + ret_erf_2 ) -
+		            ( ret_exp_1 + ret_erf_1 )   )
+
+
+		# Calculate the expected current.
+
+		ret = ( ( 1.e12 ) * ( 1. / 2. ) * ( const['q_p'] )
+		        * ( 1.e6 * prm_n )
+		        * ( 1.e-4 * self.calc_eff_area( dlk, prm_v ) )
+		        * ( ret_prn ) )
+
+
+		# Return the calculated value for the expected current.
+
+		return ret
+

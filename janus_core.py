@@ -66,7 +66,7 @@ from scipy.optimize import curve_fit
 from scipy.special import erf
 from scipy.stats import pearsonr, spearmanr
 
-from janus_helper import round_sig
+from janus_helper import round_sig, calc_vec_norm
 
 from janus_fc_spec import fc_spec
 
@@ -840,6 +840,8 @@ class core( QObject ) :
 
 		self.emit( SIGNAL('janus_chng_mfi') )
 
+<<<<<<< HEAD
+=======
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CLIPPING A VALUE OR ARRAY OF VALUES.
 	#-----------------------------------------------------------------------
@@ -1064,6 +1066,7 @@ class core( QObject ) :
 		# Return the calculated value for the expected current.
 
 		return ret
+>>>>>>> 6525b2057c92f0f144e7c4a8347cd4cc17e969d1
 
          #-----------------------------------------------------------------------
          # DEFINE THE FUNCTION FOR CHANGING THE MOM. SELCTION DIRECTION WINDOW.
