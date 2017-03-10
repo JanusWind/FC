@@ -246,7 +246,7 @@ class fc_spec():
 		                                       for w in range( win ) ] )
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION TO FIND THE MAXIMUM CURRENT IN A GIVEN WINDOW
+	# DEFINE THE FUNCTION TO FIND THE INDEX OF WINDOW WITH MAXIMUM CURRENT
 	#-----------------------------------------------------------------------
 
 	def find_max_curr( c, d, win=1 ) :
@@ -282,3 +282,33 @@ class fc_spec():
 		# Return the location of the window with the maximum current.
 
 		return b_max
+
+   #-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR CALCULATING FIRST DIRECTION WITH MAXIMUM CURR
+	#-----------------------------------------------------------------------
+
+	def calc_cup_max_ind( c ) :
+
+		# Validate the cup, direction, and bin indices.
+
+		if ( ( c < 0 ) or ( c >= self['n_cup'] ) ) :
+			raise ValueError( 'Cup index out of range.' )
+
+      b_max = self.find_max_cur( c,d, win= self.mom_win_bin )
+                                       for d in self['n_dir']
+                                       for c in self['n_cup']
+      dir_max = 0
+      curr_max = 0.
+
+		for di in range( 0, self['n_dir'] ) :
+
+         curr = sum( [ self.arr[c][d+di][b_max+w]['curr_valid'] 
+                                        for w  in range( win ) ] )
+                                        for di in range( self['n_dir'] )
+         if (curr > curr_max) :
+            dir_max = di
+            curr_max = curr
+
+      # Return the location of of the direction with maximum current
+
+      return dir_max

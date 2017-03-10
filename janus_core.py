@@ -1156,11 +1156,15 @@ class core( QObject ) :
 		                                for c in self.fc_spec['n_cup'] ]
 
 		# Compute "cup_max_ind" (two element list)
-
-      cup_max_ind = [self.
+      # List of indices with maximum current for each cup
+      cup_max_ind = [ [ False for c in self.fc_spec['n_cup'] ]
+ 
+      cup_max_ind = [ [ self.fc_spec.calc_cup_max_ind( c ) ] ]
+		                                for c in self.fc_spec['n_cup'] ]
 		# FIXME 7
 
 		# TODO Populate "cup_max_ind" = [ ?, ? ]
+
 
 		# Populate "self.mom_sel_bin" appropriately
 
