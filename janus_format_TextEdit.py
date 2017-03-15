@@ -29,6 +29,9 @@
 
 from PyQt4.QtGui import QTextEdit
 
+import platform
+import os
+
 
 ################################################################################
 ## DEFINE THE "format_TextEdit" CLASS TO EXTEND "QTextEdit" FORMATTING OPTIONS.
@@ -122,11 +125,16 @@ class format_TextEdit( QTextEdit ) :
 	# DEFINE THE FUNCTION FOR PRINTING GENERAL HTML TEXT.
 	#-----------------------------------------------------------------------
 
-	def prnt_htm( self, s ) :
+	def prnt_htm( self, s , speak=False) :
 
 		# Print the string "s" (as HTML code)..
 
 		self.insertHtml( s )
+
+		# For analysis that can take a long time to run, this is a helpful
+		# reminder to check the result.
+		if speak and platform.system() == "Darwin":
+			os.system('say "%s"' % s)
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR TESTING WHETHER THE TEXT AREA IS EMPTY.
