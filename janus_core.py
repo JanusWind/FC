@@ -932,7 +932,8 @@ class core( QObject ) :
 
 		# Compute "cup_max_ind" (two element list)
 		# List of indices with maximum current for each cup
-		cup_max_ind = [ False for c in self.fc_spec['n_cup'] ] 
+
+		cup_max_ind = [ 0 for c in self.fc_spec['n_cup'] ] 
      
 		print cup_max_ind
 
@@ -940,27 +941,18 @@ class core( QObject ) :
 
 		for c in range( 0, self.fc_spec['n_cup'] ) :
 
-			for pd in range( self.fc_spec['n_dir'],
-                          self.fc_spec['n_dir'] +self.mom_win_dir ) :
+			for d in range( self.fc_spec['n_dir'] ) :
 
-				d = pd % self.fc_spec['n_dir']
-
-				curr_sum = sum([self.dir_max_curr[c][d+i]
-					    for i in range (self.mom_win_dir)])
+				curr_sum = sum( [ dir_max_curr[c][
+				                  (d+i)%self.fc_spec['n_dir']]
+				                  for i in range(
+				                           self.mom_win_dir) ] )
 
 				if ( curr_sum > curr_sum_max ) :
 					cup_max_ind[c] = d
 					curr_sum_max = curr_sum
 
-
-     
-  
-  	# FIXME 7
-
-  	# TODO Populate "cup_max_ind" = [ ?, ? ]
-
-
-  	# Populate "self.mom_sel_bin" appropriately
+		# Populate "self.mom_sel_bin" appropriately
 
 		for c in range( self.fc_spec['n_cup'] ) :
 
