@@ -939,13 +939,13 @@ class core( QObject ) :
 
 		for c in range( 0, self.fc_spec['n_cup'] ) :
 
-			for pd in range( self.fc_Spec['n_dir'],
-			                 self.fc_Spec['n_dir'] +
+			for pd in range( self.fc_spec['n_dir'],
+			                 self.fc_spec['n_dir'] +
 		                         self.mom_win_dir    ) :
 
 				d = pd % self.fc_spec['n_dir']
 
-				curr_sum = sum([self.dir_max_curr[d][d+i]
+				curr_sum = sum([self.dir_max_curr[c][d+i]
 					    for i in range (self.mom_win_dir)])
 
 				if ( curr_sum > curr_sum_max ) :
