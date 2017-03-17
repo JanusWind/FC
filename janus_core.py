@@ -932,16 +932,16 @@ class core( QObject ) :
 
 		# Compute "cup_max_ind" (two element list)
 		# List of indices with maximum current for each cup
-
-		cup_max_ind = [ [ False for c in self.fc_spec['n_cup'] ]
+		cup_max_ind = [ False for c in self.fc_spec['n_cup'] ] 
+     
+		print cup_max_ind
 
 		curr_sum_max = 0.
 
 		for c in range( 0, self.fc_spec['n_cup'] ) :
 
 			for pd in range( self.fc_spec['n_dir'],
-			                 self.fc_spec['n_dir'] +
-		                         self.mom_win_dir    ) :
+                          self.fc_spec['n_dir'] +self.mom_win_dir ) :
 
 				d = pd % self.fc_spec['n_dir']
 
@@ -953,14 +953,14 @@ class core( QObject ) :
 					curr_sum_max = curr_sum
 
 
+     
+  
+  	# FIXME 7
 
-	
-		# FIXME 7
-
-		# TODO Populate "cup_max_ind" = [ ?, ? ]
+  	# TODO Populate "cup_max_ind" = [ ?, ? ]
 
 
-		# Populate "self.mom_sel_bin" appropriately
+  	# Populate "self.mom_sel_bin" appropriately
 
 		for c in range( self.fc_spec['n_cup'] ) :
 
@@ -999,7 +999,7 @@ class core( QObject ) :
 		#FIXME 8
 
 		#TODO Verify that this code still works (under the new variable
-		#     names).  Consider changing (c,d,b) to (c,d,b) (both here
+		#     names).  Consider changing (t,p,v) to (c,d,b) (both here
 		#     and in "janus_thread.py").
 
 		# Change the selection of the requested datum.
