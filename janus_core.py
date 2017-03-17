@@ -95,14 +95,14 @@ class core( QObject ) :
 	# | chng_spc          |                              |
 	# | chng_mfi          |                              |
 	# | chng_mom_win      |                              |
-	# | chng_mom_sel_cur  | t, p, v                      |
-	# | chng_mom_sel_dir  | t, p                         |
+	# | chng_mom_sel_bin  | c, d, b                      |
+	# | chng_mom_sel_dir  | c, d                         |
 	# | chng_mom_sel_all  |                              |
 	# | chng_mom_res      |                              |
 	# | chng_nln_ion      |                              |
 	# | chng_nln_set      |                              |
 	# | chng_nln_gss      |                              |
-	# | chng_nln_sel_cur  | t, p, v                      |
+	# | chng_nln_sel_cur  | c, d, b                      |
 	# | chng_nln_sel_all  |                              |
 	# | chng_nln_res      |                              |
 	# | chng_dsp          |                              |
@@ -913,8 +913,8 @@ class core( QObject ) :
 		                             for c in self.fc_spec['n_cup'] ]
 
 		self.mom_sel_bin = [ [ False for b in self.fc_spec['n_bin'] ]
-                                   for d in self.fc_spec['n_dir']
-                                   for c in self.fc_spec['n_cup'] ]
+					     for d in self.fc_spec['n_dir']
+					     for c in self.fc_spec['n_cup'] ]
 
 		# Find the maximum current window (of "self.mom_win_bin" bins)
 		# for each direction
@@ -931,11 +931,30 @@ class core( QObject ) :
 		                                for c in self.fc_spec['n_cup'] ]
 
 		# Compute "cup_max_ind" (two element list)
-      # List of indices with maximum current for each cup
-      cup_max_ind = [ [ False for c in self.fc_spec['n_cup'] ]
- 
-      cup_max_ind = [ [ self.fc_spec.calc_cup_max_ind( c ) ] ]
-		                                for c in self.fc_spec['n_cup'] ]
+		# List of indices with maximum current for each cup
+
+		cup_max_ind = [ [ False for c in self.fc_spec['n_cup'] ]
+
+		curr_sum_max = 0.
+
+		for c in range( 0, self.fc_spec['n_cup'] ) :
+
+			for pd in range( self.fc_Spec['n_dir'],
+			                 self.fc_Spec['n_dir'] +
+		                         self.mom_win_dir    ) :
+
+				d = pd % self.fc_spec['n_dir']
+
+				curr_sum = sum([self.dir_max_curr[d][d+i]
+					    for i in range (self.mom_win_dir)])
+
+				if ( curr_sum > curr_sum_max ) :
+					cup_max_ind[c] = d
+					curr_sum_max = curr_sum
+
+
+
+	
 		# FIXME 7
 
 		# TODO Populate "cup_max_ind" = [ ?, ? ]
@@ -975,22 +994,22 @@ class core( QObject ) :
 	# DEFINE THE FUNCTION FOR CHANGING THE SELECTION OF A SINGLE POINT.
 	#-----------------------------------------------------------------------
 
-	def chng_mom_sel( self, t, p, v ) :
+	def chng_mom_sel( self, c, d, b ) :
 
 		#FIXME 8
 
 		#TODO Verify that this code still works (under the new variable
-		#     names).  Consider changing (t,p,v) to (c,d,b) (both here
+		#     names).  Consider changing (c,d,b) to (c,d,b) (both here
 		#     and in "janus_thread.py").
 
 		# Change the selection of the requested datum.
 
-		self.mom_sel_cur[t,p,v] = not self.mom_sel_cur[t,p,v]
+		self.mom_sel_bin[c, d, b] = not self.mom_sel_bin[c, d, b]
 
 		# Emit a signal that indicates that the datum's selection status
 		# for the moments analysis has changed.
 
-		self.emit( SIGNAL('janus_chng_mom_sel_cur'), t, p, v )
+		self.emit( SIGNAL('janus_chng_mom_sel_bin'), c, d, b )
 
 		# Validate the new data selection (i.e., make sure that the two
 		# "self.sel_???" arrays are mutually-consistent) and update the
@@ -1023,12 +1042,11 @@ class core( QObject ) :
 		#TODO Don't forget to populate the "self.mom_sel_dir" array.
 
 
-
 		# Note.  This function ensures that the two "self.mom_sel_???"
 		#        arrays are mutually consistent.  For each set of "t"-
 		#        and "p"-values, "self.mom_sel_dir[t,p]" can only be
 		#        "True" if at least "self.min_sel_cur" of the elements
-		#        in "self.mom_sel_cur[t,p,:]" are "True".  However, if
+		#        in "self.mom_sel_bin[t,p,:]" are "True".  However, if
 		#        fewer than "self.mom_min_sel_dir" sets of "t"- and
 		#        "p"-values satisfy this criterion, all elements of
 		#        "self.mom_sel_dir" are given the value "False".		
@@ -1046,7 +1064,7 @@ class core( QObject ) :
 		# selected data in each pointing direction).
 
 		self.mom_n_sel_cur = array( [ [
-		                len( where( self.mom_sel_cur[t,p,:] )[0] )
+		                len( where( self.mom_sel_bin[t,p,:] )[0] )
 		                              for p in range( self.n_dir ) ]
 		                                for t in range( self.n_alt ) ] )
 
@@ -1118,7 +1136,7 @@ class core( QObject ) :
 		# the automatic point selection.
 
 		if ( ( self.mom_sel_dir is None ) or
-		     ( self.mom_sel_cur is None )    ) :
+		     ( self.mom_sel_bin is None )    ) :
 
 			self.auto_mom_sel( no_anls_mom=True )
 
@@ -1212,10 +1230,10 @@ class core( QObject ) :
 			# Extract the "v" values of the selected data from this
 			# look direction.
 
-			v = where( self.mom_sel_cur[t,p,:] )[0]
+			v = where( self.mom_sel_bin[t,p,:] )[0]
 
-			eta_v[k] = - sum( self.cur[t,p,v] ) / \
-			                sum( self.cur[t,p,v] / self.vel_cen[v] )
+			eta_v[k] = - sum( self.cur[c,d,b] ) / \
+			                sum( self.cur[c,d,b] / self.vel_cen[v] )
 
 
 		# Use singular value decomposition (in the form of least squares
@@ -1249,21 +1267,21 @@ class core( QObject ) :
 			# Extract the "v" indices of the selected data from this
 			# look direction.
 
-			v = where( self.mom_sel_cur[t,p,:] )[0]
+			v = where( self.mom_sel_bin[t,p,:] )[0]
 
 			# Estimate the number density and thermal speed based on
 			# the selected data from this look direction.
 
 			eta_n[k] = 1e-6 * ( ( 1. / const['q_p'] )
 			           / ( 1.e-4 * eta_eca[k] )
-			           * sum( ( 1.e-12 * self.cur[t,p,v] ) /
+			           * sum( ( 1.e-12 * self.cur[c,d,b] ) /
 			                  ( 1.e3 * self.vel_cen[v]   )   ) )
 
 			eta_w[k] = 1e-3 * sqrt( max( [ 0.,
 			           ( ( 1. / const['q_p'] )
 			           / ( 1.e-4 * eta_eca[k] )
 			           / ( 1.e6 * eta_n[k] )
-			           * sum( ( 1.e-12 * self.cur[t,p,v] ) *
+			           * sum( ( 1.e-12 * self.cur[c,d,b] ) *
 			                  ( 1.e3 * self.vel_cen[v]   )   ) )
 			           - ( 1e3 * eta_v[k] )**2               ] ) )
 
@@ -2208,7 +2226,7 @@ class core( QObject ) :
 	# DEFINE THE FUNCTION FOR CHANGING THE SELECTION OF A SINGLE POINT.
 	#-----------------------------------------------------------------------
 
-	def chng_nln_sel( self, t, p, v ) :
+	def chng_nln_sel( self, c, d, b ) :
 
 		# As this function was mostly likely called in response to the
 		# user manually adjusting the point selection for the
@@ -2226,11 +2244,11 @@ class core( QObject ) :
 
 		# Change the selection of the requested point.
 
-		self.nln_sel[t,p,v] = not self.nln_sel[t,p,v]
+		self.nln_sel[c,d,b] = not self.nln_sel[c,d,b]
 
 		# Propagate the new data-selection for the non-linear analysis.
 
-		self.prop_nln_sel( pnt=[t,p,v] )
+		self.prop_nln_sel( pnt=[c,d,b] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR PROPAGATING THE NLN DATA-SELECTION.
