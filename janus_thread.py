@@ -183,12 +183,12 @@ def thread_xprt_res( core, nm_fl, exit=False ) :
 ## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_mom_sel".
 ################################################################################
 
-def thread_chng_mom_sel( core, t, p, v ) :
+def thread_chng_mom_sel( core, c, d, b ) :
 
 	core.emit( SIGNAL('janus_busy_end') )
 	core.emit( SIGNAL('janus_busy_beg') )
 
-	core.chng_mom_sel( t, p, v )
+	core.chng_mom_sel( c, d, b )
 
 	core.emit( SIGNAL('janus_busy_end') )
 
@@ -254,12 +254,12 @@ def thread_chng_nln_gss( core, i, param, val ) :
 ## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_nln_sel".
 ################################################################################
 
-def thread_chng_nln_sel( core, t, p, v ) :
+def thread_chng_nln_sel( core, c, d, b ) :
 
         core.emit( SIGNAL('janus_busy_end') )
         core.emit( SIGNAL('janus_busy_beg') )
 
-        core.chng_nln_sel( t, p, v )
+        core.chng_nln_sel( c, d, b )
 
         core.emit( SIGNAL('janus_busy_end') )
 
