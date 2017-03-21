@@ -284,7 +284,7 @@ class widget_fc_cup( QWidget ) :
 				# If creating this plot would exceed the
 				# specified number of plots, don't create it.
 
-				if ( p >= self.n_plt ) :
+				if ( d >= self.n_plt ) :
 					continue
 
 				# Create and store this plot, adjust its limits,
@@ -355,7 +355,7 @@ class widget_fc_cup( QWidget ) :
 	# DEFINE THE FUNCTION FOR CREATING THE PLOTS' HISTOGRAMS (AND LABELS).
 	#-----------------------------------------------------------------------
 
-	def make_hst( self, cur_min=0.69 ) :
+	def make_hst( self, curr_min=0.69 ) :
 
 		# If no spectrum has been loaded, clear any existing histograms
 		# and abort.
@@ -379,7 +379,7 @@ class widget_fc_cup( QWidget ) :
 						for d in range(self.core.fc_spec['n_dir']) ])
 
 		stp_pnt = array( [ array( self.stp[d]\
-		                              .calc_pnt( lev_min=cur_min ) )
+		                              .calc_pnt( lev_min=curr_min ) )
 		                for d in range( self.core.fc_spec['n_dir'] ) ] )
 
 		self.stp_x = stp_pnt[:,0,:]
@@ -460,7 +460,7 @@ class widget_fc_cup( QWidget ) :
 	# DEFINE THE FUNCTION FOR CREATING THE PLOTS' SELECTION POINTS.
 	#-----------------------------------------------------------------------
 
-	def make_pnt( self, cur_min=0.69 ) :
+	def make_pnt( self, curr_min=0.69 ) :
 
 		# Add selection points to each plot.
 
@@ -485,7 +485,7 @@ class widget_fc_cup( QWidget ) :
 
 			# Add the selection points to this plot.
 
-			for v in range( self.core.fc_spec['n_bin'] ) :
+			for b in range( self.core.fc_spec['n_bin'] ) :
 
 				sel_bin = False
 				sel_dir = True
@@ -549,10 +549,10 @@ class widget_fc_cup( QWidget ) :
 			curr_ion = None
 		elif ( self.core.dsp == 'gsl' ) :
 			curr     = self.core.nln_gss_curr_tot
-			cur_ion = self.core.nln_gss_curr_ion
+			curr_ion = self.core.nln_gss_curr_ion
 		elif ( self.core.dsp == 'nln' ) :
 			curr     = self.core.nln_res_curr_tot
-			cur_ion = self.core.nln_res_curr_ion
+			curr_ion = self.core.nln_res_curr_ion
 		else :
 			curr     = None
 			curr_ion = None
@@ -590,14 +590,14 @@ class widget_fc_cup( QWidget ) :
 			# Create and add the curve of the individual
 			# contributions to the modeled current to the plot.
 
-			if ( cur_ion is not None ) :
+			if ( curr_ion is not None ) :
 
-				for n in range( len( cur_ion[self.c,d,0,:] ) ) :
+				for n in range( len( curr_ion[self.c,d,0,:] ) ) :
 
 					# Extract the points for this fit curve.
 
 					x = array( self.core.fc_spec['vel_cen'][0] )
-					y = cur_ion[self.c,d,:,n]
+					y = curr_ion[self.c,d,:,n]
 
 					# Select only those points for which
 					# the fit current is strictly positive.
@@ -819,7 +819,7 @@ class widget_fc_cup( QWidget ) :
 				# Remove and then delete each of this plot's
 				# selection points.
 
-				for v in range( self.core.n_vel ) :
+				for b in range( self.core.n_vel ) :
 					if ( self.pnt[j,i,b] is not None ) :
 						self.plt[j,i].removeItem(
 						               self.pnt[j,i,b] )
@@ -859,7 +859,7 @@ class widget_fc_cup( QWidget ) :
 						self.crv_ion[j,i,n] = None
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION CALCULATING THE INDEX "i" FROM THE INDEX "p".
+	# DEFINE THE FUNCTION CALCULATING THE INDEX "i" FROM THE INDEX "d".
 	#-----------------------------------------------------------------------
 
 	def calc_ind_i( self, d ) :
@@ -871,7 +871,7 @@ class widget_fc_cup( QWidget ) :
 		return d % self.n_plt_x
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION CALCULATING THE INDEX "j" FROM THE INDEX "p".
+	# DEFINE THE FUNCTION CALCULATING THE INDEX "j" FROM THE INDEX "d".
 	#-----------------------------------------------------------------------
 
 	def calc_ind_j( self, d ) :
@@ -880,7 +880,7 @@ class widget_fc_cup( QWidget ) :
 		# corresponding to the index "d" (i.e., look direction value)
 		# passed by the user.
 
-
+                return int( floor( d / ( 1. * self.n_plt_x ) ) )
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION CALCULATING INDEX "d" FROM INDICES "j" AND "i".
 	#-----------------------------------------------------------------------

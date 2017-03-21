@@ -492,8 +492,8 @@ class core( QObject ) :
 			self.nln_gss_pop = array( [ ] )
 			self.nln_gss_prm = array( [ ] )
 
-			self.nln_gss_cur_tot = None
-			self.nln_gss_cur_ion = None
+			self.nln_gss_curr_tot = None
+			self.nln_gss_curr_ion = None
 
 		# If requested, (re-)initialize the variables associated with
 		# the data selection for the non-linear analysis.
@@ -514,8 +514,8 @@ class core( QObject ) :
 
 			self.nln_res_sel = None
 
-			self.nln_res_cur_tot = None
-			self.nln_res_cur_ion = None
+			self.nln_res_curr_tot = None
+			self.nln_res_curr_ion = None
 
 		# If requested, (re-)initialize the variables which indicate of
 		# the analyses have their results displayed in widgets which
@@ -840,9 +840,9 @@ class core( QObject ) :
 
 		self.emit( SIGNAL('janus_chng_mfi') )
 
-         #-----------------------------------------------------------------------
-         # DEFINE THE FUNCTION FOR CHANGING THE MOM. SELCTION DIRECTION WINDOW.
-         #-----------------------------------------------------------------------
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR CHANGING THE MOM. SELCTION DIRECTION WINDOW.
+	#-----------------------------------------------------------------------
  
 	def chng_mom_win_dir( self, val ) :
 
@@ -868,9 +868,9 @@ class core( QObject ) :
 
 		self.auto_mom_sel( )
 
-         #-----------------------------------------------------------------------
-         # DEFINE THE FUNCTION FOR CHANGING THE MOMENTS SELCTION BIN WINDOW.
-         #-----------------------------------------------------------------------
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR CHANGING THE MOMENTS SELCTION BIN WINDOW.
+	#-----------------------------------------------------------------------
   
 	def chng_mom_win_bin( self, val ) :
 
@@ -910,25 +910,25 @@ class core( QObject ) :
 		# Initially, deselect all look directions and bins.
 
 		self.mom_sel_dir = [ [ False for d in self.fc_spec['n_dir'] ]
-                                   for c in self.fc_spec['n_cup'] ]
+                                             for c in self.fc_spec['n_cup'] ]
 
 		self.mom_sel_bin = [ [ False for b in self.fc_spec['n_bin'] ]
-                                   for d in self.fc_spec['n_dir']
+                                             for d in self.fc_spec['n_dir']
 		                             for c in self.fc_spec['n_cup'] ]
 
 		# Find the maximum current window (of "self.mom_win_bin" bins)
 		# for each direction
 
 		dir_max_ind = [ [ self.fc_spec.find_max_curr( c, d,
-		                              win=self.mom_win_bin )
-		                                for d in self.fc_spec['n_dir'] ]
-		                                for c in self.fc_spec['n_cup'] ]
+		                             win=self.mom_win_bin           )
+		                             for d in self.fc_spec['n_dir'] ]
+		                             for c in self.fc_spec['n_cup'] ]
 
 		dir_max_curr = [ [ self.fc_spec.calc_curr( c, d,
 		                              dir_max_ind[c][d],
-		                              win=self.mom_win_bin )
-		                                for d in self.fc_spec['n_dir'] ]
-		                                for c in self.fc_spec['n_cup'] ]
+		                             win=self.mom_win_bin           )
+		                             for d in self.fc_spec['n_dir'] ]
+		                             for c in self.fc_spec['n_cup'] ]
 
 		# Compute "cup_max_ind" (two element list)
 		# List of indices with maximum current for each cup
@@ -965,6 +965,12 @@ class core( QObject ) :
 
 					self.mom_sel_bin[c][d][b] = True
 
+		self.mom_n_sel_bin = array( [ [
+                                 len( where( self.mom_sel_cur[t,p,:] )[0] )
+                                                for d in range( self.n_dir ) ]
+                                                for c in range( self.n_alt ) ] )
+
+
 		# TODO Populate "self.mom_sel_dir" appropriately
 
 		for c in range( self.fc_spec['n_cup'] ) :
@@ -972,12 +978,13 @@ class core( QObject ) :
 			for pd in range( cup_max_ind[c],
 			                 cup_max_ind[c] + self.mom_win_dir ) :
 
-
 				d = pd % self.fc_spec['n_dir']
 
 				self.mom_sel_dir[c][d] = True
 
-		# Validate the new data selection (which includes populating
+		self.mom_n_sel_dir = len( where( self.mom_sel_dir )[0] )
+		
+                # Validate the new data selection (which includes populating
 		# the "self.mom_sel_dir" array).
 
 		self.vldt_mom_sel( )
@@ -1074,8 +1081,8 @@ class core( QObject ) :
 		# data selection, and then update the counter
 		# "self.mom_n_sel_dir".
 
-      # TODO Chnage 'sel_cur' to 'sel_bin' both here and wherever the 
-      # the signal is being called.
+                # TODO Chnage 'sel_curr' to 'sel_bin' both here and wherever the 
+                # the signal is being called.
 		self.mom_sel_dir = array( [ [
 		           self.mom_n_sel_bin[c,d] >= self.mom_min_sel_bin	
 		                              for d in range( self.n_dir ) ]
@@ -1408,7 +1415,7 @@ class core( QObject ) :
 		if ( aniso ) :
 			for c in range( self.n_alt ) :
 				for d in range( self.n_dir ) :
-					mom_curr[c,d,:] = self.calc_cur_bmx(
+					mom_curr[c,d,:] = self.calc_curr_bmx(
 					           self.vel_cen, self.vel_wid,
 					           self.alt[t], self.dir[c,d],
 					           self.mfi_avg_nrm[0],
@@ -1420,7 +1427,7 @@ class core( QObject ) :
 		else :
 			for c in range( self.n_alt ) :
 				for d in range( self.n_dir ) :
-					mom_curr[c,d,:] = self.calc_cur_max(
+					mom_curr[c,d,:] = self.calc_curr_max(
 					           self.vel_cen, self.vel_wid,
 					           self.alt[t], self.dir[c,d],
 					           mom_n, mom_v_vec[0],
@@ -2005,8 +2012,8 @@ class core( QObject ) :
 
 		self.nln_gss_prm = array( [] )
 
-		self.nln_gss_cur_ion = None
-		self.nln_gss_cur_tot = None
+		self.nln_gss_curr_ion = None
+		self.nln_gss_curr_tot = None
 
 		# Abort if any of the following cases are arise:
 		#   -- No populations have been found to be valid.
@@ -2047,7 +2054,7 @@ class core( QObject ) :
 
 		# Calculate the expected currents based on the initial geuss.
 
-		# FIXME:12  This code (and that in "self.calc_nln_cur") may not be
+		# FIXME:12  This code (and that in "self.calc_nln_curr") may not be
 		#        especially efficient.
 
 		( tk_c, tk_d, tk_b ) = indices( ( self.n_alt, self.n_dir,
@@ -2068,14 +2075,14 @@ class core( QObject ) :
 		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_dir,
 		             x_mag_x, x_mag_y, x_mag_z           ] )
 
-		self.nln_gss_cur_ion = reshape(
-		      self.calc_nln_cur( self.nln_gss_pop, x,
+		self.nln_gss_curr_ion = reshape(
+		      self.calc_nln_curr( self.nln_gss_pop, x,
 		                         self.nln_gss_prm,
 		                         ret_comp=True        ),
 		      ( self.n_alt, self.n_dir, self.n_vel,
 		        len( self.nln_gss_pop )             )    )
 
-		self.nln_gss_cur_tot = sum( self.nln_gss_cur_ion, axis=3 )
+		self.nln_gss_curr_tot = sum( self.nln_gss_curr_ion, axis=3 )
 
 		# Propagate the new initial-guess for the non-linear analysis.
 
@@ -2286,7 +2293,7 @@ class core( QObject ) :
 	# DEFINE THE FUNCTION FOR CALCULATING THE NLN MODEL CURRNET.
 	#-----------------------------------------------------------------------
 
-	def calc_nln_cur( self, pop, x, prm, ret_comp=False ) :
+	def calc_nln_curr( self, pop, x, prm, ret_comp=False ) :
 
 		# Extract the independent data variables (i.e., the
 		# specifications of the velocity windows and pointing
@@ -2372,7 +2379,7 @@ class core( QObject ) :
 
 			if ( self.nln_pyon.arr_pop[p]['aniso'] ) :
 				cur_p = self.nln_pyon.arr_pop[p]['q'] * \
-				        self.calc_cur_bmx(
+				        self.calc_curr_bmx(
 					            d_vel_cen * sqm,
 					            d_vel_wid * sqm,
 				                    d_alt, d_dir,
@@ -2382,7 +2389,7 @@ class core( QObject ) :
 				                    prm_w_per, prm_w_par       )
 			else :
 				cur_p = self.nln_pyon.arr_pop[p]['q'] * \
-				        self.calc_cur_max( d_vel_cen * sqm,
+				        self.calc_curr_max( d_vel_cen * sqm,
 					                   d_vel_wid * sqm,
 				                           d_alt, d_dir,
 				                           prm_n, prm_v_x,
@@ -2454,7 +2461,7 @@ class core( QObject ) :
 
 		def model( x, *p ) :
 
-			return self.calc_nln_cur( pop, x, array( p ) )
+			return self.calc_nln_curr( pop, x, array( p ) )
 
 		# Save the data selection and then use it to generate data
 		# arrays for the non-linear fit.
@@ -2517,11 +2524,11 @@ class core( QObject ) :
 		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_dir,
 		             x_mag_x, x_mag_y, x_mag_z           ] )
 
-		self.nln_res_cur_ion = \
-		   reshape( self.calc_nln_cur( pop, x, fit, ret_comp=True ),
+		self.nln_res_curr_ion = \
+		   reshape( self.calc_nln_curr( pop, x, fit, ret_comp=True ),
 		            ( self.n_alt, self.n_dir, self.n_vel, len( pop ) ) )
 
-		self.nln_res_cur_tot = sum( self.nln_res_cur_ion, axis=3 )
+		self.nln_res_curr_tot = sum( self.nln_res_curr_ion, axis=3 )
 
 		# Save the properties and fit parameters for each ion species
 		# used in this analysis.
