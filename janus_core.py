@@ -679,7 +679,7 @@ class core( QObject ) :
 		#self.n_vel = n_bin
 		#????... why can't we write this way
 		#self.time_epc = self.fc_spec['time']
-		self.n_alt = self.fc_spec[ 'n_cup' ]
+		self.n_alt = self.fc_spec['n_cup']
 		self.n_dir = self.fc_spec['n_dir']
 		self.n_vel = self.fc_spec['n_bin']
 
@@ -715,12 +715,12 @@ class core( QObject ) :
 		# Load the associated Wind/MFI magnetic field data associated
 		# with this spectrum.
 
-		self.load_mfi( )
+#		self.load_mfi( )
 
 		# If requested, run the moments analysis.
-
-		if ( self.dyn_mom ) :
-			self.auto_mom_sel( )
+#
+#		if ( self.dyn_mom ) :
+#			self.auto_mom_sel( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING THE Wind/MFI MAGNETIC FIELD DATA.
@@ -805,10 +805,10 @@ class core( QObject ) :
 		# magnetic field and each look direction.
 
 		self.mfi_hat_dir = array( [ [
-		          dot( self.calc_dir_look( self.alt[t], self.dir[t,p] ),
+		          dot( self.calc_dir_look( self.alt[t], self.dir[c,d] ),
 		               self.mfi_avg_nrm )
-		          for p in range( self.n_dir ) ]
-		        for t in range( self.n_alt ) ] )
+		          for d in range( self.n_dir ) ]
+		        for c in range( self.n_alt ) ] )
 
 
 		# Use interpolation to estimate a magnetic-field vector for each
@@ -910,11 +910,11 @@ class core( QObject ) :
 		# Initially, deselect all look directions and bins.
 
 		self.mom_sel_dir = [ [ False for d in self.fc_spec['n_dir'] ]
-		                             for c in self.fc_spec['n_cup'] ]
+                                   for c in self.fc_spec['n_cup'] ]
 
 		self.mom_sel_bin = [ [ False for b in self.fc_spec['n_bin'] ]
-					     for d in self.fc_spec['n_dir']
-					     for c in self.fc_spec['n_cup'] ]
+                                   for d in self.fc_spec['n_dir']
+		                             for c in self.fc_spec['n_cup'] ]
 
 		# Find the maximum current window (of "self.mom_win_bin" bins)
 		# for each direction
@@ -934,8 +934,6 @@ class core( QObject ) :
 		# List of indices with maximum current for each cup
 
 		cup_max_ind = [ 0 for c in self.fc_spec['n_cup'] ] 
-     
-		print cup_max_ind
 
 		curr_sum_max = 0.
 
@@ -952,7 +950,7 @@ class core( QObject ) :
 					cup_max_ind[c] = d
 					curr_sum_max = curr_sum
 
-		# Populate "self.mom_sel_bin" appropriately
+		#TODO Populate "self.mom_sel_bin" appropriately
 
 		for c in range( self.fc_spec['n_cup'] ) :
 
@@ -1036,9 +1034,9 @@ class core( QObject ) :
 
 		# Note.  This function ensures that the two "self.mom_sel_???"
 		#        arrays are mutually consistent.  For each set of "t"-
-		#        and "p"-values, "self.mom_sel_dir[t,p]" can only be
+		#        and "p"-values, "self.mom_sel_dir[c,d]" can only be
 		#        "True" if at least "self.min_sel_cur" of the elements
-		#        in "self.mom_sel_bin[t,p,:]" are "True".  However, if
+		#        in "self.mom_sel_bin[c,d,:]" are "True".  However, if
 		#        fewer than "self.mom_min_sel_dir" sets of "t"- and
 		#        "p"-values satisfy this criterion, all elements of
 		#        "self.mom_sel_dir" are given the value "False".		
@@ -1056,18 +1054,20 @@ class core( QObject ) :
 		# selected data in each pointing direction).
 
 		self.mom_n_sel_cur = array( [ [
-		                len( where( self.mom_sel_bin[t,p,:] )[0] )
-		                              for p in range( self.n_dir ) ]
-		                                for t in range( self.n_alt ) ] )
+		                len( where( self.mom_sel_bin[c,d,:] )[0] )
+		                              for d in range( self.n_dir ) ]
+		                              for c in range( self.n_alt ) ] )
 
 		# Create a new selection of pointing directions based on the
 		# data selection, and then update the counter
 		# "self.mom_n_sel_dir".
 
+      # TODO Chnage 'sel_cur' to 'sel_bin' both here and wherever the 
+      # the signal is being called.
 		self.mom_sel_dir = array( [ [
-		           self.mom_n_sel_cur[t,p] >= self.mom_min_sel_cur	
-		                              for p in range( self.n_dir ) ]
-		                                for t in range( self.n_alt ) ] )
+		           self.mom_n_sel_cur[c,d] >= self.mom_min_sel_cur	
+		                              for d in range( self.n_dir ) ]
+		                              for c in range( self.n_alt ) ] )
 
 		self.mom_n_sel_dir = len( where( self.mom_sel_dir )[0] )
 
@@ -1211,18 +1211,18 @@ class core( QObject ) :
 			# direction.
 
 			eta_the[k] = - self.alt[t] + 90.
-			eta_phi[k] = - self.dir[t,p]
+			eta_phi[k] = - self.dir[c,d]
 
 			# Convert the look direction from altitude-azimuth to a
 			# Cartesian unit vector.
 
 			eta_dlk[k,:] = self.calc_dir_look( self.alt[t],
-			                                   self.dir[t,p] )
+			                                   self.dir[c,d] )
 
 			# Extract the "v" values of the selected data from this
 			# look direction.
 
-			v = where( self.mom_sel_bin[t,p,:] )[0]
+			v = where( self.mom_sel_bin[c,d,:] )[0]
 
 			eta_v[k] = - sum( self.cur[c,d,b] ) / \
 			                sum( self.cur[c,d,b] / self.vel_cen[v] )
@@ -1259,7 +1259,7 @@ class core( QObject ) :
 			# Extract the "v" indices of the selected data from this
 			# look direction.
 
-			v = where( self.mom_sel_bin[t,p,:] )[0]
+			v = where( self.mom_sel_bin[c,d,:] )[0]
 
 			# Estimate the number density and thermal speed based on
 			# the selected data from this look direction.
@@ -1396,9 +1396,9 @@ class core( QObject ) :
 		if ( aniso ) :
 			for t in range( self.n_alt ) :
 				for p in range( self.n_dir ) :
-					mom_cur[t,p,:] = self.calc_cur_bmx(
+					mom_cur[c,d,:] = self.calc_cur_bmx(
 					           self.vel_cen, self.vel_wid,
-					           self.alt[t], self.dir[t,p],
+					           self.alt[t], self.dir[c,d],
 					           self.mfi_avg_nrm[0],
 					           self.mfi_avg_nrm[1],
 					           self.mfi_avg_nrm[2],
@@ -1408,9 +1408,9 @@ class core( QObject ) :
 		else :
 			for t in range( self.n_alt ) :
 				for p in range( self.n_dir ) :
-					mom_cur[t,p,:] = self.calc_cur_max(
+					mom_cur[c,d,:] = self.calc_cur_max(
 					           self.vel_cen, self.vel_wid,
-					           self.alt[t], self.dir[t,p],
+					           self.alt[t], self.dir[c,d],
 					           mom_n, mom_v_vec[0],
 					           mom_v_vec[1], mom_v_vec[2],
 					           mom_w                       )
@@ -2148,7 +2148,7 @@ class core( QObject ) :
 			p = tk_p[j]
 
 			alt = self.alt[t]
-			dir = self.dir[t,p]
+			dir = self.dir[c,d]
 
 			dlk = self.calc_dir_look( alt, dir )
 
@@ -2203,12 +2203,12 @@ class core( QObject ) :
 				# this look direction that fall into this range
 				# range of inflow speeds.
 
-				tk = where( ( self.cur_vld[t,p,:]   ) &
+				tk = where( ( self.cur_vld[c,d,:]   ) &
 				            ( self.vel_cen >= v_min ) &
 				            ( self.vel_cen <= v_max )   )[0]
 
 				if ( len( tk ) > 0 ) :
-					self.nln_sel[t,p,tk] = True
+					self.nln_sel[c,d,tk] = True
 
 		# Propagate the new data-selection for the non-linear analysis.
 
