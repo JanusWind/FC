@@ -207,7 +207,7 @@ class widget_fc_cup( QWidget ) :
 		                            color='b', size=size       )
 
 		self.grd.addItem( self.lab_axs_x, self.n_plt_y + 1, 2,
-		                                  1, self.n_plt_x      )    #????
+		                                  1, self.n_plt_x      )
 		self.grd.addItem( self.lab_axs_y, 0, 0,
 		                                  self.n_plt_y, 1      )
 
@@ -545,22 +545,22 @@ class widget_fc_cup( QWidget ) :
 		# extract the current values to be plotted.
 
 		if ( self.core.dsp == 'mom' ) :
-			cur     = self.core.mom_cur
-			cur_ion = None
+			curr     = self.core.mom_curr
+			curr_ion = None
 		elif ( self.core.dsp == 'gsl' ) :
-			cur     = self.core.nln_gss_cur_tot
-			cur_ion = self.core.nln_gss_cur_ion
+			curr     = self.core.nln_gss_curr_tot
+			cur_ion = self.core.nln_gss_curr_ion
 		elif ( self.core.dsp == 'nln' ) :
-			cur     = self.core.nln_res_cur_tot
-			cur_ion = self.core.nln_res_cur_ion
+			curr     = self.core.nln_res_curr_tot
+			cur_ion = self.core.nln_res_curr_ion
 		else :
-			cur     = None
-			cur_ion = None
+			curr     = None
+			curr_ion = None
 
 		# For each plot in the grid, generate and display a fit curve
 		# based on the results of the analysis.
 
-		for p in d_lst :
+		for d in d_lst :
 
 			# Determine the location of this plot within the grid
 			# layout.
@@ -635,7 +635,7 @@ class widget_fc_cup( QWidget ) :
 			# Create, store, and add to the plot a curve for the
 			# total fit current.
 
-			if ( cur is not None ) :
+			if ( curr is not None ) :
 
 				# Extract the points of the fit curve.
 
@@ -882,7 +882,7 @@ class widget_fc_cup( QWidget ) :
 
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION CALCULATING INDEX "p" FROM INDICES "j" AND "i".
+	# DEFINE THE FUNCTION CALCULATING INDEX "d" FROM INDICES "j" AND "i".
 	#-----------------------------------------------------------------------
 
 	def calc_ind_d( self, j, i ) :
@@ -918,7 +918,7 @@ class widget_fc_cup( QWidget ) :
 		j = tk[0][0]
 		i = tk[1][0]
 
-		# Determine the azimuth index corresponding to this plot.
+		# Determine the look direction corresponding to this plot.
 
 		d = self.calc_ind_d( j, i )
 
