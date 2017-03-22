@@ -167,11 +167,7 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT (MAXWELLIAN).
 	#-----------------------------------------------------------------------
 
-	#FIXME 5
-
 	#TODO Make this not a stupid hack of the bi-Maxwellian version.
-
-	#TODO Migrate to "fc_dat"
 
 	def calc_cur_max( self,
 	                  vel_cen, vel_wid,
@@ -200,8 +196,8 @@ class fc_dat( ) :
 	                  vel_cen, vel_wid,
 	                  dir_alt, dir_azm,
 	                  mag_x, mag_y, mag_z,
-	                  prm_n, prm_v_x, prm_v_y, prm_v_z,
-	                  prm_w_per, prm_w_par              ) :
+	                  prm_n, prm_v_x, prm_v_y, prm_v_z,		# Remove prm_
+	                  prm_w            ) :
 
 
 		# Note.  This function is based on Equation 2.34 from Maruca
@@ -243,18 +239,18 @@ class fc_dat( ) :
 		# Compute the effective thermal speed along this look direction.
 
 
-		prm_w = sqrt( ( ( 1. - dmg_dlk**2 ) * prm_w_per**2 ) + 
-		              (        dmg_dlk**2   * prm_w_par**2 )   )
+		#prm_w = sqrt( ( ( 1. - dmg_dlk**2 ) * prm_w_per**2 ) + 
+		 #             (        dmg_dlk**2   * prm_w_par**2 )   )
 
 
-		# Calcuate the exponential terms of the current.
+		# Calculate the exponential terms of the current.
 
 		ret_exp_1 = 1.e3 * prm_w * sqrt( 2. / pi ) * exp(
-		            - ( ( vel_cen - ( vel_wid / 2. )
+		            - ( ( self['vel_strt']
 		            - self.calc_arr_dot( dlk, -prm_v ) )
 		            / prm_w )**2 / 2. )
 		ret_exp_2 = 1.e3 * prm_w * sqrt( 2. / pi ) * exp(
-		            - ( ( vel_cen + ( vel_wid / 2. )
+		            - ( ( self['vel_stop'] 							#vel_cen + ( vel_wid / 2. )
 		            - self.calc_arr_dot( dlk, -prm_v ) )
 		            / prm_w )**2 / 2. )
 
@@ -262,11 +258,11 @@ class fc_dat( ) :
 		# Calculate the "erf" terms.
 
 		ret_erf_1 = 1.e3 * self.calc_arr_dot( dlk, -prm_v ) * erf(
-		            ( vel_cen - ( vel_wid / 2. )
+		            ( self['vel_strt']								#vel_cen - ( vel_wid / 2. )
 		            - self.calc_arr_dot( dlk, -prm_v ) )
 		            / ( sqrt(2.) * prm_w ) )
 		ret_erf_2 = 1.e3 * self.calc_arr_dot( dlk, -prm_v ) * erf(
-		            ( vel_cen + ( vel_wid / 2. )
+		            ( self['vel_stop']								#vel_cen + ( vel_wid / 2. )
 		            - self.calc_arr_dot( dlk, -prm_v ) )
 		            / ( sqrt(2.) * prm_w ) )
 
@@ -281,7 +277,7 @@ class fc_dat( ) :
 
 		ret = ( ( 1.e12 ) * ( 1. / 2. ) * ( const['q_p'] )
 		        * ( 1.e6 * prm_n )
-		        * ( 1.e-4 * self.calc_eff_area( dlk, prm_v ) )
+		        * ( 1.e-4 * self.spec.calc_eff_area( dlk, prm_v ) )		# Effective area now is a spec object
 		        * ( ret_prn ) )
 
 
