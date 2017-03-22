@@ -102,7 +102,7 @@ class core( QObject ) :
 	# | chng_nln_ion      |                              |
 	# | chng_nln_set      |                              |
 	# | chng_nln_gss      |                              |
-	# | chng_nln_sel_cur  | c, d, b                      |
+	# | chng_nln_sel_bin  | c, d, b                      |
 	# | chng_nln_sel_all  |                              |
 	# | chng_nln_res      |                              |
 	# | chng_dsp          |                              |
@@ -274,7 +274,7 @@ class core( QObject ) :
 			self.dir     = None
 			self.vel_cen = None
 			self.vel_wid = None
-			self.cur     = None
+			self.curr    = None
 			self.cur_vld = None
 
 			self.cur_jmp = 100.
@@ -361,7 +361,7 @@ class core( QObject ) :
 			self.mom_t_per = None
 			self.mom_t_par = None
 
-			self.mom_cur = None
+			self.mom_curr = None
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion species and populations for the non-linear analysis.
@@ -492,8 +492,8 @@ class core( QObject ) :
 			self.nln_gss_pop = array( [ ] )
 			self.nln_gss_prm = array( [ ] )
 
-			self.nln_gss_cur_tot = None
-			self.nln_gss_cur_ion = None
+			self.nln_gss_curr_tot = None
+			self.nln_gss_curr_ion = None
 
 		# If requested, (re-)initialize the variables associated with
 		# the data selection for the non-linear analysis.
@@ -514,8 +514,8 @@ class core( QObject ) :
 
 			self.nln_res_sel = None
 
-			self.nln_res_cur_tot = None
-			self.nln_res_cur_ion = None
+			self.nln_res_curr_tot = None
+			self.nln_res_curr_ion = None
 
 		# If requested, (re-)initialize the variables which indicate of
 		# the analyses have their results displayed in widgets which
@@ -658,11 +658,11 @@ class core( QObject ) :
 		#n_bin    = self.fc_spec[ 'n_bin' ]
 		#n_cup    = self.fc_spec[ 'n_cup' ]
 
-		self.alt     = array( self.fc_spec['elev'] )	# cup 1 at 15 degree??
+		self.alt     = array( self.fc_spec['elev'] )
 		self.dir     = array( self.fc_spec['azim'] )
 		self.vel_cen = array( self.fc_spec['vel_cen'][0] )
 		self.vel_wid = array( self.fc_spec['vel_del'][0] )
-		self.cur = array( self.fc_spec['curr'])
+		self.curr = array( self.fc_spec['curr'])
 
 		# Calculate and store the spectrum's properly formatted
 		# timestamp both as a float and as a string.
@@ -679,7 +679,7 @@ class core( QObject ) :
 		#self.n_vel = n_bin
 		#????... why can't we write this way
 		#self.time_epc = self.fc_spec['time']
-		self.n_alt = self.fc_spec[ 'n_cup' ]
+		self.n_alt = self.fc_spec['n_cup']
 		self.n_dir = self.fc_spec['n_dir']
 		self.n_vel = self.fc_spec['n_bin']
 
@@ -715,12 +715,12 @@ class core( QObject ) :
 		# Load the associated Wind/MFI magnetic field data associated
 		# with this spectrum.
 
-		self.load_mfi( )
+#		self.load_mfi( )
 
 		# If requested, run the moments analysis.
-
-		if ( self.dyn_mom ) :
-			self.auto_mom_sel( )
+#
+#		if ( self.dyn_mom ) :
+#			self.auto_mom_sel( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING THE Wind/MFI MAGNETIC FIELD DATA.
@@ -805,10 +805,10 @@ class core( QObject ) :
 		# magnetic field and each look direction.
 
 		self.mfi_hat_dir = array( [ [
-		          dot( self.calc_dir_look( self.alt[t], self.dir[t,p] ),
+		          dot( self.calc_dir_look( self.alt[t], self.dir[c,d] ),
 		               self.mfi_avg_nrm )
-		          for p in range( self.n_dir ) ]
-		        for t in range( self.n_alt ) ] )
+		          for d in range( self.n_dir ) ]
+		        for c in range( self.n_alt ) ] )
 
 
 		# Use interpolation to estimate a magnetic-field vector for each
@@ -840,9 +840,9 @@ class core( QObject ) :
 
 		self.emit( SIGNAL('janus_chng_mfi') )
 
-         #-----------------------------------------------------------------------
-         # DEFINE THE FUNCTION FOR CHANGING THE MOM. SELCTION DIRECTION WINDOW.
-         #-----------------------------------------------------------------------
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR CHANGING THE MOM. SELCTION DIRECTION WINDOW.
+	#-----------------------------------------------------------------------
  
 	def chng_mom_win_dir( self, val ) :
 
@@ -868,9 +868,9 @@ class core( QObject ) :
 
 		self.auto_mom_sel( )
 
-         #-----------------------------------------------------------------------
-         # DEFINE THE FUNCTION FOR CHANGING THE MOMENTS SELCTION BIN WINDOW.
-         #-----------------------------------------------------------------------
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR CHANGING THE MOMENTS SELCTION BIN WINDOW.
+	#-----------------------------------------------------------------------
   
 	def chng_mom_win_bin( self, val ) :
 
@@ -910,61 +910,47 @@ class core( QObject ) :
 		# Initially, deselect all look directions and bins.
 
 		self.mom_sel_dir = [ [ False for d in self.fc_spec['n_dir'] ]
-		                             for c in self.fc_spec['n_cup'] ]
+                                             for c in self.fc_spec['n_cup'] ]
 
 		self.mom_sel_bin = [ [ False for b in self.fc_spec['n_bin'] ]
-					     for d in self.fc_spec['n_dir']
-					     for c in self.fc_spec['n_cup'] ]
+                                             for d in self.fc_spec['n_dir']
+		                             for c in self.fc_spec['n_cup'] ]
 
 		# Find the maximum current window (of "self.mom_win_bin" bins)
 		# for each direction
 
 		dir_max_ind = [ [ self.fc_spec.find_max_curr( c, d,
-		                              win=self.mom_win_bin )
-		                                for d in self.fc_spec['n_dir'] ]
-		                                for c in self.fc_spec['n_cup'] ]
+		                             win=self.mom_win_bin           )
+		                             for d in self.fc_spec['n_dir'] ]
+		                             for c in self.fc_spec['n_cup'] ]
 
 		dir_max_curr = [ [ self.fc_spec.calc_curr( c, d,
 		                              dir_max_ind[c][d],
-		                              win=self.mom_win_bin )
-		                                for d in self.fc_spec['n_dir'] ]
-		                                for c in self.fc_spec['n_cup'] ]
+		                             win=self.mom_win_bin           )
+		                             for d in self.fc_spec['n_dir'] ]
+		                             for c in self.fc_spec['n_cup'] ]
 
 		# Compute "cup_max_ind" (two element list)
 		# List of indices with maximum current for each cup
 
-		cup_max_ind = [ [ False for c in self.fc_spec['n_cup'] ]
+		cup_max_ind = [ 0 for c in self.fc_spec['n_cup'] ] 
 
 		curr_sum_max = 0.
 
-		#for pd in range( self.fc_Spec['n_dir'], self.fc_Spec['n_dir'] +
+		for c in range( 0, self.fc_spec['n_cup'] ) :
 
+			for d in range( self.fc_spec['n_dir'] ) :
 
-		
-		for c in range( self.fc_spec['n_cup'] ) :
-
-			for pd in range( self.fc_spec['n_dir'],
-			                 self.fc_spec['n_dir'] +
-		                         self.mom_win_dir    ) :
-
-				d = pd % self.fc_spec['n_dir']
-
-				curr_sum = sum([self.dir_max_curr[c][d+i]
-					    for i in range (self.mom_win_dir)])
+				curr_sum = sum( [ dir_max_curr[c][
+				                  (d+i)%self.fc_spec['n_dir']]
+				                  for i in range(
+				                           self.mom_win_dir) ] )
 
 				if ( curr_sum > curr_sum_max ) :
 					cup_max_ind[c] = d
 					curr_sum_max = curr_sum
 
-		
-
-	
-		# FIXME 7
-
-		# TODO Populate "cup_max_ind" = [ ?, ? ]
-
-
-		# Populate "self.mom_sel_bin" appropriately
+		#TODO Populate "self.mom_sel_bin" appropriately
 
 		for c in range( self.fc_spec['n_cup'] ) :
 
@@ -979,8 +965,27 @@ class core( QObject ) :
 
 					self.mom_sel_bin[c][d][b] = True
 
-		# Validate the new data selection (which includes populating the
-		# "self.mom_sel_dir" array).
+		self.mom_n_sel_bin = array( [ [
+                                 len( where( self.mom_sel_cur[t,p,:] )[0] )
+                                                for d in range( self.n_dir ) ]
+                                                for c in range( self.n_alt ) ] )
+
+
+		# TODO Populate "self.mom_sel_dir" appropriately
+
+		for c in range( self.fc_spec['n_cup'] ) :
+
+			for pd in range( cup_max_ind[c],
+			                 cup_max_ind[c] + self.mom_win_dir ) :
+
+				d = pd % self.fc_spec['n_dir']
+
+				self.mom_sel_dir[c][d] = True
+
+		self.mom_n_sel_dir = len( where( self.mom_sel_dir )[0] )
+		
+                # Validate the new data selection (which includes populating
+		# the "self.mom_sel_dir" array).
 
 		self.vldt_mom_sel( )
 
@@ -1003,7 +1008,7 @@ class core( QObject ) :
 		#FIXME 8
 
 		#TODO Verify that this code still works (under the new variable
-		#     names).  Consider changing (c,d,b) to (c,d,b) (both here
+		#     names).  Consider changing (t,p,v) to (c,d,b) (both here
 		#     and in "janus_thread.py").
 
 		# Change the selection of the requested datum.
@@ -1048,9 +1053,9 @@ class core( QObject ) :
 
 		# Note.  This function ensures that the two "self.mom_sel_???"
 		#        arrays are mutually consistent.  For each set of "t"-
-		#        and "p"-values, "self.mom_sel_dir[t,p]" can only be
-		#        "True" if at least "self.min_sel_cur" of the elements
-		#        in "self.mom_sel_bin[t,p,:]" are "True".  However, if
+		#        and "p"-values, "self.mom_sel_dir[c,d]" can only be
+		#        "True" if at least "self.min_sel_bin" of the elements
+		#        in "self.mom_sel_bin[c,d,:]" are "True".  However, if
 		#        fewer than "self.mom_min_sel_dir" sets of "t"- and
 		#        "p"-values satisfy this criterion, all elements of
 		#        "self.mom_sel_dir" are given the value "False".		
@@ -1064,22 +1069,24 @@ class core( QObject ) :
 		old_mom_sel_dir = self.mom_sel_dir
 
 
-		# Update the counter "self.mom_n_sel_cur" (i.e., the number of
+		# Update the counter "self.mom_n_sel_bin" (i.e., the number of
 		# selected data in each pointing direction).
 
-		self.mom_n_sel_cur = array( [ [
-		                len( where( self.mom_sel_bin[t,p,:] )[0] )
-		                              for p in range( self.n_dir ) ]
-		                                for t in range( self.n_alt ) ] )
+		self.mom_n_sel_bin = array( [ [
+		                len( where( self.mom_sel_bin[c,d,:] )[0] )
+		                              for d in range( self.n_dir ) ]
+		                              for c in range( self.n_alt ) ] )
 
 		# Create a new selection of pointing directions based on the
 		# data selection, and then update the counter
 		# "self.mom_n_sel_dir".
 
+                # TODO Chnage 'sel_curr' to 'sel_bin' both here and wherever the 
+                # the signal is being called.
 		self.mom_sel_dir = array( [ [
-		           self.mom_n_sel_cur[t,p] >= self.mom_min_sel_cur	
-		                              for p in range( self.n_dir ) ]
-		                                for t in range( self.n_alt ) ] )
+		           self.mom_n_sel_bin[c,d] >= self.mom_min_sel_bin	
+		                              for d in range( self.n_dir ) ]
+		                              for c in range( self.n_alt ) ] )
 
 		self.mom_n_sel_dir = len( where( self.mom_sel_dir )[0] )
 
@@ -1103,14 +1110,14 @@ class core( QObject ) :
 		# selection status for the moments analysis has changed, emit a
 		# signal indicating this.
 
-		( tk_t, tk_p ) = where( self.mom_sel_dir != old_mom_sel_dir )
+		( tk_c, tk_d ) = where( self.mom_sel_dir != old_mom_sel_dir )
 
-		n_tk = len( tk_t )
+		n_tk = len( tk_c )
 
 		for k in range( n_tk ) :
 
 			self.emit( SIGNAL('janus_chng_mom_sel_dir'),
-			           tk_t[k], tk_p[k]                  )
+			           tk_c[k], tk_d[k]                  )
 
 
 	#-----------------------------------------------------------------------
@@ -1174,7 +1181,7 @@ class core( QObject ) :
 		# Extract the "t"- and "p"-indices of each selected pointing
 		# direction.
 
-		( tk_t, tk_p ) = where( self.mom_sel_dir )
+		( tk_c, tk_d ) = where( self.mom_sel_dir )
 
 
 		# Initialize the "eta_*" arrays.
@@ -1214,30 +1221,30 @@ class core( QObject ) :
 
 		for k in range( n_eta ) :
 
-			# Extract the "t"- and "p"-values for this direction.
+			# Extract the "c"- and "d"-values for this direction.
 
-			t = tk_t[k]
-			p = tk_p[k]
+			c = tk_c[k]
+			d = tk_d[k]
 
 			# Store the $\theta$- and $\phi$-values for this look
 			# direction.
 
-			eta_the[k] = - self.alt[t] + 90.
-			eta_phi[k] = - self.dir[t,p]
+			eta_the[k] = - self.alt[c] + 90.
+			eta_phi[k] = - self.dir[c,d]
 
 			# Convert the look direction from altitude-azimuth to a
 			# Cartesian unit vector.
 
-			eta_dlk[k,:] = self.calc_dir_look( self.alt[t],
-			                                   self.dir[t,p] )
+			eta_dlk[k,:] = self.calc_dir_look( self.alt[c],
+			                                   self.dir[c,d] )
 
 			# Extract the "v" values of the selected data from this
 			# look direction.
 
-			v = where( self.mom_sel_bin[t,p,:] )[0]
+			v = where( self.mom_sel_bin[c,d,:] )[0]
 
 			eta_v[k] = - sum( self.cur[c,d,b] ) / \
-			                sum( self.cur[c,d,b] / self.vel_cen[v] )
+			                sum( self.cur[c,d,b] / self.vel_cen[b] )
 
 
 		# Use singular value decomposition (in the form of least squares
@@ -1258,8 +1265,8 @@ class core( QObject ) :
 
 			# Extract the "t"- and "p"-values for this direction.
 
-			t = tk_t[k]
-			p = tk_p[k]
+			c = tk_c[k]
+			d = tk_d[k]
 
 			# Calculate the effective collecting area for this look
 			# direction.
@@ -1271,7 +1278,7 @@ class core( QObject ) :
 			# Extract the "v" indices of the selected data from this
 			# look direction.
 
-			v = where( self.mom_sel_bin[t,p,:] )[0]
+			v = where( self.mom_sel_bin[c,d,:] )[0]
 
 			# Estimate the number density and thermal speed based on
 			# the selected data from this look direction.
@@ -1337,7 +1344,7 @@ class core( QObject ) :
 			#        the direction of the magnetic field.  See
 			#        Equation 2.32 by Maruca (PhD thesis, 2012).
 
-			dat_x = array( [ self.mfi_hat_dir[tk_t[k],tk_p[k]]
+			dat_x = array( [ self.mfi_hat_dir[tk_c[k],tk_d[k]]
 			                 for k in range( n_eta )          ] )**2
 
 			dat_y = eta_w**2
@@ -1403,14 +1410,14 @@ class core( QObject ) :
 		# Calculate the expected currents based on the results of the
 		# (linear) moments analysis.
 
-		mom_cur = tile( 0., [ self.n_alt, self.n_dir, self.n_vel ] )
+		mom_curr = tile( 0., [ self.n_alt, self.n_dir, self.n_vel ] )
 
 		if ( aniso ) :
-			for t in range( self.n_alt ) :
-				for p in range( self.n_dir ) :
-					mom_cur[t,p,:] = self.calc_cur_bmx(
+			for c in range( self.n_alt ) :
+				for d in range( self.n_dir ) :
+					mom_curr[c,d,:] = self.calc_curr_bmx(
 					           self.vel_cen, self.vel_wid,
-					           self.alt[t], self.dir[t,p],
+					           self.alt[t], self.dir[c,d],
 					           self.mfi_avg_nrm[0],
 					           self.mfi_avg_nrm[1],
 					           self.mfi_avg_nrm[2],
@@ -1418,11 +1425,11 @@ class core( QObject ) :
 					           mom_v_vec[1], mom_v_vec[2],
 					           mom_w_per, mom_w_par        )
 		else :
-			for t in range( self.n_alt ) :
-				for p in range( self.n_dir ) :
-					mom_cur[t,p,:] = self.calc_cur_max(
+			for c in range( self.n_alt ) :
+				for d in range( self.n_dir ) :
+					mom_curr[c,d,:] = self.calc_curr_max(
 					           self.vel_cen, self.vel_wid,
-					           self.alt[t], self.dir[t,p],
+					           self.alt[t], self.dir[c,d],
 					           mom_n, mom_v_vec[0],
 					           mom_v_vec[1], mom_v_vec[2],
 					           mom_w                       )
@@ -1446,15 +1453,15 @@ class core( QObject ) :
 
 		self.mom_n_eta = n_eta
 
-		self.mom_eta_ind_t = tk_t
-		self.mom_eta_ind_p = tk_p
+		self.mom_eta_ind_c = tk_c
+		self.mom_eta_ind_d = tk_d
 
 		self.mom_eta_n = eta_n
 		self.mom_eta_v = eta_v
 		self.mom_eta_w = eta_w
 		self.mom_eta_t = eta_t
 
-		self.mom_cur = mom_cur
+		self.mom_curr = mom_curr
 
 
 		# Message the user that the moments analysis has completed.
@@ -2005,8 +2012,8 @@ class core( QObject ) :
 
 		self.nln_gss_prm = array( [] )
 
-		self.nln_gss_cur_ion = None
-		self.nln_gss_cur_tot = None
+		self.nln_gss_curr_ion = None
+		self.nln_gss_curr_tot = None
 
 		# Abort if any of the following cases are arise:
 		#   -- No populations have been found to be valid.
@@ -2047,35 +2054,35 @@ class core( QObject ) :
 
 		# Calculate the expected currents based on the initial geuss.
 
-		# FIXME:12  This code (and that in "self.calc_nln_cur") may not be
+		# FIXME:12  This code (and that in "self.calc_nln_curr") may not be
 		#        especially efficient.
 
-		( tk_t, tk_p, tk_v ) = indices( ( self.n_alt, self.n_dir,
+		( tk_c, tk_d, tk_b ) = indices( ( self.n_alt, self.n_dir,
 		                                  self.n_vel              ) )
 
-		tk_t = tk_t.flatten( )
-		tk_p = tk_p.flatten( )
-		tk_v = tk_v.flatten( )
+		tk_c = tk_c.flatten( )
+		tk_d = tk_d.flatten( )
+		tk_b = tk_b.flatten( )
 
-		x_vel_cen = self.vel_cen[ tk_v ]
-		x_vel_wid = self.vel_wid[ tk_v ]
-		x_alt     = self.alt[ tk_t ]
-		x_dir     = self.dir[ tk_t, tk_p ]
-		x_mag_x   = self.mag_x[ tk_v ]
-		x_mag_y   = self.mag_y[ tk_v ]
-		x_mag_z   = self.mag_z[ tk_v ]
+		x_vel_cen = self.vel_cen[ tk_b ]
+		x_vel_wid = self.vel_wid[ tk_b ]
+		x_alt     = self.alt[ tk_c ]
+		x_dir     = self.dir[ tk_c, tk_d ]
+		x_mag_x   = self.mag_x[ tk_b ]
+		x_mag_y   = self.mag_y[ tk_b ]
+		x_mag_z   = self.mag_z[ tk_b ]
 
 		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_dir,
 		             x_mag_x, x_mag_y, x_mag_z           ] )
 
-		self.nln_gss_cur_ion = reshape(
-		      self.calc_nln_cur( self.nln_gss_pop, x,
+		self.nln_gss_curr_ion = reshape(
+		      self.calc_nln_curr( self.nln_gss_pop, x,
 		                         self.nln_gss_prm,
 		                         ret_comp=True        ),
 		      ( self.n_alt, self.n_dir, self.n_vel,
 		        len( self.nln_gss_pop )             )    )
 
-		self.nln_gss_cur_tot = sum( self.nln_gss_cur_ion, axis=3 )
+		self.nln_gss_curr_tot = sum( self.nln_gss_curr_ion, axis=3 )
 
 		# Propagate the new initial-guess for the non-linear analysis.
 
@@ -2147,20 +2154,20 @@ class core( QObject ) :
 		# Select data based on the selection windows from each of the
 		# look directions selected for the moments analysis.
 
-		( tk_t, tk_p ) = where( self.mom_sel_dir )
+		( tk_c, tk_d ) = where( self.mom_sel_dir )
 
-		n_tk = len( tk_t )
+		n_tk = len( tk_c )
 
 		for j in range( n_tk ) :
 
 			# Extract the current look direction and convert it
 			# from altitude-azimuth to rectangular coordiantes.
 
-			t = tk_t[j]
-			p = tk_p[j]
+			t = tk_c[j]
+			p = tk_d[j]
 
 			alt = self.alt[t]
-			dir = self.dir[t,p]
+			dir = self.dir[c,d]
 
 			dlk = self.calc_dir_look( alt, dir )
 
@@ -2215,12 +2222,12 @@ class core( QObject ) :
 				# this look direction that fall into this range
 				# range of inflow speeds.
 
-				tk = where( ( self.cur_vld[t,p,:]   ) &
+				tk = where( ( self.cur_vld[c,d,:]   ) &
 				            ( self.vel_cen >= v_min ) &
 				            ( self.vel_cen <= v_max )   )[0]
 
 				if ( len( tk ) > 0 ) :
-					self.nln_sel[t,p,tk] = True
+					self.nln_sel[c,d,tk] = True
 
 		# Propagate the new data-selection for the non-linear analysis.
 
@@ -2270,7 +2277,7 @@ class core( QObject ) :
 		if ( pnt is None ) :
 			self.emit( SIGNAL('janus_chng_nln_sel_all') )
 		else :
-			self.emit( SIGNAL('janus_chng_nln_sel_cur'),
+			self.emit( SIGNAL('janus_chng_nln_sel_bin'),
 			           pnt[0], pnt[1], pnt[2]            )
 
 		# If dynamic updating of the non-linear fitting has been
@@ -2286,7 +2293,7 @@ class core( QObject ) :
 	# DEFINE THE FUNCTION FOR CALCULATING THE NLN MODEL CURRNET.
 	#-----------------------------------------------------------------------
 
-	def calc_nln_cur( self, pop, x, prm, ret_comp=False ) :
+	def calc_nln_curr( self, pop, x, prm, ret_comp=False ) :
 
 		# Extract the independent data variables (i.e., the
 		# specifications of the velocity windows and pointing
@@ -2312,9 +2319,9 @@ class core( QObject ) :
 		# calculate it's contribution to the total current.
 
 		if hasattr( x[0], '__iter__' ) :
-			cur = tile( 0., [ len( x[0] ), self.nln_n_pop ] )
+			curr = tile( 0., [ len( x[0] ), self.nln_n_pop ] )
 		else :
-			cur = tile( 0., self.nln_n_pop )
+			curr = tile( 0., self.nln_n_pop )
 
 		prm_v0_x = prm[0]
 		prm_v0_y = prm[1]
@@ -2372,7 +2379,7 @@ class core( QObject ) :
 
 			if ( self.nln_pyon.arr_pop[p]['aniso'] ) :
 				cur_p = self.nln_pyon.arr_pop[p]['q'] * \
-				        self.calc_cur_bmx(
+				        self.calc_curr_bmx(
 					            d_vel_cen * sqm,
 					            d_vel_wid * sqm,
 				                    d_alt, d_dir,
@@ -2382,7 +2389,7 @@ class core( QObject ) :
 				                    prm_w_per, prm_w_par       )
 			else :
 				cur_p = self.nln_pyon.arr_pop[p]['q'] * \
-				        self.calc_cur_max( d_vel_cen * sqm,
+				        self.calc_curr_max( d_vel_cen * sqm,
 					                   d_vel_wid * sqm,
 				                           d_alt, d_dir,
 				                           prm_n, prm_v_x,
@@ -2454,27 +2461,27 @@ class core( QObject ) :
 
 		def model( x, *p ) :
 
-			return self.calc_nln_cur( pop, x, array( p ) )
+			return self.calc_nln_curr( pop, x, array( p ) )
 
 		# Save the data selection and then use it to generate data
 		# arrays for the non-linear fit.
 
 		self.nln_res_sel = self.nln_sel.copy( )
 
-		( tk_t, tk_p, tk_v ) = where( self.nln_res_sel )
+		( tk_c, tk_d, tk_b ) = where( self.nln_res_sel )
 
-		x_vel_cen = self.vel_cen[ tk_v ]
-		x_vel_wid = self.vel_wid[ tk_v ]
-		x_alt     = self.alt[ tk_t ]
-		x_dir     = self.dir[ tk_t, tk_p ]
-		x_mag_x   = self.mag_x[ tk_v ]
-		x_mag_y   = self.mag_y[ tk_v ]
-		x_mag_z   = self.mag_z[ tk_v ]
+		x_vel_cen = self.vel_cen[ tk_b ]
+		x_vel_wid = self.vel_wid[ tk_b ]
+		x_alt     = self.alt[ tk_c ]
+		x_dir     = self.dir[ tk_c, tk_d ]
+		x_mag_x   = self.mag_x[ tk_b ]
+		x_mag_y   = self.mag_y[ tk_b ]
+		x_mag_z   = self.mag_z[ tk_b ]
 
 		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_dir,
 		             x_mag_x, x_mag_y, x_mag_z           ] )
 
-		y = self.cur[ tk_t, tk_p, tk_v ]
+		y = self.cur[ tk_c, tk_d, tk_b ]
 
 		# Attempt to perform the non-linear fit.  If this fails, reset
 		# the associated variables and abort.
@@ -2499,29 +2506,29 @@ class core( QObject ) :
 		# Calculate the expected currents based on the results of the
 		# non-linear analysis.
 
-		( tk_t, tk_p, tk_v ) = indices( ( self.n_alt, self.n_dir,
+		( tk_c, tk_d, tk_b ) = indices( ( self.n_alt, self.n_dir,
 		                                  self.n_vel              ) )
 
-		tk_t = tk_t.flatten( )
-		tk_p = tk_p.flatten( )
-		tk_v = tk_v.flatten( )
+		tk_c = tk_c.flatten( )
+		tk_d = tk_d.flatten( )
+		tk_b = tk_b.flatten( )
 
-		x_vel_cen = self.vel_cen[ tk_v ]
-		x_vel_wid = self.vel_wid[ tk_v ]
-		x_alt     = self.alt[ tk_t ]
-		x_dir     = self.dir[ tk_t, tk_p ]
-		x_mag_x   = self.mag_x[ tk_v ]
-		x_mag_y   = self.mag_y[ tk_v ]
-		x_mag_z   = self.mag_z[ tk_v ]
+		x_vel_cen = self.vel_cen[ tk_b ]
+		x_vel_wid = self.vel_wid[ tk_b ]
+		x_alt     = self.alt[ tk_c ]
+		x_dir     = self.dir[ tk_c, tk_d ]
+		x_mag_x   = self.mag_x[ tk_b ]
+		x_mag_y   = self.mag_y[ tk_b ]
+		x_mag_z   = self.mag_z[ tk_b ]
 
 		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_dir,
 		             x_mag_x, x_mag_y, x_mag_z           ] )
 
-		self.nln_res_cur_ion = \
-		   reshape( self.calc_nln_cur( pop, x, fit, ret_comp=True ),
+		self.nln_res_curr_ion = \
+		   reshape( self.calc_nln_curr( pop, x, fit, ret_comp=True ),
 		            ( self.n_alt, self.n_dir, self.n_vel, len( pop ) ) )
 
-		self.nln_res_cur_tot = sum( self.nln_res_cur_ion, axis=3 )
+		self.nln_res_curr_tot = sum( self.nln_res_curr_ion, axis=3 )
 
 		# Save the properties and fit parameters for each ion species
 		# used in this analysis.
