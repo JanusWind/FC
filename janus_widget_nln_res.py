@@ -153,7 +153,7 @@ class widget_nln_res( format_TextEdit ) :
 
 				# Print the population's density.
 
-				dcm = max( [ 1, 2 - int( floor( log10( 
+				dcm = max( [ 1, 2 - int( floor( log10(
 				                       abs( pop['n'] ) ) ) ) ] )
 
 				self.prnt_brk( )
@@ -254,25 +254,25 @@ class widget_nln_res( format_TextEdit ) :
 
 				# Print the population's temperature(s).
 
-				self.prnt_brk( )
-				self.prnt_tab( 2 )
-				self.prnt_htm( lab_t + ' = ' )
-				self.prnt_dcm( pop['t'], 1, 'kK' )
-
-				if ( pop['aniso'] ) :
-
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_t_per + ' = ' )
-					self.prnt_dcm( pop['t_per'], 1, 'kK' )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_t_par + ' = ' )
-					self.prnt_dcm( pop['t_par'], 1, 'kK' )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_r + ' = ' )
-					self.prnt_dcm( pop['r'], 2 )
+				# self.prnt_brk( )
+				# self.prnt_tab( 2 )
+				# self.prnt_htm( lab_t + ' = ' )
+				# self.prnt_dcm( pop['t'], 1, 'kK' )
+                #
+				# if ( pop['aniso'] ) :
+                #
+				# 	self.prnt_brk( )
+				# 	self.prnt_tab( 3 )
+				# 	self.prnt_htm( lab_t_per + ' = ' )
+				# 	self.prnt_dcm( pop['t_per'], 1, 'kK' )
+				# 	self.prnt_brk( )
+				# 	self.prnt_tab( 3 )
+				# 	self.prnt_htm( lab_t_par + ' = ' )
+				# 	self.prnt_dcm( pop['t_par'], 1, 'kK' )
+				# 	self.prnt_brk( )
+				# 	self.prnt_tab( 3 )
+				# 	self.prnt_htm( lab_r + ' = ' )
+				# 	self.prnt_dcm( pop['r'], 2 )
 
 				# Clear the first population indicator.
 
