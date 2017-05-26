@@ -99,6 +99,9 @@ class widget_mfi_plot( QWidget ) :
 		self.pen_crv_x = mkPen( color='r' )
 		self.pen_crv_y = mkPen( color='g' )
 		self.pen_crv_z = mkPen( color='b' )
+		# self.pen_crv_colat = mkPen( color='c' )
+		# self.pen_crv_lon = mkPen( color='m' )
+
 
 		self.fnt = self.core.app.font( )
 
@@ -142,6 +145,8 @@ class widget_mfi_plot( QWidget ) :
 		self.crv_x = None
 		self.crv_y = None
 		self.crv_z = None
+		# self.crv_colat = None
+		# self.crv_lon = None
 
 		# Populate this plot and adjust it's settings.
 
@@ -181,7 +186,7 @@ class widget_mfi_plot( QWidget ) :
 
 			d_t = max( 1.5 + d_t_0, 3. )
 			d_b = max( 1.2 * d_b_0, 5. )
-			
+
 			t_max = t_min + d_t
 
 			b_min = b_min - ( d_b - d_b_0 ) / 2.
@@ -222,12 +227,20 @@ class widget_mfi_plot( QWidget ) :
 		self.crv_z = PlotDataItem( self.core.mfi_t,
 		                           self.core.mfi_b_z,
 		                           pen=self.pen_crv_z )
+		self.crv_colat = PlotDataItem( self.core.mfi_t,
+		                           self.core.mfi_b_colat,
+		                           pen=self.pen_crv_colat )
+		self.crv_lon = PlotDataItem( self.core.mfi_t,
+		                           self.core.mfi_b_lon,
+		                           pen=self.pen_crv_lon )
 
 		self.plt.addItem( self.crv_m )
 		self.plt.addItem( self.crv_n )
 		self.plt.addItem( self.crv_x )
 		self.plt.addItem( self.crv_y )
 		self.plt.addItem( self.crv_z )
+		# self.plt.addItem( self.crv_colat )
+		# self.plt.addItem( self.crv_lon )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESETTING THIS PLOT (CLEARING ALL ELEMENTS).
@@ -252,6 +265,12 @@ class widget_mfi_plot( QWidget ) :
 		if ( self.crv_z is not None ) :
 			self.plt.removeItem( self.crv_z )
 
+		# if ( self.crv_colat is not None ) :
+		# 	self.plt.removeItem( self.crv_colat )
+
+		# if ( self.crv_lon is not None ) :
+		# 	self.plt.removeItem( self.crv_lon )
+
 		# Permanently delete this plot's elements by setting each of the
 		# variables that store them to "None".
 
@@ -260,6 +279,8 @@ class widget_mfi_plot( QWidget ) :
 		self.crv_x = None
 		self.crv_y = None
 		self.crv_z = None
+		# self.crv_colat = None
+		# self.crv_lon = None
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "rset" SIGNAL.
