@@ -122,6 +122,16 @@ class widget_mfi_info( format_TextEdit ) :
 		# self.prnt_htm( '<i>B<sub>z</sub></i> = ' )
 		self.prnt_htm( '<i><font color="#0000FF">B<sub>z</sub></font></i> = ' )
 		self.prnt_dcm( self.core.mfi_avg_vec[2], 1, 'nT' )
+		self.prnt_brk( )
+
+		# self.prnt_tab( 1 )
+		# self.prnt_htm( '<i>B<sub>&theta;</sub></i> = ')
+		# self.prnt_dcm( self.core.mfi_avg_vec[3], 1, '<sup>o</sup>' )
+		# self.prnt_brk( )
+        #
+		# self.prnt_tab( 1 )
+		# self.prnt_htm( '<i>B<sub>&phi;</sub></i> = ')
+		# self.prnt_dcm( self.core.mfi_avg_vec[3], 1, '<sup>o</sup>' )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "rset" SIGNAL.

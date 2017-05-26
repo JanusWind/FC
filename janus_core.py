@@ -54,10 +54,10 @@ from janus_mfi_arcv import mfi_arcv
 
 # Load the necessary array modules and mathematical functions.
 
-from numpy import amax, amin, append, arccos, arange, argsort, array, average, \
-                  cos, deg2rad, diag, dot, exp, indices, interp, mean, pi,     \
-                  polyfit, rad2deg, reshape, sign, sin, sum, sqrt, std, tile,  \
-                  transpose, where, zeros
+from numpy import amax, amin, append, arccos, arctan2, arange, argsort, array, \
+                    average, cos, deg2rad, diag, dot, exp, indices, interp, \
+                    mean, pi, polyfit, rad2deg, reshape, sign, sin, sum, sqrt, \
+                    std, tile, transpose, where, zeros
 
 from numpy.linalg import lstsq
 
@@ -926,7 +926,6 @@ class core( QObject ) :
 		self.mfi_b_y = mfi_b_y
 		self.mfi_b_z = mfi_b_z
 
-
 		# Compute the magnetic field magnitude.
 
 		self.mfi_b = sqrt( self.mfi_b_x**2 + self.mfi_b_y**2
@@ -937,7 +936,7 @@ class core( QObject ) :
 
 		self.mfi_avg_vec = array( [ mean( self.mfi_b_x ),
 		                            mean( self.mfi_b_y ),
-		                            mean( self.mfi_b_z )  ] )
+		                            mean( self.mfi_b_z ) ] )
 
 		self.mfi_avg_mag = sqrt( self.mfi_avg_vec[0]**2 +
 		                         self.mfi_avg_vec[1]**2 +
@@ -954,6 +953,21 @@ class core( QObject ) :
 		               self.mfi_avg_nrm )
 		          for p in range( self.n_azm ) ]
 		        for t in range( self.n_alt ) ] )
+
+		# Compute the mfi angles.
+		# These are useful diagnostic tools.
+
+		mfi_b_rho = sqrt(mfi_b_x**2.0 + mfi_b_y**2.0)
+		mfi_b_colat = arctan2(mfi_b_z, mfi_b_rho)
+		mfi_b_lon = arctan2(mfi_b_y, mfi_b_x)
+		mfi_b_colat = rad2deg(mfi_b_colat)
+		mfi_b_lon = rad2deg(mfi_b_lon)
+
+		self.mfi_b_colat = mfi_b_colat
+		self.mfi_b_lon = mfi_b_lon
+		self.mfi_avg_mag_angles = array( [mean( self.mfi_b_colat ),
+		                                  mean( self.mfi_b_lon )] )
+
 
 
 		# Use interpolation to estimate a magnetic-field vector for each
