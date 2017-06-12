@@ -32,7 +32,7 @@ from janus_const import const
 ################################################################################
 
 PARAM = [ 'b0', 'v0', 'n', 'v', 'dv', 'v0', 'w', 'w2', 'r', 't', 'beta',
-          'ac', 'time', 's'                                                   ]
+          'ac', 'time', 's','m','q', 'k'                                       ]
 
 COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat' ]
 
@@ -127,7 +127,7 @@ class series( object ) :
 
 	def __getitem__( self, key ) :
 
-		return [ sig[key] for sig in self.arr ]
+		return [ s[key] for s in self.arr ]
 
 
 ################################################################################
@@ -215,7 +215,9 @@ class plas( object ) :
 
 		# For each element from the key, attempt to identify and record
 		# what it represents.  If this fails for any given element or if
-		# elements are in conflict, abort.
+		# elements are in conflict, abort. The parameters, components
+		# and sigma are all changed to lower case independent of the
+		# type of case used for input.
 
 		# Note.  Additional verification is required for "ret['pop']" at
 		#        the end of this loop.  It's value cannot be confirmed
@@ -225,24 +227,24 @@ class plas( object ) :
 
 		for e in arr :
 
-			if ( e in PARAM ) :
+			if ( e.lower() in PARAM ) :
 
 				if ( elem['param'] is None ) :
-					elem['param'] = e
+					elem['param'] = e.lower()
 				else :
 					return None
 
-			elif ( e in COMP ) :
+			elif ( e.lower() in COMP ) :
 
 				if ( elem['comp'] is None ) :
-					elem['comp'] = e
+					elem['comp'] = e.lower()
 				else :
 					return None
 
-			elif ( e in SIGMA ) :
+			elif ( e.lower() in SIGMA ) :
 
 				if ( elem['sigma'] is None ) :
-					elem['sigma'] = e
+					elem['sigma'] = e.lower()
 				else :
 					return None
 
@@ -276,12 +278,12 @@ class plas( object ) :
 	#-----------------------------------------------------------------------
 
 	def __getitem__( self, key ) :
-
+		
 		# Attempt to parse the key.  If this fails, abort.
 
 		elem = self.parse( key )
 
-		if ( elem is None ) : 
+		if ( elem is None ) :
 			return None
 
 		# If no parameter has been specified but a species (and possibly
@@ -364,7 +366,7 @@ class plas( object ) :
 					return None
 
 		# Note.  If this point is reached, the parameter is one to be
-		#        by the species or population.
+		#        handled by the species or population.
 
 		# If no species has been specified, abort.
 
@@ -410,6 +412,10 @@ class plas( object ) :
 		# Based on the "key" in question, validate the "value".  If it
 		# is valid, store the new value (and make any appropriate
 		# changes to other parameters).
+		# Change all keys to lower case independent of the input type
+		# used.
+		
+		key=key.lower()
 
 		if ( key == 'time' ) :
 
@@ -608,7 +614,7 @@ class plas( object ) :
 	             name=None, sym=None, n=None, dv=None,
 	             w=None, w_per=None, w_par=None,
 	             sig_n=None, sig_dv=None, sig_w=None,
-	             sig_w_per=None, sig_w_par=None            ) :
+	             sig_w_per=None, sig_w_par=None       ) :
 
 		self.arr_pop.append( pop( self,
 		                          self.get_spec( spc ),
@@ -628,12 +634,12 @@ class plas( object ) :
 		if ( key is None ) :
 			return None
 
-		for sig in self.arr_spec :
+		for s in self.arr_spec :
 
-			if ( ( sig['name'] == key ) or
-			     ( sig['sym']  == key )    ) :
+			if ( ( s['name'] == key ) or
+			     ( s['sym']  == key )    ) :
 
-				return sig
+				return s
 
 		return None
 
@@ -641,13 +647,13 @@ class plas( object ) :
 	# DEFINE THE FUNCTION FOR RETREIVING A POPULATION.
 	#-----------------------------------------------------------------------
 
-	def get_pop( self, sig_key, p_key ) :
+	def get_pop( self, s_key, p_key ) :
 
 		# Attempt to retrieve the species.  If this fails, abort.
 
-		sig = self.get_spec( sig_key )
+		s = self.get_spec( s_key )
 
-		if ( sig is None ) :
+		if ( s is None ) :
 
 			return None
 
@@ -656,7 +662,7 @@ class plas( object ) :
 
 		for p in self.arr_pop :
 
-			if ( ( p['spec'] == sig            ) and
+			if ( ( p['spec'] == s            ) and
 			     ( ( p['name'] == p_key ) or
 			       ( p['sym']  == p_key )    )     ) :
 
@@ -705,14 +711,14 @@ class plas( object ) :
 
 		# Attempt to retrieve the species.  If this fails, abort.
 
-		sig = self.get_spec( key )
+		s = self.get_spec( key )
 
-		if ( sig is None ) :
+		if ( s is None ) :
 			return
 
 		# Identify the index of the species in the array of species.
 
-		i = self.arr_spec.index( sig )
+		i = self.arr_spec.index( s )
 
 		# Delete the requested species.
 
@@ -773,7 +779,7 @@ class spec( object ) :
 
 	def __getitem__( self, key ) :
 
-
+		key=key.lower()
 		# Return the appropriate value for the provided "key".
 
 		if ( key == 'plas' ) :
@@ -1006,6 +1012,104 @@ class spec( object ) :
 			return ( 1.E-3 / const['k_b'] ) * \
 			       self.m * const['m_p'] * ( 1.E6 * w2 )
 
+                elif ( key == 'w3_par' ) :
+
+			w_par = self['w_par']
+
+			if ( w_par is None ) :
+				return None
+
+			return  w_par**3
+
+ 
+                elif ( key == 'w4_par' ) :
+
+			w2_par = self['w2_par']
+
+			if ( w2_par is None ) :
+				return None
+
+			return  w2_par**2
+
+
+                elif ( key == 's' ) :
+
+			arr_pop = self.my_plas.lst_pop( self )
+
+			if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+				return None
+
+			if ( len( arr_pop ) == 1 ) :
+				return 0.
+
+			n       = self['n']
+                        w_par   = self['w_par']
+                        w2_par  = self['w2_par']
+                        w3_par  = self['w3_par']
+                        dv      = self['dv']
+
+			arr_n      = [ p['n'     ] for p in arr_pop ]
+			arr_dv     = [ p['dv'    ] for p in arr_pop ]
+			arr_w2_par = [ p['w2_par'] for p in arr_pop ]
+
+                        if ( ( None in arr_n      ) or
+			     ( None in arr_dv     ) or
+			     ( None in arr_w2_par )    ) :
+				return None
+
+                        ret = 0.
+
+                        for ( p, obj ) in enumerate( arr_pop ) :
+                                ret += ( arr_n[p] * arr_dv[p]**3 )
+				ret += ( 3 * arr_n[p]
+                                           * arr_dv[p] * arr_w2_par[p] )
+
+                        return ( ( ret / ( n * w3_par ) )
+			           - ( ( dv**3  ) / w3_par )
+			           - ( ( 3 * dv ) / w_par  ) )
+
+                elif ( key == 'k' ) :
+
+			arr_pop = self.my_plas.lst_pop( self )
+
+			if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+				return None
+
+			if ( len( arr_pop ) == 1 ) :
+				return 0.
+
+			n       = self['n']
+                        w_par   = self['w_par']
+                        w2_par  = self['w2_par']
+                        w4_par  = self['w4_par']
+                        dv      = self['dv']
+
+			arr_n      = [ p['n'     ] for p in arr_pop ]
+			arr_dv     = [ p['dv'    ] for p in arr_pop ]
+			arr_w2_par = [ p['w2_par'] for p in arr_pop ]
+			arr_w4_par = [ p['w4_par'] for p in arr_pop ]
+
+                        if ( ( None in arr_n      ) or
+			     ( None in arr_dv     ) or
+			     ( None in arr_w2_par )    ) :
+				return None
+
+                        ret = 0.
+
+                        for ( p, obj ) in enumerate( arr_pop ) :
+                                ret +=  arr_n[p] * ( arr_dv[p]**4 )
+                                ret -= ( 4 * arr_n[p] 
+                                            * dv * arr_dv[p]**3 )
+				ret +=  ( 6 * arr_n[p]
+                                            * arr_w2_par[p] * ( arr_dv[p]**2 ) )
+				ret -= (12 * arr_n[p]
+                                            * dv * arr_w2_par[p] * arr_dv[p] )
+                                ret +=  ( 3 * arr_n[p] * arr_w4_par[p] )
+
+                        return ( ( ret / ( n * w4_par )    )
+                                   + 6 * ( ( dv/w_par )**2 )
+                                   + 3 * ( ( dv/w_par )**4 ) )
+
 		else :
 
 			raise KeyError( 'Invalid key.' )
@@ -1016,6 +1120,7 @@ class spec( object ) :
 
 	def __setitem__( self, key, value ) :
 
+		key=key.lower()
 
 		# Based on the "key" in question, validate the "value".  If it
 		# is valid, store the new value (and make any appropriate
@@ -1046,6 +1151,15 @@ class spec( object ) :
 
 					ValueError(
 					    'Name cannot contain underscores.' )
+
+				elif ( ( value.lower( ) in PARAM ) or
+				       ( value.lower( ) in COMP  ) or
+				       ( value.lower( ) in SIGMA )    ) :
+
+					self.name = None
+
+					raise ValueError(
+					    'Name cannot be a reserved value.' )
 
 				elif ( ( self.name == value ) or
 				       ( self.sym  == value )    ) :
@@ -1092,6 +1206,16 @@ class spec( object ) :
 
 					ValueError(
 					       'Symbol cannot contain spaces.' )
+
+				elif ( ( value.lower( ) in PARAM ) or
+				       ( value.lower( ) in COMP  ) or
+				       ( value.lower( ) in SIGMA )    ) :
+
+					self.name = None
+
+					raise ValueError(
+					    'Name cannot be a reserved value.' )
+
 
 				elif ( ( self.name == value ) or
 				       ( self.sym  == value )    ) :
@@ -1197,7 +1321,7 @@ class pop( object ) :
 	              n=None, dv=None, w=None,
 	              w_per=None, w_par=None,
 	              sig_n=None, sig_dv=None, sig_w=None,
-	              sig_w_per=None, sig_w_par=None     ) :
+	              sig_w_per=None, sig_w_par=None       ) :
 
 		self.my_plas = my_plas
 		self.my_spec = my_spec
@@ -1242,7 +1366,7 @@ class pop( object ) :
 
 	def __getitem__( self, key ) :
 
-
+		key=key.lower()	
 		# Return the appropriate value for the provided "key".
 
 		if   ( key == 'plas' ) :
@@ -1444,6 +1568,33 @@ class pop( object ) :
 			else :
 				return w_par**2
 
+		elif ( key == 'w4' ) :
+
+			w = self['w']
+
+			if ( w is None ):
+				return None
+			else :
+				return w**4
+
+		elif ( key == 'w4_per' ) :
+
+			w_per = self['w_per']
+
+			if ( w_per is None ):
+				return None
+			else :
+				return w_per**4
+
+		elif ( key == 'w4_par' ) :
+
+			w_par = self['w_par']
+
+			if ( w_par is None ):
+				return None
+			else :
+				return w_par**4
+
 		elif ( key == 'r' ) :
 
 			if ( self.aniso ) :
@@ -1520,6 +1671,15 @@ class pop( object ) :
 			else :
 				return None
 
+                elif ( key == 's' ) :
+
+                        return 0.
+
+                elif ( key == 'k' ) :
+
+                        return 0.
+
+
 		else :
 
 			raise KeyError( 'Invalid key.' )
@@ -1534,7 +1694,11 @@ class pop( object ) :
 		# Based on the "key" in question, validate the "value".  If it
 		# is valid, store the new value (and make any appropriate
 		# changes to other parameters).
-
+		# Change all keys to lower case independent of the input type
+		# used.
+		
+		key=key.lower()
+		
 		if ( key == 'plas' ) :
 
 			raise KeyError(
