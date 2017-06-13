@@ -249,7 +249,7 @@ class fc_dat( ) :
 		            - self.calc_arr_dot( dlk, -prm_v ) )
 		            / prm_w )**2 / 2. )
 		ret_exp_2 = 1.e3 * prm_w * sqrt( 2. / pi ) * exp(
-		            - ( ( self['vel_stop'] 							#vel_cen + ( vel_wid / 2. )
+		            - ( ( self['vel_stop']#vel_cen + ( vel_wid / 2. )
 		            - self.calc_arr_dot( dlk, -prm_v ) )
 		            / prm_w )**2 / 2. )
 
@@ -257,11 +257,11 @@ class fc_dat( ) :
 		# Calculate the "erf" terms.
 
 		ret_erf_1 = 1.e3 * self.calc_arr_dot( dlk, -prm_v ) * erf(
-		            ( self['vel_strt']								#vel_cen - ( vel_wid / 2. )
+		            ( self['vel_strt']	#vel_cen - ( vel_wid / 2. )
 		            - self.calc_arr_dot( dlk, -prm_v ) )
 		            / ( sqrt(2.) * prm_w ) )
 		ret_erf_2 = 1.e3 * self.calc_arr_dot( dlk, -prm_v ) * erf(
-		            ( self['vel_stop']								#vel_cen + ( vel_wid / 2. )
+		            ( self['vel_stop']	#vel_cen + ( vel_wid / 2. )
 		            - self.calc_arr_dot( dlk, -prm_v ) )
 		            / ( sqrt(2.) * prm_w ) )
 
@@ -283,4 +283,3 @@ class fc_dat( ) :
 		# Return the calculated value for the expected current.
 
 		return ret
-
