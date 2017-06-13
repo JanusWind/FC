@@ -4,57 +4,56 @@ from janus_helper import calc_vec_norm, calc_vec_dot
 from numpy import interp, sin, cos, deg2rad
 
 	#-----------------------------------------------------------------------
-				# DEFINE THE Class FOR datum
+	# DEFINE THE CLASS FOR DATUM
 	#-----------------------------------------------------------------------
 
 class fc_dat( ) :
 
-	def __init__( self, spec=None, 
-	              azim=None, elev=None,
-	              volt_cen=None, volt_del=None,
-	              curr= None, valid = False           ) :
+	def __init__( self,
+                      spec=None, azim=None,
+                      elev=None, volt_cen=None,
+                      volt_del=None, curr=None, valid = False                ) :
 
-		self._spec  = spec
-		self._valid = valid
-		self._azim  = azim
-		self._elev  = elev
-		self._volt_cen = volt_cen
-		self._volt_del = volt_del
+		self._spec      = spec
+		self._valid     = valid
+		self._azim      = azim
+		self._elev      = elev
+		self._volt_cen  = volt_cen
+		self._volt_del  = volt_del
+
 		self._volt_strt = (self._volt_cen - ( self._volt_del / 2. ) )
 		self._volt_stop = (self._volt_cen + ( self._volt_del / 2. ) )
-		self._vel_strt  = 1E-3*( sqrt((2.0*const['q_p']*self['volt_strt']/
-								const['m_p'])))
-		self._vel_stop  = 1E-3*( sqrt((2.0*const['q_p']*self['volt_stop']/
-								const['m_p'])))
-		self._vel_cen   = ( (self['vel_strt']+self['vel_stop'])/2. )
-		self._vel_del   = (  self['vel_stop']-self['vel_strt'] )
-		self._curr = curr
 
-		self._the = 90 - self._elev     # TODO: Confirm these two formulae
-		self._phi =    - self._azim
+		self._vel_strt  = 1E-3*( sqrt(2.0*const['q_p']*
+                                         self['volt_strt']/const['m_p'])    )
+		self._vel_stop  = 1E-3*( sqrt((2.0*const['q_p']*
+                                         self['volt_stop']/const['m_p']))   )
+		self._vel_cen   = ( (self['vel_strt']+self['vel_stop'])/2.  )
+		self._vel_del   = (  self['vel_stop']-self['vel_strt']      )
+		self._curr      = curr
 
-		self._dir_x = sin( deg2rad( self._the ) ) * cos( deg2rad( self._phi ) )
-		self._dir_y = sin( deg2rad( self._the ) ) * sin( deg2rad( self._phi ) )
-		self._dir_z = cos( deg2rad( self._the ) )
 
-		self._norm_b_x = None
-		self._norm_b_y = None
-		self._norm_b_z = None
+                # TODO: Confirm these two formulae
 
-		if ( ( self._azim     is None ) or
-		     ( self._elev     is None ) or
-		     ( self._volt_cen is None ) or
-		     ( self._volt_del is None ) or
-		     ( self._curr     is None )    ) :
+		self._the       = 90 - self._elev
+		self._phi       =    - self._azim
+
+		self._dir_x     = (sin( deg2rad( self._the ) ) *
+                                   cos( deg2rad( self._phi ) )              )
+		self._dir_y     = (sin( deg2rad( self._the ) ) *
+                                   sin( deg2rad( self._phi ) )              )
+		self._dir_z     = (cos( deg2rad( self._the ) )              )
+
+		self._norm_b_x  = None
+		self._norm_b_y  = None
+		self._norm_b_z  = None
+
+		if ( ( self._azim     is None ) or ( self._elev     is None ) or
+		     ( self._volt_cen is None ) or ( self._volt_del is None ) or
+                     ( self._curr     is None )                              ) :
 			self.valid = False
 		else :
 			self.valid = True
-
-		# front underscore keeps the variable private to user
-		# How to get 'spec', 'valid'
-		# I can still set values to these arguments
-		# Set 'valid' = False ad default 
-		
 
 	def __getitem__( self, key ) :
 
@@ -116,7 +115,7 @@ class fc_dat( ) :
 
 	def __setitem__( self, key, val ) :
 
-		raise KeyError( 'Reassignment not permitted after initialization.' )
+		raise KeyError('Reassignment not allowed after initialization')
 
 
 	#-----------------------------------------------------------------------
@@ -196,8 +195,8 @@ class fc_dat( ) :
 	                  vel_cen, vel_wid,
 	                  dir_alt, dir_azm,
 	                  mag_x, mag_y, mag_z,
-	                  prm_n, prm_v_x, prm_v_y, prm_v_z,		# Remove prm_
-	                  prm_w            ) :
+	                  prm_n, prm_v_x, prm_v_y, prm_v_z,	# Remove prm_
+	                  prm_w                                  ) :
 
 
 		# Note.  This function is based on Equation 2.34 from Maruca
