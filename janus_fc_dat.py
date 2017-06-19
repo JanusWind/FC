@@ -185,7 +185,7 @@ class fc_dat( ) :
  
 '''
 
-	def calc_cur_max( self,
+	def calc_curr_max( self,
 	                  vel_cen, vel_wid,
 	                  dir_alt, dir_azm,
 	                  n, v_x, v_y, v_z, w ) :
@@ -285,7 +285,7 @@ class fc_dat( ) :
 		             (     dmg_dlk**2   * w_par**2 )   )
 
 
-                return self.calc_cur_max( vel_cen, vel_wid,
+                return self.calc_curr_max( vel_cen, vel_wid,
                                           dir_alt, dir_azm,
 	                                  mag_x, mag_y, mag_z,
                                           n, v_x, v_y, v_z, w  )
