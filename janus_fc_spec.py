@@ -11,12 +11,12 @@ class fc_spec():
 				        volt_del=None, curr=None, time=None, 
 						  curr_jump=100., curr_min=1.) :
 
-		self._n_cup=2
-		self._n_dir=20
-		self._n_bin=n_bin
-		self._time=time
+		self._n_cup    = 2
+		self._n_dir    = 20
+		self._n_bin    = n_bin
+		self._time     = time
 		self.curr_jump = curr_jump
-		self.curr_min = curr_min
+		self.curr_min  = curr_min
 
 
 		if ( elev == None ) :

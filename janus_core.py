@@ -1005,12 +1005,6 @@ class core( QObject ) :
 
 	def chng_mom_sel( self, c, d, b ) :
 
-		#FIXME 8
-
-		#TODO Verify that this code still works (under the new variable
-		#     names).  Consider changing (t,p,v) to (c,d,b) (both here
-		#     and in "janus_thread.py").
-
 		# Change the selection of the requested datum.
 
 		self.mom_sel_bin[c, d, b] = not self.mom_sel_bin[c, d, b]
@@ -1081,8 +1075,6 @@ class core( QObject ) :
 		# data selection, and then update the counter
 		# "self.mom_n_sel_dir".
 
-                # TODO Chnage 'sel_curr' to 'sel_bin' both here and wherever the 
-                # the signal is being called.
 		self.mom_sel_dir = array( [ [
 		           self.mom_n_sel_bin[c,d] >= self.mom_min_sel_bin	
 		                              for d in range( self.n_dir ) ]

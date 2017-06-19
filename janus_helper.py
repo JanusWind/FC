@@ -52,12 +52,12 @@ def round_sig( val, sig ) :
 
 
 ################################################################################
-## DEFINE THE FUNCTION FOR computing unit vector 
+## DEFINE THE FUNCTION FOR COMPUTING UNIT VECTOR 
 ################################################################################
 
 # Define the function for computing unit vector
 
-def calc_vec_norm( v ):
+def calc_arr_norm( v ):
 
 	mag = sqrt( fsum( [ c**2 for c in v ]) )
 
@@ -65,12 +65,12 @@ def calc_vec_norm( v ):
 
 
 ################################################################################
-## DEFINE THE FUNCTION FOR computing dot product
+## DEFINE THE FUNCTION FOR COMPUTING DOT PRODUCT
 ################################################################################
 
 # Define the function for computing dot product
 
-def calc_vec_dot( u,v ) :
+def calc_arr_dot( u,v ) :
 	if ( len(u) != len(v) ) :
 		raise TypeError( 'Unequal lengths.' )
 	return fsum([ x[0]*x[1] for x in zip(u,v) ]) 

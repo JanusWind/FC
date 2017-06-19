@@ -1,6 +1,6 @@
 from janus_const import const
 from math import sqrt, acos, pi
-from janus_helper import calc_vec_norm, calc_vec_dot
+from janus_helper import calc_arr_norm, calc_arr_dot
 from numpy import interp, sin, cos, deg2rad
 
 	#-----------------------------------------------------------------------
@@ -15,11 +15,11 @@ class fc_dat( ) :
                       volt_del=None, curr=None, valid = False                ) :
 
 		self._spec      = spec
-		self._valid     = valid
 		self._azim      = azim
 		self._elev      = elev
 		self._volt_cen  = volt_cen
 		self._volt_del  = volt_del
+                self._valid     = valid
 
 		self._volt_strt = (self._volt_cen - ( self._volt_del / 2. ) )
 		self._volt_stop = (self._volt_cen + ( self._volt_del / 2. ) )
@@ -126,7 +126,7 @@ class fc_dat( ) :
 
 		# Normalize the magnetic-field vector.
 
-		norm_b = calc_vec_norm( b_vec )
+		norm_b = calc_arr_norm( b_vec )
 
 		# Store the components of the normalized magnetic-field vector.
 
@@ -147,13 +147,13 @@ class fc_dat( ) :
 
 		# Normalize the look direction and particle velocity.
 
-		vn = calc_vec_norm( v )
+		vn = calc_arr_norm( v )
 		nvn = tuple( [ -c for c in vn ] )
 
 		# Calculate the particle inflow angle (in degrees) relative to
 		# the cup normal (i.e., the cup pointing direction).
 
-		psi = acos( calc_vec_dot( self['dir'], nvn ) )*pi/180.
+		psi = acos( calc_arr_dot( self['dir'], nvn ) )*pi/180.
 		if ( psi > 90. ) :
 			return 0. 
  		
@@ -167,20 +167,94 @@ class fc_dat( ) :
 	#-----------------------------------------------------------------------
 
 	#TODO Make this not a stupid hack of the bi-Maxwellian version.
+'''
+        def calc_cur_max( self,
+                           vel_cen, vel_wid,
+                           dir_alt, dir_azm,
+                           prm_n, prm_v_x, prm_v_y, prm_v_z, prm_w ) :
+ 
+ 
+                 # Return the equivalent bi-Maxwellian response for equal
+                 # perpendicular and parallel thermal speeds and a dummy
+                 # magnetic field.
+ 
+                return self.calc_cur_bmx( vel_cen, vel_wid,
+                                          dir_alt, dir_azm, 1., 0., 0.,
+                                          prm_n, prm_v_x, prm_v_y, prm_v_z,
+                                          prm_w, prm_w                      )
+ 
+'''
 
 	def calc_cur_max( self,
 	                  vel_cen, vel_wid,
 	                  dir_alt, dir_azm,
-	                  prm_n, prm_v_x, prm_v_y, prm_v_z, prm_w ) :
+	                  n, v_x, v_y, v_z, w ) :
 
 		# Return the equivalent bi-Maxwellian response for equal
 		# perpendicular and parallel thermal speeds and a dummy
 		# magnetic field.
 
-		return self.calc_cur_bmx( vel_cen, vel_wid,
-		                          dir_alt, dir_azm, 1., 0., 0.,
-		                          prm_n, prm_v_x, prm_v_y, prm_v_z,
-		                          prm_w, prm_w                      )
+		# Calcualte the vector bulk velocity.
+
+                x = array([v_x, v_y, v_z])
+
+                if (v.ndim > 1 ) :
+                        v = transpose( v )
+
+                # Calculate the look direction as a cartesian unit vector.
+
+                mag = array( [ mag_x, mag_y, mag_z ] ) 
+
+                if ( mag.ndim > 1 ) :
+                        mag = transpose( mag )
+
+                dmg = self.calc_arr_nrm( mag )
+
+
+                # Calculate the component of the magnetic field unit vector
+                # along that lies along the look direction.
+
+                dmg_dlk = self.calc_arr_dot( dmg, dlk )
+
+
+		# Calculate the exponential terms of the current.
+
+		ret_exp_1 = 1.e3 * w * sqrt( 2. / pi ) * exp(
+		            - ( ( self['vel_strt']
+		            - self.calc_arr_dot( dlk, -v ) )
+		            / w )**2 / 2. )
+		ret_exp_2 = 1.e3 * w * sqrt( 2. / pi ) * exp(
+		            - ( ( self['vel_stop']
+		            - self.calc_arr_dot( dlk, -v ) )
+		            / w )**2 / 2. )
+
+
+		# Calculate the "erf" terms.
+
+		ret_erf_1 = 1.e3 * self.calc_arr_dot( dlk, -v ) * erf(
+		            ( self['vel_strt']
+		            - self.calc_arr_dot( dlk, -v ) )
+		            / ( sqrt(2.) * w ) )
+		ret_erf_2 = 1.e3 * self.calc_arr_dot( dlk, -v ) * erf(
+		            ( self['vel_stop']
+		            - self.calc_arr_dot( dlk, -v ) )
+		            / ( sqrt(2.) * w ) )
+
+
+		# Calculate the parenthetical expression.
+
+		ret_prn = ( ( ret_exp_2 + ret_erf_2 ) -
+		            ( ret_exp_1 + ret_erf_1 )   )
+
+
+		# Calculate the expected current.
+
+		ret = ( (   1.e12 ) * ( 1. / 2. ) * ( const['q_p'] )
+		        * ( 1.e6 * n )
+		        * ( 1.e-4 * self.spec.calc_eff_area( dlk, v ) )
+		        * ( ret_prn ) )
+
+		return ret 
 
 
 	#-----------------------------------------------------------------------
@@ -191,12 +265,12 @@ class fc_dat( ) :
 
 	#TODO Migrate to "fc_dat"
 
-	def calc_cur_bmx( self,
-	                  vel_cen, vel_wid,
-	                  dir_alt, dir_azm,
-	                  mag_x, mag_y, mag_z,
-	                  prm_n, prm_v_x, prm_v_y, prm_v_z,	# Remove prm_
-	                  prm_w                                  ) :
+	def calc_curr_bmx( self,
+	                   vel_cen, vel_wid,
+                           dir_alt, dir_azm,
+	                   mag_x, mag_y, mag_z,
+                           n, v_x, v_y, v_z,
+                           w_per,w_par          ) :
 
 
 		# Note.  This function is based on Equation 2.34 from Maruca
@@ -204,13 +278,25 @@ class fc_dat( ) :
 		#        (i.e., the factor of $2$ from Equation 2.13, which is
 		#        automatically calibrated out of the Wind/FC data).
 
+		# Compute the effective thermal speed along this look direction.
 
+
+		w = sqrt( ( ( 1. - dmg_dlk**2 ) * w_per**2 ) + 
+		             (     dmg_dlk**2   * w_par**2 )   )
+
+
+                return self.calc_cur_max( vel_cen, vel_wid,
+                                          dir_alt, dir_azm,
+	                                  mag_x, mag_y, mag_z,
+                                          n, v_x, v_y, v_z, w  )
+
+'''                
 		# Calcualte the vector bulk velocity.
 
-		prm_v = array( [ prm_v_x, prm_v_y, prm_v_z ] )
+		v = array( [ v_x, v_y, v_z ] )
 
-		if ( prm_v.ndim > 1 ) :
-			prm_v = transpose( prm_v )
+		if ( v.ndim > 1 ) :
+			v = transpose( v )
 
 
 		# Calculate the look direction as a cartesian unit vector.
@@ -238,32 +324,32 @@ class fc_dat( ) :
 		# Compute the effective thermal speed along this look direction.
 
 
-		#prm_w = sqrt( ( ( 1. - dmg_dlk**2 ) * prm_w_per**2 ) + 
-		 #             (        dmg_dlk**2   * prm_w_par**2 )   )
+		w = sqrt( ( ( 1. - dmg_dlk**2 ) * w_per**2 ) + 
+		             (     dmg_dlk**2   * w_par**2 )   )
 
 
 		# Calculate the exponential terms of the current.
 
-		ret_exp_1 = 1.e3 * prm_w * sqrt( 2. / pi ) * exp(
+		ret_exp_1 = 1.e3 * w * sqrt( 2. / pi ) * exp(
 		            - ( ( self['vel_strt']
-		            - self.calc_arr_dot( dlk, -prm_v ) )
-		            / prm_w )**2 / 2. )
-		ret_exp_2 = 1.e3 * prm_w * sqrt( 2. / pi ) * exp(
-		            - ( ( self['vel_stop']#vel_cen + ( vel_wid / 2. )
-		            - self.calc_arr_dot( dlk, -prm_v ) )
-		            / prm_w )**2 / 2. )
+		            - self.calc_arr_dot( dlk, -v ) )
+		            / w )**2 / 2. )
+		ret_exp_2 = 1.e3 * w * sqrt( 2. / pi ) * exp(
+		            - ( ( self['vel_stop']
+		            - self.calc_arr_dot( dlk, -v ) )
+		            / w )**2 / 2. )
 
 
 		# Calculate the "erf" terms.
 
-		ret_erf_1 = 1.e3 * self.calc_arr_dot( dlk, -prm_v ) * erf(
-		            ( self['vel_strt']	#vel_cen - ( vel_wid / 2. )
-		            - self.calc_arr_dot( dlk, -prm_v ) )
-		            / ( sqrt(2.) * prm_w ) )
-		ret_erf_2 = 1.e3 * self.calc_arr_dot( dlk, -prm_v ) * erf(
-		            ( self['vel_stop']	#vel_cen + ( vel_wid / 2. )
-		            - self.calc_arr_dot( dlk, -prm_v ) )
-		            / ( sqrt(2.) * prm_w ) )
+		ret_erf_1 = 1.e3 * self.calc_arr_dot( dlk, -v ) * erf(
+		            ( self['vel_strt']
+		            - self.calc_arr_dot( dlk, -v ) )
+		            / ( sqrt(2.) * w ) )
+		ret_erf_2 = 1.e3 * self.calc_arr_dot( dlk, -v ) * erf(
+		            ( self['vel_stop']
+		            - self.calc_arr_dot( dlk, -v ) )
+		            / ( sqrt(2.) * w ) )
 
 
 		# Calculate the parenthetical expression.
@@ -274,12 +360,12 @@ class fc_dat( ) :
 
 		# Calculate the expected current.
 
-		ret = ( ( 1.e12 ) * ( 1. / 2. ) * ( const['q_p'] )
-		        * ( 1.e6 * prm_n )
-		        * ( 1.e-4 * self.spec.calc_eff_area( dlk, prm_v ) )		# Effective area now is a spec object
+		ret = ( (   1.e12 ) * ( 1. / 2. ) * ( const['q_p'] )
+		        * ( 1.e6 * n )
+		        * ( 1.e-4 * self.spec.calc_eff_area( dlk, v ) )
 		        * ( ret_prn ) )
-
 
 		# Return the calculated value for the expected current.
 
 		return ret
+'''
