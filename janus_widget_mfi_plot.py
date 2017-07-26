@@ -227,12 +227,12 @@ class widget_mfi_plot( QWidget ) :
 		self.crv_z = PlotDataItem( self.core.mfi_t,
 		                           self.core.mfi_b_z,
 		                           pen=self.pen_crv_z )
-		self.crv_colat = PlotDataItem( self.core.mfi_t,
-		                           self.core.mfi_b_colat,
-		                           pen=self.pen_crv_colat )
-		self.crv_lon = PlotDataItem( self.core.mfi_t,
-		                           self.core.mfi_b_lon,
-		                           pen=self.pen_crv_lon )
+		# self.crv_colat = PlotDataItem( self.core.mfi_t,
+		#                            self.core.mfi_b_colat,
+		#                            pen=self.pen_crv_colat )
+		# self.crv_lon = PlotDataItem( self.core.mfi_t,
+		#                            self.core.mfi_b_lon,
+		#                            pen=self.pen_crv_lon )
 
 		self.plt.addItem( self.crv_m )
 		self.plt.addItem( self.crv_n )
