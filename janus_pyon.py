@@ -34,7 +34,7 @@ from janus_const import const
 PARAM = [ 'b0', 'v0', 'n', 'v', 'dv', 'v0', 'w', 'w2', 'r', 't', 'beta',
           'ac', 'time', 's','m','q', 'k', 'beta_par', 'beta_per'               ]
 
-COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat' ]
+COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat'  ]
 
 SIGMA = [ 'sig', 'sigma' ]
 
