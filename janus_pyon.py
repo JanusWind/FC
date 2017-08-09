@@ -32,7 +32,7 @@ from janus_const import const
 ################################################################################
 
 PARAM = [ 'b0', 'v0', 'n', 'v', 'dv', 'v0', 'w', 'w2', 'r', 't', 'beta',
-          'ac', 'time', 's','m','q', 'k'                                       ]
+          'ac', 'time', 's','m','q', 'k', 'beta_par'                           ]
 
 COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat' ]
 
@@ -963,6 +963,24 @@ class spec( object ) :
 
 			return sqrt( w2 )
 
+		elif ( key == 'w3' ) :
+
+			w = self['w']
+
+			if ( w is None ) :
+				return None
+
+			return  w**3
+
+		elif ( key == 'w4' ) :
+
+			w = self['w']
+
+			if ( w is None ) :
+				return None
+
+			return  w**4
+
 		elif ( key == 'r' ) :
 
 			w2_per = self['w2_per']
@@ -1031,6 +1049,25 @@ class spec( object ) :
 
 			return  w2_par**2
 
+                elif ( key == 'beta_par' ) :
+
+                       arr_pop = self.my_plas.lst_pop( self )
+
+                        if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+                                return None
+
+                        b0_mag = self.my_plas.get_b0_mag( )
+
+                        n       = self['n']
+                        t_par   = self['t_par']
+                        
+                        arr_n      = [ p['n'     ] for p in arr_pop ]
+
+                        for ( p, obj ) in enumerate( arr_pop ) : 
+                                ret = ( 2*const['mu_0'] * const['k_b']*arr_n[p]
+                                         * t_par )
+
+                        return ( ret/b0_mag**2 )
 
                 elif ( key == 's' ) :
 
@@ -1047,6 +1084,7 @@ class spec( object ) :
                         w2_par  = self['w2_par']
                         w3_par  = self['w3_par']
                         dv      = self['dv']
+                        w3      = self['w3']
 
 			arr_n      = [ p['n'     ] for p in arr_pop ]
 			arr_dv     = [ p['dv'    ] for p in arr_pop ]
@@ -1064,9 +1102,9 @@ class spec( object ) :
 				ret += ( 3 * arr_n[p]
                                            * arr_dv[p] * arr_w2_par[p] )
 
-                        return ( ( ret / ( n * w3_par ) )
-			           - ( ( dv**3  ) / w3_par )
-			           - ( ( 3 * dv ) / w_par  ) )
+                        return ( ( ret / ( n * w3 ) )
+			           - ( ( dv**3  ) / w3 )
+			           - ( ( 3 * dv*w2_par) / w3 ) )
 
                 elif ( key == 'k' ) :
 
@@ -1083,6 +1121,7 @@ class spec( object ) :
                         w2_par  = self['w2_par']
                         w4_par  = self['w4_par']
                         dv      = self['dv']
+                        w4      = self['w4']
 
 			arr_n      = [ p['n'     ] for p in arr_pop ]
 			arr_dv     = [ p['dv'    ] for p in arr_pop ]
@@ -1106,9 +1145,9 @@ class spec( object ) :
                                             * dv * arr_w2_par[p] * arr_dv[p] )
                                 ret +=  ( 3 * arr_n[p] * arr_w4_par[p] )
 
-                        return ( ( ret / ( n * w4_par )    )
-                                   + 6 * ( ( dv/w_par )**2 )
-                                   + 3 * ( ( dv/w_par )**4 ) )
+                        return ( ( ret / ( n * w4 )               )
+                                   + 6 * ( ( ( dv*w_par )**2/w4 ) )
+                                   + 3 * (  dv**4/w4    )         )
 
 		else :
 
@@ -1677,7 +1716,7 @@ class pop( object ) :
 
                 elif ( key == 'k' ) :
 
-                        return 0.
+                        return 3.
 
 
 		else :
