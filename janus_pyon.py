@@ -1051,7 +1051,7 @@ class spec( object ) :
 
                 elif ( key == 'beta_par' ) :
 
-                       arr_pop = self.my_plas.lst_pop( self )
+                        arr_pop = self.my_plas.lst_pop( self )
 
                         if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
                                 return None
