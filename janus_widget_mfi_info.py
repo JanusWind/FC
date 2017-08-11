@@ -33,7 +33,6 @@ from PyQt4.QtCore import SIGNAL
 
 from janus_format_TextEdit import format_TextEdit
 
-
 ################################################################################
 ## DEFINE THE "widget_mfi_info" CLASS TO CUSTOMIZE "format_TextEdit".
 ################################################################################
@@ -108,18 +107,31 @@ class widget_mfi_info( format_TextEdit ) :
 		self.prnt_brk( )
 
 		self.prnt_tab( 1 )
-		self.prnt_htm( '<i>B<sub>x</sub></i> = ' )
+		# self.prnt_htm( '<i>B<sub>x</sub></i> = ' )
+		self.prnt_htm( '<i><font color="#FF0000">B<sub>x</sub></font></i> = ' )
 		self.prnt_dcm( self.core.mfi_avg_vec[0], 1, 'nT' )
 		self.prnt_brk( )
 
 		self.prnt_tab( 1 )
-		self.prnt_htm( '<i>B<sub>y</sub></i> = ' )
+		# self.prnt_htm( '<i>B<sub>y</sub></i> = ' )
+		self.prnt_htm( '<i><font color="#00FF00">B<sub>y</sub></font></i> = ' )
 		self.prnt_dcm( self.core.mfi_avg_vec[1], 1, 'nT' )
 		self.prnt_brk( )
 
 		self.prnt_tab( 1 )
-		self.prnt_htm( '<i>B<sub>z</sub></i> = ' )
+		# self.prnt_htm( '<i>B<sub>z</sub></i> = ' )
+		self.prnt_htm( '<i><font color="#0000FF">B<sub>z</sub></font></i> = ' )
 		self.prnt_dcm( self.core.mfi_avg_vec[2], 1, 'nT' )
+		self.prnt_brk( )
+
+		self.prnt_tab( 1 )
+		self.prnt_htm( '<i>B<sub>&lambda;</sub></i> = ')
+		self.prnt_dcm( self.core.mfi_avg_mag_angles[0], 1, '<sup>o</sup>' )
+		self.prnt_brk( )
+
+		self.prnt_tab( 1 )
+		self.prnt_htm( '<i>B<sub>&phi;</sub></i> = ')
+		self.prnt_dcm( self.core.mfi_avg_mag_angles[1], 1, '<sup>o</sup>' )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "rset" SIGNAL.

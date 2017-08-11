@@ -1,4 +1,4 @@
-###############################################################################
+################################################################################
 ##
 ## Janus -- GUI Software for Processing Thermal-Ion Measurements from the
 ##          Wind Spacecraft's Faraday Cups
@@ -21,7 +21,7 @@
 ################################################################################
 
 
-################################################################################
+###############################################################################
 ## LOAD THE NECESSARY MODULES.
 ################################################################################
 
@@ -33,7 +33,7 @@ from PyQt4.QtCore import QObject, SIGNAL, QThread
 
 import os.path
 
-# Load the modules necessary handling dates and times.
+# Load the modules necessary for handling dates and times.
 
 from time import sleep
 from datetime import datetime, timedelta
@@ -54,10 +54,10 @@ from janus_mfi_arcv import mfi_arcv
 
 # Load the necessary array modules and mathematical functions.
 
-from numpy import amax, amin, append, arccos, arange, argsort, array, average, \
-                  cos, deg2rad, diag, dot, exp, indices, interp, mean, pi,     \
-                  polyfit, rad2deg, reshape, sign, sin, sum, sqrt, std, tile,  \
-                  transpose, where, zeros
+from numpy import amax, amin, append, arccos, arctan2, arange, argsort, array, \
+                    average, cos, deg2rad, diag, dot, exp, indices, interp, \
+                    mean, pi, polyfit, rad2deg, reshape, sign, sin, sum, sqrt, \
+                    std, tile, transpose, where, zeros
 
 from numpy.linalg import lstsq
 
@@ -194,15 +194,15 @@ class core( QObject ) :
 
 		# Initialize the variables that will contain the Wind/FC ion
 		# spectrum's data; the associated Wind/MFI magnetic field data;
-		# and the settings, data selections, and results from all 
+		# and the settings, data selections, and results from all
 		# analyses.
 
-		self.rset_var( var_swe=True,     var_mfi=True,
+		self.rset_var( var_swe=True, var_mfi=True,
 		               var_mom_win=True, var_mom_sel=True,
 		               var_mom_res=True, var_nln_ion=True,
 		               var_nln_set=True, var_nln_gss=True,
-		               var_nln_sel=True, var_nln_res=True, 
-		               var_dsp=True,     var_dyn=True       )
+		               var_nln_sel=True, var_nln_res=True,
+		               var_dsp=True, var_dyn=True          )
 
 		# Define the data array with values for effective collecting
 		# area, "eff_area", as a function of inflow angle, "deg".
@@ -249,12 +249,12 @@ class core( QObject ) :
 	#-----------------------------------------------------------------------
 
 	def rset_var( self,
-	              var_swe=False,     var_mfi=False,
+	              var_swe=False, var_mfi=False,
 	              var_mom_win=False, var_mom_sel=False,
 	              var_mom_res=False, var_nln_ion=False,
 	              var_nln_set=False, var_nln_gss=False,
-	              var_nln_sel=False, var_nln_res=False, 
-	              var_dsp=False,     var_dyn=False      ) :
+	              var_nln_sel=False, var_nln_res=False,
+	              var_dsp=False, var_dyn=False          ) :
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion spectrum's data.
@@ -792,7 +792,7 @@ class core( QObject ) :
 
 		self.mfi_avg_vec = array( [ mean( self.mfi_b_x ),
 		                            mean( self.mfi_b_y ),
-		                            mean( self.mfi_b_z )  ] )
+		                            mean( self.mfi_b_z ) ] )
 
 		self.mfi_avg_mag = sqrt( self.mfi_avg_vec[0]**2 +
 		                         self.mfi_avg_vec[1]**2 +
@@ -809,6 +809,20 @@ class core( QObject ) :
 		               self.mfi_avg_nrm )
 		          for d in range( self.n_dir ) ]
 		        for c in range( self.n_alt ) ] )
+
+		# Compute the mfi angles.
+		# These are useful diagnostic tools.
+
+		mfi_b_rho = sqrt(mfi_b_x**2.0 + mfi_b_y**2.0)
+		mfi_b_colat = arctan2(mfi_b_z, mfi_b_rho)
+		mfi_b_lon = arctan2(mfi_b_y, mfi_b_x)
+		mfi_b_colat = rad2deg(mfi_b_colat)
+		mfi_b_lon = rad2deg(mfi_b_lon)
+
+		self.mfi_b_colat = mfi_b_colat
+		self.mfi_b_lon = mfi_b_lon
+		self.mfi_avg_mag_angles = array( [mean( self.mfi_b_colat ),
+		                                  mean( self.mfi_b_lon )] )
 
 
 		# Use interpolation to estimate a magnetic-field vector for each

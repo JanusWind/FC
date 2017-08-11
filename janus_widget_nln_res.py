@@ -42,6 +42,8 @@ from math import log10, floor
 
 from janus_helper import round_sig
 
+from tabulate import tabulate
+
 
 ################################################################################
 ## DEFINE CLASS "widget_nln_res" TO CUSTOMIZE "format_TextEdit" FOR NLN OUTPUT.
@@ -94,11 +96,28 @@ class widget_nln_res( format_TextEdit ) :
 		# the non-linear analysis, grouping the populations by their
 		# species.
 
+		# self.prnt_htm("lalalala")
+		# self.prnt_brk( )
+		# self.prnt_brk( )
+		# self.prnt_htm(str(type(self.core.nln_res_plas.arr_spec)))
+		# self.prnt_brk( )
+		# self.prnt_brk( )
+		# self.prnt_htm(str(dir(self.core.nln_res_plas.arr_spec)))
+		# self.prnt_brk( )
+		# self.prnt_brk( )
+		# self.prnt_htm(str(self.core.nln_res_plas.arr_spec))
+		# self.prnt_brk( )
+		# self.prnt_brk( )
+        #
+		# velocities =
+
 		first_spc = True
 
 		for spc in self.core.nln_res_plas.arr_spec :
 
 			# Unless this is the first species, skip a line.
+
+			self.prnt_htm(str(spc) + "\n\n\n")
 
 			if ( not first_spc ) :
 				self.prnt_brk( )
@@ -153,7 +172,7 @@ class widget_nln_res( format_TextEdit ) :
 
 				# Print the population's density.
 
-				dcm = max( [ 1, 2 - int( floor( log10( 
+				dcm = max( [ 1, 2 - int( floor( log10(
 				                       abs( pop['n'] ) ) ) ) ] )
 
 				self.prnt_brk( )
@@ -205,6 +224,19 @@ class widget_nln_res( format_TextEdit ) :
 					     self.core.nln_res_plas['sig_v0_z'],
 					     0, 'km/s'                         )
 
+					# self.prnt_brk()
+					# velocities = [[lab_v_x, "", lab_v_y, "", lab_v_z, ""],
+					# ["", "sig", "", "sig", "", "sig"],
+					# [self.prnt_dcm(self.core.nln_res_plas['v0_x']),
+					# self.core.nln_res_plas['v0_y'],
+					# self.core.nln_res_plas['v0_y']]]
+					# velocities = tabulate(velocities).split("\n")
+					# for row in velocities:
+					# 	self.prnt_htm(row)
+					# 	self.prnt_brk()
+					# self.prnt_htm(str(velocities))
+					# self.prnt_brk()
+
 				elif ( pop['drift'] ) :
 
 					self.prnt_brk( )
@@ -254,25 +286,25 @@ class widget_nln_res( format_TextEdit ) :
 
 				# Print the population's temperature(s).
 
-				self.prnt_brk( )
-				self.prnt_tab( 2 )
-				self.prnt_htm( lab_t + ' = ' )
-				self.prnt_dcm( pop['t'], 1, 'kK' )
-
-				if ( pop['aniso'] ) :
-
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_t_per + ' = ' )
-					self.prnt_dcm( pop['t_per'], 1, 'kK' )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_t_par + ' = ' )
-					self.prnt_dcm( pop['t_par'], 1, 'kK' )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_r + ' = ' )
-					self.prnt_dcm( pop['r'], 2 )
+				# self.prnt_brk( )
+				# self.prnt_tab( 2 )
+				# self.prnt_htm( lab_t + ' = ' )
+				# self.prnt_dcm( pop['t'], 1, 'kK' )
+                #
+				# if ( pop['aniso'] ) :
+                #
+				# 	self.prnt_brk( )
+				# 	self.prnt_tab( 3 )
+				# 	self.prnt_htm( lab_t_per + ' = ' )
+				# 	self.prnt_dcm( pop['t_per'], 1, 'kK' )
+				# 	self.prnt_brk( )
+				# 	self.prnt_tab( 3 )
+				# 	self.prnt_htm( lab_t_par + ' = ' )
+				# 	self.prnt_dcm( pop['t_par'], 1, 'kK' )
+				# 	self.prnt_brk( )
+				# 	self.prnt_tab( 3 )
+				# 	self.prnt_htm( lab_r + ' = ' )
+				# 	self.prnt_dcm( pop['r'], 2 )
 
 				# Clear the first population indicator.
 
