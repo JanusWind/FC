@@ -310,6 +310,9 @@ class core( QObject ) :
 
 			self.mfi_hat_dir = None
 
+			self.psi_b       = None
+                        self.psi_b_avg   = None
+
 		# If requested, (re-)initialize the varaibles for the windows
 		# associated with automatic data selection for the moments
 		# analysis.
@@ -843,6 +846,13 @@ class core( QObject ) :
 		self.mag_z = interp1d( self.mfi_t, self.mfi_b_z,
 		                       bounds_error=False        )( var_t )
 
+		# Calculating the average angular deviation of magnetic field
+
+                self.psi_b = sum( arccos( [ self.mfi_b_vec[i] * 
+					    self.mfi_avg_nrm[i] /
+                                            self.mfi_b[i] for i in range(3) ] ))
+
+                self.psi_b_avg = self.psi_b/self.n_mfi
 
 		# Message the user that new Wind/MFI data have been loaded.
 
