@@ -167,23 +167,23 @@ class fc_dat( ) :
 	#-----------------------------------------------------------------------
 
 	#TODO Make this not a stupid hack of the bi-Maxwellian version.
-'''
-        def calc_cur_max( self,
-                           vel_cen, vel_wid,
-                           dir_alt, dir_azm,
-                           prm_n, prm_v_x, prm_v_y, prm_v_z, prm_w ) :
+
+#        def calc_cur_max( self,
+#                           vel_cen, vel_wid,
+#                           dir_alt, dir_azm,
+#                           prm_n, prm_v_x, prm_v_y, prm_v_z, prm_w ) :
  
  
                  # Return the equivalent bi-Maxwellian response for equal
                  # perpendicular and parallel thermal speeds and a dummy
                  # magnetic field.
  
-                return self.calc_cur_bmx( vel_cen, vel_wid,
-                                          dir_alt, dir_azm, 1., 0., 0.,
-                                          prm_n, prm_v_x, prm_v_y, prm_v_z,
-                                          prm_w, prm_w                      )
+#                return self.calc_cur_bmx( vel_cen, vel_wid,
+#                                          dir_alt, dir_azm, 1., 0., 0.,
+#                                          prm_n, prm_v_x, prm_v_y, prm_v_z,
+#                                          prm_w, prm_w                      )
  
-'''
+
 
 	def calc_curr_max( self,
 	                  vel_cen, vel_wid,
