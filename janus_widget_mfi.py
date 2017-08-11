@@ -29,9 +29,9 @@
 
 from PyQt4.QtGui import QTabWidget
 
-from janus_widget_mfi_plot import widget_mfi_plot
-from janus_widget_mfi_info import widget_mfi_info
-
+from janus_widget_mfi_lin_plot import widget_mfi_lin_plot
+from janus_widget_mfi_ang_plot import widget_mfi_ang_plot
+from janus_widget_mfi_info     import widget_mfi_info
 
 ################################################################################
 ## DEFINE THE "widget_mfi" CLASS TO CUSTOMIZE "QTabWidget" FOR Wind/MFI DATA.
@@ -59,4 +59,5 @@ class widget_mfi( QTabWidget ) :
 		self.wdg_info = widget_mfi_info( self.core )
 
 		self.addTab( self.wdg_plot, 'MFI Data' )
+		self.addTab( self.wdg_ang_plot, 'Angular Plot' )
 		self.addTab( self.wdg_info, 'Summary'  )
