@@ -55,9 +55,10 @@ class widget_mfi( QTabWidget ) :
 
 		# Intialize this widget's sub-widgets and add them as tabs.
 
-		self.wdg_plot = widget_mfi_plot( self.core )
-		self.wdg_info = widget_mfi_info( self.core )
+		self.wdg_lin_plot = widget_mfi_lin_plot( self.core )
+		self.wdg_ang_plot = widget_mfi_ang_plot( self.core )
+		self.wdg_info     = widget_mfi_info( self.core     )
 
-		self.addTab( self.wdg_plot, 'MFI Data' )
+		self.addTab( self.wdg_lin_plot, 'MFI Data'     )
 		self.addTab( self.wdg_ang_plot, 'Angular Plot' )
-		self.addTab( self.wdg_info, 'Summary'  )
+		self.addTab( self.wdg_info, 'Summary'          )

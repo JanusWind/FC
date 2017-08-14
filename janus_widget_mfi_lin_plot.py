@@ -40,10 +40,10 @@ from numpy import amax, amin
 
 
 ################################################################################
-## DEFINE THE "widget_mfi_plot" CLASS TO CUSTOMIZE "QWidget" TO PLOT MFI DATA.
+## DEFINE THE "widget_mfi_lin_plot" CLASS FOR "QWidget" TO PLOT MFI DATA.
 ################################################################################
 
-class widget_mfi_plot( QWidget ) :
+class widget_mfi_lin_plot( QWidget ) :
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE INITIALIZATION FUNCTION.
@@ -53,7 +53,7 @@ class widget_mfi_plot( QWidget ) :
 
 		# Inherit all attributes of an instance of "QWidget".
 
-		super( widget_mfi_plot, self ).__init__( )
+		super( widget_mfi_lin_plot, self ).__init__( )
 
 		# Store the Janus core.
 
@@ -99,8 +99,6 @@ class widget_mfi_plot( QWidget ) :
 		self.pen_crv_x = mkPen( color='r' )
 		self.pen_crv_y = mkPen( color='g' )
 		self.pen_crv_z = mkPen( color='b' )
-		# self.pen_crv_colat = mkPen( color='c' )
-		# self.pen_crv_lon = mkPen( color='m' )
 
 
 		self.fnt = self.core.app.font( )
@@ -145,8 +143,6 @@ class widget_mfi_plot( QWidget ) :
 		self.crv_x = None
 		self.crv_y = None
 		self.crv_z = None
-		# self.crv_colat = None
-		# self.crv_lon = None
 
 		# Populate this plot and adjust it's settings.
 
