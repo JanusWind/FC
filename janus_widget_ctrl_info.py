@@ -194,11 +194,11 @@ class widget_ctrl_info( format_TextEdit ) :
 
 				if ( mesg_obj == 'mom' ) :
 					self.prnt_htm( 'ERROR!  Can\'t ' +
-					               'run moments.'      )
+					               'run moments.' , speak=True)
 
 				if ( mesg_obj == 'nln' ) :
 					self.prnt_htm( 'ERROR!  Can\'t ' +
-					               'run NLN.'          )
+					               'run NLN.' , speak=True)
 
 			if ( mesg_typ == 'fail' ) :
 
@@ -209,39 +209,43 @@ class widget_ctrl_info( format_TextEdit ) :
 				if ( mesg_obj == 'mom' ) :
 					self.prnt_tab( 1 )
 					self.prnt_htm( 'ERROR!  Moments ' +
-					               'failed.'            )
+					               'failed.' , speak=True)
 
 				if ( mesg_obj == 'nln' ) :
 					self.prnt_tab( 1 )
 					self.prnt_htm( 'ERROR!  NLN ' +
-					               'analysis failed.' )
+					               'analysis failed.' , speak=True)
 
 				if ( mesg_obj == 'save' ) :
 					self.prnt_tab( 1 )
-					self.prnt_htm( 'ERROR!  Save failed.' )
+					self.prnt_htm( 'ERROR!  Save failed.' , speak=True)
 					self.clear_for_next_mesg = True
 
 				if ( mesg_obj == 'xprt' ) :
 					self.prnt_tab( 1 )
 					self.prnt_htm( 'ERROR!  Export ' +
-					               'failed.'           )
+					               'failed.' , speak=True)
 					self.clear_for_next_mesg = True
 
 			if ( mesg_typ == 'abort' ) :
 
 				if ( mesg_obj == 'auto' ) :
 					self.prnt_brk( )
-					self.prnt_htm( 'AUTO-RUN ABORTED!' )
+					self.prnt_htm( 'AUTO-RUN ABORTED!' , speak=True)
 
 			if ( mesg_typ == 'end' ) :
 
 				if ( mesg_obj == 'auto' ) :
 					self.prnt_brk( )
 					self.prnt_htm( 'Finished ' +
-					               'automated analysis.' )
+					               'automated analysis.' , speak=True)
 				else :
 					self.prnt_tab( 1 )
-					self.prnt_htm( 'Done.' )
+
+					speak = False
+					if mesg_obj == 'nln': speak = True
+
+					self.prnt_htm( 'Done.' , speak=speak)
 
 				if ( mesg_obj == 'save' ) :
 					self.clear_for_next_mesg = True
@@ -278,7 +282,7 @@ class widget_ctrl_info( format_TextEdit ) :
 
 			if ( mesg_typ == 'none' ) :
 				self.prnt_tab( 1 )
-				self.prnt_htm( 'ERROR!  No data found.' )
+				self.prnt_htm( 'ERROR!  No data found.' , speak=True)
 
 		# Scroll to the bottom of the text area.
 
