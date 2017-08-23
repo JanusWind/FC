@@ -40,10 +40,10 @@ from numpy import amax, amin
 
 
 ################################################################################
-## DEFINE THE "widget_mfi_plot" CLASS TO CUSTOMIZE "QWidget" TO PLOT MFI DATA.
+## DEFINE THE "widget_mfi_angular_plot" CLASS FOR "QWidget" TO PLOT MFI DATA.
 ################################################################################
 
-class widget_mfi_plot( QWidget ) :
+class widget_mfi_ang_plot( QWidget ) :
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE INITIALIZATION FUNCTION.
@@ -53,7 +53,7 @@ class widget_mfi_plot( QWidget ) :
 
 		# Inherit all attributes of an instance of "QWidget".
 
-		super( widget_mfi_plot, self ).__init__( )
+		super( widget_mfi_ang_plot, self ).__init__( )
 
 		# Store the Janus core.
 
@@ -94,13 +94,8 @@ class widget_mfi_plot( QWidget ) :
 		# Initialize and store the pens and fonts.
 
 		self.pen_vbx   = mkPen( color='k' )
-		self.pen_crv_m = mkPen( color='k' )
-		self.pen_crv_n = mkPen( color='k' )
-		self.pen_crv_x = mkPen( color='r' )
-		self.pen_crv_y = mkPen( color='g' )
-		self.pen_crv_z = mkPen( color='b' )
-		# self.pen_crv_colat = mkPen( color='c' )
-		# self.pen_crv_lon = mkPen( color='m' )
+		self.pen_crv_colat = mkPen( color='b' )
+		self.pen_crv_lon   = mkPen( color='r' )
 
 
 		self.fnt = self.core.app.font( )
@@ -123,7 +118,7 @@ class widget_mfi_plot( QWidget ) :
 
 		labelStyle = {'color':'k'}
 		self.axs_x.setLabel( 'Time [s]'           , **labelStyle )
-		self.axs_y.setLabel( 'Magnetic Field [nT]', **labelStyle )
+		self.axs_y.setLabel( 'Magnetic Field Angle [degrees]', **labelStyle )
 
 		self.axs_x.label.setFont( self.fnt )
 		self.axs_y.label.setFont( self.fnt )
@@ -140,13 +135,8 @@ class widget_mfi_plot( QWidget ) :
 
 		# Initialize the curves that will be added to this plot.
 
-		self.crv_m = None
-		self.crv_n = None
-		self.crv_x = None
-		self.crv_y = None
-		self.crv_z = None
-		# self.crv_colat = None
-		# self.crv_lon = None
+		self.crv_colat = None
+		self.crv_lon   = None
 
 		# Populate this plot and adjust it's settings.
 
@@ -178,27 +168,31 @@ class widget_mfi_plot( QWidget ) :
 			# ensure that the range satisfies a minimum size and has
 			# sufficient padding.
 
-			b_max = amax( self.core.mfi_b )
-			b_min = - b_max
+			b_max_c = amax( self.core.mfi_b_colat )
+			b_min_c = amin( self.core.mfi_b_colat )
+
+			b_max_l = amax( self.core.mfi_b_lon )
+			b_min_l = amin( self.core.mfi_b_lon )
+
+			b_max = max( b_max_c, b_max_l )
+			b_min = min( b_min_c, b_min_l )
 
 			d_t_0 = t_max - t_min
-			d_b_0 = b_max - b_min
 
 			d_t = max( 1.5 + d_t_0, 3. )
-			d_b = max( 1.2 * d_b_0, 5. )
 
 			t_max = t_min + d_t
 
-			b_min = b_min - ( d_b - d_b_0 ) / 2.
-			b_max = b_max + ( d_b - d_b_0 ) / 2.
+			b_min = b_min - 0.2*abs(b_min)
+			b_max = b_max + 0.2*abs(b_max)
 
 		else :
 
 			t_min = 0.001
 			t_max = 3.500
 
-			b_min = -2.5
-			b_max =  2.5
+			b_min = -360
+			b_max =  360
 
 		# Set the range of the axis of each plot.
 
@@ -212,35 +206,15 @@ class widget_mfi_plot( QWidget ) :
 
 		# Generate and display each curve for the plot.
 
-		self.crv_m = PlotDataItem( self.core.mfi_t,
-		                           self.core.mfi_b,
-		                           pen=self.pen_crv_m )
-		self.crv_n = PlotDataItem( self.core.mfi_t,
-		                           -self.core.mfi_b,
-		                           pen=self.pen_crv_n )
-		self.crv_x = PlotDataItem( self.core.mfi_t,
-		                           self.core.mfi_b_x,
-		                           pen=self.pen_crv_x )
-		self.crv_y = PlotDataItem( self.core.mfi_t,
-		                           self.core.mfi_b_y,
-		                           pen=self.pen_crv_y )
-		self.crv_z = PlotDataItem( self.core.mfi_t,
-		                           self.core.mfi_b_z,
-		                           pen=self.pen_crv_z )
-		# self.crv_colat = PlotDataItem( self.core.mfi_t,
-		#                            self.core.mfi_b_colat,
-		#                            pen=self.pen_crv_colat )
-		# self.crv_lon = PlotDataItem( self.core.mfi_t,
-		#                            self.core.mfi_b_lon,
-		#                            pen=self.pen_crv_lon )
+		self.crv_colat = PlotDataItem( self.core.mfi_t,
+		                               self.core.mfi_b_colat,
+		                               pen=self.pen_crv_colat )
+		self.crv_lon   = PlotDataItem( self.core.mfi_t,
+		                               self.core.mfi_b_lon,
+		                               pen=self.pen_crv_lon   )
 
-		self.plt.addItem( self.crv_m )
-		self.plt.addItem( self.crv_n )
-		self.plt.addItem( self.crv_x )
-		self.plt.addItem( self.crv_y )
-		self.plt.addItem( self.crv_z )
-		# self.plt.addItem( self.crv_colat )
-		# self.plt.addItem( self.crv_lon )
+		self.plt.addItem( self.crv_colat )
+		self.plt.addItem( self.crv_lon   )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESETTING THIS PLOT (CLEARING ALL ELEMENTS).
@@ -249,38 +223,18 @@ class widget_mfi_plot( QWidget ) :
 	def rset_plt( self ) :
 
 		# Hide and remove each of this plot's elements.
+#
+		if ( self.crv_colat is not None ) :
+		     self.plt.removeItem( self.crv_colat )
 
-		if ( self.crv_m is not None ) :
-			self.plt.removeItem( self.crv_m )
-
-		if ( self.crv_n is not None ) :
-			self.plt.removeItem( self.crv_n )
-
-		if ( self.crv_x is not None ) :
-			self.plt.removeItem( self.crv_x )
-
-		if ( self.crv_y is not None ) :
-			self.plt.removeItem( self.crv_y )
-
-		if ( self.crv_z is not None ) :
-			self.plt.removeItem( self.crv_z )
-
-		# if ( self.crv_colat is not None ) :
-		# 	self.plt.removeItem( self.crv_colat )
-
-		# if ( self.crv_lon is not None ) :
-		# 	self.plt.removeItem( self.crv_lon )
+		if ( self.crv_lon is not None ) :
+		     self.plt.removeItem( self.crv_lon   )
 
 		# Permanently delete this plot's elements by setting each of the
 		# variables that store them to "None".
 
-		self.crv_m = None
-		self.crv_n = None
-		self.crv_x = None
-		self.crv_y = None
-		self.crv_z = None
-		# self.crv_colat = None
-		# self.crv_lon = None
+		self.crv_colat = None
+		self.crv_lon   = None
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "rset" SIGNAL.
