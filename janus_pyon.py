@@ -32,9 +32,9 @@ from janus_const import const
 ################################################################################
 
 PARAM = [ 'b0', 'v0', 'n', 'v', 'dv', 'v0', 'w', 'w2', 'r', 't', 'beta',
-          'ac', 'time', 's','m','q'                                            ]
+          'ac', 'time', 's','m','q', 'k', 'beta_par', 'beta_per'               ]
 
-COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat' ]
+COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat'  ]
 
 SIGMA = [ 'sig', 'sigma' ]
 
@@ -207,7 +207,10 @@ class plas( object ) :
 		# Also ensuring that 
 
 		try :
-			arr=key.split('_')
+#			arr=arr.lower()
+			arr = key.split( '_' )
+			for i in range(len(arr)):
+				arr[i] = arr[i].lower()
 		except :
 			return None
 
@@ -612,7 +615,7 @@ class plas( object ) :
 	             name=None, sym=None, n=None, dv=None,
 	             w=None, w_per=None, w_par=None,
 	             sig_n=None, sig_dv=None, sig_w=None,
-	             sig_w_per=None, sig_w_par=None            ) :
+	             sig_w_per=None, sig_w_par=None       ) :
 
 		self.arr_pop.append( pop( self,
 		                          self.get_spec( spc ),
@@ -961,6 +964,24 @@ class spec( object ) :
 
 			return sqrt( w2 )
 
+		elif ( key == 'w3' ) :
+
+			w = self['w']
+
+			if ( w is None ) :
+				return None
+
+			return  w**3
+
+		elif ( key == 'w4' ) :
+
+			w = self['w']
+
+			if ( w is None ) :
+				return None
+
+			return  w**4
+
 		elif ( key == 'r' ) :
 
 			w2_per = self['w2_per']
@@ -1009,6 +1030,145 @@ class spec( object ) :
 
 			return ( 1.E-3 / const['k_b'] ) * \
 			       self.m * const['m_p'] * ( 1.E6 * w2 )
+
+                elif ( key == 'w3_par' ) :
+
+			w_par = self['w_par']
+
+			if ( w_par is None ) :
+				return None
+
+			return  w_par**3
+
+ 
+                elif ( key == 'w4_par' ) :
+
+			w2_par = self['w2_par']
+
+			if ( w2_par is None ) :
+				return None
+
+			return  w2_par**2
+
+                elif ( key == 'beta_par' ) :
+
+                        arr_pop = self.my_plas.lst_pop( self )
+
+                        if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+                                return None
+
+                        b0 = self.my_plas.get_b0_mag( )
+
+                        n       = self['n']
+                        t_par   = self['t_par']
+                        
+                        arr_n      = [ p['n'] for p in arr_pop ]
+
+                        for ( p, obj ) in enumerate( arr_pop ) : 
+                                ret = ( n * 1.E6 ) * const['k_b'] * ( t_par * 1.E3 )
+                                ret /= ( b0 / 1.E9 )**2 / ( 2. * const['mu_0'] )
+
+                        return  ret
+
+                elif ( key == 'beta_per' ) :
+
+                        arr_pop = self.my_plas.lst_pop( self )
+
+                        if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+                                return None
+
+                        b0 = self.my_plas.get_b0_mag( )
+
+                        n       = self['n']
+                        t_par   = self['t_per']
+                        
+                        arr_n      = [ p['n'] for p in arr_pop ]
+
+                        for ( p, obj ) in enumerate( arr_pop ) : 
+                                ret = ( n * 1.E6 ) * const['k_b'] * ( t_per * 1.E3 )
+                                ret /= ( b0 / 1.E9 )**2 / ( 2. * const['mu_0'] )
+
+                        return  ret
+
+                elif ( key == 's' ) :
+
+			arr_pop = self.my_plas.lst_pop( self )
+
+			if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+				return None
+
+			if ( len( arr_pop ) == 1 ) :
+				return 0.
+
+			n       = self['n']
+                        w_par   = self['w_par']
+                        w2_par  = self['w2_par']
+                        w3_par  = self['w3_par']
+                        dv      = self['dv']
+                        w3      = self['w3']
+
+			arr_n      = [ p['n'     ] for p in arr_pop ]
+			arr_dv     = [ p['dv'    ] for p in arr_pop ]
+			arr_w2_par = [ p['w2_par'] for p in arr_pop ]
+
+                        if ( ( None in arr_n      ) or
+			     ( None in arr_dv     ) or
+			     ( None in arr_w2_par )    ) :
+				return None
+
+                        ret = 0.
+
+                        for ( p, obj ) in enumerate( arr_pop ) :
+                                ret += ( arr_n[p] * arr_dv[p]**3 )
+				ret += ( 3 * arr_n[p]
+                                           * arr_dv[p] * arr_w2_par[p] )
+
+                        return ( ( ret / ( n * w3 ) )
+			           - ( ( dv**3  ) / w3 )
+			           - ( ( 3 * dv*w2_par) / w3 ) )
+
+                elif ( key == 'k' ) :
+
+			arr_pop = self.my_plas.lst_pop( self )
+
+			if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+				return None
+
+			if ( len( arr_pop ) == 1 ) :
+				return 0.
+
+			n       = self['n']
+                        w_par   = self['w_par']
+                        w2_par  = self['w2_par']
+                        w4_par  = self['w4_par']
+                        dv      = self['dv']
+                        w4      = self['w4']
+
+			arr_n      = [ p['n'     ] for p in arr_pop ]
+			arr_dv     = [ p['dv'    ] for p in arr_pop ]
+			arr_w2_par = [ p['w2_par'] for p in arr_pop ]
+			arr_w4_par = [ p['w4_par'] for p in arr_pop ]
+
+                        if ( ( None in arr_n      ) or
+			     ( None in arr_dv     ) or
+			     ( None in arr_w2_par )    ) :
+				return None
+
+                        ret = 0.
+
+                        for ( p, obj ) in enumerate( arr_pop ) :
+                                ret +=  arr_n[p] * ( arr_dv[p]**4 )
+                                ret -= ( 4 * arr_n[p] 
+                                            * dv * arr_dv[p]**3 )
+				ret +=  ( 6 * arr_n[p]
+                                            * arr_w2_par[p] * ( arr_dv[p]**2 ) )
+				ret -= (12 * arr_n[p]
+                                            * dv * arr_w2_par[p] * arr_dv[p] )
+                                ret +=  ( 3 * arr_n[p] * arr_w4_par[p] )
+
+                        return ( ( ret / ( n * w4 )               )
+                                   + 6 * ( ( ( dv*w_par )**2/w4 ) )
+                                   + 3 * (  dv**4/w4    )         )
 
 		else :
 
@@ -1468,6 +1628,33 @@ class pop( object ) :
 			else :
 				return w_par**2
 
+		elif ( key == 'w4' ) :
+
+			w = self['w']
+
+			if ( w is None ):
+				return None
+			else :
+				return w**4
+
+		elif ( key == 'w4_per' ) :
+
+			w_per = self['w_per']
+
+			if ( w_per is None ):
+				return None
+			else :
+				return w_per**4
+
+		elif ( key == 'w4_par' ) :
+
+			w_par = self['w_par']
+
+			if ( w_par is None ):
+				return None
+			else :
+				return w_par**4
+
 		elif ( key == 'r' ) :
 
 			if ( self.aniso ) :
@@ -1544,6 +1731,55 @@ class pop( object ) :
 			else :
 				return None
 
+                elif ( key == 'beta_par' ) :
+
+                        arr_pop = self.my_plas.lst_pop( self )
+
+                        if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+                                return None
+
+                        b0 = self.my_plas.get_b0_mag( )
+
+                        n       = self['n']
+                        t_par   = self['t_par']
+                        
+                        arr_n      = [ p['n'] for p in arr_pop ]
+
+                        for ( p, obj ) in enumerate( arr_pop ) : 
+                                ret = ( n * 1.E6 ) * const['k_b'] * ( t_par * 1.E3 )
+                                ret /= ( b0 / 1.E9 )**2 / ( 2. * const['mu_0'] )
+
+                        return  ret
+
+                elif ( key == 'beta_per' ) :
+
+                        arr_pop = self.my_plas.lst_pop( self )
+
+                        if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+                                return None
+
+                        b0 = self.my_plas.get_b0_mag( )
+
+                        n       = self['n']
+                        t_par   = self['t_per']
+                        
+                        arr_n      = [ p['n'] for p in arr_pop ]
+
+                        for ( p, obj ) in enumerate( arr_pop ) : 
+                                ret = ( n * 1.E6 ) * const['k_b'] * ( t_per * 1.E3 )
+                                ret /= ( b0 / 1.E9 )**2 / ( 2. * const['mu_0'] )
+
+                        return  ret
+
+                elif ( key == 's' ) :
+
+                        return 0.
+
+                elif ( key == 'k' ) :
+
+                        return 3.
+
+
 		else :
 
 			raise KeyError( 'Invalid key.' )
@@ -1553,7 +1789,7 @@ class pop( object ) :
 	#-----------------------------------------------------------------------
 
 	def __setitem__( self, key, value ) :
-	
+
 
 		# Based on the "key" in question, validate the "value".  If it
 		# is valid, store the new value (and make any appropriate

@@ -42,6 +42,8 @@ from math import log10, floor
 
 from janus_helper import round_sig
 
+from tabulate import tabulate
+
 
 ################################################################################
 ## DEFINE CLASS "widget_nln_res" TO CUSTOMIZE "format_TextEdit" FOR NLN OUTPUT.
@@ -100,6 +102,8 @@ class widget_nln_res( format_TextEdit ) :
 
 			# Unless this is the first species, skip a line.
 
+			self.prnt_htm(str(spc) + "\n\n\n")
+
 			if ( not first_spc ) :
 				self.prnt_brk( )
 				self.prnt_brk( )
@@ -153,7 +157,7 @@ class widget_nln_res( format_TextEdit ) :
 
 				# Print the population's density.
 
-				dcm = max( [ 1, 2 - int( floor( log10( 
+				dcm = max( [ 1, 2 - int( floor( log10(
 				                       abs( pop['n'] ) ) ) ) ] )
 
 				self.prnt_brk( )

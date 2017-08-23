@@ -54,10 +54,10 @@ from janus_mfi_arcv import mfi_arcv
 
 # Load the necessary array modules and mathematical functions.
 
-from numpy import amax, amin, append, arccos, arange, argsort, array, average, \
-                  cos, deg2rad, diag, dot, exp, indices, interp, mean, pi,     \
-                  polyfit, rad2deg, reshape, sign, sin, sum, sqrt, std, tile,  \
-                  transpose, where, zeros
+from numpy import amax, amin, append, arccos, arctan2, arange, argsort, array, \
+                    average, cos, deg2rad, diag, dot, exp, indices, interp, \
+                    mean, pi, polyfit, rad2deg, reshape, sign, sin, sum, sqrt, \
+                    std, tile, transpose, where, zeros
 
 from numpy.linalg import lstsq
 
@@ -304,6 +304,9 @@ class core( QObject ) :
 			self.mfi_avg_nrm = None
 
 			self.mfi_hat_dir = None
+
+			self.psi_b       = None
+                        self.psi_b_avg   = None
 
 		# If requested, (re-)initialize the varaibles for the windows
 		# associated with automatic data selection for the moments
@@ -922,10 +925,10 @@ class core( QObject ) :
 		self.mfi_t = array( [ ( t - self.time_epc ).total_seconds( )
 		                      for t in mfi_t                         ] )
 
-		self.mfi_b_x = mfi_b_x
-		self.mfi_b_y = mfi_b_y
-		self.mfi_b_z = mfi_b_z
-
+		self.mfi_b_x   = mfi_b_x
+		self.mfi_b_y   = mfi_b_y
+		self.mfi_b_z   = mfi_b_z
+                self.mfi_b_vec = [ self.mfi_b_x, self.mfi_b_y, self.mfi_b_z ]
 
 		# Compute the magnetic field magnitude.
 
@@ -955,6 +958,20 @@ class core( QObject ) :
 		          for p in range( self.n_azm ) ]
 		        for t in range( self.n_alt ) ] )
 
+		# Compute the mfi angles.
+
+		mfi_b_rho   = sqrt( mfi_b_x**2.0 + mfi_b_y**2.0 )
+		mfi_b_colat = arctan2( mfi_b_z, mfi_b_rho       )
+		mfi_b_lon   = arctan2( mfi_b_y, mfi_b_x         )
+		mfi_b_colat = rad2deg( mfi_b_colat              )
+		mfi_b_lon   = rad2deg( mfi_b_lon                )
+
+		self.mfi_b_colat = mfi_b_colat
+		self.mfi_b_lon   = mfi_b_lon
+
+		self.mfi_avg_mag_angles = array( [mean( self.mfi_b_colat ),
+		                                  mean( self.mfi_b_lon )] )
+
 
 		# Use interpolation to estimate a magnetic-field vector for each
 		# velocity bin.
@@ -974,6 +991,13 @@ class core( QObject ) :
 		self.mag_z = interp1d( self.mfi_t, self.mfi_b_z,
 		                       bounds_error=False        )( var_t )
 
+		# Calculating the average angular deviation of magnetic field
+
+                self.psi_b = sum( arccos( [ self.mfi_b_vec[i] * 
+					    self.mfi_avg_nrm[i] /
+                                            self.mfi_b[i] for i in range(3) ] ))
+
+                self.psi_b_avg = self.psi_b/self.n_mfi
 
 		# Message the user that new Wind/MFI data have been loaded.
 
