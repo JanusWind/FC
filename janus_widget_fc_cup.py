@@ -438,11 +438,11 @@ class widget_fc_cup( QWidget ) :
 			# indicating the pointing direction.
 
 			r_alt = round( self.core.fc_spec['elev'][self.c] )
-			r_azm = round( self.core.fc_spec['azim'][self.c][d])
+			r_dir = round( self.core.fc_spec['azim'][self.c][d])
 
 			txt = ( u'({0:+.0f}\N{DEGREE SIGN}, ' + 
 			        u'{1:+.0f}\N{DEGREE SIGN})'     ).format(
-			                                          r_alt, r_azm )
+			                                          r_alt, r_dir )
 
 			self.lbl[j,i].setText( txt, color=(0,0,0) )
 			#self.lbl[j,i].setFont( self.fnt           )
@@ -538,7 +538,7 @@ class widget_fc_cup( QWidget ) :
 			return
 
 		if ( d_lst is None ) :
-			#d_lst = range( min( self.core.n_azm, self.n_plt ) )
+			#d_lst = range( min( self.core.n_dir, self.n_plt ) )
 			d_lst = range( min( self.core.fc_spec['n_dir'], self.n_plt ) )
 
 		# If the results of the analysis are missing, abort; otherwise,
@@ -640,7 +640,7 @@ class widget_fc_cup( QWidget ) :
 				# Extract the points of the fit curve.
 
 				x = self.core.vel_cen
-				y = cur[self.c,d,:]
+				y = curr[self.c,d,:]
 
 				# Select only those points for which the fit
 				# current is strictly positive.
@@ -711,9 +711,9 @@ class widget_fc_cup( QWidget ) :
 			ax = self.core.vel_cen[b]
 
 		if ( self.log_y ) :
-			ay = log10( self.core.cur[self.c,d,b] )
+			ay = log10( self.core.curr[self.c,d,b] )
 		else :
-			ay = self.core.cur[self.c,d,b]
+			ay = self.core.curr[self.c,d,b]
 
 		# Select the color for the point (i.e., the brush and pen used
 		# to render it) based on whether or not this datum's look
@@ -927,7 +927,7 @@ class widget_fc_cup( QWidget ) :
 		# positions in the "ViewBox".
 
 		dat_x = self.core.vel_cen
-		dat_y = self.core.cur[self.c,d]
+		dat_y = self.core.curr[self.c,d]
 
 		dat_ax = log10( dat_x ) if ( self.log_x ) else dat_x
 		dat_ay = log10( dat_y ) if ( self.log_y ) else dat_y
@@ -1166,7 +1166,7 @@ class widget_fc_cup( QWidget ) :
 		if ( c != self.c ) :
 			return
 
-		if ( ( d < 0 ) or ( d >= self.core.n_azm ) ) :
+		if ( ( d < 0 ) or ( d >= self.core.n_dir ) ) :
 			return
 
 		if ( ( b < 0 ) or ( b >= self.core.n_vel ) ) :
