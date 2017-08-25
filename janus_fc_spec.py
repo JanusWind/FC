@@ -1,10 +1,36 @@
+################################################################################
+##
+## Janus -- GUI Software for Processing Thermal-Ion Measurements from the
+##          Wind Spacecraft's Faraday Cups
+##
+## Copyright (C) 2016 Bennett A. Maruca (bmaruca@udel.edu)
+##
+## This program is free software: you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation, either version 3 of the License, or (at your option) any later
+## version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program.  If not, see http://www.gnu.org/licenses/.
+##
+################################################################################
+
+
+################################################################################
+## LOAD THE NECESSARY MODULES.
+################################################################################
+
+
 from janus_fc_dat import fc_dat
 
-	#-----------------------------------------------------------------------
-	# DEFINE THE Class FOR spec
-	#-----------------------------------------------------------------------
-
-
+################################################################################
+## DEFINE THE Class FOR spec
+################################################################################
 
 class fc_spec():
 	def __init__( self, n_bin, elev=None, azim=None, volt_cen=None, 
@@ -192,18 +218,20 @@ class fc_spec():
 					# If the bin appears to be an isolated
 					# jump, mark it as invalid.
 
-					if ( (b == 0                               )and
-					     (self.arr[c][d][1]['curr'] is not None)and
-					     (self.arr[c][d][0]['curr']
+					if ( ( b == 0                           ) and
+					     ( self.arr[c][d][1]['curr']
+                                                                    is not None ) and
+					     ( self.arr[c][d][0]['curr']
 					          > self.curr_jump
-					                * self.arr[c][d][1]['curr'])   ) :
+					                * self.arr[c][d][1]['curr']) ) :
 						self.arr[c][d][0]._valid = False
 
-					elif ( (b == ( self._n_bin - 1 )              )and
-					       (self.arr[c][d][-2]['curr'] is not None)and
-					       (self.arr[c][d][-1]['curr']
+					elif ( ( b == ( self._n_bin - 1 )          ) and
+					       ( self.arr[c][d][-2]['curr']
+                                                                       is not None ) and
+					       ( self.arr[c][d][-1]['curr']
 					          > self.curr_jump
-					                  * self.arr[c][d][-2]['curr'])   ) :
+					               * self.arr[c][d][-2]['curr']) ) :
 						self.arr[c][d][-1]._valid = False
 
 					elif ( ( self.arr[c][d][b-1]['curr']
@@ -215,7 +243,7 @@ class fc_spec():
 					              * self.arr[c][d][b-1]['curr'] ) and 
 					       ( self.arr[c][d][b]['curr']
 					           > self.curr_jump
-					              * self.arr[c][d][b+1]['curr'] )     ) :
+					             * self.arr[c][d][b+1]['curr'] ) ) :
 						self.arr[c][d][b]._valid = False
 
 	#-----------------------------------------------------------------------
@@ -242,7 +270,7 @@ class fc_spec():
 
 		# Return the total (valid) current in the specified window.
 
-		return sum( [ self.arr[c][d][b+w]['curr_valid']
+		return sum( [ self.arr[c][d][b+w]['curr']
 		                                       for w in range( win ) ] )
 
 	#-----------------------------------------------------------------------
@@ -267,16 +295,16 @@ class fc_spec():
 		# Search the specified direction for the "win"-bin range that
 		# contains the maximum total current.
 
-		b_max   = 0
+		b_max    = 0
 		curr_max = 0.
 
 		for b in range( 0, self['n_bin'] - win + 1 ) :
 
-			curr = sum( [ self.arr[c][d][b+w]['curr_valid']
+			curr = sum( [ self.arr[c][d][b+w]['curr']
 			                               for w in range( win ) ] )
 
 			if ( curr > curr_max ) :
-				b_max   = b
+				b_max    = b
 				curr_max = curr
 
 		# Return the location of the window with the maximum current.

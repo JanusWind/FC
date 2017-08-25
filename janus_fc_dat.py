@@ -1,11 +1,39 @@
+################################################################################
+##
+## Janus -- GUI Software for Processing Thermal-Ion Measurements from the
+##          Wind Spacecraft's Faraday Cups
+##
+## Copyright (C) 2016 Bennett A. Maruca (bmaruca@udel.edu)
+##
+## This program is free software: you can redistribute it and/or modify it under
+## the terms of the GNU General Public License as published by the Free Software
+## Foundation, either version 3 of the License, or (at your option) any later
+## version.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+## details.
+##
+## You should have received a copy of the GNU General Public License along with
+## this program.  If not, see http://www.gnu.org/licenses/.
+##
+################################################################################
+
+
+################################################################################
+## LOAD THE NECESSARY MODULES.
+################################################################################
+
 from janus_const import const
 from math import sqrt, acos, pi
 from janus_helper import calc_arr_norm, calc_arr_dot
 from numpy import interp, sin, cos, deg2rad
 
-	#-----------------------------------------------------------------------
-	# DEFINE THE CLASS FOR DATUM
-	#-----------------------------------------------------------------------
+
+################################################################################
+## DEFINE THE CLASS FOR DATUM
+################################################################################
 
 class fc_dat( ) :
 
@@ -147,7 +175,7 @@ class fc_dat( ) :
 
 		# Normalize the look direction and particle velocity.
 
-		vn = calc_arr_norm( v )
+		vn  = calc_arr_norm( v )
 		nvn = tuple( [ -c for c in vn ] )
 
 		# Calculate the particle inflow angle (in degrees) relative to
@@ -184,11 +212,14 @@ class fc_dat( ) :
 #                                          prm_w, prm_w                      )
  
 
+        # TODO: Even if we have defined the parameters, doesn't a function
+        #       still need inputs? Or can we just skip that part and remove
+        #       all the inputs and put them in the function as self.* ???
 
 	def calc_curr_max( self,
-	                  vel_cen, vel_wid,
-	                  dir_alt, dir_azm,
-	                  n, v_x, v_y, v_z, w ) :
+	                    vel_cen, vel_wid,
+	                    dir_alt, dir_azm,
+	                    n, v_x, v_y, v_z, w ) :
 
 		# Return the equivalent bi-Maxwellian response for equal
 		# perpendicular and parallel thermal speeds and a dummy
@@ -289,83 +320,3 @@ class fc_dat( ) :
                                           dir_alt, dir_azm,
 	                                  mag_x, mag_y, mag_z,
                                           n, v_x, v_y, v_z, w  )
-
-'''                
-		# Calcualte the vector bulk velocity.
-
-		v = array( [ v_x, v_y, v_z ] )
-
-		if ( v.ndim > 1 ) :
-			v = transpose( v )
-
-
-		# Calculate the look direction as a cartesian unit vector.
-
-		dlk = self.calc_dir_look( )
-
-
-		# Calculate the direction of the magnetic field as a cartesian
-		# unit vector.
-
-		mag = array( [ mag_x, mag_y, mag_z ] )
-
-		if ( mag.ndim > 1 ) :
-			mag = transpose( mag )
-
-		dmg = self.calc_arr_nrm( mag )
-
-
-		# Calculate the component of the magnetic field unit vector
-		# along that lies along the look direction.
-
-		dmg_dlk = self.calc_arr_dot( dmg, dlk )
-
-
-		# Compute the effective thermal speed along this look direction.
-
-
-		w = sqrt( ( ( 1. - dmg_dlk**2 ) * w_per**2 ) + 
-		             (     dmg_dlk**2   * w_par**2 )   )
-
-
-		# Calculate the exponential terms of the current.
-
-		ret_exp_1 = 1.e3 * w * sqrt( 2. / pi ) * exp(
-		            - ( ( self['vel_strt']
-		            - self.calc_arr_dot( dlk, -v ) )
-		            / w )**2 / 2. )
-		ret_exp_2 = 1.e3 * w * sqrt( 2. / pi ) * exp(
-		            - ( ( self['vel_stop']
-		            - self.calc_arr_dot( dlk, -v ) )
-		            / w )**2 / 2. )
-
-
-		# Calculate the "erf" terms.
-
-		ret_erf_1 = 1.e3 * self.calc_arr_dot( dlk, -v ) * erf(
-		            ( self['vel_strt']
-		            - self.calc_arr_dot( dlk, -v ) )
-		            / ( sqrt(2.) * w ) )
-		ret_erf_2 = 1.e3 * self.calc_arr_dot( dlk, -v ) * erf(
-		            ( self['vel_stop']
-		            - self.calc_arr_dot( dlk, -v ) )
-		            / ( sqrt(2.) * w ) )
-
-
-		# Calculate the parenthetical expression.
-
-		ret_prn = ( ( ret_exp_2 + ret_erf_2 ) -
-		            ( ret_exp_1 + ret_erf_1 )   )
-
-
-		# Calculate the expected current.
-
-		ret = ( (   1.e12 ) * ( 1. / 2. ) * ( const['q_p'] )
-		        * ( 1.e6 * n )
-		        * ( 1.e-4 * self.spec.calc_eff_area( dlk, v ) )
-		        * ( ret_prn ) )
-
-		# Return the calculated value for the expected current.
-
-		return ret
-'''

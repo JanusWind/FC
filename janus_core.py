@@ -21,7 +21,7 @@
 ################################################################################
 
 
-###############################################################################
+#################################################################################
 ## LOAD THE NECESSARY MODULES.
 ################################################################################
 
@@ -117,7 +117,7 @@ class core( QObject ) :
 
 	def __init__( self, app=None, time=None ) :
 
-		# Inheret all attributes of the "QObject" class.
+		# Inherit all attributes of the "QObject" class.
 
 		# Note.  This class does not directly provide any graphical
 		#        interface.  Rather, the functions of the "QObject"
@@ -665,7 +665,7 @@ class core( QObject ) :
 		self.dir     = array( self.fc_spec['azim'] )
 		self.vel_cen = array( self.fc_spec['vel_cen'][0] )
 		self.vel_wid = array( self.fc_spec['vel_del'][0] )
-		self.curr = array( self.fc_spec['curr'])
+		self.curr    = array( self.fc_spec['curr'] )
 
 		# Calculate and store the spectrum's properly formatted
 		# timestamp both as a float and as a string.
@@ -816,14 +816,14 @@ class core( QObject ) :
 		# Compute the mfi angles.
 		# These are useful diagnostic tools.
 
-		mfi_b_rho = sqrt(mfi_b_x**2.0 + mfi_b_y**2.0)
-		mfi_b_colat = arctan2(mfi_b_z, mfi_b_rho)
-		mfi_b_lon = arctan2(mfi_b_y, mfi_b_x)
-		mfi_b_colat = rad2deg(mfi_b_colat)
-		mfi_b_lon = rad2deg(mfi_b_lon)
+		mfi_b_rho   = sqrt( mfi_b_x**2.0 + mfi_b_y**2.0 )
+		mfi_b_colat = arctan2( mfi_b_z, mfi_b_rho )
+		mfi_b_lon   = arctan2( mfi_b_y, mfi_b_x )
+		mfi_b_colat = rad2deg( mfi_b_colat )
+		mfi_b_lon   = rad2deg( mfi_b_lon )
 
-		self.mfi_b_colat = mfi_b_colat
-		self.mfi_b_lon = mfi_b_lon
+		self.mfi_b_colat        = mfi_b_colat
+		self.mfi_b_lon          = mfi_b_lon
 		self.mfi_avg_mag_angles = array( [mean( self.mfi_b_colat ),
 		                                  mean( self.mfi_b_lon )] )
 
