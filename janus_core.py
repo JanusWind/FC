@@ -69,6 +69,7 @@ from scipy.stats import pearsonr, spearmanr
 from janus_helper import round_sig
 
 from janus_fc_spec import fc_spec
+from janus_fc_dat import fc_dat
 
 # Load the "pyon" module.
 
@@ -677,11 +678,6 @@ class core( QObject ) :
 
 		# Store the counts of velocity bins and angles.
 
-		#self.n_alt = n_cup
-		#self.n_dir = n_dir
-		#self.n_vel = n_bin
-		#????... why can't we write this way
-		#self.time_epc = self.fc_spec['time']
 		self.n_alt = self.fc_spec['n_cup']
 		self.n_dir = self.fc_spec['n_dir']
 		self.n_vel = self.fc_spec['n_bin']
@@ -691,7 +687,6 @@ class core( QObject ) :
 
 		self.cur_vld = tile( True,
 		                     [ self.n_alt, self.n_dir, self.n_vel ] )
-
 
 		# Estimate the duration of each spectrum and the mean time
 		# offset of each velocity bin.
@@ -718,7 +713,7 @@ class core( QObject ) :
 		# Load the associated Wind/MFI magnetic field data associated
 		# with this spectrum.
 
-#		self.load_mfi( )
+		self.load_mfi( )
 
 		# If requested, run the moments analysis.
 #
@@ -783,7 +778,7 @@ class core( QObject ) :
 		self.mfi_b_x = mfi_b_x
 		self.mfi_b_y = mfi_b_y
 		self.mfi_b_z = mfi_b_z
-
+                self.mfi_b_vec = [ self.mfi_b_x, self.mfi_b_y, self.mfi_b_z ]
 
 		# Compute the magnetic field magnitude.
 
@@ -808,7 +803,7 @@ class core( QObject ) :
 		# magnetic field and each look direction.
 
 		self.mfi_hat_dir = array( [ [
-		          dot( self.calc_dir_look( self.alt[t], self.dir[c,d] ),
+		          dot( self.fc_dat.calc_dir_look( self.alt[c], self.dir[c,d] ),
 		               self.mfi_avg_nrm )
 		          for d in range( self.n_dir ) ]
 		        for c in range( self.n_alt ) ] )
@@ -943,13 +938,13 @@ class core( QObject ) :
 		# Find the maximum current window (of "self.mom_win_bin" bins)
 		# for each direction
 
-		dir_max_ind = [ [ self.fc_spec.find_max_curr( c, d,
+		dir_max_ind  = [ [ self.fc_spec.find_max_curr( c, d,
 		                             win=self.mom_win_bin           )
 		                             for d in self.fc_spec['n_dir'] ]
 		                             for c in self.fc_spec['n_cup'] ]
 
 		dir_max_curr = [ [ self.fc_spec.calc_curr( c, d,
-		                              dir_max_ind[c][d],
+		                             dir_max_ind[c][d],
 		                             win=self.mom_win_bin           )
 		                             for d in self.fc_spec['n_dir'] ]
 		                             for c in self.fc_spec['n_cup'] ]
@@ -957,7 +952,7 @@ class core( QObject ) :
 		# Compute "cup_max_ind" (two element list)
 		# List of indices with maximum current for each cup
 
-		cup_max_ind = [ 0 for c in self.fc_spec['n_cup'] ] 
+		cup_max_ind  = [ 0 for c in self.fc_spec['n_cup'] ] 
 
 		curr_sum_max = 0.
 
@@ -972,7 +967,7 @@ class core( QObject ) :
 
 				if ( curr_sum > curr_sum_max ) :
 					cup_max_ind[c] = d
-					curr_sum_max = curr_sum
+					curr_sum_max   = curr_sum
 
 		#TODO Populate "self.mom_sel_bin" appropriately
 
@@ -990,7 +985,7 @@ class core( QObject ) :
 					self.mom_sel_bin[c][d][b] = True
 
 		self.mom_n_sel_bin = array( [ [
-                                 len( where( self.mom_sel_cur[t,p,:] )[0] )
+                                 len( where( self.mom_sel_cur[c,d,:] )[0] )
                                                 for d in range( self.n_dir ) ]
                                                 for c in range( self.n_alt ) ] )
 
@@ -1070,12 +1065,12 @@ class core( QObject ) :
 
 
 		# Note.  This function ensures that the two "self.mom_sel_???"
-		#        arrays are mutually consistent.  For each set of "t"-
-		#        and "p"-values, "self.mom_sel_dir[c,d]" can only be
+		#        arrays are mutually consistent.  For each set of "c"-
+		#        and "d"-values, "self.mom_sel_dir[c,d]" can only be
 		#        "True" if at least "self.min_sel_bin" of the elements
 		#        in "self.mom_sel_bin[c,d,:]" are "True".  However, if
-		#        fewer than "self.mom_min_sel_dir" sets of "t"- and
-		#        "p"-values satisfy this criterion, all elements of
+		#        fewer than "self.mom_min_sel_dir" sets of "c"- and
+		#        "d"-values satisfy this criterion, all elements of
 		#        "self.mom_sel_dir" are given the value "False".		
 		#
 		#        Additionally, this functions serves to update the
@@ -1194,7 +1189,7 @@ class core( QObject ) :
 		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'mom' )
 
 
-		# Extract the "t"- and "p"-indices of each selected pointing
+		# Extract the "c"- and "d"-indices of each selected pointing
 		# direction.
 
 		( tk_c, tk_d ) = where( self.mom_sel_dir )
@@ -1251,13 +1246,13 @@ class core( QObject ) :
 			# Convert the look direction from altitude-azimuth to a
 			# Cartesian unit vector.
 
-			eta_dlk[k,:] = self.calc_dir_look( self.alt[c],
+			eta_dlk[k,:] = self.fc_dat.calc_dir_look( self.alt[c],
 			                                   self.dir[c,d] )
 
-			# Extract the "v" values of the selected data from this
+			# Extract the "b" values of the selected data from this
 			# look direction.
 
-			v = where( self.mom_sel_bin[c,d,:] )[0]
+			b = where( self.mom_sel_bin[c,d,:] )[0]
 
 			eta_v[k] = - sum( self.cur[c,d,b] ) / \
 			                sum( self.cur[c,d,b] / self.vel_cen[b] )
@@ -1279,7 +1274,7 @@ class core( QObject ) :
 
 		for k in range( n_eta ) :
 
-			# Extract the "t"- and "p"-values for this direction.
+			# Extract the "c"- and "d"-values for this direction.
 
 			c = tk_c[k]
 			d = tk_d[k]
@@ -1291,10 +1286,10 @@ class core( QObject ) :
 			                                 mom_v_vec     )
 			#eta_eca1[k] = self.fc_spec.
 
-			# Extract the "v" indices of the selected data from this
+			# Extract the "b" indices of the selected data from this
 			# look direction.
 
-			v = where( self.mom_sel_bin[c,d,:] )[0]
+			b = where( self.mom_sel_bin[c,d,:] )[0]
 
 			# Estimate the number density and thermal speed based on
 			# the selected data from this look direction.
@@ -1302,14 +1297,14 @@ class core( QObject ) :
 			eta_n[k] = 1e-6 * ( ( 1. / const['q_p'] )
 			           / ( 1.e-4 * eta_eca[k] )
 			           * sum( ( 1.e-12 * self.cur[c,d,b] ) /
-			                  ( 1.e3 * self.vel_cen[v]   )   ) )
+			                  ( 1.e3 * self.vel_cen[b]   )   ) )
 
 			eta_w[k] = 1e-3 * sqrt( max( [ 0.,
 			           ( ( 1. / const['q_p'] )
 			           / ( 1.e-4 * eta_eca[k] )
 			           / ( 1.e6 * eta_n[k] )
 			           * sum( ( 1.e-12 * self.cur[c,d,b] ) *
-			                  ( 1.e3 * self.vel_cen[v]   )   ) )
+			                  ( 1.e3 * self.vel_cen[b]   )   ) )
 			           - ( 1e3 * eta_v[k] )**2               ] ) )
 
 
@@ -1433,7 +1428,7 @@ class core( QObject ) :
 				for d in range( self.n_dir ) :
 					mom_curr[c,d,:] = self.calc_curr_bmx(
 					           self.vel_cen, self.vel_wid,
-					           self.alt[t], self.dir[c,d],
+					           self.alt[c], self.dir[c,d],
 					           self.mfi_avg_nrm[0],
 					           self.mfi_avg_nrm[1],
 					           self.mfi_avg_nrm[2],
@@ -1445,7 +1440,7 @@ class core( QObject ) :
 				for d in range( self.n_dir ) :
 					mom_curr[c,d,:] = self.calc_curr_max(
 					           self.vel_cen, self.vel_wid,
-					           self.alt[t], self.dir[c,d],
+					           self.alt[c], self.dir[c,d],
 					           mom_n, mom_v_vec[0],
 					           mom_v_vec[1], mom_v_vec[2],
 					           mom_w                       )
@@ -2179,13 +2174,13 @@ class core( QObject ) :
 			# Extract the current look direction and convert it
 			# from altitude-azimuth to rectangular coordiantes.
 
-			t = tk_c[j]
-			p = tk_d[j]
+			c = tk_c[j]
+			d = tk_d[j]
 
-			alt = self.alt[t]
+			alt = self.alt[c]
 			dir = self.dir[c,d]
 
-			dlk = self.calc_dir_look( alt, dir )
+			dlk = self.fc_dat.calc_dir_look( alt, dir )
 
 			# Select data for each species.
 

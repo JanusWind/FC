@@ -84,6 +84,9 @@ class fc_dat( ) :
 			self.valid = True
 
 	def __getitem__( self, key ) :
+#
+#               return self.__dict__['_'+key]
+#
 
 		if ( key == 'spec' ) :
 			return self._spec
@@ -320,3 +323,25 @@ class fc_dat( ) :
                                           dir_alt, dir_azm,
 	                                  mag_x, mag_y, mag_z,
                                           n, v_x, v_y, v_z, w  )
+
+        #-----------------------------------------------------------------------
+        # DEFINE THE FUNCTION FOR CONVERT ALT-AZM TO A CARTESIAN UNIT VECTOR.
+        #-----------------------------------------------------------------------
+
+#        def calc_dir_look( self, dir_alt, dir_azm ) :
+#
+#                # Convert from spherical to rectangular coordinates and return
+#                # the result.
+#
+#                the = self._the
+#                phi = self._phi
+#
+#                ret = array( [
+#                        sin( deg2rad( self._the ) ) * cos( deg2rad(self._phi ) ),
+#                        sin( deg2rad( self._the ) ) * sin( deg2rad(self._phi ) ),
+#                        cos( deg2rad( self._the ) )                          ] )
+#
+#                if ( ret.ndim > 1 ) :
+#                        return transpose( ret )
+#                else :
+#                        return ret

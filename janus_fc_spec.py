@@ -32,7 +32,7 @@ from janus_fc_dat import fc_dat
 ## DEFINE THE Class FOR spec
 ################################################################################
 
-class fc_spec():
+class fc_spec( ) :
 	def __init__( self, n_bin, elev=None, azim=None, volt_cen=None, 
 				        volt_del=None, curr=None, time=None, 
 						  curr_jump=100., curr_min=1.) :
