@@ -936,7 +936,7 @@ class core( QObject ) :
 		# for each direction
 
 		dir_max_ind  = [ [ self.fc_spec.find_max_curr( c, d,
-		                             win=6           )
+		                             win=self.mom_win_bin            )
 		                             for d in range(self.fc_spec['n_dir']) ]
 		                             for c in range(self.fc_spec['n_cup']) ]
 
@@ -949,11 +949,11 @@ class core( QObject ) :
 		# Compute "cup_max_ind" (two element list)
 		# List of indices with maximum current for each cup
 
-		cup_max_ind  = [ 0 for c in self.fc_spec['n_cup'] ] 
+		cup_max_ind  = [ 0 for c in range( self.fc_spec['n_cup'] ) ]
 
 		curr_sum_max = 0.
 
-		for c in range( 0, self.fc_spec['n_cup'] ) :
+		for c in range( self.fc_spec['n_cup'] ) :
 
 			for d in range( self.fc_spec['n_dir'] ) :
 

@@ -250,7 +250,7 @@ class fc_spec( ) :
 	# DEFINE THE FUNCTION FOR CALCULATING TOTAL CURRENT IN A GIVEN WINDOW
 	#-----------------------------------------------------------------------
 
-	def calc_curr( c, d, b, win=1 ) :
+	def calc_curr( self, c, d, b, win=1 ) :
 
 		# Validate the cup, direction, and bin indices.
 
@@ -277,7 +277,7 @@ class fc_spec( ) :
 	# DEFINE THE FUNCTION TO FIND THE INDEX OF WINDOW WITH MAXIMUM CURRENT
 	#-----------------------------------------------------------------------
 
-	def find_max_curr( c, d, win ) :
+	def find_max_curr( self, c, d, win ) :
 
 		# Validate the cup and direction indices.
 
