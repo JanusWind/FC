@@ -277,7 +277,7 @@ class fc_spec( ) :
 	# DEFINE THE FUNCTION TO FIND THE INDEX OF WINDOW WITH MAXIMUM CURRENT
 	#-----------------------------------------------------------------------
 
-	def find_max_curr( c, d, win=1 ) :
+	def find_max_curr( c, d, win ) :
 
 		# Validate the cup and direction indices.
 

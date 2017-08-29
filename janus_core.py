@@ -69,7 +69,6 @@ from scipy.stats import pearsonr, spearmanr
 from janus_helper import round_sig
 
 from janus_fc_spec import fc_spec
-from janus_fc_dat import fc_dat
 
 # Load the "pyon" module.
 
@@ -739,7 +738,6 @@ class core( QObject ) :
 		     ( self.n_vel    == 0    )    ) :
 			return
 
-
 		# Message the user that new Wind/MFI data are about to be
 		# loaded.
 
@@ -803,8 +801,7 @@ class core( QObject ) :
 		# magnetic field and each look direction.
 
 		self.mfi_hat_dir = array( [ [
-		          dot( self.fc_dat.calc_dir_look( self.alt[c], self.dir[c,d] ),
-		               self.mfi_avg_nrm )
+		          dot(self.fc_spec.arr[c][d][0]['dir'], self.mfi_avg_nrm )
 		          for d in range( self.n_dir ) ]
 		        for c in range( self.n_alt ) ] )
 
@@ -928,26 +925,26 @@ class core( QObject ) :
 
 		# Initially, deselect all look directions and bins.
 
-		self.mom_sel_dir = [ [ False for d in self.fc_spec['n_dir'] ]
-                                             for c in self.fc_spec['n_cup'] ]
+		self.mom_sel_dir = [ [ False for d in range(self.fc_spec['n_dir']) ]
+                                             for c in range(self.fc_spec['n_cup']) ]
 
-		self.mom_sel_bin = [ [ False for b in self.fc_spec['n_bin'] ]
-                                             for d in self.fc_spec['n_dir']
-		                             for c in self.fc_spec['n_cup'] ]
+		self.mom_sel_bin = [ [ False for b in range(self.fc_spec['n_bin']) ]
+                                             for d in range(self.fc_spec['n_dir'])
+		                             for c in range(self.fc_spec['n_cup']) ]
 
 		# Find the maximum current window (of "self.mom_win_bin" bins)
 		# for each direction
 
 		dir_max_ind  = [ [ self.fc_spec.find_max_curr( c, d,
-		                             win=self.mom_win_bin           )
-		                             for d in self.fc_spec['n_dir'] ]
-		                             for c in self.fc_spec['n_cup'] ]
+		                             win=6           )
+		                             for d in range(self.fc_spec['n_dir']) ]
+		                             for c in range(self.fc_spec['n_cup']) ]
 
 		dir_max_curr = [ [ self.fc_spec.calc_curr( c, d,
 		                             dir_max_ind[c][d],
 		                             win=self.mom_win_bin           )
-		                             for d in self.fc_spec['n_dir'] ]
-		                             for c in self.fc_spec['n_cup'] ]
+		                             for d in range(self.fc_spec['n_dir']) ]
+		                             for c in range(self.fc_spec['n_cup']) ]
 
 		# Compute "cup_max_ind" (two element list)
 		# List of indices with maximum current for each cup
@@ -985,7 +982,7 @@ class core( QObject ) :
 					self.mom_sel_bin[c][d][b] = True
 
 		self.mom_n_sel_bin = array( [ [
-                                 len( where( self.mom_sel_cur[c,d,:] )[0] )
+                                 len( where( self.mom_sel_bin[c,d,:] )[0] )
                                                 for d in range( self.n_dir ) ]
                                                 for c in range( self.n_alt ) ] )
 
@@ -1160,7 +1157,7 @@ class core( QObject ) :
 		if ( ( self.mom_sel_dir is None ) or
 		     ( self.mom_sel_bin is None )    ) :
 
-			self.auto_mom_sel( no_anls_mom=True )
+			self.auto_mom_sel( )
 
 
 		# If any of the following conditions are met, emit a signal that
@@ -1246,16 +1243,15 @@ class core( QObject ) :
 			# Convert the look direction from altitude-azimuth to a
 			# Cartesian unit vector.
 
-			eta_dlk[k,:] = self.fc_dat.calc_dir_look( self.alt[c],
-			                                   self.dir[c,d] )
+			eta_dlk[k,:] = self.fc_spec.arr[c][d][0]['dir']
 
 			# Extract the "b" values of the selected data from this
 			# look direction.
 
-			b = where( self.mom_sel_bin[c,d,:] )[0]
+			tk_b = where( self.mom_sel_bin[c,d,:] )[0]
 
-			eta_v[k] = - sum( self.cur[c,d,b] ) / \
-			                sum( self.cur[c,d,b] / self.vel_cen[b] )
+			eta_v[k] = - sum( self.curr[c,d,b] ) / \
+			                sum( self.curr[c,d,b] / self.vel_cen[b] )
 
 
 		# Use singular value decomposition (in the form of least squares
@@ -1296,14 +1292,14 @@ class core( QObject ) :
 
 			eta_n[k] = 1e-6 * ( ( 1. / const['q_p'] )
 			           / ( 1.e-4 * eta_eca[k] )
-			           * sum( ( 1.e-12 * self.cur[c,d,b] ) /
+			           * sum( ( 1.e-12 * self.curr[c,d,b] ) /
 			                  ( 1.e3 * self.vel_cen[b]   )   ) )
 
 			eta_w[k] = 1e-3 * sqrt( max( [ 0.,
 			           ( ( 1. / const['q_p'] )
 			           / ( 1.e-4 * eta_eca[k] )
 			           / ( 1.e6 * eta_n[k] )
-			           * sum( ( 1.e-12 * self.cur[c,d,b] ) *
+			           * sum( ( 1.e-12 * self.curr[c,d,b] ) *
 			                  ( 1.e3 * self.vel_cen[b]   )   ) )
 			           - ( 1e3 * eta_v[k] )**2               ] ) )
 
@@ -2177,10 +2173,10 @@ class core( QObject ) :
 			c = tk_c[j]
 			d = tk_d[j]
 
-			alt = self.alt[c]
-			dir = self.dir[c,d]
+#			alt = self.alt[c]
+#			dir = self.dir[c,d]
 
-			dlk = self.fc_dat.calc_dir_look( alt, dir )
+			dlk = self.fc_spec.arr[c][d][0]['dir']
 
 			# Select data for each species.
 
@@ -2492,7 +2488,7 @@ class core( QObject ) :
 		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_dir,
 		             x_mag_x, x_mag_y, x_mag_z           ] )
 
-		y = self.cur[ tk_c, tk_d, tk_b ]
+		y = self.curr[ tk_c, tk_d, tk_b ]
 
 		# Attempt to perform the non-linear fit.  If this fails, reset
 		# the associated variables and abort.

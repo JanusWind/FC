@@ -36,7 +36,6 @@ from datetime import datetime, timedelta
 from janus_time import calc_time_str, calc_time_val, calc_time_epc
 
 from janus_fc_spec import fc_spec
-from janus_fc_dat import fc_dat
 
 # Load the necessary "numpy" array modules.
 
@@ -255,12 +254,11 @@ class fc_arcv( object ) :
 		spec = fc_spec( n_bin, elev=elev, azim=azim, volt_cen=volt_cen,\
 					volt_del=volt_del, curr=curr,  time=time )
 
-#                dat  = fc_dat( spec=spec, azim=azim,elev=elev, volt_cen=volt_cen,\
-#                                        volt_del=volt_del, curr=curr, valid=True  )
 		# Request a cleanup of the data loaded into this archive.
 
 		self.cleanup_date( )	
 
+                print spec['n_cup']
 		#print spec['n_bin'],spec['n_cup'], spec['time'],spec.arr[1][0][0]['elev']
 		# Return the selected spetrum to the user.
 		#print spec.arr[0][0][0]['volt_strt'], spec.arr[0][0][0]['volt_stop']
