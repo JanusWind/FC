@@ -40,7 +40,7 @@ class fc_dat( ) :
 	def __init__( self,
                       spec=None, azim=None,
                       elev=None, volt_cen=None,
-                      volt_del=None, curr=None, valid = False                ) :
+                      volt_del=None, curr=None, valid=False ) :
 
 		self._spec      = spec
 		self._azim      = azim
@@ -79,9 +79,9 @@ class fc_dat( ) :
 		if ( ( self._azim     is None ) or ( self._elev     is None ) or
 		     ( self._volt_cen is None ) or ( self._volt_del is None ) or
                      ( self._curr     is None )                              ) :
-			self.valid = False
+			self._valid = False
 		else :
-			self.valid = True
+			self._valid = True
 
 	def __getitem__( self, key ) :
 #
