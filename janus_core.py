@@ -936,7 +936,7 @@ class core( QObject ) :
 		# for each direction
 
 		dir_max_ind  = [ [ self.fc_spec.find_max_curr( c, d,
-		                             win=6           )
+		                             win=self.mom_win_bin           )
 		                             for d in range(self.fc_spec['n_dir']) ]
 		                             for c in range(self.fc_spec['n_cup']) ]
 
