@@ -285,7 +285,7 @@ class fc_dat( ) :
 
 		ret = ( (   1.e12 ) * ( 1. / 2. ) * ( const['q_p'] )
 		        * ( 1.e6 * n )
-		        * ( 1.e-4 * self.spec.calc_eff_area( dlk, v ) )
+		        * ( 1.e-4 * self.fc_spec.calc_eff_area( dlk, v ) )
 		        * ( ret_prn ) )
 
 		return ret 

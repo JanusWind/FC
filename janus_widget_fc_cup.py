@@ -498,27 +498,27 @@ class widget_fc_cup( QWidget ) :
 					                   is not None )     ) :
 
 					sel_bin = \
-					       self.core.mom_sel_bin[self.c,d,b]
+					       self.core.mom_sel_bin[c][d][b]
 					sel_dir = \
-					       self.core.mom_sel_dir[self.c,d]
+					       self.core.mom_sel_dir[c][d]
 
 				elif ( ( self.core.dsp == 'gsl'        ) and 
 				       ( self.core.nln_sel is not None )     ) :
 
-					sel_bin = self.core.nln_sel[self.c,d,b]
+					sel_bin = self.core.nln_sel[c][d][b]
 
 				elif ( ( self.core.dsp == 'nln'        ) and 
 				       ( self.core.nln_res_sel
 					                   is not None )     ) :
 
 					sel_bin = \
-					       self.core.nln_res_sel[self.c,d,b]
+					       self.core.nln_res_sel[c][d][b]
 
 					if ( self.core.nln_sel is None ) :
 						sel_alt = None
 					else :
 						sel_alt = \
-						   self.core.nln_sel[self.c,d,b]
+						   self.core.nln_sel[c][d][b]
 
 				self.chng_pnt( j, i, b, sel_bin,
 					       sel_dir=sel_dir,

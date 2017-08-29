@@ -197,7 +197,7 @@ class fc_spec( ) :
 
 			for d in range( self._n_dir ) :
 
-				for b in range( self._n_bin ) :
+				for b in range( self._n_bin - 1 ) :
 
 					# If the datum is not valid on its own
 					# (e.g., a parameter value is missing),

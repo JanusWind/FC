@@ -1248,10 +1248,10 @@ class core( QObject ) :
 			# Extract the "b" values of the selected data from this
 			# look direction.
 
-			tk_b = where( self.mom_sel_bin[c,d,:] )[0]
+			tk_b = where( self.mom_sel_bin[c][d] )[0]
 
-			eta_v[k] = - sum( self.curr[c,d,b] ) / \
-			                sum( self.curr[c,d,b] / self.vel_cen[b] )
+			eta_v[k] = - sum( self.curr[c][d][tk_b] ) / \
+			                sum( self.curr[c][d][tk_b] / self.vel_cen[tk_b] )
 
 
 		# Use singular value decomposition (in the form of least squares
@@ -1278,28 +1278,28 @@ class core( QObject ) :
 			# Calculate the effective collecting area for this look
 			# direction.
 
-			eta_eca[k] = self.calc_eff_area( eta_dlk[k,:],
+			eta_eca[k] = self.spec.calc_eff_area( eta_dlk[k],
 			                                 mom_v_vec     )
 			#eta_eca1[k] = self.fc_spec.
 
 			# Extract the "b" indices of the selected data from this
 			# look direction.
 
-			b = where( self.mom_sel_bin[c,d,:] )[0]
+			b = where( self.mom_sel_bin[c][d] )[0]
 
 			# Estimate the number density and thermal speed based on
 			# the selected data from this look direction.
 
 			eta_n[k] = 1e-6 * ( ( 1. / const['q_p'] )
 			           / ( 1.e-4 * eta_eca[k] )
-			           * sum( ( 1.e-12 * self.curr[c,d,b] ) /
+			           * sum( ( 1.e-12 * self.curr[c][d][b] ) /
 			                  ( 1.e3 * self.vel_cen[b]   )   ) )
 
 			eta_w[k] = 1e-3 * sqrt( max( [ 0.,
 			           ( ( 1. / const['q_p'] )
 			           / ( 1.e-4 * eta_eca[k] )
 			           / ( 1.e6 * eta_n[k] )
-			           * sum( ( 1.e-12 * self.curr[c,d,b] ) *
+			           * sum( ( 1.e-12 * self.curr[c][d][b] ) *
 			                  ( 1.e3 * self.vel_cen[b]   )   ) )
 			           - ( 1e3 * eta_v[k] )**2               ] ) )
 
@@ -1422,9 +1422,9 @@ class core( QObject ) :
 		if ( aniso ) :
 			for c in range( self.n_alt ) :
 				for d in range( self.n_dir ) :
-					mom_curr[c,d,:] = self.calc_curr_bmx(
+					mom_curr[c][d] = self.calc_curr_bmx(
 					           self.vel_cen, self.vel_wid,
-					           self.alt[c], self.dir[c,d],
+					           self.alt[c], self.dir[c][d],
 					           self.mfi_avg_nrm[0],
 					           self.mfi_avg_nrm[1],
 					           self.mfi_avg_nrm[2],

@@ -258,7 +258,6 @@ class fc_arcv( object ) :
 
 		self.cleanup_date( )	
 
-                print spec['n_cup']
 		#print spec['n_bin'],spec['n_cup'], spec['time'],spec.arr[1][0][0]['elev']
 		# Return the selected spetrum to the user.
 		#print spec.arr[0][0][0]['volt_strt'], spec.arr[0][0][0]['volt_stop']
