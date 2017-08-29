@@ -715,9 +715,9 @@ class core( QObject ) :
 		self.load_mfi( )
 
 		# If requested, run the moments analysis.
-#
-#		if ( self.dyn_mom ) :
-#			self.auto_mom_sel( )
+
+		if ( self.dyn_mom ) :
+			self.auto_mom_sel( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING THE Wind/MFI MAGNETIC FIELD DATA.
@@ -928,9 +928,9 @@ class core( QObject ) :
 		self.mom_sel_dir = [ [ False for d in range(self.fc_spec['n_dir']) ]
                                              for c in range(self.fc_spec['n_cup']) ]
 
-		self.mom_sel_bin = [ [ False for b in range(self.fc_spec['n_bin']) ]
-                                             for d in range(self.fc_spec['n_dir'])
-		                             for c in range(self.fc_spec['n_cup']) ]
+		self.mom_sel_bin = [ [ [ False for b in range(self.fc_spec['n_bin']) ]
+                                               for d in range(self.fc_spec['n_dir']) ]
+		                               for c in range(self.fc_spec['n_cup']) ]
 
 		# Find the maximum current window (of "self.mom_win_bin" bins)
 		# for each direction
@@ -982,7 +982,7 @@ class core( QObject ) :
 					self.mom_sel_bin[c][d][b] = True
 
 		self.mom_n_sel_bin = array( [ [
-                                 len( where( self.mom_sel_bin[c,d,:] )[0] )
+                                 len( where( self.mom_sel_bin[c][d] )[0] )
                                                 for d in range( self.n_dir ) ]
                                                 for c in range( self.n_alt ) ] )
 
@@ -1023,7 +1023,7 @@ class core( QObject ) :
 
 		# Change the selection of the requested datum.
 
-		self.mom_sel_bin[c, d, b] = not self.mom_sel_bin[c, d, b]
+		self.mom_sel_bin[c][d][b] = not self.mom_sel_bin[c][d][b]
 
 		# Emit a signal that indicates that the datum's selection status
 		# for the moments analysis has changed.
@@ -1083,7 +1083,7 @@ class core( QObject ) :
 		# selected data in each pointing direction).
 
 		self.mom_n_sel_bin = array( [ [
-		                len( where( self.mom_sel_bin[c,d,:] )[0] )
+		                len( where( self.mom_sel_bin[c][d] )[0] )
 		                              for d in range( self.n_dir ) ]
 		                              for c in range( self.n_alt ) ] )
 
@@ -1238,7 +1238,7 @@ class core( QObject ) :
 			# direction.
 
 			eta_the[k] = - self.alt[c] + 90.
-			eta_phi[k] = - self.dir[c,d]
+			eta_phi[k] = - self.dir[c][d]
 
 			# Convert the look direction from altitude-azimuth to a
 			# Cartesian unit vector.
