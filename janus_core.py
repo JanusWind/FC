@@ -1278,7 +1278,7 @@ class core( QObject ) :
 			# Calculate the effective collecting area for this look
 			# direction.
 
-			eta_eca[k] = self.spec.calc_eff_area( eta_dlk[k],
+			eta_eca[k] = self.fc_spec.arr[c][d][0].calc_eff_area(
 			                                 mom_v_vec     )
 			#eta_eca1[k] = self.fc_spec.
 
@@ -1433,7 +1433,6 @@ class core( QObject ) :
 					           mom_w_per, mom_w_par        )
 		else :
 			for c in range( self.n_alt ) :
-				for d in range( self.n_dir ) :
 					mom_curr[c,d,:] = self.calc_curr_max(
 					           self.vel_cen, self.vel_wid,
 					           self.alt[c], self.dir[c,d],
