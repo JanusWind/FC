@@ -1243,7 +1243,7 @@ class core( QObject ) :
 			# Convert the look direction from altitude-azimuth to a
 			# Cartesian unit vector.
 
-			eta_dlk[k,:] = self.fc_spec.arr[c][d][0]['dir']
+			eta_dlk[k] = self.fc_spec.arr[c][d][0]['dir']
 
 			# Extract the "b" values of the selected data from this
 			# look direction.
@@ -1251,7 +1251,8 @@ class core( QObject ) :
 			tk_b = where( self.mom_sel_bin[c][d] )[0]
 
 			eta_v[k] = - sum( self.curr[c][d][tk_b] ) / \
-			                sum( self.curr[c][d][tk_b] / self.vel_cen[tk_b] )
+			             sum( self.curr[c][d][tk_b] /
+                                          self.vel_cen[tk_b]    )
 
 
 		# Use singular value decomposition (in the form of least squares
