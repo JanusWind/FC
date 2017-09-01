@@ -28,7 +28,8 @@
 from janus_const import const
 from math import sqrt, acos, pi
 from janus_helper import calc_arr_norm, calc_arr_dot
-from numpy import interp, sin, cos, deg2rad
+from numpy import interp, sin, cos, deg2rad, exp
+from scipy.special import erf
 
 
 ################################################################################
@@ -220,8 +221,6 @@ class fc_dat( ) :
         #       all the inputs and put them in the function as self.* ???
 
 	def calc_curr_max( self,
-	                    vel_cen, vel_wid,
-	                    dir_alt, dir_azm,
 	                    n, v_x, v_y, v_z, w ) :
 
 		# Return the equivalent bi-Maxwellian response for equal
@@ -230,49 +229,44 @@ class fc_dat( ) :
 
 		# Calcualte the vector bulk velocity.
 
-                x = array([v_x, v_y, v_z])
-
-                if (v.ndim > 1 ) :
-                        v = transpose( v )
-
+                v = [v_x, v_y, v_z]
+#
+#                if (v.ndim > 1 ) :
+#                        v = transpose( v )
+#
                 # Calculate the look direction as a cartesian unit vector.
 
-                mag = array( [ mag_x, mag_y, mag_z ] ) 
-
-                if ( mag.ndim > 1 ) :
-                        mag = transpose( mag )
-
-                dmg = self.calc_arr_nrm( mag )
+#                mag = [ mag_x, mag_y, mag_z ] 
+#
+#                if ( mag.ndim > 1 ) :
+#                        mag = transpose( mag )
+#
+#                dmg = calc_arr_norm( mag )
 
 
                 # Calculate the component of the magnetic field unit vector
                 # along that lies along the look direction.
 
-                dmg_dlk = self.calc_arr_dot( dmg, dlk )
+#                dmg_dlk = calc_arr_dot( dmg, dlk )
+                dlk     = self['dir']
+                dlk_v   = -calc_arr_dot( dlk, v )
 
-
-		# Calculate the exponential terms of the current.
+        	# Calculate the exponential terms of the current.
 
 		ret_exp_1 = 1.e3 * w * sqrt( 2. / pi ) * exp(
-		            - ( ( self['vel_strt']
-		            - self.calc_arr_dot( dlk, -v ) )
-		            / w )**2 / 2. )
+		            - ( ( self['vel_strt'] - dlk_v   )
+		            / w )**2 / 2.                    )
 		ret_exp_2 = 1.e3 * w * sqrt( 2. / pi ) * exp(
-		            - ( ( self['vel_stop']
-		            - self.calc_arr_dot( dlk, -v ) )
-		            / w )**2 / 2. )
+		            - ( ( self['vel_stop'] - dlk_v   )
+		            / w )**2 / 2.                    )
 
 
 		# Calculate the "erf" terms.
 
-		ret_erf_1 = 1.e3 * self.calc_arr_dot( dlk, -v ) * erf(
-		            ( self['vel_strt']
-		            - self.calc_arr_dot( dlk, -v ) )
-		            / ( sqrt(2.) * w ) )
-		ret_erf_2 = 1.e3 * self.calc_arr_dot( dlk, -v ) * erf(
-		            ( self['vel_stop']
-		            - self.calc_arr_dot( dlk, -v ) )
-		            / ( sqrt(2.) * w ) )
+		ret_erf_1 = 1.e3 * dlk_v * erf( ( self['vel_strt']
+		            - dlk_v ) / ( sqrt(2.) * w )          )
+		ret_erf_2 = 1.e3 * dlk_v * erf( ( self['vel_stop']
+		            - dlk_v ) / ( sqrt(2.) * w )        )
 
 
 		# Calculate the parenthetical expression.
@@ -285,7 +279,7 @@ class fc_dat( ) :
 
 		ret = ( (   1.e12 ) * ( 1. / 2. ) * ( const['q_p'] )
 		        * ( 1.e6 * n )
-		        * ( 1.e-4 * self.calc_eff_area( dlk, v ) )
+		        * ( 1.e-4 * self.calc_eff_area( v ) )
 		        * ( ret_prn ) )
 
 		return ret 
@@ -300,10 +294,8 @@ class fc_dat( ) :
 	#TODO Migrate to "fc_dat"
 
 	def calc_curr_bmx( self,
-	                   vel_cen, vel_wid,
-                           dir_alt, dir_azm,
-	                   mag_x, mag_y, mag_z,
                            n, v_x, v_y, v_z,
+                           mag_x, mag_y, mag_z,
                            w_per,w_par          ) :
 
 
@@ -314,15 +306,17 @@ class fc_dat( ) :
 
 		# Compute the effective thermal speed along this look direction.
 
+                dlk     = self['dir']
+                mag     = [ mag_x, mag_y, mag_z ] 
+                dmg     = calc_arr_norm( mag )
+                dmg_dlk = calc_arr_dot( dmg, dlk )
 
 		w = sqrt( ( ( 1. - dmg_dlk**2 ) * w_per**2 ) + 
 		             (     dmg_dlk**2   * w_par**2 )   )
 
 
-                return self.calc_curr_max( vel_cen, vel_wid,
-                                          dir_alt, dir_azm,
-	                                  mag_x, mag_y, mag_z,
-                                          n, v_x, v_y, v_z, w  )
+                return self.calc_curr_max( n, v_x, v_y, v_z,
+                                           w                   )
 
         #-----------------------------------------------------------------------
         # DEFINE THE FUNCTION FOR CONVERT ALT-AZM TO A CARTESIAN UNIT VECTOR.

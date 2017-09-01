@@ -147,7 +147,7 @@ class widget_fc_cup( QWidget ) :
 		self.bsh_pnt_y = mkBrush( color='y' )
 		self.bsh_pnt_r = mkBrush( color='r' )
 
-		self.fnt = self.core.app.font( )				
+		self.fnt = self.core.app.font( )
 
 		# Set the maximum number of velocity channels and the maximum
 		# number of ion species.
@@ -185,7 +185,7 @@ class widget_fc_cup( QWidget ) :
 		self.setLayout( QGridLayout( ) )
 
 		self.grd = GraphicsLayoutWidget( )
-		self.grd.setBackground( 'w' )		
+		self.grd.setBackground( 'w' )
 		self.layout( ).addWidget( self.grd )
 
 		self.layout().setContentsMargins( 0, 0, 0, 0 )
@@ -299,7 +299,7 @@ class widget_fc_cup( QWidget ) :
 				                        yRange=self.alm_y,
 				                        padding=0.         )
 
-				self.grd.addItem( self.plt[j,i], j, i + 2 )	
+				self.grd.addItem( self.plt[j,i], j, i + 2 )
 
 				# Create and store an (empty) label and add it
 				# to this plot.
@@ -597,7 +597,7 @@ class widget_fc_cup( QWidget ) :
 					# Extract the points for this fit curve.
 
 					x = array( self.core.fc_spec['vel_cen'][0] )
-					y = curr_ion[self.c,d,:,n]
+					y = curr_ion[c][d][0][n]
 
 					# Select only those points for which
 					# the fit current is strictly positive.
@@ -640,7 +640,7 @@ class widget_fc_cup( QWidget ) :
 				# Extract the points of the fit curve.
 
 				x = self.core.vel_cen
-				y = curr[self.c,d,:]
+				y = curr[c][d]
 
 				# Select only those points for which the fit
 				# current is strictly positive.
@@ -711,9 +711,9 @@ class widget_fc_cup( QWidget ) :
 			ax = self.core.vel_cen[b]
 
 		if ( self.log_y ) :
-			ay = log10( self.core.curr[self.c,d,b] )
+			ay = log10( self.core.curr[c][d][b] )
 		else :
-			ay = self.core.curr[self.c,d,b]
+			ay = self.core.curr[c][d][b]
 
 		# Select the color for the point (i.e., the brush and pen used
 		# to render it) based on whether or not this datum's look

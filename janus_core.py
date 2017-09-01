@@ -1279,8 +1279,8 @@ class core( QObject ) :
 			# Calculate the effective collecting area for this look
 			# direction.
 
-			eta_eca[k] = self.fc_spec.arr[c][d][0].calc_eff_area(
-			                                 mom_v_vec     )
+			eta_eca[k] = self.fc_spec.arr[c][d][0].\
+                                          calc_eff_area( mom_v_vec )
 			#eta_eca1[k] = self.fc_spec.
 
 			# Extract the "b" indices of the selected data from this
@@ -1423,20 +1423,16 @@ class core( QObject ) :
 		if ( aniso ) :
 			for c in range( self.n_alt ) :
 				for d in range( self.n_dir ) :
-					mom_curr[c][d] = self.calc_curr_bmx(
-					           self.vel_cen, self.vel_wid,
-					           self.alt[c], self.dir[c][d],
-					           self.mfi_avg_nrm[0],
-					           self.mfi_avg_nrm[1],
-					           self.mfi_avg_nrm[2],
+					mom_curr[c][d] = self.fc_spec.arr[c][d][0].calc_curr_bmx(
 					           mom_n, mom_v_vec[0],
 					           mom_v_vec[1], mom_v_vec[2],
+                                                   self.mfi_hat_dir[c][0],
+                                                   self.mfi_hat_dir[c][1],
+                                                   self.mfi_hat_dir[c][2],
 					           mom_w_per, mom_w_par        )
 		else :
 			for c in range( self.n_alt ) :
-					mom_curr[c,d,:] = self.calc_curr_max(
-					           self.vel_cen, self.vel_wid,
-					           self.alt[c], self.dir[c,d],
+					mom_curr[c][d] = self.fc_spec.arr[c][d][0].calc_curr_max(
 					           mom_n, mom_v_vec[0],
 					           mom_v_vec[1], mom_v_vec[2],
 					           mom_w                       )
