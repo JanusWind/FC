@@ -78,6 +78,10 @@ from janus_pyon import plas, series
 
 import pickle
 
+# Load the modules necessary for copying.
+
+from copy import deepcopy
+
 
 ################################################################################
 ## DEFINE THE "core" CLASS: THE ANLYSIS CORE OF JANUS.
@@ -966,49 +970,31 @@ class core( QObject ) :
 					cup_max_ind[c] = d
 					curr_sum_max   = curr_sum
 
-		#TODO Populate "self.mom_sel_bin" appropriately
+		# Populate "self.mom_sel_bin" and "self.mom_sel_dir"
+		# appropriately.
 
 		for c in range( self.fc_spec['n_cup'] ) :
 
 			for pd in range( cup_max_ind[c],
 			                 cup_max_ind[c] + self.mom_win_dir ) :
 
+				# Compute the actual direction-index (versus the
+				# pseudo-direction-index).
+
 				d = pd % self.fc_spec['n_dir']
+
+				# Select the bins in this look direction's
+				# maximal window
 
 				for b in range( dir_max_ind[c][d],
 				                dir_max_ind[c][d]
 				                          + self.mom_win_bin ) :
-
 					self.mom_sel_bin[c][d][b] = True
 
-		self.mom_n_sel_bin = array( [ [
-                                 len( where( self.mom_sel_bin[c][d] )[0] )
-                                                for d in range( self.n_dir ) ]
-                                                for c in range( self.n_alt ) ] )
-
-
-		# TODO Populate "self.mom_sel_dir" appropriately
-
-		for c in range( self.fc_spec['n_cup'] ) :
-
-			for pd in range( cup_max_ind[c],
-			                 cup_max_ind[c] + self.mom_win_dir ) :
-
-				d = pd % self.fc_spec['n_dir']
-
-				self.mom_sel_dir[c][d] = True
-
-		self.mom_n_sel_dir = len( where( self.mom_sel_dir )[0] )
-		
                 # Validate the new data selection (which includes populating
 		# the "self.mom_sel_dir" array).
 
-		self.vldt_mom_sel( )
-
-		# Emit a signal that indicates that the selection status of all
-		# data for the moments analysis has changed.
-
-		self.emit( SIGNAL('janus_chng_mom_sel_all') )
+		self.vldt_mom_sel( emit_all=True )
 
 		# Run the moments analysis (and then, if the non-linear analysis
 		# is set to be dynamically updated, run that analysis as well).
@@ -1053,13 +1039,7 @@ class core( QObject ) :
 	# DEFINE THE FUNCTION FOR VALIDATING THE DATA SELECTION.
 	#-----------------------------------------------------------------------
 
-	def vldt_mom_sel( self ) :
-
-
-		#FIXME 9
-
-		#TODO Don't forget to populate the "self.mom_sel_dir" array.
-
+	def vldt_mom_sel( self, emit_all=False ) :
 
 		# Note.  This function ensures that the two "self.mom_sel_???"
 		#        arrays are mutually consistent.  For each set of "c"-
@@ -1076,57 +1056,62 @@ class core( QObject ) :
 
 		# Save the initial selection of pointing directions.
 
-		old_mom_sel_dir = self.mom_sel_dir
-
+		old_mom_sel_dir = deepcopy( self.mom_sel_dir )
 
 		# Update the counter "self.mom_n_sel_bin" (i.e., the number of
 		# selected data in each pointing direction).
 
-		self.mom_n_sel_bin = array( [ [
-		                len( where( self.mom_sel_bin[c][d] )[0] )
-		                              for d in range( self.n_dir ) ]
-		                              for c in range( self.n_alt ) ] )
+		self.mom_n_sel_bin = [ [ sum( self.mom_sel_bin[c][d] )
+		                       for d in range( self.fc_spec['n_dir'] ) ]
+		                       for c in range( self.fc_spec['n_cup'] ) ]
 
 		# Create a new selection of pointing directions based on the
 		# data selection, and then update the counter
 		# "self.mom_n_sel_dir".
 
-		self.mom_sel_dir = array( [ [
-		           self.mom_n_sel_bin[c,d] >= self.mom_min_sel_bin	
-		                              for d in range( self.n_dir ) ]
-		                              for c in range( self.n_alt ) ] )
-
-		self.mom_n_sel_dir = len( where( self.mom_sel_dir )[0] )
-
+		self.mom_sel_dir = [ [
+		              self.mom_n_sel_bin[c][d] >= self.mom_min_sel_bin
+		                       for d in range( self.fc_spec['n_dir'] ) ]
+		                       for c in range( self.fc_spec['n_cup'] ) ]
 
 		# Determine the total number of selected pointing directions; if
 		# this number is less than the minimum "self.mom_min_sel_dir",
 		# deselect all pointing directions.
 
-		mom_n_sel_dir = len( where( self.mom_sel_dir )[0] )		
+		self.mom_n_sel_dir = \
+		               sum( [ sum( sub ) for sub in self.mom_sel_dir ] )
 
-		if ( mom_n_sel_dir < self.mom_min_sel_dir ) :
+		if ( self.mom_n_sel_dir < self.mom_min_sel_dir ) :
 
-			self.mom_sel_dir = tile( False,
-			                         [ self.n_alt, self.n_dir ] )
+			self.mom_sel_dir = [ [ False
+			               for d in range( self.fc_spec['n_dir'] ) ]
+			               for c in range( self.fc_spec['n_cup'] ) ]
 
 			self.mom_n_sel_dir = 0
 
+		# Emit (if necessary) the appropriate update signal(s).
 
-		# Identify differences between the new and old versions of
-		# "self.mom_sel_dir".  For each pointing direction whose
-		# selection status for the moments analysis has changed, emit a
-		# signal indicating this.
+		if ( emit_all ) :
 
-		( tk_c, tk_d ) = where( self.mom_sel_dir != old_mom_sel_dir )
+			self.emit( SIGNAL('janus_chng_mom_sel_all') )
 
-		n_tk = len( tk_c )
+		else :
 
-		for k in range( n_tk ) :
+			# Identify differences between the new and old versions
+			# of "self.mom_sel_dir".  For each pointing direction
+			# whose selection status for the moments analysis has
+			# changed, emit a signal indicating this.
 
-			self.emit( SIGNAL('janus_chng_mom_sel_dir'),
-			           tk_c[k], tk_d[k]                  )
+			for c in range( self.fc_spec['n_cup'] ) :
 
+				for d in range( self.fc_spec['n_dir'] ) :
+
+					if ( self.mom_sel_dir[c][d]
+					            != old_mom_sel_dir[c][d] ) :
+
+						self.emit( SIGNAL(
+						      'janus_chng_mom_sel_dir'),
+						      c, d )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RUNNING THE MOMENTS ANALYSIS.
@@ -1137,6 +1122,11 @@ class core( QObject ) :
 
 
 		#FIXME 10
+
+		return
+
+
+
 
 		#TODO Transition from data arrays to use of "self.fc_spec"
 
