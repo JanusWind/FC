@@ -498,27 +498,27 @@ class widget_fc_cup( QWidget ) :
 					                   is not None )     ) :
 
 					sel_bin = \
-					       self.core.mom_sel_bin[c][d][b]
+					       self.core.mom_sel_bin[self.c][d][b]
 					sel_dir = \
-					       self.core.mom_sel_dir[c][d]
+					       self.core.mom_sel_dir[self.c][d]
 
 				elif ( ( self.core.dsp == 'gsl'        ) and 
 				       ( self.core.nln_sel is not None )     ) :
 
-					sel_bin = self.core.nln_sel[c][d][b]
+					sel_bin = self.core.nln_sel[self.c][d][b]
 
 				elif ( ( self.core.dsp == 'nln'        ) and 
 				       ( self.core.nln_res_sel
 					                   is not None )     ) :
 
 					sel_bin = \
-					       self.core.nln_res_sel[c][d][b]
+					       self.core.nln_res_sel[self.c][d][b]
 
 					if ( self.core.nln_sel is None ) :
 						sel_alt = None
 					else :
 						sel_alt = \
-						   self.core.nln_sel[c][d][b]
+						   self.core.nln_sel[self.c][d][b]
 
 				self.chng_pnt( j, i, b, sel_bin,
 					       sel_dir=sel_dir,
@@ -592,12 +592,12 @@ class widget_fc_cup( QWidget ) :
 
 			if ( curr_ion is not None ) :
 
-				for n in range( len( curr_ion[c][d][0] ) ) :
+				for n in range( len( curr_ion[self.c][d][0] ) ) :
 
 					# Extract the points for this fit curve.
 
 					x = array( self.core.fc_spec['vel_cen'][0] )
-					y = curr_ion[c][d][0][n]
+					y = curr_ion[self.c][d][0][n]
 
 					# Select only those points for which
 					# the fit current is strictly positive.
@@ -640,7 +640,7 @@ class widget_fc_cup( QWidget ) :
 				# Extract the points of the fit curve.
 
 				x = self.core.vel_cen
-				y = curr[c][d]
+				y = curr[self.c][d]
 
 				# Select only those points for which the fit
 				# current is strictly positive.
@@ -711,9 +711,9 @@ class widget_fc_cup( QWidget ) :
 			ax = self.core.vel_cen[b]
 
 		if ( self.log_y ) :
-			ay = log10( self.core.curr[c][d][b] )
+			ay = log10( self.core.curr[self.c][d][b] )
 		else :
-			ay = self.core.curr[c][d][b]
+			ay = self.core.curr[self.c][d][b]
 
 		# Select the color for the point (i.e., the brush and pen used
 		# to render it) based on whether or not this datum's look

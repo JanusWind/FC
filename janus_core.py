@@ -1123,7 +1123,7 @@ class core( QObject ) :
 
 		#FIXME 10
 
-		return
+#		return
 
 
 
