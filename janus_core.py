@@ -1192,8 +1192,8 @@ class core( QObject ) :
 
 		n_eta = self.mom_n_sel_dir
 
-		eta_phi = tile( 0., n_eta )
-		eta_the = tile( 0., n_eta )
+#		eta_phi = tile( 0., n_eta )
+#		eta_the = tile( 0., n_eta )
 
 		eta_dlk = tile( 0., [ n_eta, 3 ] )  # Cartesian look direction
 
@@ -1227,8 +1227,8 @@ class core( QObject ) :
 			# Store the $\theta$- and $\phi$-values for this look
 			# direction.
 
-			eta_the[k] = - self.alt[c] + 90.
-			eta_phi[k] = - self.dir[c][d]
+#			eta_the[k] = - self.alt[c] + 90.
+#			eta_phi[k] = - self.dir[c][d]
 
 			# Convert the look direction from altitude-azimuth to a
 			# Cartesian unit vector.
