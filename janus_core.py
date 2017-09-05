@@ -191,14 +191,14 @@ class core( QObject ) :
 
 		# Initialize the variables that will contain the Wind/FC ion
 		# spectrum's data; the associated Wind/MFI magnetic field data;
-		# and the settings, data selections, and results from all 
+		# and the settings, data selections, and results from all
 		# analyses.
 
 		self.rset_var( var_swe=True, var_mfi=True,
 		               var_mom_win=True, var_mom_sel=True,
 		               var_mom_res=True, var_nln_ion=True,
 		               var_nln_set=True, var_nln_gss=True,
-		               var_nln_sel=True, var_nln_res=True, 
+		               var_nln_sel=True, var_nln_res=True,
 		               var_dsp=True, var_dyn=True          )
 
 		# Define the data array with values for effective collecting
@@ -249,7 +249,7 @@ class core( QObject ) :
 	              var_mom_win=False, var_mom_sel=False,
 	              var_mom_res=False, var_nln_ion=False,
 	              var_nln_set=False, var_nln_gss=False,
-	              var_nln_sel=False, var_nln_res=False, 
+	              var_nln_sel=False, var_nln_res=False,
 	              var_dsp=False, var_dyn=False          ) :
 
 		# If requested, (re-)initialize the variables associated with
@@ -844,7 +844,7 @@ class core( QObject ) :
 		# If requested (and required), generate an initial guess for
 		# the non-linear analysis.
 
-		if ( ( self.dyn_gss                 ) and 
+		if ( ( self.dyn_gss                 ) and
 		     ( len( self.nln_gss_prm ) == 0 )     ) :
 			self.auto_nln_gss( )
 
@@ -852,14 +852,14 @@ class core( QObject ) :
 		# If requested (and required), select data for the non-linear
 		# analysis.
 
-		if ( ( self.dyn_sel         ) and 
+		if ( ( self.dyn_sel         ) and
 		     ( self.nln_sel is None )     ) :
 			self.auto_nln_sel( )
 
 
 		# If requested (and required), run the non-linear analysis.
 
-		if ( ( self.dyn_nln            ) and 
+		if ( ( self.dyn_nln            ) and
 		     ( self.nln_res_n_ion == 0 )     ) :
 			self.anls_nln( )
 		"""
@@ -940,7 +940,7 @@ class core( QObject ) :
 
 		self.mfi_avg_vec = array( [ mean( self.mfi_b_x ),
 		                            mean( self.mfi_b_y ),
-		                            mean( self.mfi_b_z )  ] )
+		                            mean( self.mfi_b_z ) ] )
 
 		self.mfi_avg_mag = sqrt( self.mfi_avg_vec[0]**2 +
 		                         self.mfi_avg_vec[1]**2 +
@@ -1111,7 +1111,7 @@ class core( QObject ) :
 		# Convert from spherical to rectangular coordinates and return
 		# the result.
 
-		ret = array( [ 
+		ret = array( [
 		        sin( deg2rad( the ) ) * cos( deg2rad( phi ) ),
 		        sin( deg2rad( the ) ) * sin( deg2rad( phi ) ),
 		        cos( deg2rad( the ) )                          ] )
@@ -1236,7 +1236,7 @@ class core( QObject ) :
 		# Compute the effective thermal speed along this look direction.
 
 
-		prm_w = sqrt( ( ( 1. - dmg_dlk**2 ) * prm_w_per**2 ) + 
+		prm_w = sqrt( ( ( 1. - dmg_dlk**2 ) * prm_w_per**2 ) +
 		              (        dmg_dlk**2   * prm_w_par**2 )   )
 
 
@@ -1306,7 +1306,7 @@ class core( QObject ) :
 
 		# Note.  This step is used to provide a record of keyword
 		#        input that cannot be converted to an integer.  In
-		#        such cases, the corresponding variable 
+		#        such cases, the corresponding variable
 		#        "self.req_win_???" is given a value of "None".  This
 		#        invalid input is principally saved so that it can be
 		#        displayed in the user-input text-box.
@@ -1322,7 +1322,7 @@ class core( QObject ) :
 
 		# Note.  No change is made to the value of a given
 		#        "self.mom_win_???_req" variable if the value of the
-		#        corresponding "win_???" keyword is "None" (either 
+		#        corresponding "win_???" keyword is "None" (either
 		#        because the user passed no value or passed a value of
 		#        "None").  If the user passes an invalid value, though,
 		#        "self.mom_win_???_req" is set to "None" and no change
@@ -1467,7 +1467,7 @@ class core( QObject ) :
 
 		for t in range( self.n_alt ) :
 
-			p0 = where( mm_cur[t,:] == 
+			p0 = where( mm_cur[t,:] ==
 			                 amax( mm_cur[t,:] ) )[0][0]
 
 			for p in range( p0, p0+self.mom_win_azm ) :
@@ -1852,7 +1852,7 @@ class core( QObject ) :
 
 		# Calculate a net estimator of the number density.
 
-		# Note.  The total signal for a look direction is roughly 
+		# Note.  The total signal for a look direction is roughly
 		#        proportional to its effective collecting area.  Thus,
 		#        the reciprical of the effective collecting area can be
 		#        thought of a crude indicator of the uncertainty in the
@@ -3488,7 +3488,7 @@ class core( QObject ) :
 		fl.write( '#      that value written immediately below it.\n'  )
 		fl.write( '#      Uncertainty values are absolute (versus\n'   )
 		fl.write( '#      relative) uncertainties and are scaled so\n' )
-                fl.write( '#      that the reduced chi-squared returned by\n'  )
+		fl.write( '#      that the reduced chi-squared returned by\n'  )
 		fl.write( '#      the non-linear fit is unity.\n'              )
 		fl.write( '#   -- The units on numerical quantities are as\n'  )
 		fl.write( '#      follows:\n'                                  )
@@ -3559,7 +3559,7 @@ class core( QObject ) :
 
 					fl.write( '\n' )
 					fl.write( txt_spc )
-					fl.write( ' ' )	
+					fl.write( ' ' )
 					fl.write( 'Population: ' )
 					fl.write( pop['name'] )
 					fl.write( ' (' )
