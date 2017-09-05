@@ -61,5 +61,5 @@ class widget_mfi( QTabWidget ) :
 		self.wdg_info     = widget_mfi_info( self.core     )
 
 		self.addTab( self.wdg_lin_plot, 'MFI'     )
-		self.addTab( self.wdg_ang_plot, u'θ, λ, Ψ' )
+		self.addTab( self.wdg_ang_plot, u'θ, λ' )
 		self.addTab( self.wdg_info, '<B>'          )

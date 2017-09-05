@@ -118,7 +118,7 @@ class widget_mfi_ang_plot( QWidget ) :
 
 		labelStyle = {'color':'k'}
 		self.axs_x.setLabel( 'Time [s]'           , **labelStyle )
-		self.axs_y.setLabel( 'Magnetic Field Angle [degrees]', **labelStyle )
+		self.axs_y.setLabel( 'Magnetic Field Angles [degrees]', **labelStyle )
 
 		self.axs_x.label.setFont( self.fnt )
 		self.axs_y.label.setFont( self.fnt )
