@@ -201,17 +201,17 @@ class core( QObject ) :
 		# and the settings, data selections, and results from all
 		# analyses.
 
-		self.rset_var( var_swe=True, var_mfi=True,
-		               var_mom_win=True, var_mom_sel=True,
-		               var_mom_res=True, var_nln_ion=True,
-		               var_nln_set=True, var_nln_gss=True,
-		               var_nln_sel=True, var_nln_res=True,
-		               var_dsp=True, var_dyn=True          )
+		self.rset_var( var_swe     = True, var_mfi     = True,
+		               var_mom_win = True, var_mom_sel = True,
+		               var_mom_res = True, var_nln_ion = True,
+		               var_nln_set = True, var_nln_gss = True,
+		               var_nln_sel = True, var_nln_res = True,
+		               var_dsp     = True, var_dyn     = True          )
 
 		# Define the data array with values for effective collecting
 		# area, "eff_area", as a function of inflow angle, "deg".
 
-		self.eff_deg  = arange( 0., 91., dtype=float )
+		self.eff_deg  = arange( 0., 91., dtype = float )
 		
 		self.eff_area = array( [
 		      33.820000, 33.830000, 33.830000, 33.820000, 33.810000,
@@ -253,12 +253,12 @@ class core( QObject ) :
 	#-----------------------------------------------------------------------
 
 	def rset_var( self,
-	              var_swe=False, var_mfi=False,
-	              var_mom_win=False, var_mom_sel=False,
-	              var_mom_res=False, var_nln_ion=False,
-	              var_nln_set=False, var_nln_gss=False,
-	              var_nln_sel=False, var_nln_res=False,
-	              var_dsp=False, var_dyn=False          ) :
+	              var_swe     = False, var_mfi     = False,
+	              var_mom_win = False, var_mom_sel = False,
+	              var_mom_res = False, var_nln_ion = False,
+	              var_nln_set = False, var_nln_gss = False,
+	              var_nln_sel = False, var_nln_res = False,
+	              var_dsp     = False, var_dyn     = False          ) :
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion spectrum's data.
@@ -271,42 +271,42 @@ class core( QObject ) :
 			self.time_txt = ''
 			self.time_vld = True
 
-			self.rot_sec = 3.
-			self.dur_sec = 0.
+			self.rot_sec  = 3.
+			self.dur_sec  = 0.
 
-			self.alt     = None
-			self.dir     = None
-			self.vel_cen = None
-			self.vel_wid = None
-			self.curr    = None
-			self.cur_vld = None
+			self.alt      = None
+			self.dir      = None
+			self.vel_cen  = None
+			self.vel_wid  = None
+			self.curr     = None
+			self.cur_vld  = None
 
-			self.cur_jmp = 100.
-			self.cur_min =   1.
+			self.cur_jmp  = 100.
+			self.cur_min  =   1.
 
-			self.mag_t = None
-			self.mag_x = None
-			self.mag_y = None
-			self.mag_z = None
+			self.mag_t    = None
+			self.mag_x    = None
+			self.mag_y    = None
+			self.mag_z    = None
 
-			self.n_alt = 0
-			self.n_dir = 0
-			self.n_vel = 0
+			self.n_alt    = 0
+			self.n_dir    = 0
+			self.n_vel    = 0
 
 		# If requested, (re-)initialize the varaibles for the Wind/MFI
 		# data associated with this spectrum.
 
 		if ( var_mfi ) :
 
-			self.n_mfi = 0
+			self.n_mfi       = 0
 
-			self.mfi_dur = 0.
+			self.mfi_dur     = 0.
 
-			self.mfi_t   = None
-			self.mfi_b   = None
-			self.mfi_b_x = None
-			self.mfi_b_y = None
-			self.mfi_b_z = None
+			self.mfi_t       = None
+			self.mfi_b       = None
+			self.mfi_b_x     = None
+			self.mfi_b_y     = None
+			self.mfi_b_z     = None
 
 			self.mfi_avg_mag = None
 			self.mfi_avg_vec = None
@@ -334,41 +334,41 @@ class core( QObject ) :
 			self.mom_min_sel_dir = 5
 			self.mom_min_sel_bin = 3
 
-			self.mom_sel_dir = None
-			self.mom_sel_bin = None
+			self.mom_sel_dir     = None
+			self.mom_sel_bin     = None
 
 		# If requested, (re-)initialize and store the variables
 		# associated with the results of the moments analysis.
 
 		if ( var_mom_res ) :
 
-			self.mom_n_eta = 0
+			self.mom_n_eta      = 0
 
-			self.mom_eta_ind_t = None
-			self.mom_eta_ind_p = None
+			self.mom_eta_ind_t  = None
+			self.mom_eta_ind_p  = None
 
-			self.mom_eta_n = None
-			self.mom_eta_v = None
-			self.mom_eta_w = None
-			self.mom_eta_t = None
+			self.mom_eta_n      = None
+			self.mom_eta_v      = None
+			self.mom_eta_w      = None
+			self.mom_eta_t      = None
 
 			self.mom_corr_pears = None
 			self.mom_corr_spear = None
 
-			self.mom_n = None
-			self.mom_v = None
-			self.mom_w = None
-			self.mom_t = None
-			self.mom_r = None
+			self.mom_n          = None
+			self.mom_v          = None
+			self.mom_w          = None
+			self.mom_t          = None
+			self.mom_r          = None
 
-			self.mom_v_vec = None
+			self.mom_v_vec      = None
 
-			self.mom_w_per = None
-			self.mom_w_par = None
-			self.mom_t_per = None
-			self.mom_t_par = None
+			self.mom_w_per      = None
+			self.mom_w_par      = None
+			self.mom_t_per      = None
+			self.mom_t_par      = None
 
-			self.mom_curr = None
+			self.mom_curr       = None
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion species and populations for the non-linear analysis.
@@ -445,36 +445,36 @@ class core( QObject ) :
 			self.nln_set_sel_b   = tile( None , self.nln_n_pop )
 			self.nln_set_sel_vld = tile( False, self.nln_n_pop )
 
-			self.nln_set_gss_n[0] =  1.00
-			self.nln_set_gss_n[1] =  0.20
-			self.nln_set_gss_n[2] =  0.02
-			self.nln_set_gss_n[3] =  0.01
+			self.nln_set_gss_n[0]   =  1.00
+			self.nln_set_gss_n[1]   =  0.20
+			self.nln_set_gss_n[2]   =  0.02
+			self.nln_set_gss_n[3]   =  0.01
 
-			self.nln_set_gss_d[1] =  0.03
-			self.nln_set_gss_d[2] =  0.01
-			self.nln_set_gss_d[3] =  0.05
+			self.nln_set_gss_d[1]   =  0.03
+			self.nln_set_gss_d[2]   =  0.01
+			self.nln_set_gss_d[3]   =  0.05
 
-			self.nln_set_gss_w[0] =  1.00
-			self.nln_set_gss_w[1] =  1.25
-			self.nln_set_gss_w[2] =  1.00
-			self.nln_set_gss_w[3] =  1.25
+			self.nln_set_gss_w[0]   =  1.00
+			self.nln_set_gss_w[1]   =  1.25
+			self.nln_set_gss_w[2]   =  1.00
+			self.nln_set_gss_w[3]   =  1.25
 
 			self.nln_set_gss_vld[0] = True
 			self.nln_set_gss_vld[1] = True
 			self.nln_set_gss_vld[2] = True
 			self.nln_set_gss_vld[3] = True
 
-			self.nln_set_sel_a[0] = -3.00
-			self.nln_set_sel_a[1] = -3.00
-			self.nln_set_sel_a[2] = -3.00
-			self.nln_set_sel_a[3] = -3.00
-			self.nln_set_sel_a[4] = -3.00
+			self.nln_set_sel_a[0]   = -3.00
+			self.nln_set_sel_a[1]   = -3.00
+			self.nln_set_sel_a[2]   = -3.00
+			self.nln_set_sel_a[3]   = -3.00
+			self.nln_set_sel_a[4]   = -3.00
 
-			self.nln_set_sel_b[0] =  3.00
-			self.nln_set_sel_b[1] =  3.00
-			self.nln_set_sel_b[2] =  3.00
-			self.nln_set_sel_b[3] =  3.00
-			self.nln_set_sel_b[4] =  3.00
+			self.nln_set_sel_b[0]   =  3.00
+			self.nln_set_sel_b[1]   =  3.00
+			self.nln_set_sel_b[2]   =  3.00
+			self.nln_set_sel_b[3]   =  3.00
+			self.nln_set_sel_b[4]   =  3.00
 
 			self.nln_set_sel_vld[0] = True
 			self.nln_set_sel_vld[1] = True
@@ -496,8 +496,8 @@ class core( QObject ) :
 
 			self.nln_gss_vld = tile( False, self.nln_n_pop )
 
-			self.nln_gss_pop = array( [ ] )
-			self.nln_gss_prm = array( [ ] )
+			self.nln_gss_pop      = array( [ ] )
+			self.nln_gss_prm      = array( [ ] )
 
 			self.nln_gss_curr_tot = None
 			self.nln_gss_curr_ion = None
@@ -507,7 +507,7 @@ class core( QObject ) :
 
 		if ( var_nln_sel ) :
 
-			self.nln_sel = None
+			self.nln_sel     = None
 
 			self.nln_n_sel   = 0
 			self.nln_min_sel = 30
@@ -519,7 +519,7 @@ class core( QObject ) :
 
 			self.nln_res_plas = plas( enforce=False )
 
-			self.nln_res_sel = None
+			self.nln_res_sel      = None
 
 			self.nln_res_curr_tot = None
 			self.nln_res_curr_ion = None
@@ -561,10 +561,10 @@ class core( QObject ) :
 
 		self.emit( SIGNAL('janus_rset') )
 
-		self.rset_var( var_swe=True,     var_mfi=True,
-		               var_mom_sel=True, var_mom_res=True,
-		               var_nln_gss=True, var_nln_sel=True,
-		               var_nln_res=True                    )
+		self.rset_var( var_swe     = True, var_mfi     = True,
+		               var_mom_sel = True, var_mom_res = True,
+		               var_nln_gss = True, var_nln_sel = True,
+		               var_nln_res = True                         )
 
 
 		# If a special code has been entered, take the specified action.
@@ -681,9 +681,9 @@ class core( QObject ) :
 
 		# Store the counts of velocity bins and angles.
 
-		self.n_alt = self.fc_spec['n_cup']
-		self.n_dir = self.fc_spec['n_dir']
-		self.n_vel = self.fc_spec['n_bin']
+		self.n_alt    = self.fc_spec['n_cup']
+		self.n_dir    = self.fc_spec['n_dir']
+		self.n_vel    = self.fc_spec['n_bin']
 
 		# Examine each measured current value and determine whether or
 		# not it's valid for use in the proceding analyses.
@@ -698,7 +698,7 @@ class core( QObject ) :
 
 		self.dur_sec = self.rot_sec * self.n_vel
 
-		self.mag_t = self.rot_sec * ( arange( self.n_vel ) + 0.5 )
+		self.mag_t   = self.rot_sec * ( arange( self.n_vel ) + 0.5 )
 
 
 		# Message the user that a new Wind/FC ion spectrum has been
@@ -777,9 +777,9 @@ class core( QObject ) :
 		self.mfi_t = array( [ ( t - self.time_epc ).total_seconds( )
 		                      for t in mfi_t                         ] )
 
-		self.mfi_b_x = mfi_b_x
-		self.mfi_b_y = mfi_b_y
-		self.mfi_b_z = mfi_b_z
+		self.mfi_b_x   = mfi_b_x
+		self.mfi_b_y   = mfi_b_y
+		self.mfi_b_z   = mfi_b_z
                 self.mfi_b_vec = [ self.mfi_b_x, self.mfi_b_y, self.mfi_b_z ]
 
 		# Compute the magnetic field magnitude.
@@ -812,11 +812,11 @@ class core( QObject ) :
 		# Compute the mfi angles.
 		# These are useful diagnostic tools.
 
-		mfi_b_rho   = sqrt( mfi_b_x**2.0 + mfi_b_y**2.0 )
-		mfi_b_colat = arctan2( mfi_b_z, mfi_b_rho )
-		mfi_b_lon   = arctan2( mfi_b_y, mfi_b_x )
-		mfi_b_colat = rad2deg( mfi_b_colat )
-		mfi_b_lon   = rad2deg( mfi_b_lon )
+		mfi_b_rho               = sqrt( mfi_b_x**2.0 + mfi_b_y**2.0 )
+		mfi_b_colat             = arctan2( mfi_b_z, mfi_b_rho )
+		mfi_b_lon               = arctan2( mfi_b_y, mfi_b_x )
+		mfi_b_colat             = rad2deg( mfi_b_colat )
+		mfi_b_lon               = rad2deg( mfi_b_lon )
 
 		self.mfi_b_colat        = mfi_b_colat
 		self.mfi_b_lon          = mfi_b_lon
@@ -827,10 +827,10 @@ class core( QObject ) :
 		# Use interpolation to estimate a magnetic-field vector for each
 		# velocity bin.
 
-		var_t = self.mag_t
+		var_t        = self.mag_t
 
-		tk_lo = where( var_t < amin( self.mfi_t ) )
-		tk_hi = where( var_t > amax( self.mfi_t ) )
+		tk_lo        = where( var_t < amin( self.mfi_t ) )
+		tk_hi        = where( var_t > amax( self.mfi_t ) )
 
 		var_t[tk_lo] = amin( self.mfi_t )
 		var_t[tk_hi] = amax( self.mfi_t )
@@ -1125,16 +1125,11 @@ class core( QObject ) :
 
 #		return
 
-
-
-
 		#TODO Transition from data arrays to use of "self.fc_spec"
 
 		#TODO Store results in a "plas" object (e.g.,
 		#     "self.mom_res = plas()", which you should add to
 		#     "self.rset_var" under the "var_mom_res" section).
-
-
 
 		# Re-initialize and the output of the moments analysis.
 
@@ -1148,7 +1143,6 @@ class core( QObject ) :
 		     ( self.mom_sel_bin is None )    ) :
 
 			self.auto_mom_sel( )
-
 
 		# If any of the following conditions are met, emit a signal that
 		# indicates that the results of the moments analysis have
@@ -1431,30 +1425,30 @@ class core( QObject ) :
 		# Save the "mom_?" and "mom_?_???" values and select "eta_*"
 		# arrays.
 
-		self.mom_n = mom_n
-		self.mom_v = mom_v
-		self.mom_w = mom_w
-		self.mom_t = mom_t
-		self.mom_r = mom_r
+		self.mom_n         = mom_n
+		self.mom_v         = mom_v
+		self.mom_w         = mom_w
+		self.mom_t         = mom_t
+		self.mom_r         = mom_r
 
-		self.mom_v_vec = mom_v_vec
+		self.mom_v_vec     = mom_v_vec
 
-		self.mom_w_per = mom_w_per
-		self.mom_w_par = mom_w_par
-		self.mom_t_per = mom_t_per
-		self.mom_t_par = mom_t_par
+		self.mom_w_per     = mom_w_per
+		self.mom_w_par     = mom_w_par
+		self.mom_t_per     = mom_t_per
+		self.mom_t_par     = mom_t_par
 
-		self.mom_n_eta = n_eta
+		self.mom_n_eta     = n_eta
 
 		self.mom_eta_ind_c = tk_c
 		self.mom_eta_ind_d = tk_d
 
-		self.mom_eta_n = eta_n
-		self.mom_eta_v = eta_v
-		self.mom_eta_w = eta_w
-		self.mom_eta_t = eta_t
+		self.mom_eta_n     = eta_n
+		self.mom_eta_v     = eta_v
+		self.mom_eta_w     = eta_w
+		self.mom_eta_t     = eta_t
 
-		self.mom_curr = mom_curr
+		self.mom_curr      = mom_curr
 
 
 		# Message the user that the moments analysis has completed.
@@ -1999,11 +1993,11 @@ class core( QObject ) :
 
 				self.nln_gss_vld[i] = False
 
-		self.nln_gss_pop = where( self.nln_gss_vld )[0]
+		self.nln_gss_pop      = where( self.nln_gss_vld )[0]
 
 		# Reset the "prm" and "cur_???" arrays.
 
-		self.nln_gss_prm = array( [] )
+		self.nln_gss_prm      = array( [] )
 
 		self.nln_gss_curr_ion = None
 		self.nln_gss_curr_tot = None
@@ -2053,9 +2047,9 @@ class core( QObject ) :
 		( tk_c, tk_d, tk_b ) = indices( ( self.n_alt, self.n_dir,
 		                                  self.n_vel              ) )
 
-		tk_c = tk_c.flatten( )
-		tk_d = tk_d.flatten( )
-		tk_b = tk_b.flatten( )
+		tk_c      = tk_c.flatten( )
+		tk_d      = tk_d.flatten( )
+		tk_b      = tk_b.flatten( )
 
 		x_vel_cen = self.vel_cen[ tk_b ]
 		x_vel_wid = self.vel_wid[ tk_b ]
@@ -2065,8 +2059,8 @@ class core( QObject ) :
 		x_mag_y   = self.mag_y[ tk_b ]
 		x_mag_z   = self.mag_z[ tk_b ]
 
-		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_dir,
-		             x_mag_x, x_mag_y, x_mag_z           ] )
+		x         = array( [ x_vel_cen, x_vel_wid, x_alt, x_dir,
+		                     x_mag_x, x_mag_y, x_mag_z           ] )
 
 		self.nln_gss_curr_ion = reshape(
 		      self.calc_nln_curr( self.nln_gss_pop, x,
@@ -2156,8 +2150,8 @@ class core( QObject ) :
 			# Extract the current look direction and convert it
 			# from altitude-azimuth to rectangular coordiantes.
 
-			c = tk_c[j]
-			d = tk_d[j]
+			c   = tk_c[j]
+			d   = tk_d[j]
 
 #			alt = self.alt[c]
 #			dir = self.dir[c,d]
@@ -2302,11 +2296,11 @@ class core( QObject ) :
 
 		# Compute the normalized magnetic field values.
 
-		d_mag = sqrt( d_mag_x**2 + d_mag_y**2 + d_mag_z**2 )
+		d_mag     = sqrt( d_mag_x**2 + d_mag_y**2 + d_mag_z**2 )
 
-		d_nrm_x = d_mag_x / d_mag
-		d_nrm_y = d_mag_y / d_mag
-		d_nrm_z = d_mag_z / d_mag
+		d_nrm_x   = d_mag_x / d_mag
+		d_nrm_y   = d_mag_y / d_mag
+		d_nrm_z   = d_mag_z / d_mag
 
 		# For each ion species, extract the passed parameters and
 		# calculate it's contribution to the total current.
@@ -2316,9 +2310,9 @@ class core( QObject ) :
 		else :
 			curr = tile( 0., self.nln_n_pop )
 
-		prm_v0_x = prm[0]
-		prm_v0_y = prm[1]
-		prm_v0_z = prm[2]
+		prm_v0_x  = prm[0]
+		prm_v0_y  = prm[1]
+		prm_v0_z  = prm[2]
 
 		c = 3
 
@@ -2502,9 +2496,9 @@ class core( QObject ) :
 		( tk_c, tk_d, tk_b ) = indices( ( self.n_alt, self.n_dir,
 		                                  self.n_vel              ) )
 
-		tk_c = tk_c.flatten( )
-		tk_d = tk_d.flatten( )
-		tk_b = tk_b.flatten( )
+		tk_c      = tk_c.flatten( )
+		tk_d      = tk_d.flatten( )
+		tk_b      = tk_b.flatten( )
 
 		x_vel_cen = self.vel_cen[ tk_b ]
 		x_vel_wid = self.vel_wid[ tk_b ]
@@ -2514,8 +2508,8 @@ class core( QObject ) :
 		x_mag_y   = self.mag_y[ tk_b ]
 		x_mag_z   = self.mag_z[ tk_b ]
 
-		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_dir,
-		             x_mag_x, x_mag_y, x_mag_z           ] )
+		x         = array( [ x_vel_cen, x_vel_wid, x_alt, x_dir,
+		                     x_mag_x, x_mag_y, x_mag_z           ] )
 
 		self.nln_res_curr_ion = \
 		   reshape( self.calc_nln_curr( pop, x, fit, ret_comp=True ),
@@ -2526,17 +2520,17 @@ class core( QObject ) :
 		# Save the properties and fit parameters for each ion species
 		# used in this analysis.
 
-		self.nln_res_plas.covar = covar.copy( )
+		self.nln_res_plas.covar       = covar.copy( )
 
-		self.nln_res_plas['time'] = self.time_epc
+		self.nln_res_plas['time']     = self.time_epc
 
-		self.nln_res_plas['b0_x'] = self.mfi_avg_vec[0]
-		self.nln_res_plas['b0_y'] = self.mfi_avg_vec[1]
-		self.nln_res_plas['b0_z'] = self.mfi_avg_vec[2]
+		self.nln_res_plas['b0_x']     = self.mfi_avg_vec[0]
+		self.nln_res_plas['b0_y']     = self.mfi_avg_vec[1]
+		self.nln_res_plas['b0_z']     = self.mfi_avg_vec[2]
 
-		self.nln_res_plas['v0_x'] = fit[0]
-		self.nln_res_plas['v0_y'] = fit[1]
-		self.nln_res_plas['v0_z'] = fit[2]
+		self.nln_res_plas['v0_x']     = fit[0]
+		self.nln_res_plas['v0_y']     = fit[1]
+		self.nln_res_plas['v0_z']     = fit[2]
 		self.nln_res_plas['sig_v0_x'] = sigma[0]
 		self.nln_res_plas['sig_v0_y'] = sigma[1]
 		self.nln_res_plas['sig_v0_z'] = sigma[2]
@@ -2569,7 +2563,7 @@ class core( QObject ) :
 			pop_name  = self.nln_pyon.arr_pop[i]['name']
 			pop_sym   = self.nln_pyon.arr_pop[i]['sym']
 
-			pop_n   = fit[c]
+			pop_n     = fit[c]
 			pop_sig_n = sigma[c]
 			c += 1
 
@@ -2582,17 +2576,17 @@ class core( QObject ) :
 				pop_sig_dv = None
 
 			if ( pop_aniso ) :
-				pop_w     = None
-				pop_w_per = fit[c  ]
-				pop_w_par = fit[c+1]
+				pop_w         = None
+				pop_w_per     = fit[c  ]
+				pop_w_par     = fit[c+1]
 				pop_sig_w     = None
 				pop_sig_w_per = sigma[c  ]
 				pop_sig_w_par = sigma[c+1]
 				c += 2
 			else :
-				pop_w     = fit[c]
-				pop_w_per = None
-				pop_w_par = None
+				pop_w         = fit[c]
+				pop_w_per     = None
+				pop_w_par     = None
 				pop_sig_w     = sigma[c]
 				pop_sig_w_per = None
 				pop_sig_w_par = None
