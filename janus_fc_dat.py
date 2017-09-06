@@ -77,6 +77,8 @@ class fc_dat( ) :
 		self._norm_b_y  = None
 		self._norm_b_z  = None
 
+		self._maglook   = None
+
 		if ( ( self._azim     is None ) or ( self._elev     is None ) or
 		     ( self._volt_cen is None ) or ( self._volt_del is None ) or
                      ( self._curr     is None )                              ) :
@@ -140,6 +142,8 @@ class fc_dat( ) :
 			return self._norm_b_z
 		elif ( key == 'norm_b' ) :
 			return ( self._norm_b_x, self._norm_b_y, self._norm_b_z )
+		elif ( key == 'maglook' ) :
+			return ( self._maglook )
 
 		else :
 			raise KeyError( 'Invalid key for "fc_dat ".' )
@@ -166,6 +170,7 @@ class fc_dat( ) :
 		self._norm_b_y = norm_b[1]
 		self._norm_b_z = norm_b[2]
 
+		self._maglook = calc_arr_dot( self['norm_b'], self['dir'] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CALCULATING THE EFFECTIVE AREA OF THE CUP.
@@ -193,13 +198,17 @@ class fc_dat( ) :
 
 		return interp( psi, self._spec._eff_deg, self._spec._eff_area )
 
-
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT (MAXWELLIAN).
 	#-----------------------------------------------------------------------
 
 	def calc_curr_max( self,
-	                    n, v_x, v_y, v_z, w ) :
+	                   n, v_x, v_y, v_z, w ) :
+
+		# Note.  This function is based on Equation 2.34 from Maruca
+		#        (PhD thesis, 2012), but differs by a factor of $2$
+		#        (i.e., the factor of $2$ from Equation 2.13, which is
+		#        automatically calibrated out of the Wind/FC data).
 
 		# Return the equivalent bi-Maxwellian response for equal
 		# perpendicular and parallel thermal speeds and a dummy
@@ -247,35 +256,88 @@ class fc_dat( ) :
 
 		return ret 
 
-
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT (BI-MAXWELLIAN).
 	#-----------------------------------------------------------------------
 
-	#FIXME 6
-
-
 	def calc_curr_bmx( self,
-                           n, v_x, v_y, v_z,
-                           mag_x, mag_y, mag_z,
-                           w_per,w_par          ) :
-
-
-		# Note.  This function is based on Equation 2.34 from Maruca
-		#        (PhD thesis, 2012), but differs by a factor of $2$
-		#        (i.e., the factor of $2$ from Equation 2.13, which is
-		#        automatically calibrated out of the Wind/FC data).
+	                   n, v_x, v_y, v_z,
+	                   w_per, w_par      ) :
 
 		# Compute the effective thermal speed along this look direction.
 
-                dlk     = self['dir']
-                mag     = [ mag_x, mag_y, mag_z ] 
-                dmg     = calc_arr_norm( mag )
-                dmg_dlk = calc_arr_dot( dmg, dlk )
+		ml2 = ( self['maglook'] )**2
 
-		w = sqrt( ( ( 1. - dmg_dlk**2 ) * w_per**2 ) + 
-		             (     dmg_dlk**2   * w_par**2 )   )
+		w = sqrt( ( ( 1. - ml2 ) * w_per**2 ) + 
+		          (        ml2   * w_par**2 )   )
+
+		# Return the computed current.
+
+                return self.calc_curr_max( n, v_x, v_y, v_z, w )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT.
+	#-----------------------------------------------------------------------
+
+	def calc_curr( self, pop ) :
+
+		# If no population has been provided, abort.
+
+		if ( pop is None ) :
+			return 0.
+
+		# Extract/compute the moments of the population.
+
+		n = pop['n']
+		v = pop['v_vec']
+
+		if ( pop['aniso'] ) :
+
+			w_per = pop['w_per']
+			w_par = pop['w_par']
+
+			ml2 = ( self['maglook'] )**2
+
+			w = sqrt( ( ( 1. - ml2 ) * w_per**2 ) + 
+			          (        ml2   * w_par**2 )   )
+
+		else :
+
+			w = pop['w']
+
+		# Calculate the component of the magnetic field unit vector
+		# along that lies along the look direction.
+
+		dlk_v   = -calc_arr_dot( self['dir'], v )
+
+		# Calculate the exponential terms of the current.
+
+		ret_exp_1 = 1.e3 * w * sqrt( 2. / pi ) * exp(
+		            - ( ( self['vel_strt'] - dlk_v   )
+		            / w )**2 / 2.                    )
+		ret_exp_2 = 1.e3 * w * sqrt( 2. / pi ) * exp(
+		            - ( ( self['vel_stop'] - dlk_v   )
+		            / w )**2 / 2.                    )
+
+		# Calculate the "erf" terms.
+
+		ret_erf_1 = 1.e3 * dlk_v * erf( ( self['vel_strt']
+		            - dlk_v ) / ( sqrt(2.) * w )          )
+		ret_erf_2 = 1.e3 * dlk_v * erf( ( self['vel_stop']
+		            - dlk_v ) / ( sqrt(2.) * w )        )
 
 
-                return self.calc_curr_max( n, v_x, v_y, v_z,
-                                           w                   )
+		# Calculate the parenthetical expression.
+
+		ret_prn = ( ( ret_exp_2 + ret_erf_2 ) -
+		            ( ret_exp_1 + ret_erf_1 )   )
+
+
+		# Calculate the expected current.
+
+		ret = ( (   1.e12 ) * ( 1. / 2. ) * ( const['q_p'] )
+		        * ( 1.e6 * n )
+		        * ( 1.e-4 * self.calc_eff_area( v ) )
+		        * ( ret_prn ) )
+
+		return ret

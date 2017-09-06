@@ -64,7 +64,6 @@ from numpy.linalg import lstsq
 from scipy.interpolate import interp1d
 from scipy.optimize import curve_fit
 from scipy.special import erf
-from scipy.stats import pearsonr, spearmanr
 
 from janus_helper import round_sig
 
@@ -266,32 +265,16 @@ class core( QObject ) :
 		if ( var_swe ) :
 
 			self.fc_spec  = None
+
 			self.time_epc = None
 			self.time_val = None
 			self.time_txt = ''
 			self.time_vld = True
 
-			self.rot_sec  = 3.
-			self.dur_sec  = 0.
-
-			self.cup      = None
-			self.dir      = None
-			self.vel_cen  = None
-			self.vel_wid  = None
-			self.curr     = None
-			self.cur_vld  = None
-
-			self.cur_jmp  = 100.
-			self.cur_min  =   1.
-
 			self.mag_t    = None
 			self.mag_x    = None
 			self.mag_y    = None
 			self.mag_z    = None
-
-			self.n_cup    = 0
-			self.n_dir    = 0
-			self.n_bin    = 0
 
 		# If requested, (re-)initialize the varaibles for the Wind/MFI
 		# data associated with this spectrum.
@@ -342,33 +325,9 @@ class core( QObject ) :
 
 		if ( var_mom_res ) :
 
-			self.mom_n_eta      = 0
+			self.mom_res = None
 
-			self.mom_eta_ind_t  = None
-			self.mom_eta_ind_p  = None
-
-			self.mom_eta_n      = None
-			self.mom_eta_v      = None
-			self.mom_eta_w      = None
-			self.mom_eta_t      = None
-
-			self.mom_corr_pears = None
-			self.mom_corr_spear = None
-
-			self.mom_n          = None
-			self.mom_v          = None
-			self.mom_w          = None
-			self.mom_t          = None
-			self.mom_r          = None
-
-			self.mom_v_vec      = None
-
-			self.mom_w_per      = None
-			self.mom_w_par      = None
-			self.mom_t_per      = None
-			self.mom_t_par      = None
-
-			self.mom_curr       = None
+			self.mom_curr = None
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion species and populations for the non-linear analysis.
@@ -660,16 +619,7 @@ class core( QObject ) :
 
 		# Extract the parameters of the loaded Wind/FC ion spectrum.
 		  
-		time_epc = self.fc_spec[ 'time' ] 
-		#n_dir    = self.fc_spec[ 'n_dir' ]
-		#n_bin    = self.fc_spec[ 'n_bin' ]
-		#n_cup    = self.fc_spec[ 'n_cup' ]
-
-		self.cup     = array( self.fc_spec['elev'] )
-		self.dir     = array( self.fc_spec['azim'] )
-		self.vel_cen = array( self.fc_spec['vel_cen'][0] )
-		self.vel_wid = array( self.fc_spec['vel_del'][0] )
-		self.curr    = array( self.fc_spec['curr'] )
+		time_epc = self.fc_spec[ 'time' ]
 
 		# Calculate and store the spectrum's properly formatted
 		# timestamp both as a float and as a string.
@@ -679,39 +629,15 @@ class core( QObject ) :
 		self.time_txt = calc_time_sec( time_epc )
 		self.time_vld = True
 
-		# Store the counts of velocity bins and angles.
-
-		self.n_cup    = self.fc_spec['n_cup']
-		self.n_dir    = self.fc_spec['n_dir']
-		self.n_bin    = self.fc_spec['n_bin']
-
-		# Examine each measured current value and determine whether or
-		# not it's valid for use in the proceding analyses.
-
-		self.cur_vld = tile( True,
-		                     [ self.n_cup, self.n_dir, self.n_bin ] )
-
-		# Estimate the duration of each spectrum and the mean time
-		# offset of each velocity bin.
-
-		self.rot_sec = 3.
-
-		self.dur_sec = self.rot_sec * self.n_bin
-
-		self.mag_t   = self.rot_sec * ( arange( self.n_bin ) + 0.5 )
-
-
 		# Message the user that a new Wind/FC ion spectrum has been
 		# loaded.
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'fc' )
 
-
 		# Emit a signal that indicates that a new Wind/FC ion spectrum
 		# has now been loaded.
 
 		self.emit( SIGNAL('janus_chng_spc') )
-
 
 		# Load the associated Wind/MFI magnetic field data associated
 		# with this spectrum.
@@ -729,17 +655,13 @@ class core( QObject ) :
 
 	def load_mfi( self ) :
 
-
 		# Reset the contents of the "self.mfi_*" arrays.
 
 		self.rset_var( var_mfi=True )
 
-
 		# If no Wind/FC ion spectrum has been loaded, abort.
 
-		if ( ( self.time_epc is None ) or
-		     ( self.n_bin    is None ) or
-		     ( self.n_bin    == 0    )    ) :
+		if ( self.fc_spec is None ) :
 			return
 
 		# Message the user that new Wind/MFI data are about to be
@@ -752,13 +674,12 @@ class core( QObject ) :
 		# spectrum.
 
 		( mfi_t, mfi_b_x, mfi_b_y, mfi_b_z  ) = \
-		          self.mfi_arcv.load_rang( self.time_val, self.dur_sec )
-
+		          self.mfi_arcv.load_rang( self.time_val,
+		                                   self.fc_spec['dur'] )
 
 		# Establish the number of data.
 
 		self.n_mfi = len( mfi_t )
-
 
 		# If no magnetic field data were returned, abort with a signal
 		# that the data have changed.
@@ -768,7 +689,6 @@ class core( QObject ) :
 			self.emit( SIGNAL('janus_chng_mfi') )
 
 			return
-
 
 		# Store the loaded data.  As part of this step, shift the data's
 		# timestamps to be relative to the start time of this Wind/FC
@@ -787,7 +707,6 @@ class core( QObject ) :
 		self.mfi_b = sqrt( self.mfi_b_x**2 + self.mfi_b_y**2
 		                                   + self.mfi_b_z**2 )
 
-
 		# Compute the average magetic field.
 
 		self.mfi_avg_vec = array( [ mean( self.mfi_b_x ),
@@ -805,8 +724,8 @@ class core( QObject ) :
 
 		self.mfi_hat_dir = array( [ [
 		          dot(self.fc_spec.arr[c][d][0]['dir'], self.mfi_avg_nrm )
-		          for d in range( self.n_dir ) ]
-		        for c in range( self.n_cup ) ] )
+		          for d in range( self.fc_spec['n_dir'] ) ]
+		        for c in range( self.fc_spec['n_cup'] ) ] )
 
 		# Compute the mfi angles.
 		# These are useful diagnostic tools.
@@ -819,27 +738,26 @@ class core( QObject ) :
 
 		self.mfi_b_colat        = mfi_b_colat
 		self.mfi_b_lon          = mfi_b_lon
-		self.mfi_avg_mag_angles = array( [mean( self.mfi_b_colat ),
-		                                  mean( self.mfi_b_lon )] )
-
+		self.mfi_avg_mag_angles = array( [ mean( self.mfi_b_colat ),
+		                                   mean( self.mfi_b_lon   )  ] )
 
 		# Use interpolation to estimate a magnetic-field vector for each
 		# velocity bin.
 
-		var_t        = self.mag_t
+		self.mag_t   = self.fc_spec['rot'] * ( arange( self.fc_spec['n_bin'] ) + 0.5 )
 
-		tk_lo        = where( var_t < amin( self.mfi_t ) )
-		tk_hi        = where( var_t > amax( self.mfi_t ) )
+		tk_lo        = where( self.mag_t < amin( self.mfi_t ) )
+		tk_hi        = where( self.mag_t > amax( self.mfi_t ) )
 
-		var_t[tk_lo] = amin( self.mfi_t )
-		var_t[tk_hi] = amax( self.mfi_t )
+		self.mag_t[tk_lo] = amin( self.mfi_t )
+		self.mag_t[tk_hi] = amax( self.mfi_t )
 
 		self.mag_x = interp1d( self.mfi_t, self.mfi_b_x,
-		                       bounds_error=False        )( var_t )
+		                       bounds_error=False )( self.mag_t )
 		self.mag_y = interp1d( self.mfi_t, self.mfi_b_y,
-		                       bounds_error=False        )( var_t )
+		                       bounds_error=False )( self.mag_t )
 		self.mag_z = interp1d( self.mfi_t, self.mfi_b_z,
-		                       bounds_error=False        )( var_t )
+		                       bounds_error=False )( self.mag_t )
 
 		# Calculating the average angular deviation of magnetic field
 
@@ -852,7 +770,6 @@ class core( QObject ) :
 		# Message the user that new Wind/MFI data have been loaded.
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mfi' )
-
 
 		# Emit a signal that indicates that a new Wind/MFI data have now
 		# been loaded.
@@ -943,7 +860,7 @@ class core( QObject ) :
 		                             for d in range(self.fc_spec['n_dir']) ]
 		                             for c in range(self.fc_spec['n_cup']) ]
 
-		dir_max_curr = [ [ self.fc_spec.calc_curr( c, d,
+		dir_max_curr = [ [ self.fc_spec.calc_tot_curr( c, d,
 		                             dir_max_ind[c][d],
 		                             win=self.mom_win_bin           )
 		                             for d in range(self.fc_spec['n_dir']) ]
@@ -954,9 +871,9 @@ class core( QObject ) :
 
 		cup_max_ind  = [ 0 for c in range( self.fc_spec['n_cup'] ) ]
 
-		curr_sum_max = 0.
-
 		for c in range( self.fc_spec['n_cup'] ) :
+
+			curr_sum_max = 0.
 
 			for d in range( self.fc_spec['n_dir'] ) :
 
@@ -1135,7 +1052,6 @@ class core( QObject ) :
 
 		self.rset_var( var_mom_res=True )
 
-
 		# If the point-selection arrays have not been populated, run
 		# the automatic point selection.
 
@@ -1148,13 +1064,9 @@ class core( QObject ) :
 		# indicates that the results of the moments analysis have
 		# changed, and then abort.
 		#   -- No (valid) ion spectrum has been requested.
-		#   -- No ion spectrum has been loaded.
-		#   -- The primary ion species is not available for analysis.
-		#   -- No initial guess has been generated.
 		#   -- Insufficient data have been selected.
 
-		if ( ( self.time_epc is None                     ) or
-		     ( self.n_bin == 0                           ) or
+		if ( ( self.fc_spec is None                      ) or
 		     ( self.mom_n_sel_dir < self.mom_min_sel_dir )    ) :
 
 			self.emit( SIGNAL('janus_mesg'),
@@ -1164,11 +1076,9 @@ class core( QObject ) :
 
 			return
 
-
 		# Message the user that the moments analysis has begun.
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'mom' )
-
 
 		# Extract the "c"- and "d"-indices of each selected pointing
 		# direction.
@@ -1196,7 +1106,6 @@ class core( QObject ) :
 		eta_v   = tile( 0., n_eta )         # inflow speed
 		eta_w   = tile( 0., n_eta )         # thermal speed
 		eta_t   = tile( 0., n_eta )         # temperature
-
 
 		# For each of the selected look directions, identify the
 		# selected data therefrom and calculate the estimator of the
@@ -1243,9 +1152,6 @@ class core( QObject ) :
 
 		mom_v_vec = lstsq( eta_dlk, eta_v )[0]
 
-		mom_v = sqrt( mom_v_vec[0]**2 + mom_v_vec[1]**2
-		                              + mom_v_vec[2]**2 )
-
 		# For each of the selected look directions, use the derived
 		# value of "mom_v_vec" to estimate its effective collecting
 		# area, the number density, and the thermal speed.
@@ -1285,15 +1191,14 @@ class core( QObject ) :
 			                  ( 1.e3 * self.vel_cen[b]   )   ) )
 			           - ( 1e3 * eta_v[k] )**2               ] ) )
 
-
 		# Compute the effective temperature for each of the analyzed
 		# look directions.
 
 		eta_t = ( 1.E-3 / const['k_b'] ) * \
 		        const['m_p'] * ( ( 1.E3 * eta_w )**2 )
 
-
-		# Calculate a net estimator of the number density.
+		# Calculate a net estimators of the number density and thermal
+		# speed.
 
 		# Note.  The total signal for a look direction is roughly 
 		#        proportional to its effective collecting area.  Thus,
@@ -1304,162 +1209,37 @@ class core( QObject ) :
 
 		mom_n = average( eta_n, weights=eta_eca**2 )
 
+		mom_w = mean( eta_w )
 
-		# Initialize the temporary variable the indicates whether or not
-		# the temperature anisotropy analysis has been successfully
-		# performed.  If there are some magnetic field data, at least
-		# attempt the analysis.  Otherewise, skip it.
+		# Save the results of the moments analysis.
 
-		if ( self.n_mfi > 0 ) :
-			aniso = True
-		else :
-			aniso = False
+		self.mom_res = plas( )
 
+		self.mom_res['v0_x'] = mom_v_vec[0]
+		self.mom_res['v0_y'] = mom_v_vec[1]
+		self.mom_res['v0_z'] = mom_v_vec[2]
 
-		# If indicated, attempt to compute the components of thermal
-		# speed and temperature.  If this fails (or could not be
-		# attempted because of a lack of magnetic field data), simply
-		# compute the scalar values.
+		self.mom_res.add_spec( name='Proton', sym='p', m=1., q=1. )
 
-		if ( aniso ) :
-
-			# Construct the "data" arrays that will be used to
-			# determine the components of the thermal speed.
-
-			# Note.  Assuming a bi-Maxwellian distribution, the
-			#        square of a look direction's thermal speed
-			#        should be a linear function of the square of
-			#        the dot product between the look direction and
-			#        the direction of the magnetic field.  See
-			#        Equation 2.32 by Maruca (PhD thesis, 2012).
-
-			dat_x = array( [ self.mfi_hat_dir[tk_c[k],tk_d[k]]
-			                 for k in range( n_eta )          ] )**2
-
-			dat_y = eta_w**2
-
-			# If the "x" data array has insufficient coverage for a
-			# reliable linear fit, abort the anisotropy analysis.
-
-			if ( amax( dat_x ) == amin( dat_x ) ) :
-				aniso = False
-
-		if ( aniso ) :
-
-			# Perform the linear fit.
-
-			( f_slope, f_icept ) = polyfit( dat_x, dat_y, 1 )
-
-			# If the returned fit parameters are non-physical, abort
-			# the anisotropy analysis.
-
-			if ( (   f_icept             <= 0 ) or
-			     ( ( f_icept + f_slope ) <= 0 )    ) :
-				aniso = False
-
-		if ( aniso ) :
-
-			# Use the values returned for the fit parameters to
-			# calculate the components of thermal speed and
-			# temperature.
-
-			mom_w_per = sqrt( f_icept )
-			mom_w_par = sqrt( f_icept + f_slope )
-
-			mom_t_per = ( 1.E-3 / const['k_b'] ) * \
-			            const['m_p'] * ( 1.E6 * f_icept )
-			mom_t_par = ( 1.E-3 / const['k_b'] ) * \
-			            const['m_p'] * \
-			            ( 1.E6 * ( f_icept + f_slope ) )
-
-			# Compute the scalar thermal speed and temperature.
-
-			mom_w = sqrt( ( (2./3.) *   f_icept             ) +
-			              ( (1./3.) * ( f_icept + f_slope ) )   )
-			mom_t = ( (2./3.) * mom_t_per ) + \
-			        ( (1./3.) * mom_t_par )
-
-			# Compute the estimate temperature anisotropy ratio.
-
-			mom_r = mom_t_per / mom_t_par
-
-		else :
-
-			mom_w = mean( eta_w )
-			mom_t = ( 1.E-3 / const['k_b'] ) * \
-			        const['m_p'] * ( 1.E3 * mom_w )**2
-
-			mom_w_per = None
-			mom_w_par = None
-			mom_t_per = None
-			mom_t_par = None
-			mom_r     = None
-
+		self.mom_res.add_pop( 'p',
+		                      drift=False, aniso=False,
+		                      name='Core', sym='c',
+		                      n=mom_n, w=mom_w          )
 
 		# Calculate the expected currents based on the results of the
 		# (linear) moments analysis.
 
-		mom_curr = tile( 0., [ self.n_cup, self.n_dir, self.n_bin ] )
-
-		if ( aniso ) :
-			for c in range( self.n_cup ) :
-				for d in range( self.n_dir ) :
-					mom_curr[c][d] = self.fc_spec.\
-                                                   arr[c][d][0].calc_curr_bmx(
-					           mom_n, mom_v_vec[0],
-					           mom_v_vec[1], mom_v_vec[2],
-                                                   self.mfi_hat_dir[c][0],
-                                                   self.mfi_hat_dir[c][1],
-                                                   self.mfi_hat_dir[c][2],
-					           mom_w_per, mom_w_par        )
-		else :
-			for c in range( self.n_cup ) :
-                                for d in range( self.n_dir) :
-                                        mom_curr[c][d] = self.fc_spec.\
-                                                   arr[c][d][0].calc_curr_max(
-					           mom_n, mom_v_vec[0],
-					           mom_v_vec[1], mom_v_vec[2],
-					           mom_w                       )
-
-		# Save the "mom_?" and "mom_?_???" values and select "eta_*"
-		# arrays.
-
-		self.mom_n         = mom_n
-		self.mom_v         = mom_v
-		self.mom_w         = mom_w
-		self.mom_t         = mom_t
-		self.mom_r         = mom_r
-
-		self.mom_v_vec     = mom_v_vec
-
-		self.mom_w_per     = mom_w_per
-		self.mom_w_par     = mom_w_par
-		self.mom_t_per     = mom_t_per
-		self.mom_t_par     = mom_t_par
-
-		self.mom_n_eta     = n_eta
-
-		self.mom_eta_ind_c = tk_c
-		self.mom_eta_ind_d = tk_d
-
-		self.mom_eta_n     = eta_n
-		self.mom_eta_v     = eta_v
-		self.mom_eta_w     = eta_w
-		self.mom_eta_t     = eta_t
-
-		self.mom_curr      = mom_curr
-
+		self.mom_curr = self.fc_spec.calc_arr_curr(
+		                                           self.mom_res['p_c'] )
 
 		# Message the user that the moments analysis has completed.
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mom' )
 
-
 		# Emit a signal that indicates that the results of the moments
 		# analysis have changed.
 
 		self.emit( SIGNAL('janus_chng_mom_res') )
-
 
 		# Update the initial guess for the non-linear analysis if
 		# dynamic updating has been requested.  If it wasn't, make sure

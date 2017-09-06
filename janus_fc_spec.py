@@ -25,25 +25,30 @@
 ## LOAD THE NECESSARY MODULES.
 ################################################################################
 
-
 from janus_fc_dat import fc_dat
 
+
 ################################################################################
-## DEFINE THE Class FOR spec
+## DEFINE THE "fc_spec" CLASS.
 ################################################################################
 
 class fc_spec( ) :
-	def __init__( self, n_bin, elev=None, azim=None, volt_cen=None, 
-				        volt_del=None, curr=None, time=None, 
-						  curr_jump=100., curr_min=1.) :
 
-		self._n_cup    = 2
-		self._n_dir    = 20
-		self._n_bin    = n_bin
-		self._time     = time
-		self.curr_jump = curr_jump
-		self.curr_min  = curr_min
+	#-----------------------------------------------------------------------
+	# DEFINE THE INITIALIZATION FUNCTION.
+	#-----------------------------------------------------------------------
 
+	def __init__( self, n_bin,
+	              elev=None, azim=None, volt_cen=None, volt_del=None,
+	              curr=None, time=None, rot=3., curr_jump=100.,
+	              curr_min=1.                                         ) :
+
+		self._n_cup     = 2
+		self._n_dir     = 20
+		self._n_bin     = n_bin
+		self._time      = time
+		self._curr_jump = curr_jump
+		self._curr_min  = curr_min
 
 		if ( elev == None ) :
 			elev = [ None for c in range( self._n_cup ) ]
@@ -71,12 +76,14 @@ class fc_spec( ) :
 		self.arr = [[[ fc_dat( spec=self,
 		                       elev=elev[c],
 		                       azim=azim[c][d],
-				       volt_cen=volt_cen[c][b], 
-				       volt_del=volt_del[c][b], 
-				       curr=curr[c][d][b]) 
-							 for b in range(self._n_bin)]
-		                                         for d in range(self._n_dir)]
-		                                         for c in range(self._n_cup)]
+		                       volt_cen=volt_cen[c][b], 
+		                       volt_del=volt_del[c][b], 
+		                       curr=curr[c][d][b]) 
+		               for b in range(self._n_bin) ]
+		               for d in range(self._n_dir) ]
+		               for c in range(self._n_cup) ]
+
+		self.set_rot( rot )
 
 		self._eff_deg  = [ float(i) for i in range(91) ]
 		self._eff_area = [
@@ -171,19 +178,25 @@ class fc_spec( ) :
 			         for b in range( self._n_bin )
 			         for d in range( self._n_dir )
 			         for c in range( self._n_cup ) ]
+
+		elif ( key == 'curr_jump' ) :
+			return self._curr_jump
+
+		elif ( key == 'curr_min' ) :
+			return self._curr_min
+		elif ( key == 'time' ) :
+			return self._time
+		elif ( key == 'rot' ) :
+			return self._rot
+		elif ( key == 'dur' ) :
+			return self._dur
 		else :
 			raise KeyError( 'Invalid key for "fc_spec".' )
 
 	def __setitem__( self, key, val ) :		
 
-		"""
-		if ( key == 'time' ) :
-			self._time = val
-		else :
-			raise KeyError( 'Invalid key for "fc_spec".' )
-		"""
-
-		raise KeyError( 'Reassignment not permitted after initialization.' )
+		raise KeyError( 'Reassignment not permitted except through'
+		                                    + ' "set_*" functions.' )
 
 	def validate( self ) :
 
@@ -211,7 +224,7 @@ class fc_spec( ) :
 					# invalid.
 
 					if ( self.arr[c][d][b]['curr'] <
-					                       self.curr_min ) :
+					                    self['curr_min'] ) :
 						self.arr[c][d][b]._valid = False
 						continue
 
@@ -222,7 +235,7 @@ class fc_spec( ) :
 					     ( self.arr[c][d][1]['curr']
                                                                     is not None ) and
 					     ( self.arr[c][d][0]['curr']
-					          > self.curr_jump
+					          > self['curr_jump']
 					                * self.arr[c][d][1]['curr']) ) :
 						self.arr[c][d][0]._valid = False
 
@@ -230,7 +243,7 @@ class fc_spec( ) :
 					       ( self.arr[c][d][-2]['curr']
                                                                        is not None ) and
 					       ( self.arr[c][d][-1]['curr']
-					          > self.curr_jump
+					          > self['curr_jump']
 					               * self.arr[c][d][-2]['curr']) ) :
 						self.arr[c][d][-1]._valid = False
 
@@ -239,18 +252,46 @@ class fc_spec( ) :
 					       ( self.arr[c][d][b+1]['curr']
 					                                is not None ) and
 					       ( self.arr[c][d][b]['curr']
-					           > self.curr_jump
+					           > self['curr_jump']
 					              * self.arr[c][d][b-1]['curr'] ) and 
 					       ( self.arr[c][d][b]['curr']
-					           > self.curr_jump
+					           > self['curr_jump']
 					             * self.arr[c][d][b+1]['curr'] ) ) :
 						self.arr[c][d][b]._valid = False
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR CALCULATING TOTAL CURRENT IN A GIVEN WINDOW
+	# DEFINE THE FUNCTION SETTING THE ROTATION PERIOD.
 	#-----------------------------------------------------------------------
 
-	def calc_curr( self, c, d, b, win=1 ) :
+	def set_rot( self, rot ) :
+
+		# Update the rotation period and the duration of this spectrum.
+
+		self._rot = rot
+		self._dur = rot * self['n_bin']
+
+		# TODO Implement calculation and assignment of timestamp for
+		#      each "fc_dat" object.
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR CALCULATING CURRENT FOR EACH BIN.
+	#-----------------------------------------------------------------------
+
+	def calc_arr_curr( self, pop ) :
+
+		# Return a 3-D list with the calculated current for each bin in
+		# the spectrum.
+
+		return [ [ [ self.arr[c][d][b].calc_curr( pop )
+		             for b in range( self['n_bin'] )    ]
+		             for d in range( self['n_dir'] )    ]
+		             for c in range( self['n_cup'] )    ]
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR CALCULATING TOTAL CURRENT IN A GIVEN WINDOW.
+	#-----------------------------------------------------------------------
+
+	def calc_tot_curr( self, c, d, b, win=1 ) :
 
 		# Validate the cup, direction, and bin indices.
 

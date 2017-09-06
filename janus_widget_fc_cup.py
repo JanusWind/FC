@@ -538,8 +538,8 @@ class widget_fc_cup( QWidget ) :
 			return
 
 		if ( d_lst is None ) :
-			#d_lst = range( min( self.core.n_dir, self.n_plt ) )
-			d_lst = range( min( self.core.fc_spec['n_dir'], self.n_plt ) )
+			d_lst = range( min( self.core.fc_spec['n_dir'],
+			               self.n_plt                       ) )
 
 		# If the results of the analysis are missing, abort; otherwise,
 		# extract the current values to be plotted.
@@ -639,31 +639,40 @@ class widget_fc_cup( QWidget ) :
 
 				# Extract the points of the fit curve.
 
-				x = self.core.vel_cen
+				x = [ self.core.fc_spec.arr[self.c][d][b][
+				                                    'vel_cen']
+				      for b in range(
+				                  self.core.fc_spec['n_bin'] ) ]
+
 				y = curr[self.c][d]
+
+				x = array( x )
+				y = array( y )
 
 				# Select only those points for which the fit
 				# current is strictly positive.
 
-				tk = where( y > 0. )[0]
+				valid = [ yy > 0. for yy in y ]
+
+				n_a = sum( valid )
+
+				ax = [ xx for xx, vv in zip( x, valid ) if vv ]
+				ay = [ yy for yy, vv in zip( y, valid ) if vv ]
 
 				# If at least two points were selected, proceed
 				# with plotting.
 
-				if ( len( tk ) >= 2 ) :
+				if ( n_a >= 2 ) :
 
-					# Generate the adjusted points for this
-					# curve.
+					# If needed, convert to a logarithmic
+					# scale.
 
 					if ( self.log_x ) :
-						ax = log10( x[tk] )
-					else :
-						ax = x[tk]
-
+						ax = [ log10( xx )
+						       for xx in ax ]
 					if ( self.log_y ) :
-						ay = log10( y[tk] )
-					else :
-						ay = y[tk]
+						ay = [ log10( yy )
+					               for yy in ay ]
 
 					# Create, store, and add to the plot
 					# this fit curve.
@@ -819,7 +828,7 @@ class widget_fc_cup( QWidget ) :
 				# Remove and then delete each of this plot's
 				# selection points.
 
-				for b in range( self.core.n_bin ) :
+				for b in range( self.n_k ) :
 					if ( self.pnt[j,i,b] is not None ) :
 						self.plt[j,i].removeItem(
 						               self.pnt[j,i,b] )

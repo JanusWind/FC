@@ -83,19 +83,10 @@ class widget_mom_res( format_TextEdit ) :
 
 		self.clear( )
 
-		# If no Wind/FC ion spectrum has been (successfully) loaded,
-		# return.
-
-		if ( self.core.time_epc is None ) :
-			return
-
-		if ( self.core.n_bin == 0 ) :
-			return
-
 		# If the moments analysis has failed or has not been performed,
 		# return.
 
-		if ( self.core.mom_n is None ) :
+		if ( self.core.mom_res is None ) :
 			return
 
 		# Print the results of the moments analysis.
@@ -116,79 +107,43 @@ class widget_mom_res( format_TextEdit ) :
 		#               '</table>' )
 
 		self.prnt_htm( '<i>n<sub>p</sub></i> = ' )
-		self.prnt_dcm( self.core.mom_n, 2, 'cm<sup>-3</sup>' )
+		self.prnt_dcm( self.core.mom_res['n_p_c'],
+		               2, 'cm<sup>-3</sup>'        )
 		self.prnt_brk( )
 
 		self.prnt_brk( )
 
 		self.prnt_htm( '<i>v<sub>p</sub></i> = ' )
-		self.prnt_dcm( self.core.mom_v, 0, 'km/s' )
+		self.prnt_dcm( self.core.mom_res['v_p_c'], 0, 'km/s' )
 		self.prnt_brk( )
+
+		v_vec = self.core.mom_res['v_vec_p_c']
 
 		self.prnt_tab( 1 )
 		self.prnt_htm( '<i>v<sub>xp</sub></i> = ' )
-		self.prnt_dcm( self.core.mom_v_vec[0], 0, 'km/s' )
+		self.prnt_dcm( v_vec[0], 0, 'km/s' )
 		self.prnt_brk( )
 
 		self.prnt_tab( 1 )
 		self.prnt_htm( '<i>v<sub>yp</sub></i> = ' )
-		self.prnt_dcm( self.core.mom_v_vec[1], 0, 'km/s' )
+		self.prnt_dcm( v_vec[1], 0, 'km/s' )
 		self.prnt_brk( )
 
 		self.prnt_tab( 1 )
 		self.prnt_htm( '<i>v<sub>zp</sub></i> = ' )
-		self.prnt_dcm( self.core.mom_v_vec[2], 0, 'km/s' )
+		self.prnt_dcm( v_vec[2], 0, 'km/s' )
 		self.prnt_brk( )
 
 		self.prnt_brk( )
 
 		self.prnt_htm( '<i>w<sub>p</sub></i> = ' )
-		self.prnt_dcm( self.core.mom_w, 0, 'km/s' )
+		self.prnt_dcm( self.core.mom_res['w_p_c'], 0, 'km/s' )
 		self.prnt_brk( )
-
-		if ( self.core.mom_r is not None ) :
-
-			self.prnt_tab( 1 )
-			self.prnt_htm( '<i>w</i><sub>&perp;</sub>' )
-			self.prnt_htm( '<sub><i>p</i></sub> = ')
-			self.prnt_dcm( self.core.mom_w_per, 0, 'km/s' )
-			self.prnt_brk( )
-
-			self.prnt_tab( 1 )
-			self.prnt_htm( '<i>w</i><sub>||</sub>' )
-			self.prnt_htm( '<sub><i>p</i></sub> = ')
-			self.prnt_dcm( self.core.mom_w_par, 0, 'km/s' )
-			self.prnt_brk( )
-
-			self.prnt_tab( 1 )
-			self.prnt_htm( '<i>R<sub>p</sub></i> = ')
-			self.prnt_dcm( self.core.mom_r, 2 )
-			self.prnt_brk( )
 
 		self.prnt_brk( )
 
 		self.prnt_htm( '<i>T<sub>p</sub></i> = ' )
-		self.prnt_dcm( self.core.mom_t, 1, 'kK' )
-
-		if ( self.core.mom_r is not None ) :
-
-			self.prnt_brk( )
-
-			self.prnt_tab( 1 )
-			self.prnt_htm( '<i>T</i><sub>&perp;</sub>' )
-			self.prnt_htm( '<sub><i>p</i></sub> = ')
-			self.prnt_dcm( self.core.mom_t_per, 1, 'kK' )
-			self.prnt_brk( )
-
-			self.prnt_tab( 1 )
-			self.prnt_htm( '<i>T</i><sub>||</sub>' )
-			self.prnt_htm( '<sub><i>p</i></sub> = ')
-			self.prnt_dcm( self.core.mom_t_par, 1, 'kK' )
-			self.prnt_brk( )
-
-			self.prnt_tab( 1 )
-			self.prnt_htm( '<i>R<sub>p</sub></i> = ')
-			self.prnt_dcm( self.core.mom_r, 2 )
+		self.prnt_dcm( self.core.mom_res['T_p_c'], 1, 'kK' )
 
 		# Scroll to the top of the text area.
 
