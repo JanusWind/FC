@@ -274,7 +274,7 @@ class core( QObject ) :
 			self.rot_sec  = 3.
 			self.dur_sec  = 0.
 
-			self.alt      = None
+			self.cup      = None
 			self.dir      = None
 			self.vel_cen  = None
 			self.vel_wid  = None
@@ -665,7 +665,7 @@ class core( QObject ) :
 		#n_bin    = self.fc_spec[ 'n_bin' ]
 		#n_cup    = self.fc_spec[ 'n_cup' ]
 
-		self.alt     = array( self.fc_spec['elev'] )
+		self.cup     = array( self.fc_spec['elev'] )
 		self.dir     = array( self.fc_spec['azim'] )
 		self.vel_cen = array( self.fc_spec['vel_cen'][0] )
 		self.vel_wid = array( self.fc_spec['vel_del'][0] )
@@ -1220,7 +1220,7 @@ class core( QObject ) :
 			# Store the $\theta$- and $\phi$-values for this look
 			# direction.
 
-#			eta_the[k] = - self.alt[c] + 90.
+#			eta_the[k] = - self.cup[c] + 90.
 #			eta_phi[k] = - self.dir[c][d]
 
 			# Convert the look direction from altitude-azimuth to a
@@ -1491,11 +1491,11 @@ class core( QObject ) :
 
                 # TODO: DELETE
 
-		if ( self.dyn_gss ) :
-			self.auto_nln_gss( )
-		else :
-			self.chng_dsp( 'mom' )
-
+#		if ( self.dyn_gss ) :
+#			self.auto_nln_gss( )
+#		else :
+#			self.chng_dsp( 'mom' )
+#
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CHANGING A NLN SPECIES.
 	#-----------------------------------------------------------------------
@@ -2040,7 +2040,7 @@ class core( QObject ) :
 
 		self.nln_gss_prm = array( prm )
 
-		# Calculate the expected currents based on the initial geuss.
+		# Calculate the expected currents based on the initial guess.
 
 		# FIXME:12  This code (and that in "self.calc_nln_curr") may not be
 		#        especially efficient.
@@ -2054,21 +2054,23 @@ class core( QObject ) :
 
 		x_vel_cen = self.vel_cen[ tk_b ]
 		x_vel_wid = self.vel_wid[ tk_b ]
-		x_alt     = self.alt[ tk_c ]
+		x_cup     = self.cup[ tk_c ]
 		x_dir     = self.dir[ tk_c, tk_d ]
 		x_mag_x   = self.mag_x[ tk_b ]
 		x_mag_y   = self.mag_y[ tk_b ]
 		x_mag_z   = self.mag_z[ tk_b ]
 
-		x         = array( [ x_vel_cen, x_vel_wid, x_alt, x_dir,
+		x         = array( [ x_vel_cen, x_vel_wid, x_cup, x_dir,
 		                     x_mag_x, x_mag_y, x_mag_z           ] )
 
 		self.nln_gss_curr_ion = reshape(
-		      self.calc_nln_curr( self.nln_gss_pop, x,
-		                         self.nln_gss_prm,
-		                         ret_comp=True        ),
-		      ( self.n_cup, self.n_dir, self.n_bin,
-		        len( self.nln_gss_pop )             )    )
+		                        self.calc_nln_curr( self.nln_gss_pop,x,
+		                                            self.nln_gss_prm,
+		                                            ret_comp = True   ),
+		                                          ( self.n_cup,
+                                                            self.n_dir,
+                                                            self.n_bin,
+		                                       len( self.nln_gss_pop )))
 
 		self.nln_gss_curr_tot = sum( self.nln_gss_curr_ion, axis=3 )
 
@@ -2154,7 +2156,7 @@ class core( QObject ) :
 			c   = tk_c[j]
 			d   = tk_d[j]
 
-#			alt = self.alt[c]
+#			cup = self.cup[c]
 #			dir = self.dir[c,d]
 
 			dlk = self.fc_spec.arr[c][d][0]['dir']
@@ -2289,7 +2291,7 @@ class core( QObject ) :
 
 		d_vel_cen = x[0]
 		d_vel_wid = x[1]
-		d_alt     = x[2]
+		d_cup     = x[2]
 		d_dir     = x[3]
 		d_mag_x   = x[4]
 		d_mag_y   = x[5]
@@ -2315,24 +2317,24 @@ class core( QObject ) :
 		prm_v0_y  = prm[1]
 		prm_v0_z  = prm[2]
 
-		c = 3
+		k = 3
 
 		for p in pop :
 
 			# Extract the density of population "p".
 
-			prm_n = prm[c]
+			prm_n = prm[k]
 
-			c += 1
+			k += 1
 
 			# Determine the bulk velocity of population "p",
 			# extracting (if necessary) the population's drift.
 
 			if ( self.nln_pyon.arr_pop[p]['drift'] ) :
 
-				prm_dv = prm[c]
+				prm_dv = prm[k]
 
-				c += 1
+				k += 1
 
 				prm_v_x = prm_v0_x + ( prm_dv * d_nrm_x )
 				prm_v_y = prm_v0_y + ( prm_dv * d_nrm_y )
@@ -2348,16 +2350,16 @@ class core( QObject ) :
 
 			if ( self.nln_pyon.arr_pop[p]['aniso'] ) :
 
-				prm_w_per = prm[c  ]
-				prm_w_par = prm[c+1]
+				prm_w_per = prm[k  ]
+				prm_w_par = prm[k+1]
 
-				c += 2
+				k += 2
 
 			else :
 
-				prm_w = prm[c]
+				prm_w = prm[k]
 
-				c += 1
+				k += 1
 
 			# Add the contribution of this ion species to
 			# the total current.
@@ -2367,22 +2369,23 @@ class core( QObject ) :
 
 			if ( self.nln_pyon.arr_pop[p]['aniso'] ) :
 				cur_p = self.nln_pyon.arr_pop[p]['q'] * \
-				        self.fc_spec.arr[c][d][0].calc_curr_bmx(
-					            d_vel_cen * sqm,
-					            d_vel_wid * sqm,
-				                    d_alt, d_dir,
-					            d_nrm_x, d_nrm_y, d_nrm_z,
-				                    prm_n, prm_v_x,
-				                    prm_v_y, prm_v_z,
-				                    prm_w_per, prm_w_par       )
+				        self.fc_spec.arr[c][d][0].\
+                                        calc_curr_bmx( d_vel_cen * sqm,
+					               d_vel_wid * sqm,
+				                       d_cup, d_dir,
+					               d_nrm_x, d_nrm_y,
+                                                       d_nrm_z, prm_n, prm_v_x,
+				                       prm_v_y, prm_v_z,
+				                       prm_w_per, prm_w_par    )
 			else :
 				cur_p = self.nln_pyon.arr_pop[p]['q'] * \
-				        self.fc_spec.arr[c][d][0].calc_curr_max( d_vel_cen * sqm,
-					                   d_vel_wid * sqm,
-				                           d_alt, d_dir,
-				                           prm_n, prm_v_x,
-				                           prm_v_y, prm_v_z,
-				                           prm_w             )
+				        self.fc_spec.arr[c][d][0].\
+                                        calc_curr_max( d_vel_cen * sqm,
+					               d_vel_wid * sqm,
+				                       d_cup, d_dir,
+				                       prm_n, prm_v_x,
+				                       prm_v_y, prm_v_z,
+				                       prm_w                  )
 
 			if hasattr( x[0], '__iter__' ) :
 				cur[:,p] = cur_p
@@ -2460,13 +2463,13 @@ class core( QObject ) :
 
 		x_vel_cen = self.vel_cen[ tk_b ]
 		x_vel_wid = self.vel_wid[ tk_b ]
-		x_alt     = self.alt[ tk_c ]
+		x_cup     = self.cup[ tk_c ]
 		x_dir     = self.dir[ tk_c, tk_d ]
 		x_mag_x   = self.mag_x[ tk_b ]
 		x_mag_y   = self.mag_y[ tk_b ]
 		x_mag_z   = self.mag_z[ tk_b ]
 
-		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_dir,
+		x = array( [ x_vel_cen, x_vel_wid, x_cup, x_dir,
 		             x_mag_x, x_mag_y, x_mag_z           ] )
 
 		y = self.curr[ tk_c, tk_d, tk_b ]
@@ -2503,13 +2506,13 @@ class core( QObject ) :
 
 		x_vel_cen = self.vel_cen[ tk_b ]
 		x_vel_wid = self.vel_wid[ tk_b ]
-		x_alt     = self.alt[ tk_c ]
+		x_cup     = self.cup[ tk_c ]
 		x_dir     = self.dir[ tk_c, tk_d ]
 		x_mag_x   = self.mag_x[ tk_b ]
 		x_mag_y   = self.mag_y[ tk_b ]
 		x_mag_z   = self.mag_z[ tk_b ]
 
-		x         = array( [ x_vel_cen, x_vel_wid, x_alt, x_dir,
+		x         = array( [ x_vel_cen, x_vel_wid, x_cup, x_dir,
 		                     x_mag_x, x_mag_y, x_mag_z           ] )
 
 		self.nln_res_curr_ion = \

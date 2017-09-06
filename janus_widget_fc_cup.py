@@ -1185,7 +1185,7 @@ class widget_fc_cup( QWidget ) :
 		if ( self.core.dsp == 'gsl' ) :
 
 			self.chng_pnt( j, i, b,
-			               self.core.nln_sel[c][d][b] )
+			               self.core.nln_sel[self.c][d][b] )
 
 			self.make_crv( )
 
@@ -1194,11 +1194,11 @@ class widget_fc_cup( QWidget ) :
 			if ( self.core.nln_res_sel is None ) :
 				self.chng_pnt( j, i, b,
 				              False,
-				              sel_alt=self.core.nln_sel[c][d][b] )			
+				              sel_alt=self.core.nln_sel[self.c][d][b] )			
 			else :
 				self.chng_pnt( j, i, b,
-				              self.core.nln_res_sel[c][d][b],
-				              sel_alt=self.core.nln_sel[c][d][b] )
+				              self.core.nln_res_sel[self.c][d][b],
+				              sel_alt=self.core.nln_sel[self.c][d][b] )
 
 			self.make_crv( d_lst=[d] )
 
