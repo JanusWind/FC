@@ -198,28 +198,6 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT (MAXWELLIAN).
 	#-----------------------------------------------------------------------
 
-	#TODO Make this not a stupid hack of the bi-Maxwellian version.
-
-#        def calc_cur_max( self,
-#                           vel_cen, vel_wid,
-#                           dir_alt, dir_azm,
-#                           prm_n, prm_v_x, prm_v_y, prm_v_z, prm_w ) :
- 
- 
-                 # Return the equivalent bi-Maxwellian response for equal
-                 # perpendicular and parallel thermal speeds and a dummy
-                 # magnetic field.
- 
-#                return self.calc_cur_bmx( vel_cen, vel_wid,
-#                                          dir_alt, dir_azm, 1., 0., 0.,
-#                                          prm_n, prm_v_x, prm_v_y, prm_v_z,
-#                                          prm_w, prm_w                      )
- 
-
-        # TODO: Even if we have defined the parameters, doesn't a function
-        #       still need inputs? Or can we just skip that part and remove
-        #       all the inputs and put them in the function as self.* ???
-
 	def calc_curr_max( self,
 	                    n, v_x, v_y, v_z, w ) :
 
@@ -230,24 +208,10 @@ class fc_dat( ) :
 		# Calcualte the vector bulk velocity.
 
                 v = [v_x, v_y, v_z]
-#
-#                if (v.ndim > 1 ) :
-#                        v = transpose( v )
-#
-                # Calculate the look direction as a cartesian unit vector.
-
-#                mag = [ mag_x, mag_y, mag_z ] 
-#
-#                if ( mag.ndim > 1 ) :
-#                        mag = transpose( mag )
-#
-#                dmg = calc_arr_norm( mag )
-
 
                 # Calculate the component of the magnetic field unit vector
                 # along that lies along the look direction.
 
-#                dmg_dlk = calc_arr_dot( dmg, dlk )
                 dlk     = self['dir']
                 dlk_v   = -calc_arr_dot( dlk, v )
 
@@ -259,7 +223,6 @@ class fc_dat( ) :
 		ret_exp_2 = 1.e3 * w * sqrt( 2. / pi ) * exp(
 		            - ( ( self['vel_stop'] - dlk_v   )
 		            / w )**2 / 2.                    )
-
 
 		# Calculate the "erf" terms.
 
@@ -291,7 +254,6 @@ class fc_dat( ) :
 
 	#FIXME 6
 
-	#TODO Migrate to "fc_dat"
 
 	def calc_curr_bmx( self,
                            n, v_x, v_y, v_z,
@@ -317,25 +279,3 @@ class fc_dat( ) :
 
                 return self.calc_curr_max( n, v_x, v_y, v_z,
                                            w                   )
-
-        #-----------------------------------------------------------------------
-        # DEFINE THE FUNCTION FOR CONVERT ALT-AZM TO A CARTESIAN UNIT VECTOR.
-        #-----------------------------------------------------------------------
-
-#        def calc_dir_look( self, dir_alt, dir_azm ) :
-#
-#                # Convert from spherical to rectangular coordinates and return
-#                # the result.
-#
-#                the = self._the
-#                phi = self._phi
-#
-#                ret = array( [
-#                        sin( deg2rad( self._the ) ) * cos( deg2rad(self._phi ) ),
-#                        sin( deg2rad( self._the ) ) * sin( deg2rad(self._phi ) ),
-#                        cos( deg2rad( self._the ) )                          ] )
-#
-#                if ( ret.ndim > 1 ) :
-#                        return transpose( ret )
-#                else :
-#                        return ret

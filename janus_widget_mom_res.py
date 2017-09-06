@@ -89,7 +89,7 @@ class widget_mom_res( format_TextEdit ) :
 		if ( self.core.time_epc is None ) :
 			return
 
-		if ( self.core.n_vel == 0 ) :
+		if ( self.core.n_bin == 0 ) :
 			return
 
 		# If the moments analysis has failed or has not been performed,

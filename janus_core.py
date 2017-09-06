@@ -289,9 +289,9 @@ class core( QObject ) :
 			self.mag_y    = None
 			self.mag_z    = None
 
-			self.n_alt    = 0
+			self.n_cup    = 0
 			self.n_dir    = 0
-			self.n_vel    = 0
+			self.n_bin    = 0
 
 		# If requested, (re-)initialize the varaibles for the Wind/MFI
 		# data associated with this spectrum.
@@ -681,24 +681,24 @@ class core( QObject ) :
 
 		# Store the counts of velocity bins and angles.
 
-		self.n_alt    = self.fc_spec['n_cup']
+		self.n_cup    = self.fc_spec['n_cup']
 		self.n_dir    = self.fc_spec['n_dir']
-		self.n_vel    = self.fc_spec['n_bin']
+		self.n_bin    = self.fc_spec['n_bin']
 
 		# Examine each measured current value and determine whether or
 		# not it's valid for use in the proceding analyses.
 
 		self.cur_vld = tile( True,
-		                     [ self.n_alt, self.n_dir, self.n_vel ] )
+		                     [ self.n_cup, self.n_dir, self.n_bin ] )
 
 		# Estimate the duration of each spectrum and the mean time
 		# offset of each velocity bin.
 
 		self.rot_sec = 3.
 
-		self.dur_sec = self.rot_sec * self.n_vel
+		self.dur_sec = self.rot_sec * self.n_bin
 
-		self.mag_t   = self.rot_sec * ( arange( self.n_vel ) + 0.5 )
+		self.mag_t   = self.rot_sec * ( arange( self.n_bin ) + 0.5 )
 
 
 		# Message the user that a new Wind/FC ion spectrum has been
@@ -738,8 +738,8 @@ class core( QObject ) :
 		# If no Wind/FC ion spectrum has been loaded, abort.
 
 		if ( ( self.time_epc is None ) or
-		     ( self.n_vel    is None ) or
-		     ( self.n_vel    == 0    )    ) :
+		     ( self.n_bin    is None ) or
+		     ( self.n_bin    == 0    )    ) :
 			return
 
 		# Message the user that new Wind/MFI data are about to be
@@ -800,14 +800,13 @@ class core( QObject ) :
 
 		self.mfi_avg_nrm = self.mfi_avg_vec / self.mfi_avg_mag
 
-
 		# Compute the dot product between the average, normalized
 		# magnetic field and each look direction.
 
 		self.mfi_hat_dir = array( [ [
 		          dot(self.fc_spec.arr[c][d][0]['dir'], self.mfi_avg_nrm )
 		          for d in range( self.n_dir ) ]
-		        for c in range( self.n_alt ) ] )
+		        for c in range( self.n_cup ) ] )
 
 		# Compute the mfi angles.
 		# These are useful diagnostic tools.
@@ -982,6 +981,7 @@ class core( QObject ) :
 				# pseudo-direction-index).
 
 				d = pd % self.fc_spec['n_dir']
+                                self.mom_sel_dir[c][d] = True
 
 				# Select the bins in this look direction's
 				# maximal window
@@ -1154,7 +1154,7 @@ class core( QObject ) :
 		#   -- Insufficient data have been selected.
 
 		if ( ( self.time_epc is None                     ) or
-		     ( self.n_vel == 0                           ) or
+		     ( self.n_bin == 0                           ) or
 		     ( self.mom_n_sel_dir < self.mom_min_sel_dir )    ) :
 
 			self.emit( SIGNAL('janus_mesg'),
@@ -1174,7 +1174,6 @@ class core( QObject ) :
 		# direction.
 
 		( tk_c, tk_d ) = where( self.mom_sel_dir )
-
 
 		# Initialize the "eta_*" arrays.
 
@@ -1238,7 +1237,6 @@ class core( QObject ) :
 			             sum( self.curr[c][d][tk_b] /
                                           self.vel_cen[tk_b]    )
 
-
 		# Use singular value decomposition (in the form of least squares
 		# analysis) to calculate the best-fit bulk speed for the solar
 		# wind.
@@ -1247,7 +1245,6 @@ class core( QObject ) :
 
 		mom_v = sqrt( mom_v_vec[0]**2 + mom_v_vec[1]**2
 		                              + mom_v_vec[2]**2 )
-
 
 		# For each of the selected look directions, use the derived
 		# value of "mom_v_vec" to estimate its effective collecting
@@ -1402,12 +1399,13 @@ class core( QObject ) :
 		# Calculate the expected currents based on the results of the
 		# (linear) moments analysis.
 
-		mom_curr = tile( 0., [ self.n_alt, self.n_dir, self.n_vel ] )
+		mom_curr = tile( 0., [ self.n_cup, self.n_dir, self.n_bin ] )
 
 		if ( aniso ) :
-			for c in range( self.n_alt ) :
+			for c in range( self.n_cup ) :
 				for d in range( self.n_dir ) :
-					mom_curr[c][d] = self.fc_spec.arr[c][d][0].calc_curr_bmx(
+					mom_curr[c][d] = self.fc_spec.\
+                                                   arr[c][d][0].calc_curr_bmx(
 					           mom_n, mom_v_vec[0],
 					           mom_v_vec[1], mom_v_vec[2],
                                                    self.mfi_hat_dir[c][0],
@@ -1415,12 +1413,13 @@ class core( QObject ) :
                                                    self.mfi_hat_dir[c][2],
 					           mom_w_per, mom_w_par        )
 		else :
-			for c in range( self.n_alt ) :
-					mom_curr[c][d] = self.fc_spec.arr[c][d][0].calc_curr_max(
+			for c in range( self.n_cup ) :
+                                for d in range( self.n_dir) :
+                                        mom_curr[c][d] = self.fc_spec.\
+                                                   arr[c][d][0].calc_curr_max(
 					           mom_n, mom_v_vec[0],
 					           mom_v_vec[1], mom_v_vec[2],
 					           mom_w                       )
-
 
 		# Save the "mom_?" and "mom_?_???" values and select "eta_*"
 		# arrays.
@@ -1488,12 +1487,14 @@ class core( QObject ) :
 
 		# WARNING!  THIS CODE HAS BEEN DISABLED TO FOR DEBUGGING. 
 
-		self.chng_dsp( 'mom' )     # TODO: DELETE
+		self.chng_dsp( 'mom' )
 
-		#####if ( self.dyn_gss ) :
-		#####	self.auto_nln_gss( )
-		#####else :
-		#####	self.chng_dsp( 'mom' )
+                # TODO: DELETE
+
+		if ( self.dyn_gss ) :
+			self.auto_nln_gss( )
+		else :
+			self.chng_dsp( 'mom' )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CHANGING A NLN SPECIES.
@@ -2044,8 +2045,8 @@ class core( QObject ) :
 		# FIXME:12  This code (and that in "self.calc_nln_curr") may not be
 		#        especially efficient.
 
-		( tk_c, tk_d, tk_b ) = indices( ( self.n_alt, self.n_dir,
-		                                  self.n_vel              ) )
+		( tk_c, tk_d, tk_b ) = indices( ( self.n_cup, self.n_dir,
+		                                  self.n_bin              ) )
 
 		tk_c      = tk_c.flatten( )
 		tk_d      = tk_d.flatten( )
@@ -2066,7 +2067,7 @@ class core( QObject ) :
 		      self.calc_nln_curr( self.nln_gss_pop, x,
 		                         self.nln_gss_prm,
 		                         ret_comp=True        ),
-		      ( self.n_alt, self.n_dir, self.n_vel,
+		      ( self.n_cup, self.n_dir, self.n_bin,
 		        len( self.nln_gss_pop )             )    )
 
 		self.nln_gss_curr_tot = sum( self.nln_gss_curr_ion, axis=3 )
@@ -2116,8 +2117,8 @@ class core( QObject ) :
 
 		# Intially deselect all data.
 
-		self.nln_sel = tile( False, [ self.n_alt, self.n_dir,
-		                              self.n_vel              ] )
+		self.nln_sel = tile( False, [ self.n_cup, self.n_dir,
+		                              self.n_bin              ] )
 
 		# Determine which ion species have been selected for analysis
 		# and have been given valid parameters, initial geusses, and
@@ -2237,8 +2238,8 @@ class core( QObject ) :
 
 		if ( self.nln_sel is None ) :
 			self.nln_sel = tile( False,
-			                     [ self.n_alt, self.n_dir,
-			                       self.n_vel              ] )
+			                     [ self.n_cup, self.n_dir,
+			                       self.n_bin              ] )
 
 		# Change the selection of the requested point.
 
@@ -2366,7 +2367,7 @@ class core( QObject ) :
 
 			if ( self.nln_pyon.arr_pop[p]['aniso'] ) :
 				cur_p = self.nln_pyon.arr_pop[p]['q'] * \
-				        self.calc_curr_bmx(
+				        self.fc_spec.arr[c][d][0].calc_curr_bmx(
 					            d_vel_cen * sqm,
 					            d_vel_wid * sqm,
 				                    d_alt, d_dir,
@@ -2376,7 +2377,7 @@ class core( QObject ) :
 				                    prm_w_per, prm_w_par       )
 			else :
 				cur_p = self.nln_pyon.arr_pop[p]['q'] * \
-				        self.calc_curr_max( d_vel_cen * sqm,
+				        self.fc_spec.arr[c][d][0].calc_curr_max( d_vel_cen * sqm,
 					                   d_vel_wid * sqm,
 				                           d_alt, d_dir,
 				                           prm_n, prm_v_x,
@@ -2426,7 +2427,7 @@ class core( QObject ) :
 		#   -- No initial guess has been generated.
 		#   -- Insufficient data have been selected.
 
-		if ( ( self.n_vel == 0                   ) or
+		if ( ( self.n_bin == 0                   ) or
 		     ( self.n_mfi == 0                   ) or
 		     ( len( pop ) == 0                   ) or
 		     ( 0 not in pop                      ) or
@@ -2493,8 +2494,8 @@ class core( QObject ) :
 		# Calculate the expected currents based on the results of the
 		# non-linear analysis.
 
-		( tk_c, tk_d, tk_b ) = indices( ( self.n_alt, self.n_dir,
-		                                  self.n_vel              ) )
+		( tk_c, tk_d, tk_b ) = indices( ( self.n_cup, self.n_dir,
+		                                  self.n_bin              ) )
 
 		tk_c      = tk_c.flatten( )
 		tk_d      = tk_d.flatten( )
@@ -2513,7 +2514,7 @@ class core( QObject ) :
 
 		self.nln_res_curr_ion = \
 		   reshape( self.calc_nln_curr( pop, x, fit, ret_comp=True ),
-		            ( self.n_alt, self.n_dir, self.n_vel, len( pop ) ) )
+		            ( self.n_cup, self.n_dir, self.n_bin, len( pop ) ) )
 
 		self.nln_res_curr_tot = sum( self.nln_res_curr_ion, axis=3 )
 

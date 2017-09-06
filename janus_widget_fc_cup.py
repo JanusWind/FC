@@ -819,7 +819,7 @@ class widget_fc_cup( QWidget ) :
 				# Remove and then delete each of this plot's
 				# selection points.
 
-				for b in range( self.core.n_vel ) :
+				for b in range( self.core.n_bin ) :
 					if ( self.pnt[j,i,b] is not None ) :
 						self.plt[j,i].removeItem(
 						               self.pnt[j,i,b] )
@@ -907,7 +907,7 @@ class widget_fc_cup( QWidget ) :
 
 		# If no spectrum has been loaded, abort.
 
-		if ( self.core.n_vel <= 0 ) :
+		if ( self.core.n_bin <= 0 ) :
 
 			return
 
@@ -932,9 +932,9 @@ class widget_fc_cup( QWidget ) :
 		dat_ax = log10( dat_x ) if ( self.log_x ) else dat_x
 		dat_ay = log10( dat_y ) if ( self.log_y ) else dat_y
 
-		dat_a = tile( None, self.core.n_vel )
+		dat_a = tile( None, self.core.n_bin )
 
-		for b in range( self.core.n_vel ) :
+		for b in range( self.core.n_bin ) :
 			dat_a[b] = QPointF( dat_ax[b], dat_ay[b] )
 
 		dat_p = array( [
@@ -1056,8 +1056,8 @@ class widget_fc_cup( QWidget ) :
 			# corresponding to the specified datum.
 
 			self.chng_pnt( j, i, b,
-			               self.core.mom_sel_bin[c,d,b],
-			               sel_dir=self.core.mom_sel_dir[c,d] )
+			               self.core.mom_sel_bin[c][d][b],
+			               sel_dir=self.core.mom_sel_dir[c][ d] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_mom_sel_dir" SIGNAL.
@@ -1102,8 +1102,8 @@ class widget_fc_cup( QWidget ) :
 
 			for b in range( self.core.fc_spec['n_bin'] ) :
 				self.chng_pnt( j, i, b,
-				            self.core.mom_sel_bin[c,d,b],
-				            sel_dir=self.core.mom_sel_dir[c,d] )
+				            self.core.mom_sel_bin[c][d][b],
+				            sel_dir=self.core.mom_sel_dir[c][d] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_mom_sel_all" SIGNAL.
@@ -1169,7 +1169,7 @@ class widget_fc_cup( QWidget ) :
 		if ( ( d < 0 ) or ( d >= self.core.n_dir ) ) :
 			return
 
-		if ( ( b < 0 ) or ( b >= self.core.n_vel ) ) :
+		if ( ( b < 0 ) or ( b >= self.core.n_bin ) ) :
 			return
 
 		# Determine the location of this plot within the grid layout.
@@ -1185,7 +1185,7 @@ class widget_fc_cup( QWidget ) :
 		if ( self.core.dsp == 'gsl' ) :
 
 			self.chng_pnt( j, i, b,
-			               self.core.nln_sel[c,d,b] )
+			               self.core.nln_sel[c][d][b] )
 
 			self.make_crv( )
 
@@ -1194,11 +1194,11 @@ class widget_fc_cup( QWidget ) :
 			if ( self.core.nln_res_sel is None ) :
 				self.chng_pnt( j, i, b,
 				              False,
-				              sel_alt=self.core.nln_sel[c,d,b] )			
+				              sel_alt=self.core.nln_sel[c][d][b] )			
 			else :
 				self.chng_pnt( j, i, b,
-				              self.core.nln_res_sel[c,d,b],
-				              sel_alt=self.core.nln_sel[c,d,b] )
+				              self.core.nln_res_sel[c][d][b],
+				              sel_alt=self.core.nln_sel[c][d][b] )
 
 			self.make_crv( d_lst=[d] )
 

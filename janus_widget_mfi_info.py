@@ -85,7 +85,7 @@ class widget_mfi_info( format_TextEdit ) :
 		if ( self.core.time_epc is None ) :
 			return
 
-		if ( self.core.n_vel == 0 ) :
+		if ( self.core.n_bin == 0 ) :
 			return
 
 		# If a Wind/FC ion spectrum has been (successfully) loaded, but
