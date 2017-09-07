@@ -112,7 +112,7 @@ class widget_mfi_info( format_TextEdit ) :
 		self.prnt_brk( )
 
 		self.prnt_tab( 1 )
-		self.prnt_htm( '<i><font color="#00FF00">B<sub>y</sub></font></i> = ' )
+		self.prnt_htm( '<i><font color="#AA00AA">B<sub>y</sub></font></i> = ' )
 		self.prnt_dcm( self.core.mfi_avg_vec[1], 1, 'nT' )
 		self.prnt_brk( )
 
