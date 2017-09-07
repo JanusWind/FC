@@ -718,7 +718,7 @@ class widget_fc_cup( QWidget ) :
 			ax = log10( self.core.fc_spec['vel_cen'][b] )
 		else :
 			ax = self.core.fc_spec['vel_cen'][b]
-
+                        print (b)
 		if ( self.log_y ) :
 			ay = log10( self.core.fc_spec['curr'][self.c][d][b] )
 		else :

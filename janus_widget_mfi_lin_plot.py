@@ -168,7 +168,7 @@ class widget_mfi_lin_plot( QWidget ) :
 
 			t_min = min( amin( self.core.mfi_t ), 0. )
 			t_max = max( amax( self.core.mfi_t ),
-			             self.core.dur_sec        )
+			             self.core.fc_spec['dur']     )
 
 			# Establish the range of the plot.  As part of this,
 			# ensure that the range satisfies a minimum size and has
