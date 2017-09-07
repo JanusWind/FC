@@ -715,14 +715,14 @@ class widget_fc_cup( QWidget ) :
 		# Computed the adjusted point location in the "ViewBox".
 
 		if ( self.log_x ) :
-			ax = log10( self.core.vel_cen[b] )
+			ax = log10( self.core.fc_spec['vel_cen'][b] )
 		else :
-			ax = self.core.vel_cen[b]
+			ax = self.core.fc_spec['vel_cen'][b]
 
 		if ( self.log_y ) :
-			ay = log10( self.core.curr[self.c][d][b] )
+			ay = log10( self.core.fc_spec['curr'][self.c][d][b] )
 		else :
-			ay = self.core.curr[self.c][d][b]
+			ay = self.core.fc_spec['curr'][self.c][d][b]
 
 		# Select the color for the point (i.e., the brush and pen used
 		# to render it) based on whether or not this datum's look
@@ -916,7 +916,7 @@ class widget_fc_cup( QWidget ) :
 
 		# If no spectrum has been loaded, abort.
 
-		if ( self.core.n_bin <= 0 ) :
+		if ( self.core.fc_spec['n_bin'] <= 0 ) :
 
 			return
 
@@ -935,15 +935,15 @@ class widget_fc_cup( QWidget ) :
 		# their adjusted values, and then to their equivalent pixel
 		# positions in the "ViewBox".
 
-		dat_x = self.core.vel_cen
-		dat_y = self.core.curr[self.c,d]
+		dat_x = self.core.fc_spec['vel_cen']
+		dat_y = self.core.fc_Spec['curr'][self.c][d]
 
 		dat_ax = log10( dat_x ) if ( self.log_x ) else dat_x
 		dat_ay = log10( dat_y ) if ( self.log_y ) else dat_y
 
-		dat_a = tile( None, self.core.n_bin )
+		dat_a = tile( None, self.core.fc_spec['n_bin'] )
 
-		for b in range( self.core.n_bin ) :
+		for b in range( self.core.fc_spec['n_bin'] ) :
 			dat_a[b] = QPointF( dat_ax[b], dat_ay[b] )
 
 		dat_p = array( [
@@ -1175,10 +1175,10 @@ class widget_fc_cup( QWidget ) :
 		if ( c != self.c ) :
 			return
 
-		if ( ( d < 0 ) or ( d >= self.core.n_dir ) ) :
+		if ( ( d < 0 ) or ( d >= self.core.fc_spec['n_dir'] ) ) :
 			return
 
-		if ( ( b < 0 ) or ( b >= self.core.n_bin ) ) :
+		if ( ( b < 0 ) or ( b >= self.core.fc_spec['n_bin'] ) ) :
 			return
 
 		# Determine the location of this plot within the grid layout.
