@@ -596,7 +596,7 @@ class widget_fc_cup( QWidget ) :
 
 					# Extract the points for this fit curve.
 
-					x = array( self.core.fc_spec['vel_cen'][0] )
+					x = array( self.core.fc_spec['vel_cen'][self.c][0] )
 					y = curr_ion[self.c][d][0][n]
 
 					# Select only those points for which
@@ -715,10 +715,9 @@ class widget_fc_cup( QWidget ) :
 		# Computed the adjusted point location in the "ViewBox".
 
 		if ( self.log_x ) :
-			ax = log10( self.core.fc_spec['vel_cen'][b] )
+			ax = log10( self.core.fc_spec['vel_cen'][self.c][b] )
 		else :
-			ax = self.core.fc_spec['vel_cen'][b]
-                        print (b)
+			ax = self.core.fc_spec['vel_cen'][self.c][b]
 		if ( self.log_y ) :
 			ay = log10( self.core.fc_spec['curr'][self.c][d][b] )
 		else :

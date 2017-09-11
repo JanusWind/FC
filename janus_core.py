@@ -1185,16 +1185,20 @@ class core( QObject ) :
 
 			eta_n[k] = 1e-6 * ( ( 1. / const['q_p'] )
 			           / ( 1.e-4 * eta_eca[k] )
-			           * sum( ( 1.e-12 * self.fc_spec['curr'][c][d][b] ) /
-			                  ( 1.e3 * self.fc_spec['vel_cen'][b]   )   ) )
+			           * sum([ ( 1.e-12 *
+                                     self.fc_spec['curr'][c][d][i] ) /
+			           ( 1.e3 * self.fc_spec['vel_cen'][c][i] )
+                                              for i in b ]              ) )
 
 			eta_w[k] = 1e-3 * sqrt( max( [ 0.,
 			           ( ( 1. / const['q_p'] )
 			           / ( 1.e-4 * eta_eca[k] )
 			           / ( 1.e6 * eta_n[k] )
-			           * sum( ( 1.e-12 * self.fc_Spec['curr'][c][d][b] ) *
-			                  ( 1.e3 * self.fc_spec['vel_cen'][b]   )   ) )
-			           - ( 1e3 * eta_v[k] )**2               ] ) )
+			           * sum( [ ( 1.e-12 * 
+                                     self.fc_spec['curr'][c][d][i] ) *
+			           ( 1.e3 * self.fc_spec['vel_cen'][c][i] )
+                                              for i in b ]              ) )
+			          - ( 1e3 * eta_v[k] )**2             ] ) )
 
 		# Compute the effective temperature for each of the analyzed
 		# look directions.
