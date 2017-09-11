@@ -1140,12 +1140,15 @@ class core( QObject ) :
 			# Extract the "b" values of the selected data from this
 			# look direction.
 
-			tk_b = where( self.mom_sel_bin[c][d] )[0]
+                        tk_b = [i for i, x in enumerate( self.mom_sel_bin[c][d] )
+                                                                  if x==True    ]
 
-			eta_v[k] = - sum( self.curr[c][d][tk_b] ) / \
-			             sum( self.curr[c][d][tk_b] /
-                                          self.vel_cen[tk_b]    )
-
+			eta_v[k] = - sum( [ self.fc_spec['curr'][c][d][i] 
+                                                for i in range(len(tk_b))] ) / \
+                                     sum( [ self.fc_spec['curr'][c][d][i]  /
+                                           self.fc_spec['vel_cen'][c][i]
+                                                for i in range(len(tk_b))] )
+                        
 		# Use singular value decomposition (in the form of least squares
 		# analysis) to calculate the best-fit bulk speed for the solar
 		# wind.
@@ -1173,22 +1176,24 @@ class core( QObject ) :
 			# Extract the "b" indices of the selected data from this
 			# look direction.
 
-			b = where( self.mom_sel_bin[c][d] )[0]
+#			b = where( self.mom_sel_bin[c][d] )[0]
+                        b = [i for i, x in enumerate( self.mom_sel_bin[c][d] )
+                                                                if x==True   ]
 
 			# Estimate the number density and thermal speed based on
 			# the selected data from this look direction.
 
 			eta_n[k] = 1e-6 * ( ( 1. / const['q_p'] )
 			           / ( 1.e-4 * eta_eca[k] )
-			           * sum( ( 1.e-12 * self.curr[c][d][b] ) /
-			                  ( 1.e3 * self.vel_cen[b]   )   ) )
+			           * sum( ( 1.e-12 * self.fc_spec['curr'][c][d][b] ) /
+			                  ( 1.e3 * self.fc_spec['vel_cen'][b]   )   ) )
 
 			eta_w[k] = 1e-3 * sqrt( max( [ 0.,
 			           ( ( 1. / const['q_p'] )
 			           / ( 1.e-4 * eta_eca[k] )
 			           / ( 1.e6 * eta_n[k] )
-			           * sum( ( 1.e-12 * self.curr[c][d][b] ) *
-			                  ( 1.e3 * self.vel_cen[b]   )   ) )
+			           * sum( ( 1.e-12 * self.fc_Spec['curr'][c][d][b] ) *
+			                  ( 1.e3 * self.fc_spec['vel_cen'][b]   )   ) )
 			           - ( 1e3 * eta_v[k] )**2               ] ) )
 
 		# Compute the effective temperature for each of the analyzed

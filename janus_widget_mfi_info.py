@@ -33,8 +33,6 @@ from PyQt4.QtCore import SIGNAL
 
 from janus_format_TextEdit import format_TextEdit
 
-from janus_fc_spec import fc_spec
-
 ################################################################################
 ## DEFINE THE "widget_mfi_info" CLASS TO CUSTOMIZE "format_TextEdit".
 ################################################################################
@@ -87,7 +85,7 @@ class widget_mfi_info( format_TextEdit ) :
 		if ( self.core.time_epc is None ) :
 			return
 
-		if ( self.fc_spec is None ) :
+		if ( self.core.fc_spec is None ) :
 			return
 
 		# If a Wind/FC ion spectrum has been (successfully) loaded, but
