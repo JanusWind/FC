@@ -1106,6 +1106,10 @@ class core( QObject ) :
 		eta_v   = tile( 0., n_eta )         # inflow speed
 		eta_w   = tile( 0., n_eta )         # thermal speed
 		eta_t   = tile( 0., n_eta )         # temperature
+                eta_w1  = tile( 0., n_eta )
+                eta_w2  = tile( 0., n_eta )
+                eta_w3  = tile( 0., n_eta )
+                eta_w4  = tile( 0., n_eta )
 
 		# For each of the selected look directions, identify the
 		# selected data therefrom and calculate the estimator of the
@@ -1145,10 +1149,16 @@ class core( QObject ) :
 
 			eta_v[k] = - sum( [ self.fc_spec['curr'][c][d][i] 
                                                 for i in range(len(tk_b))] ) / \
-                                     sum( [ self.fc_spec['curr'][c][d][i]  /
-                                           self.fc_spec['vel_cen'][c][i]
-                                                for i in range(len(tk_b))] )
-                        
+                                     sum( [ self.fc_spec['curr'][c][d][i]    /
+                                            self.fc_spec['vel_cen'][c][i]
+                                                for i in range(len(tk_b))]   )
+                        print(eta_v[k])
+#                        print( [ self.fc_spec['curr'][c][d][i] 
+#                                                for i in range(len(tk_b))] )
+#                              sum( [ self.fc_spec['curr'][c][d][i]    /
+#                                            self.fc_spec['vel_cen'][c][i]
+#                                                for i in range(len(tk_b))]   ))
+#
 		# Use singular value decomposition (in the form of least squares
 		# analysis) to calculate the best-fit bulk speed for the solar
 		# wind.
@@ -1176,29 +1186,51 @@ class core( QObject ) :
 			# Extract the "b" indices of the selected data from this
 			# look direction.
 
-#			b = where( self.mom_sel_bin[c][d] )[0]
+#			bi = where( self.mom_sel_bin[c][d] )[0]
                         b = [i for i, x in enumerate( self.mom_sel_bin[c][d] )
                                                                 if x==True   ]
 
 			# Estimate the number density and thermal speed based on
 			# the selected data from this look direction.
 
-			eta_n[k] = 1e-6 * ( ( 1. / const['q_p'] )
-			           / ( 1.e-4 * eta_eca[k] )
-			           * sum([ ( 1.e-12 *
-                                     self.fc_spec['curr'][c][d][i] ) /
-			           ( 1.e3 * self.fc_spec['vel_cen'][c][i] )
-                                              for i in b ]              ) )
+			eta_n[k] = 1e-6 * ( ( 1. / const['q_p'] ) /
+			           ( 1.e-4 * eta_eca[k] ) *
+			             sum([
+                                   ( 1.e-12 * self.fc_spec['curr'][c][d][i] ) /
+			           ( 1.e3 *   self.fc_spec['vel_cen'][c][i] )
+                                              for i in b ]                  ) )
 
-			eta_w[k] = 1e-3 * sqrt( max( [ 0.,
-			           ( ( 1. / const['q_p'] )
-			           / ( 1.e-4 * eta_eca[k] )
-			           / ( 1.e6 * eta_n[k] )
-			           * sum( [ ( 1.e-12 * 
-                                     self.fc_spec['curr'][c][d][i] ) *
-			           ( 1.e3 * self.fc_spec['vel_cen'][c][i] )
-                                              for i in b ]              ) )
-			          - ( 1e3 * eta_v[k] )**2             ] ) )
+                        eta_w1[k] =const['q_p'] * 1.e-4 * eta_eca[k] * 1.e6 * eta_n[k]
+
+                        eta_w2[k] = sum( [
+                                   ( 1.e-12 * self.fc_spec['curr'][c][d][i] ) *
+			           ( 1.e3   * self.fc_spec['vel_cen'][c][i] )
+                                              for i in b ]                  )
+ 
+			eta_w3[k] = - ( 1e3 * eta_v[k] )**2
+
+                        eta_w4[k] =1.e-3 * sqrt((eta_w2[k]/eta_w1[k])+eta_w3[k])
+
+			eta_w[k] = 1.e-3 * sqrt( max( [ 0.,
+			           ( ( 1. / const['q_p']  ) /
+			           ( 1.e-4 * eta_eca[k]   ) /
+			           ( 1.e6 * eta_n[k]      ) *
+			             sum( [
+                                   ( 1.e-12 * self.fc_spec['curr'][c][d][i] ) *
+			           ( 1.e3   * self.fc_spec['vel_cen'][c][i] )
+                                              for i in b ]                  ) )
+			          - ( 1.e3 * eta_v[k] )**2             ]     ) )
+
+#                        print( ( 1. / const['q_p']  ) /
+#			           ( 1.e-4 * eta_eca[k]   ) /
+#			           ( 1.e6 * eta_n[k]      ) *
+#			             sum( [
+#                                   ( 1.e-12 * self.fc_spec['curr'][c][d][i] ) *
+#			           ( 1.e3   * self.fc_spec['vel_cen'][c][i] )
+#                                              for i in b ]                  ) - ( 1.e3 * eta_v[k] )**2 )
+
+#
+#                        print(eta_w2[k]/eta_w1[k])
 
 		# Compute the effective temperature for each of the analyzed
 		# look directions.
