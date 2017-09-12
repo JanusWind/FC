@@ -1152,7 +1152,8 @@ class core( QObject ) :
                                      sum( [ self.fc_spec['curr'][c][d][i]    /
                                             self.fc_spec['vel_cen'][c][i]
                                                 for i in range(len(tk_b))]   )
-                        print(eta_v[k])
+
+#                        print(sum([self.fc_spec['curr'][c][d][i] for i in range(len(tk_b))]))
 #                        print( [ self.fc_spec['curr'][c][d][i] 
 #                                                for i in range(len(tk_b))] )
 #                              sum( [ self.fc_spec['curr'][c][d][i]    /
@@ -1181,12 +1182,11 @@ class core( QObject ) :
 
 			eta_eca[k] = self.fc_spec.arr[c][d][0].\
                                           calc_eff_area( mom_v_vec )
-			#eta_eca1[k] = self.fc_spec.
 
+                        print(eta_eca[k])
 			# Extract the "b" indices of the selected data from this
 			# look direction.
 
-#			bi = where( self.mom_sel_bin[c][d] )[0]
                         b = [i for i, x in enumerate( self.mom_sel_bin[c][d] )
                                                                 if x==True   ]
 
@@ -1200,16 +1200,16 @@ class core( QObject ) :
 			           ( 1.e3 *   self.fc_spec['vel_cen'][c][i] )
                                               for i in b ]                  ) )
 
-                        eta_w1[k] =const['q_p'] * 1.e-4 * eta_eca[k] * 1.e6 * eta_n[k]
-
-                        eta_w2[k] = sum( [
-                                   ( 1.e-12 * self.fc_spec['curr'][c][d][i] ) *
-			           ( 1.e3   * self.fc_spec['vel_cen'][c][i] )
-                                              for i in b ]                  )
- 
-			eta_w3[k] = - ( 1e3 * eta_v[k] )**2
-
-                        eta_w4[k] =1.e-3 * sqrt((eta_w2[k]/eta_w1[k])+eta_w3[k])
+#                        eta_w1[k] =const['q_p'] * 1.e-4 * eta_eca[k] * 1.e6 * eta_n[k]
+#
+#                        eta_w2[k] = sum( [
+#                                   ( 1.e-12 * self.fc_spec['curr'][c][d][i] ) *
+#			           ( 1.e3   * self.fc_spec['vel_cen'][c][i] )
+#                                              for i in b ]                  )
+# 
+#			eta_w3[k] = - ( 1e3 * eta_v[k] )**2
+#
+#                       eta_w4[k] =1.e-3 * sqrt((eta_w2[k]/eta_w1[k])+eta_w3[k])
 
 			eta_w[k] = 1.e-3 * sqrt( max( [ 0.,
 			           ( ( 1. / const['q_p']  ) /

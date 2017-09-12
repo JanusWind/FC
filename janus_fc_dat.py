@@ -235,6 +235,7 @@ class fc_dat( ) :
 			w = sqrt( ( ( 1. - ml2 ) * w_per**2 ) + 
 			          (        ml2   * w_par**2 )   )
 
+                        print(w)
 		else :
 
 			w = pop['w']
