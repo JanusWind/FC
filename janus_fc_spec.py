@@ -274,18 +274,32 @@ class fc_spec( ) :
 		#      each "fc_dat" object.
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR CALCULATING CURRENT FOR EACH BIN.
+	# DEFINE THE FUNCTION FOR CALC'ING EXPECTED CURRENT FROM A POPULATION.
 	#-----------------------------------------------------------------------
 
-	def calc_arr_curr( self, pop ) :
+	def calc_curr_pop( self, pop ) :
 
 		# Return a 3-D list with the calculated current for each bin in
 		# the spectrum.
 
-		return [ [ [ self.arr[c][d][b].calc_curr( pop )
-		             for b in range( self['n_bin'] )    ]
-		             for d in range( self['n_dir'] )    ]
-		             for c in range( self['n_cup'] )    ]
+		return [ [ [ self.arr[c][d][b].calc_curr_pop( pop )
+		                    for b in range( self['n_bin'] ) ]
+		                    for d in range( self['n_dir'] ) ]
+		                    for c in range( self['n_cup'] ) ]
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR CALC'ING EXPECTED CURRENT OF MANY POPULATIONS.
+	#-----------------------------------------------------------------------
+
+	def calc_curr_plas( self, plas ) :
+
+		# Return a 4-D list with the calculated current for each bin in
+		# the spectrum due to each population in plas.
+
+		return [ [ [ self.arr[c][d][b].calc_curr_plas( plas )
+		                      for b in range( self['n_bin'] ) ]
+		                      for d in range( self['n_dir'] ) ]
+		                      for c in range( self['n_cup'] ) ]
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CALCULATING TOTAL CURRENT IN A GIVEN WINDOW.

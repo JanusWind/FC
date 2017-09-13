@@ -1702,7 +1702,7 @@ class core( QObject ) :
 		elif ( param == 'v_z' ) :
 
 			try :
-				self.nln_pyon['v0_z'] = val
+				self.   ['v0_z'] = val
 			except :
 				self.nln_pyon['v0_z'] = None
 
@@ -1812,41 +1812,21 @@ class core( QObject ) :
 			else :
 				prm.append( self.nln_pyon.arr_pop[i]['w'] )
 
-		self.nln_gss_prm = array( prm )
+		self.nln_gss_prm = prm
 
 		# Calculate the expected currents based on the initial guess.
 
 		# FIXME:12  This code (and that in "self.calc_nln_curr") may not be
 		#        especially efficient.
 
-		( tk_c, tk_d, tk_b ) = indices( ( self.n_cup, self.n_dir,
-		                                  self.n_bin              ) )
+		self.nln_gss_curr_ion = self.fc_spec.calc_curr_plas(
+		                                             self.nln_gss_plas )
 
-		tk_c      = tk_c.flatten( )
-		tk_d      = tk_d.flatten( )
-		tk_b      = tk_b.flatten( )
-
-		x_vel_cen = self.vel_cen[ tk_b ]
-		x_vel_wid = self.vel_wid[ tk_b ]
-		x_cup     = self.cup[ tk_c ]
-		x_dir     = self.dir[ tk_c, tk_d ]
-		x_mag_x   = self.mag_x[ tk_b ]
-		x_mag_y   = self.mag_y[ tk_b ]
-		x_mag_z   = self.mag_z[ tk_b ]
-
-		x         = array( [ x_vel_cen, x_vel_wid, x_cup, x_dir,
-		                     x_mag_x, x_mag_y, x_mag_z           ] )
-
-		self.nln_gss_curr_ion = reshape(
-		                        self.calc_nln_curr( self.nln_gss_pop,x,
-		                                            self.nln_gss_prm,
-		                                            ret_comp = True   ),
-		                                          ( self.n_cup,
-                                                            self.n_dir,
-                                                            self.n_bin,
-		                                       len( self.nln_gss_pop )))
-
-		self.nln_gss_curr_tot = sum( self.nln_gss_curr_ion, axis=3 )
+		self.nln_gss_curr_tot = [ [ [
+		                       sum( self.nln_gss_curr_ion[c][d][b]
+		                       for b in range( self.fc_spec['n_bin'] ) ]
+		                       for d in range( self.fc_spec['n_dir'] ) ]
+		                       for c in range( self.fc_spec['n_cup'] ) ]
 
 		# Propagate the new initial-guess for the non-linear analysis.
 

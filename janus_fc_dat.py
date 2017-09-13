@@ -199,10 +199,10 @@ class fc_dat( ) :
 		return interp( psi, self._spec._eff_deg, self._spec._eff_area )
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT.
+	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT OF A POPULATION.
 	#-----------------------------------------------------------------------
 
-	def calc_curr( self, pop ) :
+	def calc_curr_pop( self, pop ) :
 
 		# Note.  This function is based on Equation 2.34 from Maruca
 		#        (PhD thesis, 2012), but differs by a factor of $2$
@@ -274,3 +274,11 @@ class fc_dat( ) :
 		        * ( ret_prn ) )
 
 		return ret
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT OF MANY POP.'S.
+	#-----------------------------------------------------------------------
+
+	def calc_curr_plas( self, plas ) :
+
+		return [ self.calc_curr_pop( pop ) for pop in plas.arr_pop ]
