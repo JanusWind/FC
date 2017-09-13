@@ -180,20 +180,20 @@ class widget_nln_pop( QWidget ) :
 
 			tmp_use = self.core.nln_pop_use[i]
 
-			tmp_ion   = self.core.nln_pyon.arr_pop[i]['spec']
-			tmp_name  = self.core.nln_pyon.arr_pop[i]['name']
-			tmp_sym   = self.core.nln_pyon.arr_pop[i]['sym']
-			tmp_drift = self.core.nln_pyon.arr_pop[i]['drift']
-			tmp_aniso = self.core.nln_pyon.arr_pop[i]['aniso']
+			tmp_ion   = self.core.nln_plas.arr_pop[i]['spec']
+			tmp_name  = self.core.nln_plas.arr_pop[i]['name']
+			tmp_sym   = self.core.nln_plas.arr_pop[i]['sym']
+			tmp_drift = self.core.nln_plas.arr_pop[i]['drift']
+			tmp_aniso = self.core.nln_plas.arr_pop[i]['aniso']
 
 			# Construct the list of ion-species names/symbols.
 
 			lst_ion = [ str( s['name'] )
-			            for s in self.core.nln_pyon.arr_spec ]
+			            for s in self.core.nln_plas.arr_spec ]
 
 			lst_ion = [ '' ]
 
-			for s in self.core.nln_pyon.arr_spec :
+			for s in self.core.nln_plas.arr_spec :
 
 				txt = ''
 
@@ -237,7 +237,7 @@ class widget_nln_pop( QWidget ) :
 				self.arr_ion[i].addItems( lst_ion )
 
 				try :
-					s = self.core.nln_pyon.arr_spec.index(
+					s = self.core.nln_plas.arr_spec.index(
 					                           tmp_ion ) + 1
 				except :
 					s = 0

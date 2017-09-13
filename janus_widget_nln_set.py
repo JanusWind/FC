@@ -184,7 +184,7 @@ class widget_nln_set( QWidget ) :
 
 			if ( self.arr_name[p] is not None ) :
 				self.arr_name[p].setText(
-				            self.core.nln_pyon.arr_pop[p][
+				            self.core.nln_plas.arr_pop[p][
 				                              'full_name_sym'] )
 
 			if ( ( self.arr_gss_n[p]          is not None ) and
@@ -230,7 +230,7 @@ class widget_nln_set( QWidget ) :
 				ss_sel_a = 'background-color: gray;\n'
 				ss_sel_b = 'background-color: gray;\n'
 
-			if ( not self.core.nln_pyon.arr_pop[p]['drift'] ) :
+			if ( not self.core.nln_plas.arr_pop[p]['drift'] ) :
 				ss_gss_d = 'background-color: gray;\n'
 
 			# Select the text color based on the validity of the

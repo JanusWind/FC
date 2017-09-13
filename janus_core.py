@@ -325,16 +325,17 @@ class core( QObject ) :
 
 		if ( var_mom_res ) :
 
-			self.mom_res = None
+			self.mom_res  = None
 
 			self.mom_curr = None
+                        self.mom_n    = None
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion species and populations for the non-linear analysis.
 
 		# Note.  This includes both the "self.nln_spc_?" and
 		#        "self.nln_pop_?" arrays.  These are done together since
-		#        they are so interconnected by the "self.nln_pyon"
+		#        they are so interconnected by the "self.nln_plas"
 		#        object, which is also handled here.
 
 		if ( var_nln_ion ) :
@@ -342,7 +343,7 @@ class core( QObject ) :
 			self.nln_n_spc = 4
 			self.nln_n_pop = 5
 
-			self.nln_pyon = plas( enforce=True )
+			self.nln_plas = plas( enforce=True )
 
 			self.nln_pop_use = tile( False, self.nln_n_pop )
 			self.nln_pop_vld = tile( False, self.nln_n_pop )
@@ -350,44 +351,44 @@ class core( QObject ) :
 			for s in range ( self.nln_n_spc ) :
 
 				if ( s == 0 ) :
-					self.nln_pyon.add_spec( name='Proton',
+					self.nln_plas.add_spec( name='Proton',
 					                   sym='p', m=1., q=1. )
 				elif ( s == 1 ) :
-					self.nln_pyon.add_spec( name='Alpha' ,
+					self.nln_plas.add_spec( name='Alpha' ,
 					                   sym='a', m=4., q=2. )
 				else :
-					self.nln_pyon.add_spec( )
+					self.nln_plas.add_spec( )
 
 			for p in range ( self.nln_n_pop ) :
 
 				if ( p == 0 ) :
 					self.nln_pop_use[p] = True
 					self.nln_pop_vld[p] = True
-					self.nln_pyon.add_pop(
+					self.nln_plas.add_pop(
 					        'p', name='Core', sym='c',
 					        drift=False, aniso=True    )
 				elif ( p == 1 ) :
 					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = True
-					self.nln_pyon.add_pop(
+					self.nln_plas.add_pop(
 					        'p', name='Beam', sym='b',
 					        drift=True , aniso=False   )
 				elif ( p == 2 ) :
 					self.nln_pop_use[p] = True
 					self.nln_pop_vld[p] = True
-					self.nln_pyon.add_pop(
+					self.nln_plas.add_pop(
 					        'a', name='Core', sym='c',
 					        drift=True , aniso=True    )
 				elif ( p == 3 ) :
 					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = True
-					self.nln_pyon.add_pop(
+					self.nln_plas.add_pop(
 					        'a', name='Beam', sym='b',
 					        drift=True , aniso=False   )
 				else :
 					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = False
-					self.nln_pyon.add_pop( None )
+					self.nln_plas.add_pop( None )
 
 		# If requested, (re-)initialize the variables associated with
 		# the settings for the automatic initial guess generation and
@@ -447,11 +448,11 @@ class core( QObject ) :
 		if ( var_nln_gss ) :
 
 			for p in range( self.nln_n_pop ) :
-				self.nln_pyon.arr_pop[p]['n']     = None
-				self.nln_pyon.arr_pop[p]['dv']    = None
-				self.nln_pyon.arr_pop[p]['w']     = None
-				self.nln_pyon.arr_pop[p]['w_per'] = None
-				self.nln_pyon.arr_pop[p]['w_par'] = None
+				self.nln_plas.arr_pop[p]['n']     = None
+				self.nln_plas.arr_pop[p]['dv']    = None
+				self.nln_plas.arr_pop[p]['w']     = None
+				self.nln_plas.arr_pop[p]['w_per'] = None
+				self.nln_plas.arr_pop[p]['w_par'] = None
 
 			self.nln_gss_vld = tile( False, self.nln_n_pop )
 
@@ -1184,7 +1185,6 @@ class core( QObject ) :
                                               for i in b ]                  ) )
 			         - ( 1.e3 * eta_v[k] )**2             ]     ) )
 
-                        print(eta_w[k])
 		# Compute the effective temperature for each of the analyzed
 		# look directions.
 
@@ -1223,7 +1223,7 @@ class core( QObject ) :
 		# Calculate the expected currents based on the results of the
 		# (linear) moments analysis.
 
-		self.mom_curr = self.fc_spec.calc_arr_curr(
+		self.mom_curr = self.fc_spec.calc_curr_pop(
 		                                           self.mom_res['p_c'] )
 
 		# Message the user that the moments analysis has completed.
@@ -1261,15 +1261,15 @@ class core( QObject ) :
 
 		# WARNING!  THIS CODE HAS BEEN DISABLED TO FOR DEBUGGING. 
 
-		self.chng_dsp( 'mom' )
+#		self.chng_dsp( 'mom' )
 
                 # TODO: DELETE
 
-#		if ( self.dyn_gss ) :
-#			self.auto_nln_gss( )
-#		else :
-#			self.chng_dsp( 'mom' )
-#
+		if ( self.dyn_gss ) :
+			self.auto_nln_gss( )
+		else :
+			self.chng_dsp( 'mom' )
+
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CHANGING A NLN SPECIES.
 	#-----------------------------------------------------------------------
@@ -1288,35 +1288,35 @@ class core( QObject ) :
 
 		if   ( param == 'name' ) :
 			try :
-				self.nln_pyon.arr_spec[s]['name'] = str( val )
+				self.nln_plas.arr_spec[s]['name'] = str( val )
 			except :
-				self.nln_pyon.arr_spec[s]['name'] = None
+				self.nln_plas.arr_spec[s]['name'] = None
 
 		elif ( param == 'sym' ) :
 			try :
-				self.nln_pyon.arr_spec[s]['sym'] = str( val )
+				self.nln_plas.arr_spec[s]['sym'] = str( val )
 			except :
-				self.nln_pyon.arr_spec[s]['sym'] = None
+				self.nln_plas.arr_spec[s]['sym'] = None
 
 		elif ( param == 'm' ) :
 			try :
 				val = float( val )
 				if ( val >= 0 ) :
-					self.nln_pyon.arr_spec[s]['m'] = val
+					self.nln_plas.arr_spec[s]['m'] = val
 				else :
-					self.nln_pyon.arr_spec[s]['m'] = None
+					self.nln_plas.arr_spec[s]['m'] = None
 			except :
-				self.nln_pyon.arr_spec[s]['m'] = None
+				self.nln_plas.arr_spec[s]['m'] = None
 
 		elif ( param == 'q' ) :
 			try :
 				val = float( val )
 				if ( val >= 0 ) :
-					self.nln_pyon.arr_spec[s]['q'] = val
+					self.nln_plas.arr_spec[s]['q'] = val
 				else :
-					self.nln_pyon.arr_spec[s]['q'] = None
+					self.nln_plas.arr_spec[s]['q'] = None
 			except :
-				self.nln_pyon.arr_spec[s]['q'] = None
+				self.nln_plas.arr_spec[s]['q'] = None
 
 		# Propagate the changes to the ion population.
 
@@ -1348,54 +1348,54 @@ class core( QObject ) :
 			if ( ( val >= 0              ) and
 			     ( val <  self.nln_n_spc )     ) :
 				try :
-					self.nln_pyon.arr_pop[i]['spec'] = \
-					             self.nln_pyon.arr_spec[val]
+					self.nln_plas.arr_pop[i]['spec'] = \
+					             self.nln_plas.arr_spec[val]
 				except :
-					self.nln_pyon.arr_pop[i]['spec'] = None
+					self.nln_plas.arr_pop[i]['spec'] = None
 			else :
-				self.nln_pyon.arr_pop[i]['spec'] = None
+				self.nln_plas.arr_pop[i]['spec'] = None
 
 			if ( pop_name is not None ) :
 				try :
-					self.nln_pyon.arr_pop[i]['name'] = \
+					self.nln_plas.arr_pop[i]['name'] = \
 					                         str( pop_name )
 				except :
-					self.nln_pyon.arr_pop[i]['name'] = None
+					self.nln_plas.arr_pop[i]['name'] = None
 
 			if ( pop_sym is not None ) :
 				try :
-					self.nln_pyon.arr_pop[i]['sym'] = \
+					self.nln_plas.arr_pop[i]['sym'] = \
 					                          str( pop_sym )
 				except :
-					self.nln_pyon.arr_pop[i]['sym'] = None
+					self.nln_plas.arr_pop[i]['sym'] = None
 
 		if ( param == 'name' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['name'] = str( val )
+				self.nln_plas.arr_pop[i]['name'] = str( val )
 			except :
-				self.nln_pyon.arr_pop[i]['name'] = None
+				self.nln_plas.arr_pop[i]['name'] = None
 
 		if ( param == 'sym' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['sym'] = str( val )
+				self.nln_plas.arr_pop[i]['sym'] = str( val )
 			except :
-				self.nln_pyon.arr_pop[i]['sym'] = None
+				self.nln_plas.arr_pop[i]['sym'] = None
 
 		if ( param == 'drift' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['drift'] = bool( val )
+				self.nln_plas.arr_pop[i]['drift'] = bool( val )
 			except :
-				self.nln_pyon.arr_pop[i]['drift'] = None
+				self.nln_plas.arr_pop[i]['drift'] = None
 
 		if ( param == 'aniso' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['aniso'] = bool( val )
+				self.nln_plas.arr_pop[i]['aniso'] = bool( val )
 			except :
-				self.nln_pyon.arr_pop[i]['aniso'] = None
+				self.nln_plas.arr_pop[i]['aniso'] = None
 
 		# Propagate the changes to the ion population.
 
@@ -1412,7 +1412,7 @@ class core( QObject ) :
 		for p in range( self.nln_n_pop ) :
 
 			self.nln_pop_vld[p] = \
-			     self.nln_pyon.arr_pop[p].valid( require_val=False )
+			     self.nln_plas.arr_pop[p].valid( require_val=False )
 
 		# Emit a signal that indicates that the ion parameters for the
 		# non-linear analysis have changed.
@@ -1499,7 +1499,7 @@ class core( QObject ) :
 		if   ( ( self.nln_set_gss_n[i] is None ) or
 		       ( self.nln_set_gss_w[i] is None )    ) :
 			self.nln_set_gss_vld[i] = False
-		elif ( ( self.nln_pyon.arr_pop[i]['drift'] ) and
+		elif ( ( self.nln_plas.arr_pop[i]['drift'] ) and
 		       ( self.nln_set_gss_d[i] is None     )     ) :
 			self.nln_set_gss_vld[i] = False
 		else :
@@ -1576,13 +1576,13 @@ class core( QObject ) :
 		# non-drifting species).
 
 		try :
-			self.nln_pyon['v0_x'] = round( self.mom_v_vec[0], 1 )
-			self.nln_pyon['v0_y'] = round( self.mom_v_vec[1], 1 )
-			self.nln_pyon['v0_z'] = round( self.mom_v_vec[2], 1 )
+			self.nln_plas['v0_x'] = round( self.mom_v_vec[0], 1 )
+			self.nln_plas['v0_y'] = round( self.mom_v_vec[1], 1 )
+			self.nln_plas['v0_z'] = round( self.mom_v_vec[2], 1 )
 		except :
-			self.nln_pyon['v0_x'] = None
-			self.nln_pyon['v0_y'] = None
-			self.nln_pyon['v0_z'] = None
+			self.nln_plas['v0_x'] = None
+			self.nln_plas['v0_y'] = None
+			self.nln_plas['v0_z'] = None
 
 		# Attempt to generate an initial guess of the parameters for
 		# each ion population.
@@ -1602,52 +1602,52 @@ class core( QObject ) :
 			# density.
 
 			try :
-				self.nln_pyon.arr_pop[i]['n'] = round_sig(
+				self.nln_plas.arr_pop[i]['n'] = round_sig(
 				         self.nln_set_gss_n[i] * self.mom_n, 4 )
 			except :
-				self.nln_pyon.arr_pop[i]['n'] = None
+				self.nln_plas.arr_pop[i]['n'] = None
 
 			# Generate (if necessary) the initial guess for this
 			# population's differential flow.
 
-			if ( self.nln_pyon.arr_pop[i]['drift'] ) :
+			if ( self.nln_plas.arr_pop[i]['drift'] ) :
 				try :
 					sgn = sign( dot( self.mom_v_vec,
 					                 self.mfi_avg_nrm ) )
 					if ( sgn == 0. ) :
 						sgn = 1.
-					self.nln_pyon.arr_pop[i]['dv'] = \
+					self.nln_plas.arr_pop[i]['dv'] = \
 					    round_sig(
 					        sgn * self.mom_v
 					            * self.nln_set_gss_d[i], 4 )
 				except :
-					self.nln_pyon.arr_pop[i]['dv'] = None
+					self.nln_plas.arr_pop[i]['dv'] = None
 
 			# Generate the initial guess of this population's
 			# thermal speed(s).
 
-			if ( self.nln_pyon.arr_pop[i]['aniso'] ) :
+			if ( self.nln_plas.arr_pop[i]['aniso'] ) :
 				try :
-					self.nln_pyon.arr_pop[i]['w_per'] = \
+					self.nln_plas.arr_pop[i]['w_per'] = \
 					   round_sig( self.nln_set_gss_w[i]
 					                       * self.mom_w, 4 )
 				except :
-					self.nln_pyon.arr_pop[i]['w_per'] = \
+					self.nln_plas.arr_pop[i]['w_per'] = \
 					      None
 				try :
-					self.nln_pyon.arr_pop[i]['w_par'] = \
+					self.nln_plas.arr_pop[i]['w_par'] = \
 					   round_sig( self.nln_set_gss_w[i]
 					                       * self.mom_w, 4 )
 				except :
-					self.nln_pyon.arr_pop[i]['w_par'] = \
+					self.nln_plas.arr_pop[i]['w_par'] = \
 					      None
 			else :
 				try :
-					self.nln_pyon.arr_pop[i]['w'] = \
+					self.nln_plas.arr_pop[i]['w'] = \
 					   round_sig( self.nln_set_gss_w[i]
 					                       * self.mom_w, 4 )
 				except :
-					self.nln_pyon.arr_pop[i]['w'] = \
+					self.nln_plas.arr_pop[i]['w'] = \
 					      None
 
 		# Run the "make_nln_gss" function to update the "self.nln_gss_"
@@ -1688,58 +1688,58 @@ class core( QObject ) :
 		if   ( param == 'v_x' ) :
 
 			try :
-				self.nln_pyon['v0_x'] = val
+				self.nln_plas['v0_x'] = val
 			except :
-				self.nln_pyon['v0_x'] = None
+				self.nln_plas['v0_x'] = None
 
 		elif ( param == 'v_y' ) :
 
 			try :
-				self.nln_pyon['v0_y'] = val
+				self.nln_plas['v0_y'] = val
 			except :
-				self.nln_pyon['v0_y'] = None
+				self.nln_plas['v0_y'] = None
 
 		elif ( param == 'v_z' ) :
 
 			try :
-				self.   ['v0_z'] = val
+				self.nln_plas['v0_z'] = val
 			except :
-				self.nln_pyon['v0_z'] = None
+				self.nln_plas['v0_z'] = None
 
 		elif ( param == 'n' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['n'] = val
+				self.nln_plas.arr_pop[i]['n'] = val
 			except :
-				self.nln_pyon.arr_pop[i]['n'] = None
+				self.nln_plas.arr_pop[i]['n'] = None
 
 		elif ( param == 'dv' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['dv'] = val
+				self.nln_plas.arr_pop[i]['dv'] = val
 			except :
-				self.nln_pyon.arr_pop[i]['dv'] = None
+				self.nln_plas.arr_pop[i]['dv'] = None
 
 		elif ( param == 'w' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['w'] = val
+				self.nln_plas.arr_pop[i]['w'] = val
 			except :
-				self.nln_pyon.arr_pop[i]['w'] = None
+				self.nln_plas.arr_pop[i]['w'] = None
 
 		elif ( param == 'w_per' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['w_per'] = val
+				self.nln_plas.arr_pop[i]['w_per'] = val
 			except :
-				self.nln_pyon.arr_pop[i]['w_per'] = None
+				self.nln_plas.arr_pop[i]['w_per'] = None
 
 		elif ( param == 'w_par' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['w_par'] = val
+				self.nln_plas.arr_pop[i]['w_par'] = val
 			except :
-				self.nln_pyon.arr_pop[i]['w_par'] = None
+				self.nln_plas.arr_pop[i]['w_par'] = None
 
 		# Run the "make_nln_gss" function to update the "self.nln_gss_"
 		# arrays, widgets, etc.
@@ -1759,7 +1759,7 @@ class core( QObject ) :
 
 			if ( ( self.nln_pop_use[i]               ) and
 			     ( self.nln_pop_vld[i]               ) and
-			     ( self.nln_pyon.arr_pop[i].valid(
+			     ( self.nln_plas.arr_pop[i].valid(
 			                      require_val=True ) )     ) :
 
 				self.nln_gss_vld[i] = True
@@ -1788,7 +1788,7 @@ class core( QObject ) :
 
 		if ( ( len( self.nln_gss_pop ) == 0    ) or
 		     ( 0 not in self.nln_gss_pop       ) or
-		     ( None in self.nln_pyon['vec_v0'] ) or
+		     ( None in self.nln_plas['vec_v0'] ) or
 		     ( self.n_mfi == 0                 )    ) :
 
 			self.emit( SIGNAL('janus_chng_nln_gss') )
@@ -1797,20 +1797,20 @@ class core( QObject ) :
 
 		# Generate the intial guess array in the format expected.
 
-		prm = list( self.nln_pyon['vec_v0'] )
+		prm = list( self.nln_plas['vec_v0'] )
 
 		for i in self.nln_gss_pop :
 
-			prm.append( self.nln_pyon.arr_pop[i]['n'] )
+			prm.append( self.nln_plas.arr_pop[i]['n'] )
 
-			if ( self.nln_pyon.arr_pop[i]['drift'] ) :
-				prm.append( self.nln_pyon.arr_pop[i]['dv'] )
+			if ( self.nln_plas.arr_pop[i]['drift'] ) :
+				prm.append( self.nln_plas.arr_pop[i]['dv'] )
 
-			if ( self.nln_pyon.arr_pop[i]['aniso'] ) :
-				prm.append( self.nln_pyon.arr_pop[i]['w_per'] )
-				prm.append( self.nln_pyon.arr_pop[i]['w_par'] )
+			if ( self.nln_plas.arr_pop[i]['aniso'] ) :
+				prm.append( self.nln_plas.arr_pop[i]['w_per'] )
+				prm.append( self.nln_plas.arr_pop[i]['w_par'] )
 			else :
-				prm.append( self.nln_pyon.arr_pop[i]['w'] )
+				prm.append( self.nln_plas.arr_pop[i]['w'] )
 
 		self.nln_gss_prm = prm
 
@@ -1823,7 +1823,7 @@ class core( QObject ) :
 		                                             self.nln_gss_plas )
 
 		self.nln_gss_curr_tot = [ [ [
-		                       sum( self.nln_gss_curr_ion[c][d][b]
+		                       sum( self.nln_gss_curr_ion[c][d][b])
 		                       for b in range( self.fc_spec['n_bin'] ) ]
 		                       for d in range( self.fc_spec['n_dir'] ) ]
 		                       for c in range( self.fc_spec['n_cup'] ) ]
@@ -1923,11 +1923,11 @@ class core( QObject ) :
 				# magnitude thereof) of this ion species (based
 				# on the initial guess).
 
-				vel = array( self.nln_pyon['vec_v0'] )
+				vel = array( self.nln_plas['vec_v0'] )
 
-				if ( self.nln_pyon.arr_pop[i]['drift'] ) :
+				if ( self.nln_plas.arr_pop[i]['drift'] ) :
 					vel += self.mfi_avg_nrm * \
-					          self.nln_pyon.arr_pop[i]['dv']
+					          self.nln_plas.arr_pop[i]['dv']
 
 				v = sqrt( vel[0]**2 + vel[1]**2 + vel[2]**2 )
 
@@ -1940,15 +1940,15 @@ class core( QObject ) :
 				# specified by this ion species' charge-to-mass
 				# ratio, initial geusses, and selection window.
 
-				if ( self.nln_pyon.arr_pop[i]['aniso'] ) :
+				if ( self.nln_plas.arr_pop[i]['aniso'] ) :
 					ang = abs( dot( dlk, self.mfi_avg_nrm ))
 					w = sqrt(
-					   ( self.nln_pyon.arr_pop[i]['w_per']
+					   ( self.nln_plas.arr_pop[i]['w_per']
 					                     * sin(ang) )**2 +
-					   ( self.nln_pyon.arr_pop[i]['w_par']
+					   ( self.nln_plas.arr_pop[i]['w_par']
 					                     * cos(ang) )**2   )
 				else :
-					w = self.nln_pyon.arr_pop[i]['w']
+					w = self.nln_plas.arr_pop[i]['w']
 
 				v_min = v_proj + ( self.nln_set_sel_a[i] *
 				                   w * v_proj / v          )
@@ -1956,11 +1956,11 @@ class core( QObject ) :
 				                   w * v_proj / v          )
 
 				v_min = v_min * sqrt(
-				               self.nln_pyon.arr_pop[i]['m'] /
-				               self.nln_pyon.arr_pop[i]['q']   )
+				               self.nln_plas.arr_pop[i]['m'] /
+				               self.nln_plas.arr_pop[i]['q']   )
 				v_max = v_max * sqrt(
-				               self.nln_pyon.arr_pop[i]['m'] /
-				               self.nln_pyon.arr_pop[i]['q']   )
+				               self.nln_plas.arr_pop[i]['m'] /
+				               self.nln_plas.arr_pop[i]['q']   )
 
 				# Select all seemingly valid measurements from
 				# this look direction that fall into this range
@@ -2084,7 +2084,7 @@ class core( QObject ) :
 			# Determine the bulk velocity of population "p",
 			# extracting (if necessary) the population's drift.
 
-			if ( self.nln_pyon.arr_pop[p]['drift'] ) :
+			if ( self.nln_plas.arr_pop[p]['drift'] ) :
 
 				prm_dv = prm[k]
 
@@ -2102,7 +2102,7 @@ class core( QObject ) :
 
 			# Extract the thermal speed(s).
 
-			if ( self.nln_pyon.arr_pop[p]['aniso'] ) :
+			if ( self.nln_plas.arr_pop[p]['aniso'] ) :
 
 				prm_w_per = prm[k  ]
 				prm_w_par = prm[k+1]
@@ -2118,11 +2118,11 @@ class core( QObject ) :
 			# Add the contribution of this ion species to
 			# the total current.
 
-			sqm = sqrt( self.nln_pyon.arr_pop[p]['q'] /
-			            self.nln_pyon.arr_pop[p]['m']   )
+			sqm = sqrt( self.nln_plas.arr_pop[p]['q'] /
+			            self.nln_plas.arr_pop[p]['m']   )
 
-			if ( self.nln_pyon.arr_pop[p]['aniso'] ) :
-				cur_p = self.nln_pyon.arr_pop[p]['q'] * \
+			if ( self.nln_plas.arr_pop[p]['aniso'] ) :
+				cur_p = self.nln_plas.arr_pop[p]['q'] * \
 				        self.fc_spec.arr[c][d][0].\
                                         calc_curr_bmx( d_vel_cen * sqm,
 					               d_vel_wid * sqm,
@@ -2132,7 +2132,7 @@ class core( QObject ) :
 				                       prm_v_y, prm_v_z,
 				                       prm_w_per, prm_w_par    )
 			else :
-				cur_p = self.nln_pyon.arr_pop[p]['q'] * \
+				cur_p = self.nln_plas.arr_pop[p]['q'] * \
 				        self.fc_spec.arr[c][d][0].\
                                         calc_curr_max( d_vel_cen * sqm,
 					               d_vel_wid * sqm,
@@ -2299,16 +2299,16 @@ class core( QObject ) :
 			# If necessary, add this population's species to the
 			# results.
 
-			spc_name = self.nln_pyon.arr_pop[i].my_spec['name']
+			spc_name = self.nln_plas.arr_pop[i].my_spec['name']
 
 			if ( self.nln_res_plas.get_spec( spc_name ) is None ) :
 
 				spc_sym = \
-				         self.nln_pyon.arr_pop[i].my_spec['sym']
+				         self.nln_plas.arr_pop[i].my_spec['sym']
 				spc_m   = \
-				         self.nln_pyon.arr_pop[i].my_spec['m'  ]
+				         self.nln_plas.arr_pop[i].my_spec['m'  ]
 				spc_q   = \
-				         self.nln_pyon.arr_pop[i].my_spec['q'  ]
+				         self.nln_plas.arr_pop[i].my_spec['q'  ]
 
 				self.nln_res_plas.add_spec(
 				                   name=spc_name, sym=spc_sym,
@@ -2316,10 +2316,10 @@ class core( QObject ) :
 
 			# Add the population itself to the results.
 
-			pop_drift = self.nln_pyon.arr_pop[i]['drift']
-			pop_aniso = self.nln_pyon.arr_pop[i]['aniso']
-			pop_name  = self.nln_pyon.arr_pop[i]['name']
-			pop_sym   = self.nln_pyon.arr_pop[i]['sym']
+			pop_drift = self.nln_plas.arr_pop[i]['drift']
+			pop_aniso = self.nln_plas.arr_pop[i]['aniso']
+			pop_name  = self.nln_plas.arr_pop[i]['name']
+			pop_sym   = self.nln_plas.arr_pop[i]['sym']
 
 			pop_n     = fit[c]
 			pop_sig_n = sigma[c]

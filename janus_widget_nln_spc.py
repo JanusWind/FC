@@ -141,10 +141,10 @@ class widget_nln_spc( QWidget ) :
 
 			# Extract the values from the core.
 
-			tmp_name = self.core.nln_pyon.arr_spec[i]['name']
-			tmp_sym  = self.core.nln_pyon.arr_spec[i]['sym']
-			tmp_m    = self.core.nln_pyon.arr_spec[i]['m']
-			tmp_q    = self.core.nln_pyon.arr_spec[i]['q']
+			tmp_name = self.core.nln_plas.arr_spec[i]['name']
+			tmp_sym  = self.core.nln_plas.arr_spec[i]['sym']
+			tmp_m    = self.core.nln_plas.arr_spec[i]['m']
+			tmp_q    = self.core.nln_plas.arr_spec[i]['q']
 
 			# Update each widget's text.
 
