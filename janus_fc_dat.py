@@ -66,14 +66,12 @@ class fc_dat( ) :
 
                 # TODO: Confirm these two formulae
 
-		self._the       = 90 - self._elev
-		self._phi       =    - self._azim
+		self._the       = ( 90 - self._elev ) * pi/180
+		self._phi       = (    - self._azim ) * pi/180
 
-		self._dir_x     = (sin( deg2rad( self._the ) ) *
-                                   cos( deg2rad( self._phi ) )              )
-		self._dir_y     = (sin( deg2rad( self._the ) ) *
-                                   sin( deg2rad( self._phi ) )              )
-		self._dir_z     = (cos( deg2rad( self._the ) )              )
+		self._dir_x     = sin( self._the ) * cos( self._phi )
+		self._dir_y     = sin( self._the ) * sin( self._phi )
+		self._dir_z     = cos( self._the )
 
 		self._norm_b_x  = None
 		self._norm_b_y  = None

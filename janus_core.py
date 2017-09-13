@@ -1040,10 +1040,6 @@ class core( QObject ) :
 
 		#FIXME 10
 
-#		return
-
-		#TODO Transition from data arrays to use of "self.fc_spec"
-
 		#TODO Store results in a "plas" object (e.g.,
 		#     "self.mom_res = plas()", which you should add to
 		#     "self.rset_var" under the "var_mom_res" section).
@@ -1095,9 +1091,6 @@ class core( QObject ) :
 
 		n_eta = self.mom_n_sel_dir
 
-#		eta_phi = tile( 0., n_eta )
-#		eta_the = tile( 0., n_eta )
-
 		eta_dlk = tile( 0., [ n_eta, 3 ] )  # Cartesian look direction
 
 		eta_eca = tile( 0., n_eta )         # effective collecting area
@@ -1106,10 +1099,6 @@ class core( QObject ) :
 		eta_v   = tile( 0., n_eta )         # inflow speed
 		eta_w   = tile( 0., n_eta )         # thermal speed
 		eta_t   = tile( 0., n_eta )         # temperature
-                eta_w1  = tile( 0., n_eta )
-                eta_w2  = tile( 0., n_eta )
-                eta_w3  = tile( 0., n_eta )
-                eta_w4  = tile( 0., n_eta )
 
 		# For each of the selected look directions, identify the
 		# selected data therefrom and calculate the estimator of the
@@ -1130,36 +1119,22 @@ class core( QObject ) :
 			c = tk_c[k]
 			d = tk_d[k]
 
-			# Store the $\theta$- and $\phi$-values for this look
-			# direction.
-
-#			eta_the[k] = - self.cup[c] + 90.
-#			eta_phi[k] = - self.dir[c][d]
-
-			# Convert the look direction from altitude-azimuth to a
-			# Cartesian unit vector.
+			# Calculate the look direction using "c"- and "d"-values
 
 			eta_dlk[k] = self.fc_spec.arr[c][d][0]['dir']
 
 			# Extract the "b" values of the selected data from this
 			# look direction.
 
-                        tk_b = [i for i, x in enumerate( self.mom_sel_bin[c][d] )
+                        b = [i for i, x in enumerate( self.mom_sel_bin[c][d] )
                                                                   if x==True    ]
 
 			eta_v[k] = - sum( [ self.fc_spec['curr'][c][d][i] 
-                                                for i in range(len(tk_b))] ) / \
+                                                for i in b] ) / \
                                      sum( [ self.fc_spec['curr'][c][d][i]    /
                                             self.fc_spec['vel_cen'][c][i]
-                                                for i in range(len(tk_b))]   )
+                                                for i in b]   )
 
-#                        print(sum([self.fc_spec['curr'][c][d][i] for i in range(len(tk_b))]))
-#                        print( [ self.fc_spec['curr'][c][d][i] 
-#                                                for i in range(len(tk_b))] )
-#                              sum( [ self.fc_spec['curr'][c][d][i]    /
-#                                            self.fc_spec['vel_cen'][c][i]
-#                                                for i in range(len(tk_b))]   ))
-#
 		# Use singular value decomposition (in the form of least squares
 		# analysis) to calculate the best-fit bulk speed for the solar
 		# wind.
@@ -1181,9 +1156,8 @@ class core( QObject ) :
 			# direction.
 
 			eta_eca[k] = self.fc_spec.arr[c][d][0].\
-                                          calc_eff_area( mom_v_vec )
+                                                  calc_eff_area( mom_v_vec )
 
-                        print(eta_eca[k])
 			# Extract the "b" indices of the selected data from this
 			# look direction.
 
@@ -1200,17 +1174,6 @@ class core( QObject ) :
 			           ( 1.e3 *   self.fc_spec['vel_cen'][c][i] )
                                               for i in b ]                  ) )
 
-#                        eta_w1[k] =const['q_p'] * 1.e-4 * eta_eca[k] * 1.e6 * eta_n[k]
-#
-#                        eta_w2[k] = sum( [
-#                                   ( 1.e-12 * self.fc_spec['curr'][c][d][i] ) *
-#			           ( 1.e3   * self.fc_spec['vel_cen'][c][i] )
-#                                              for i in b ]                  )
-# 
-#			eta_w3[k] = - ( 1e3 * eta_v[k] )**2
-#
-#                       eta_w4[k] =1.e-3 * sqrt((eta_w2[k]/eta_w1[k])+eta_w3[k])
-
 			eta_w[k] = 1.e-3 * sqrt( max( [ 0.,
 			           ( ( 1. / const['q_p']  ) /
 			           ( 1.e-4 * eta_eca[k]   ) /
@@ -1219,19 +1182,9 @@ class core( QObject ) :
                                    ( 1.e-12 * self.fc_spec['curr'][c][d][i] ) *
 			           ( 1.e3   * self.fc_spec['vel_cen'][c][i] )
                                               for i in b ]                  ) )
-			          - ( 1.e3 * eta_v[k] )**2             ]     ) )
+			         - ( 1.e3 * eta_v[k] )**2             ]     ) )
 
-#                        print( ( 1. / const['q_p']  ) /
-#			           ( 1.e-4 * eta_eca[k]   ) /
-#			           ( 1.e6 * eta_n[k]      ) *
-#			             sum( [
-#                                   ( 1.e-12 * self.fc_spec['curr'][c][d][i] ) *
-#			           ( 1.e3   * self.fc_spec['vel_cen'][c][i] )
-#                                              for i in b ]                  ) - ( 1.e3 * eta_v[k] )**2 )
-
-#
-#                        print(eta_w2[k]/eta_w1[k])
-
+                        print(eta_w[k])
 		# Compute the effective temperature for each of the analyzed
 		# look directions.
 
