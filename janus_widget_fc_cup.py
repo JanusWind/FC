@@ -935,7 +935,7 @@ class widget_fc_cup( QWidget ) :
 		# positions in the "ViewBox".
 
 		dat_x = self.core.fc_spec['vel_cen']
-		dat_y = self.core.fc_Spec['curr'][self.c][d]
+		dat_y = self.core.fc_spec['curr'][self.c][d]
 
 		dat_ax = log10( dat_x ) if ( self.log_x ) else dat_x
 		dat_ay = log10( dat_y ) if ( self.log_y ) else dat_y

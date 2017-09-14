@@ -477,7 +477,7 @@ class core( QObject ) :
 
 		if ( var_nln_res ) :
 
-			self.nln_res_plas = plas( enforce=False )
+			self.nln_res_plas     = plas( enforce=False )
 
 			self.nln_res_sel      = None
 
@@ -1036,14 +1036,6 @@ class core( QObject ) :
 	#-----------------------------------------------------------------------
 
 	def anls_mom( self ) :
-
-
-
-		#FIXME 10
-
-		#TODO Store results in a "plas" object (e.g.,
-		#     "self.mom_res = plas()", which you should add to
-		#     "self.rset_var" under the "var_mom_res" section).
 
 		# Re-initialize and the output of the moments analysis.
 
@@ -1873,8 +1865,9 @@ class core( QObject ) :
 
 		# Intially deselect all data.
 
-		self.nln_sel = tile( False, [ self.n_cup, self.n_dir,
-		                              self.n_bin              ] )
+		self.nln_sel = tile( False, [ self.fc_spec['n_cup'],
+                                              self.fc_spec['n_dir'],
+		                              self.fc_spec['n_bin']   ] )
 
 		# Determine which ion species have been selected for analysis
 		# and have been given valid parameters, initial geusses, and
@@ -1994,8 +1987,9 @@ class core( QObject ) :
 
 		if ( self.nln_sel is None ) :
 			self.nln_sel = tile( False,
-			                     [ self.n_cup, self.n_dir,
-			                       self.n_bin              ] )
+			                     [ self.fc_spec['n_cup'],
+                                               self.fc_spec['n_dir'],
+			                       self.fc_spec['n_bin']     ] )
 
 		# Change the selection of the requested point.
 
@@ -2184,7 +2178,7 @@ class core( QObject ) :
 		#   -- No initial guess has been generated.
 		#   -- Insufficient data have been selected.
 
-		if ( ( self.n_bin == 0                   ) or
+		if ( ( self.fc_spec['n_bin'] == 0                   ) or
 		     ( self.n_mfi == 0                   ) or
 		     ( len( pop ) == 0                   ) or
 		     ( 0 not in pop                      ) or
@@ -2251,8 +2245,9 @@ class core( QObject ) :
 		# Calculate the expected currents based on the results of the
 		# non-linear analysis.
 
-		( tk_c, tk_d, tk_b ) = indices( ( self.n_cup, self.n_dir,
-		                                  self.n_bin              ) )
+		( tk_c, tk_d, tk_b ) = indices( ( self.fc_spec['n_cup'],
+                                                  self.fc_spec['n_dir'],
+		                                  self.fc_spec['n_bin']   ) )
 
 		tk_c      = tk_c.flatten( )
 		tk_d      = tk_d.flatten( )
@@ -2271,7 +2266,8 @@ class core( QObject ) :
 
 		self.nln_res_curr_ion = \
 		   reshape( self.calc_nln_curr( pop, x, fit, ret_comp=True ),
-		            ( self.n_cup, self.n_dir, self.n_bin, len( pop ) ) )
+		            ( self.fc_spec['n_cup'], self.fc_spec['n_dir'],
+                              self.fc_spec['n_bin'], len( pop )            ) )
 
 		self.nln_res_curr_tot = sum( self.nln_res_curr_ion, axis=3 )
 
