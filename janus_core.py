@@ -1988,7 +1988,7 @@ class core( QObject ) :
 				# range of inflow speeds.
 
 				tk = where( (
-                                         self.fc_spec.arr[c][d]['cur_valid'])  &
+                                         self.fc_spec.arr[c][d]['curr_valid'])  &
 				       ( self.fc_spec['vel_cen'][c][d][b]
                                                                 >=  v_min   )  &
 				       ( self.fc_spec['vel_cen'][c][d][b]
