@@ -64,6 +64,7 @@ from numpy.linalg import lstsq
 from scipy.interpolate import interp1d
 from scipy.optimize import curve_fit
 from scipy.special import erf
+from scipy.stats import pearsonr, spearmanr
 
 from janus_helper import round_sig
 
@@ -102,6 +103,7 @@ class core( QObject ) :
 	# | chng_mom_sel_dir  | c, d                         |
 	# | chng_mom_sel_all  |                              |
 	# | chng_mom_res      |                              |
+	# | chng_nln_pop      | i                            |
 	# | chng_nln_ion      |                              |
 	# | chng_nln_set      |                              |
 	# | chng_nln_gss      |                              |
@@ -544,6 +546,14 @@ class core( QObject ) :
 
 			return
 
+		if ( str( time_req ).lower( ) == 'haiku' ) :
+
+			self.emit( SIGNAL('janus_chng_spc') )
+
+			self.emit( SIGNAL('janus_mesg'),
+			           'core', 'begin', 'haiku' )
+
+			return
 
 		# Convert the argument "time_req" into the standard, second-
 		# precision, string format.  If this conversion returns "None",
@@ -799,7 +809,7 @@ class core( QObject ) :
 		# Emit a signal that a change has occured to the moments window
 		# parameters.
 
-		self.emit( SIGNAL('janus_chng_mom_win') )
+		self.emit( SIGNAL('janus_chng_mom_win_dir') )
 
 		# Call the automatic selection of data for the moments analysis.
 
@@ -827,7 +837,7 @@ class core( QObject ) :
 		# Emit a signal that a change has occured to the moments window
 		# parameters.
 
-		self.emit( SIGNAL('janus_chng_mom_win') )
+		self.emit( SIGNAL('janus_chng_mom_win_bin') )
 
 		# Call the automatic selection of data for the moments analysis.
 
@@ -1339,6 +1349,30 @@ class core( QObject ) :
 
 			if ( ( val >= 0              ) and
 			     ( val <  self.nln_n_spc )     ) :
+
+				# If the population's name and/or symbol would
+				# contradict with a population already
+				# associated with the new species, clear out
+				# both.
+
+				if ( ( self.nln_plas.get_pop( 
+				          self.nln_plas.arr_spec[
+				                         val]['sym'],
+				          self.nln_plas.arr_pop[
+				                           i]['name'] )
+				                             is not None) or
+				     ( self.nln_plas.get_pop( 
+				          self.nln_plas.arr_spec[
+				                         val]['sym'],
+				          self.nln_plas.arr_pop[
+				                           i]['sym']  )
+				                             is not None)    ) :
+
+					self.nln_plas.arr_pop[i]['name'] = None
+					self.nln_plas.arr_pop[i]['sym']  = None
+
+					self.emit( SIGNAL('janus_chng_nln_pop'), i )
+
 				try :
 					self.nln_plas.arr_pop[i]['spec'] = \
 					             self.nln_plas.arr_spec[val]
@@ -1808,9 +1842,6 @@ class core( QObject ) :
 
 		# Calculate the expected currents based on the initial guess.
 
-		# FIXME:12  This code (and that in "self.calc_nln_curr") may not be
-		#        especially efficient.
-
 		self.nln_gss_curr_ion = self.fc_spec.calc_curr_plas(
 		                                             self.nln_gss_plas )
 
@@ -1827,9 +1858,6 @@ class core( QObject ) :
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR PROPAGATING THE GUESS FOR THE NLN ANALYSIS.
 	#-----------------------------------------------------------------------
-
-	def prop_nln_gss( self ) :
-
 		# Emit a signal that indicates that the initial guess for the
 		# non-linear analysis has changed.
 
@@ -1959,9 +1987,12 @@ class core( QObject ) :
 				# this look direction that fall into this range
 				# range of inflow speeds.
 
-				tk = where( ( self.cur_vld[c,d,:]   ) &
-				            ( self.vel_cen >= v_min ) &
-				            ( self.vel_cen <= v_max )   )[0]
+				tk = where( (
+                                         self.fc_spec.arr[c][d]['cur_valid'])  &
+				       ( self.fc_spec['vel_cen'][c][d][b]
+                                                                >=  v_min   )  &
+				       ( self.fc_spec['vel_cen'][c][d][b]
+                                                                <= v_max )  )[0]
 
 				if ( len( tk ) > 0 ) :
 					self.nln_sel[c,d,tk] = True

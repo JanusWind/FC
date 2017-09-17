@@ -66,7 +66,7 @@ class fc_dat( ) :
 
                 # TODO: Confirm these two formulae
 
-		self._the       = ( 90 - self._elev ) * pi/180
+		self._the       = ( 90 + self._elev ) * pi/180
 		self._phi       = (    - self._azim ) * pi/180
 
 		self._dir_x     = sin( self._the ) * cos( self._phi )

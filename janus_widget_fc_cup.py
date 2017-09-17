@@ -934,7 +934,7 @@ class widget_fc_cup( QWidget ) :
 		# their adjusted values, and then to their equivalent pixel
 		# positions in the "ViewBox".
 
-		dat_x = self.core.fc_spec['vel_cen']
+		dat_x = self.core.fc_spec['vel_cen'][self.c]
 		dat_y = self.core.fc_spec['curr'][self.c][d]
 
 		dat_ax = log10( dat_x ) if ( self.log_x ) else dat_x

@@ -52,6 +52,7 @@ def n_thread( ) :
 		     ( thr._Thread__target is thread_save_res         ) or
 		     ( thr._Thread__target is thread_xprt_res         ) or
 		     ( thr._Thread__target is thread_chng_mom_sel     ) or
+                     ( thr._Thread__target is thread_auto_mom_sel     ) or
 		     ( thr._Thread__target is thread_chng_nln_spc     ) or
 		     ( thr._Thread__target is thread_chng_nln_pop     ) or
 		     ( thr._Thread__target is thread_chng_nln_set     ) or
@@ -143,12 +144,12 @@ def thread_chng_dyn( core, anal, value ) :
 def thread_auto_run( core, t_strt, t_stop,
                      get_next=None, err_halt=None, pause=None ) :
 
-	core.emit( SIGNAL('janus_busy_end') )
-	core.emit( SIGNAL('janus_busy_beg') )
+        core.emit( SIGNAL('janus_busy_end') )
+        core.emit( SIGNAL('janus_busy_beg') )
 
-	core.auto_run( t_strt, t_stop, get_next, err_halt, pause )
+        core.auto_run( t_strt, t_stop, get_next, err_halt, pause )
 
-	core.emit( SIGNAL('janus_busy_end') )
+        core.emit( SIGNAL('janus_busy_end') )
 
 
 ################################################################################
@@ -194,6 +195,20 @@ def thread_chng_mom_sel( core, c, d, b ) :
 
 
 ################################################################################
+## DEFINE THE WRAPPER FOR THE FUNCTION "core.auto_mom_sel".
+################################################################################
+
+def thread_auto_mom_sel( core ) :
+
+        core.emit( SIGNAL('janus_busy_end') )
+        core.emit( SIGNAL('janus_busy_beg') )
+
+        core.auto_mom_sel( )
+
+        core.emit( SIGNAL('janus_busy_end') )
+
+
+################################################################################
 ## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_nln_spc".
 ################################################################################
 
@@ -211,13 +226,12 @@ def thread_chng_nln_spc( core, s, param, val ) :
 ## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_nln_pop".
 ################################################################################
 
-def thread_chng_nln_pop( core, i, param, val,
-                         pop_name=None, pop_sym=None ) :
+def thread_chng_nln_pop( core, i, param, val ) :
 
 	core.emit( SIGNAL('janus_busy_end') )
 	core.emit( SIGNAL('janus_busy_beg') )
 
-	core.chng_nln_pop( i, param, val, pop_name, pop_sym )
+	core.chng_nln_pop( i, param, val )
 
 	core.emit( SIGNAL('janus_busy_end') )
 
