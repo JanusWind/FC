@@ -138,13 +138,12 @@ def thread_chng_nln_spc( core, s, param, val ) :
 ## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_nln_pop".
 ################################################################################
 
-def thread_chng_nln_pop( core, i, param, val,
-                         pop_name=None, pop_sym=None ) :
+def thread_chng_nln_pop( core, i, param, val ) :
 
 	core.emit( SIGNAL('janus_busy_end') )
 	core.emit( SIGNAL('janus_busy_beg') )
 
-	core.chng_nln_pop( i, param, val, pop_name, pop_sym )
+	core.chng_nln_pop( i, param, val )
 
 	core.emit( SIGNAL('janus_busy_end') )
 

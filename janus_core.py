@@ -96,6 +96,7 @@ class core( QObject ) :
 	# | chng_mom_sel_azm  | t, p                         |
 	# | chng_mom_sel_all  |                              |
 	# | chng_mom_res      |                              |
+	# | chng_nln_pop      | i                            |
 	# | chng_nln_ion      |                              |
 	# | chng_nln_set      |                              |
 	# | chng_nln_gss      |                              |
@@ -2104,8 +2105,7 @@ class core( QObject ) :
 	# DEFINE THE FUNCTION FOR CHANGING A NLN POPULATION.
 	#-----------------------------------------------------------------------
 
-	def chng_nln_pop( self, i, param, val,
-	                  pop_name=None, pop_sym=None ) :
+	def chng_nln_pop( self, i, param, val ) :
 
 		# Ensure that "i" is a valid ion-population index.
 
@@ -2125,27 +2125,39 @@ class core( QObject ) :
 
 			if ( ( val >= 0              ) and
 			     ( val <  self.nln_n_spc )     ) :
+
+				# If the population's name and/or symbol would
+				# contradict with a population already
+				# associated with the new species, clear out
+				# both.
+
+				if ( ( self.nln_pyon.get_pop( 
+				          self.nln_pyon.arr_spec[
+				                         val]['sym'],
+				          self.nln_pyon.arr_pop[
+				                           i]['name'] )
+				                             is not None) or
+				     ( self.nln_pyon.get_pop( 
+				          self.nln_pyon.arr_spec[
+				                         val]['sym'],
+				          self.nln_pyon.arr_pop[
+				                           i]['sym']  )
+				                             is not None)    ) :
+
+					self.nln_pyon.arr_pop[i]['name'] = None
+					self.nln_pyon.arr_pop[i]['sym']  = None
+
+					self.emit( SIGNAL('janus_chng_nln_pop'), i )
+
 				try :
 					self.nln_pyon.arr_pop[i]['spec'] = \
 					             self.nln_pyon.arr_spec[val]
 				except :
 					self.nln_pyon.arr_pop[i]['spec'] = None
+
 			else :
+
 				self.nln_pyon.arr_pop[i]['spec'] = None
-
-			if ( pop_name is not None ) :
-				try :
-					self.nln_pyon.arr_pop[i]['name'] = \
-					                         str( pop_name )
-				except :
-					self.nln_pyon.arr_pop[i]['name'] = None
-
-			if ( pop_sym is not None ) :
-				try :
-					self.nln_pyon.arr_pop[i]['sym'] = \
-					                          str( pop_sym )
-				except :
-					self.nln_pyon.arr_pop[i]['sym'] = None
 
 		if ( param == 'name' ) :
 

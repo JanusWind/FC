@@ -190,6 +190,14 @@ class widget_ctrl_info( format_TextEdit ) :
 					     'the program to crash.  '   +
 					     'Proceed with caution.'       )
 
+				if ( mesg_obj == 'haiku' ) :
+					self.clear( )
+					self.prnt_htm( 'Janus joint fitting:' )
+					self.prnt_brk( )
+					self.prnt_htm( 'powerful in principle,')
+					self.prnt_brk( )
+					self.prnt_htm( 'hard to implement' )
+
 			if ( mesg_typ == 'norun' ) :
 
 				if ( mesg_obj == 'mom' ) :
