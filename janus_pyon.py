@@ -450,6 +450,23 @@ class plas( object ) :
 
 				self.v0_z = float( value )
 
+		elif ( key == 'v0_vec' ) :
+
+			try :
+				l = len( value )
+			except :
+				l = 0
+
+			if ( l != 3 ) :
+				raise TypeError( 'Array of length 3 required.' )
+			else :
+				if ( value[0] is not None ) :
+					self.v0_x = float( value[0] )
+				if ( value[1] is not None ) :
+					self.v0_y = float( value[1] )
+				if ( value[2] is not None ) :
+					self.v0_z = float( value[2] )
+
 		elif ( key == 'sig_v0_x' ) :
 
 			self.sig_v0_x = None
@@ -497,6 +514,23 @@ class plas( object ) :
 			if ( value is not None ) :
 
 				self.b0_z = float( value )
+
+		elif ( key == 'b0_vec' ) :
+
+			try :
+				l = len( value )
+			except :
+				l = 0
+
+			if ( l != 3 ) :
+				raise TypeError( 'Array of length 3 required.' )
+			else :
+				if ( value[0] is not None ) :
+					self.b0_x = float( value[0] )
+				if ( value[1] is not None ) :
+					self.b0_y = float( value[1] )
+				if ( value[2] is not None ) :
+					self.b0_z = float( value[2] )
 
 		else :
 
@@ -841,8 +875,10 @@ class spec( object ) :
 
 			dv_mag = self['dv']
 
-			if ( dv_mag is None ) :
+			if   ( dv_mag is None ) :
 				return None
+			elif ( dv_mag == 0. ) :
+				return ( 0., 0., 0. )
 
 			b0_hat = self.my_plas.get_b0_hat( )
 

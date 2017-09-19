@@ -1211,9 +1211,7 @@ class core( QObject ) :
 
 		self.mom_res = plas( )
 
-		self.mom_res['v0_x'] = mom_v_vec[0]
-		self.mom_res['v0_y'] = mom_v_vec[1]
-		self.mom_res['v0_z'] = mom_v_vec[2]
+		self.mom_res['v0_vec'] = mom_v_vec
 
 		self.mom_res.add_spec( name='Proton', sym='p', m=1., q=1. )
 
@@ -1258,12 +1256,6 @@ class core( QObject ) :
 		#        its output would be no different than that from its
 		#        last run (since no changes to the inital guess or to
 		#        the point selection would have been made since then).
-
-		#FIXME 11
-
-#		self.chng_dsp( 'mom' )
-
-                # TODO: DELETE
 
 		if ( self.dyn_gss ) :
 			self.auto_nln_gss( )
@@ -1590,7 +1582,7 @@ class core( QObject ) :
 		# (sucessfully), run the "make_nln_gss" function (to update the
 		# "self.nln_gss_" arrays, widgets, etc.) and then abort.
 
-		if ( self.mom_n is None ) :
+		if ( self.mom_res is None ) :
 
 			self.make_nln_gss( )
 
@@ -1600,13 +1592,10 @@ class core( QObject ) :
 		# non-drifting species).
 
 		try :
-			self.nln_plas['v0_x'] = round( self.mom_v_vec[0], 1 )
-			self.nln_plas['v0_y'] = round( self.mom_v_vec[1], 1 )
-			self.nln_plas['v0_z'] = round( self.mom_v_vec[2], 1 )
+			self.nln_plas['v0_vec'] = [
+			         round( v, 1 ) for v in self.mom_res['v0_vec'] ]
 		except :
-			self.nln_plas['v0_x'] = None
-			self.nln_plas['v0_y'] = None
-			self.nln_plas['v0_z'] = None
+			pass
 
 		# Attempt to generate an initial guess of the parameters for
 		# each ion population.
@@ -1627,7 +1616,8 @@ class core( QObject ) :
 
 			try :
 				self.nln_plas.arr_pop[i]['n'] = round_sig(
-				         self.nln_set_gss_n[i] * self.mom_n, 4 )
+				                      self.nln_set_gss_n[i]
+				                      * self.mom_res['n_p'], 4 )
 			except :
 				self.nln_plas.arr_pop[i]['n'] = None
 
@@ -1636,13 +1626,14 @@ class core( QObject ) :
 
 			if ( self.nln_plas.arr_pop[i]['drift'] ) :
 				try :
-					sgn = sign( dot( self.mom_v_vec,
-					                 self.mfi_avg_nrm ) )
+					sgn = sign( dot(
+					             self.mom_res['v0_vec'],
+					             self.mfi_avg_nrm        ) )
 					if ( sgn == 0. ) :
 						sgn = 1.
 					self.nln_plas.arr_pop[i]['dv'] = \
-					    round_sig(
-					        sgn * self.mom_v
+					    round_sig( 
+					        sgn * self.mom_res['v0_mag']
 					            * self.nln_set_gss_d[i], 4 )
 				except :
 					self.nln_plas.arr_pop[i]['dv'] = None
@@ -1650,34 +1641,26 @@ class core( QObject ) :
 			# Generate the initial guess of this population's
 			# thermal speed(s).
 
-			if ( self.nln_plas.arr_pop[i]['aniso'] ) :
-				try :
-					self.nln_plas.arr_pop[i]['w_per'] = \
-					   round_sig( self.nln_set_gss_w[i]
-					                       * self.mom_w, 4 )
-				except :
-					self.nln_plas.arr_pop[i]['w_per'] = \
-					      None
-				try :
-					self.nln_plas.arr_pop[i]['w_par'] = \
-					   round_sig( self.nln_set_gss_w[i]
-					                       * self.mom_w, 4 )
-				except :
-					self.nln_plas.arr_pop[i]['w_par'] = \
-					      None
+			try :
+				w = round_sig( self.nln_set_gss_w[i] 
+				               * self.mom_res['w_p'], 4 )
+			except :
+				w = None
+
+			if ( self.nln_plas.arr_pop[i].aniso ) :
+				self.nln_plas.arr_pop[i]['w_per'] = w
+				self.nln_plas.arr_pop[i]['w_par'] = w
 			else :
-				try :
-					self.nln_plas.arr_pop[i]['w'] = \
-					   round_sig( self.nln_set_gss_w[i]
-					                       * self.mom_w, 4 )
-				except :
-					self.nln_plas.arr_pop[i]['w'] = \
-					      None
+				self.nln_plas.arr_pop[i]['w'] = w
 
 		# Run the "make_nln_gss" function to update the "self.nln_gss_"
 		# arrays, widgets, etc.
 
-		self.make_nln_gss( )
+		# FIXME
+
+		self.emit( SIGNAL('janus_chng_nln_gss') )   # This can be removed once 'make_nln_gss' is fixed.
+
+		#####self.make_nln_gss( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CHANGING A GUESS VALUE FOR ONE NLN PARAMETER.
