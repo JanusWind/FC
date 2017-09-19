@@ -1261,8 +1261,6 @@ class core( QObject ) :
 
 		#FIXME 11
 
-		# WARNING!  THIS CODE HAS BEEN DISABLED TO FOR DEBUGGING. 
-
 #		self.chng_dsp( 'mom' )
 
                 # TODO: DELETE
@@ -1794,16 +1792,16 @@ class core( QObject ) :
 
 				self.nln_gss_vld[i] = False
 
-		self.nln_gss_pop      = where( self.nln_gss_vld )[0]
+		self.nln_gss_pop = where( self.nln_gss_vld )[0]
 
 		# Reset the "prm" and "cur_???" arrays.
 
-		self.nln_gss_prm      = array( [] )
+		self.nln_gss_prm = array( [] )
 
 		self.nln_gss_curr_ion = None
 		self.nln_gss_curr_tot = None
 
-		# Abort if any of the following cases are arise:
+		# Abort if any of the following cases arise:
 		#   -- No populations have been found to be valid.
 		#   -- The primary population is not valid.
 		#   -- The init. guess of any reference vel. comp. is invalid.
@@ -1858,6 +1856,9 @@ class core( QObject ) :
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR PROPAGATING THE GUESS FOR THE NLN ANALYSIS.
 	#-----------------------------------------------------------------------
+
+        def prop_nln_gss( self ) :
+
 		# Emit a signal that indicates that the initial guess for the
 		# non-linear analysis has changed.
 
