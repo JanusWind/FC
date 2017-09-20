@@ -1659,8 +1659,8 @@ class core( QObject ) :
 		# FIXME
 
 		self.emit( SIGNAL('janus_chng_nln_gss') )   # This can be removed once 'make_nln_gss' is fixed.
-
-		#####self.make_nln_gss( )
+#
+		self.make_nln_gss( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CHANGING A GUESS VALUE FOR ONE NLN PARAMETER.
@@ -1795,7 +1795,7 @@ class core( QObject ) :
 
 		if ( ( len( self.nln_gss_pop ) == 0    ) or
 		     ( 0 not in self.nln_gss_pop       ) or
-		     ( None in self.nln_plas['vec_v0'] ) or
+		     ( None in self.nln_plas['v0_vec'] ) or
 		     ( self.n_mfi == 0                 )    ) :
 
 			self.emit( SIGNAL('janus_chng_nln_gss') )
@@ -1804,7 +1804,7 @@ class core( QObject ) :
 
 		# Generate the intial guess array in the format expected.
 
-		prm = list( self.nln_plas['vec_v0'] )
+		prm = list( self.nln_plas['v0_vec'] )
 
 		for i in self.nln_gss_pop :
 
