@@ -25,11 +25,13 @@
 ## LOAD THE NECESSARY MODULES.
 ################################################################################
 
-from janus_const import const
 from math import sqrt, acos, pi
-from janus_helper import calc_arr_norm, calc_arr_dot
 from numpy import interp, sin, cos, deg2rad, exp
 from scipy.special import erf
+
+from janus_const import const
+from janus_helper import calc_arr_norm, calc_arr_dot
+from janus_mfi_arcv import mfi_arcv
 
 
 ################################################################################
@@ -49,6 +51,7 @@ class fc_dat( ) :
 		self._volt_cen  = volt_cen
 		self._volt_del  = volt_del
                 self._valid     = valid
+#                self.mfi_arcv    = mfi_arcv( core=self )
 
 		self._volt_strt = (self._volt_cen - ( self._volt_del / 2. ) )
 		self._volt_stop = (self._volt_cen + ( self._volt_del / 2. ) )
@@ -63,6 +66,8 @@ class fc_dat( ) :
 		self._vel_del   = (  self['vel_stop']-self['vel_strt']      )
 		self._curr      = curr
 
+#                ( mfi_t, mfi_b_x, mfi_b_y, mfi_b_z ) = \
+#                     self.mfi_arcv.load_rang()
 
                 # TODO: Confirm these two formulae
 

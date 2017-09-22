@@ -1660,7 +1660,7 @@ class core( QObject ) :
 
 		self.emit( SIGNAL('janus_chng_nln_gss') )   # This can be removed once 'make_nln_gss' is fixed.
 #
-		self.make_nln_gss( )
+#		self.make_nln_gss( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CHANGING A GUESS VALUE FOR ONE NLN PARAMETER.

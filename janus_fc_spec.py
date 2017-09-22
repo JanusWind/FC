@@ -26,7 +26,7 @@
 ################################################################################
 
 from janus_fc_dat import fc_dat
-
+from datetime import timedelta
 
 ################################################################################
 ## DEFINE THE "fc_spec" CLASS.
@@ -40,8 +40,8 @@ class fc_spec( ) :
 
 	def __init__( self, n_bin,
 	              elev=None, azim=None, volt_cen=None, volt_del=None,
-	              curr=None, time=None, rot=3., curr_jump=100.,
-	              curr_min=1.                                         ) :
+	              time=None, curr=None, rot=3., curr_jump=100.,
+	              curr_min=1.                                            ) :
 
 		self._n_cup     = 2
 		self._n_dir     = 20
@@ -82,6 +82,34 @@ class fc_spec( ) :
 		               for b in range(self._n_bin) ]
 		               for d in range(self._n_dir) ]
 		               for c in range(self._n_cup) ]
+
+	        # Define the time offsets for the individual data in the
+                # spectrum. 
+
+                # Note.  These calibration parameters have been taken from the
+                #        "calfile_mode_params" file in the old IDL code.  The
+                #        meaning of the "integ" values is unknown, but has been
+                #        assumed to represent integration times (possibly
+                #        expressed in terms of the number of modulator-voltage
+                #        oscillations).
+
+                self._offset = [
+                     [ 0.105350, 0.175650, 0.245850, 0.316150, 0.386350,
+                       0.456600, 0.526850, 0.597050, 0.667350, 0.737550,
+                       0.807850, 0.878050, 0.948350, 1.01855 , 1.08885 ,
+                       1.15905 , 1.22930 , 1.29955 , 1.91670 , 2.54390   ],
+                     [ 0.366300, 0.993500, 1.61065 , 1.68085 , 1.75115 ,
+                       1.82135 , 1.89165 , 1.96185 , 2.03215 , 2.10235 ,
+                       2.17265 , 2.24285 , 2.31305 , 2.38335 , 2.45355 ,
+                       2.52385 , 2.59405 , 2.66435 , 2.73455 , 2.80485   ]  ]
+
+                self._integ = [
+                     [  6,  6, 6, 6, 6, 6, 6, 6,  6,  6,
+                        6,  6, 6, 6, 6, 6, 6, 6, 24, 24  ],
+                     [ 24, 24, 6, 6, 6, 6, 6, 6,  6,  6,
+                        6,  6, 6, 6, 6, 6, 6, 6,  6,  6  ]  ]
+
+
 
 		self.set_rot( rot )
 
@@ -184,8 +212,6 @@ class fc_spec( ) :
 
 		elif ( key == 'curr_min' ) :
 			return self._curr_min
-		elif ( key == 'time' ) :
-			return self._time
 		elif ( key == 'rot' ) :
 			return self._rot
 		elif ( key == 'dur' ) :
@@ -231,33 +257,71 @@ class fc_spec( ) :
 					# If the bin appears to be an isolated
 					# jump, mark it as invalid.
 
-					if ( ( b == 0                           ) and
+					if ( ( b == 0                     ) and
 					     ( self.arr[c][d][1]['curr']
-                                                                    is not None ) and
+                                                               is not None ) and
 					     ( self.arr[c][d][0]['curr']
-					          > self['curr_jump']
-					                * self.arr[c][d][1]['curr']) ) :
-						self.arr[c][d][0]._valid = False
+					        > self['curr_jump']
+					        * self.arr[c][d][1]['curr']) ) :
+                                                self.arr[c][d][0]._valid = False
 
-					elif ( ( b == ( self._n_bin - 1 )          ) and
+					elif ( ( b == ( self._n_bin - 1 )  ) and
 					       ( self.arr[c][d][-2]['curr']
-                                                                       is not None ) and
+                                                               is not None ) and
 					       ( self.arr[c][d][-1]['curr']
 					          > self['curr_jump']
-					               * self.arr[c][d][-2]['curr']) ) :
-						self.arr[c][d][-1]._valid = False
+					       * self.arr[c][d][-2]['curr']) ) :
+                                                self.arr[c][d][-1]._valid = False
 
 					elif ( ( self.arr[c][d][b-1]['curr']
-					                                is not None ) and
+					                       is not None ) and
 					       ( self.arr[c][d][b+1]['curr']
-					                                is not None ) and
+					                       is not None ) and
 					       ( self.arr[c][d][b]['curr']
 					           > self['curr_jump']
-					              * self.arr[c][d][b-1]['curr'] ) and 
+					     * self.arr[c][d][b-1]['curr'] ) and 
 					       ( self.arr[c][d][b]['curr']
 					           > self['curr_jump']
-					             * self.arr[c][d][b+1]['curr'] ) ) :
+					     * self.arr[c][d][b+1]['curr'] ) ) :
 						self.arr[c][d][b]._valid = False
+
+
+        #-----------------------------------------------------------------------
+        # DEFINE THE FUNCTION FOR CALCULATING THE TIMESTAMP OF A SINGLE DATUM.
+        #-----------------------------------------------------------------------
+
+        def calc_time( self, c, d, b ) :
+
+                # Compute and return the timestamp of the specified datum.  If
+                # this cannot be done (due to missing information), return
+                # "None".
+
+                if ( ( self._time is None ) or ( self._rot  is None ) ) :
+
+                        return None
+
+                else :
+
+                        return ( self._time
+                                     + timedelta( seconds=(self._rot*b) )
+                                     + timedelta( seconds=self._offset[c][d] ) )
+
+        #-----------------------------------------------------------------------
+        # DEFINE THE FUNCTION FOR MAKING A TIMESTAMP FOR EACH DATUM.
+        #-----------------------------------------------------------------------
+
+        def make_time( self ) :
+
+                # Compute and apply each datum's timestamp.
+
+                for c in range ( self._n_cup ) :
+
+                        for d in range ( self._n_dir ) :
+
+                                for b in range ( self._n_bin ) :
+
+                                        self.arr[c][d][b]._time \
+                                                     = self.calc_time( c, d, b )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION SETTING THE ROTATION PERIOD.
@@ -270,8 +334,9 @@ class fc_spec( ) :
 		self._rot = rot
 		self._dur = rot * self['n_bin']
 
-		# TODO Implement calculation and assignment of timestamp for
-		#      each "fc_dat" object.
+                # Update the timestamps of the individual data in this spectrum.
+
+                self.make_time( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CALC'ING EXPECTED CURRENT FROM A POPULATION.
