@@ -27,6 +27,7 @@
 
 from janus_fc_dat import fc_dat
 from datetime import timedelta
+from janus_time import calc_time_val
 
 ################################################################################
 ## DEFINE THE "fc_spec" CLASS.
@@ -49,6 +50,7 @@ class fc_spec( ) :
 		self._time      = time
 		self._curr_jump = curr_jump
 		self._curr_min  = curr_min
+                self._time_strt = calc_time_val( time )
 
 		if ( elev == None ) :
 			elev = [ None for c in range( self._n_cup ) ]
@@ -430,3 +432,16 @@ class fc_spec( ) :
 		# Return the location of the window with the maximum current.
 
 		return b_max
+        #-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION TO FIND THE INDEX OF WINDOW WITH MAXIMUM CURRENT
+	#-----------------------------------------------------------------------
+
+        def set_mag (self, mfi_t, mfi_b_x, mfi_b_y, mfi_b_x)
+
+                b_x = interp1d( self.mfi_t, mfi_b_x,
+                                       bounds_error=False )( self.mag_t )
+                b_y = interp1d( self.mfi_t, mfi_b_y,
+                                       bounds_error=False )( self.mag_t )
+                b_z = interp1d( self.mfi_t, mfi_b_z,
+                                       bounds_error=False )( self.mag_t )
+
