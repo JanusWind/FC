@@ -42,7 +42,7 @@ class fc_dat( ) :
 
 	def __init__( self,
                       spec=None, azim=None,
-                      elev=None, volt_cen=None,
+                      elev=None, volt_cen=None, time=None,
                       volt_del=None, curr=None, valid=False ) :
 
 		self._spec      = spec
@@ -51,6 +51,7 @@ class fc_dat( ) :
 		self._volt_cen  = volt_cen
 		self._volt_del  = volt_del
                 self._valid     = valid
+                self._time      = time
 #                self.mfi_arcv    = mfi_arcv( core=self )
 
 		self._volt_strt = (self._volt_cen - ( self._volt_del / 2. ) )
@@ -104,6 +105,8 @@ class fc_dat( ) :
 			return self._azim
 		elif ( key == 'elev' ) :
 			return self._elev
+                elif ( key == 'time' ) :
+                        return self._time
 		elif ( key == 'volt_cen' ) :
 			return self._volt_cen
 		elif ( key == 'volt_del' ) :

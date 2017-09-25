@@ -687,7 +687,7 @@ class core( QObject ) :
 		( mfi_t, mfi_b_x, mfi_b_y, mfi_b_z  ) = \
 		          self.mfi_arcv.load_rang( self.time_val,
 		                                   self.fc_spec['dur'] )
-
+                print type(mfi_t)
 		# Establish the number of data.
 
 		self.n_mfi = len( mfi_t )
@@ -705,8 +705,8 @@ class core( QObject ) :
 		# timestamps to be relative to the start time of this Wind/FC
 		# ion spectrum.
 
-		self.mfi_t = array( [ ( t - self.time_epc ).total_seconds( )
-		                      for t in mfi_t                         ] )
+#		self.mfi_t = array( [ ( t - self.time_epc ).total_seconds( )
+#		                      for t in mfi_t                         ] )
 
 		self.mfi_b_x   = mfi_b_x
 		self.mfi_b_y   = mfi_b_y
@@ -757,18 +757,21 @@ class core( QObject ) :
 
 		self.mag_t   = self.fc_spec['rot'] * ( arange( self.fc_spec['n_bin'] ) + 0.5 )
 
-		tk_lo        = where( self.mag_t < amin( self.mfi_t ) )
-		tk_hi        = where( self.mag_t > amax( self.mfi_t ) )
-
-		self.mag_t[tk_lo] = amin( self.mfi_t )
-		self.mag_t[tk_hi] = amax( self.mfi_t )
-
-		self.mag_x = interp1d( self.mfi_t, self.mfi_b_x,
-		                       bounds_error=False )( self.mag_t )
-		self.mag_y = interp1d( self.mfi_t, self.mfi_b_y,
-		                       bounds_error=False )( self.mag_t )
-		self.mag_z = interp1d( self.mfi_t, self.mfi_b_z,
-		                       bounds_error=False )( self.mag_t )
+#		tk_lo        = where( self.mag_t < amin( self.mfi_t ) )
+#		tk_hi        = where( self.mag_t > amax( self.mfi_t ) )
+#
+#                mag_field = self.fc_spec.set_mag(self.mfi_t, self.mfi_b_x, self.mfi_b_y, self.mfi_b_z)
+#                print mag_field
+#
+#		self.mag_t[tk_lo] = amin( self.mfi_t )
+#		self.mag_t[tk_hi] = amax( self.mfi_t )
+#
+#		self.mag_x = interp1d( self.mfi_t, self.mfi_b_x,
+#		                       bounds_error=False )( self.mag_t )
+#		self.mag_y = interp1d( self.mfi_t, self.mfi_b_y,
+#		                       bounds_error=False )( self.mag_t )
+#		self.mag_z = interp1d( self.mfi_t, self.mfi_b_z,
+#		                       bounds_error=False )( self.mag_t )
 
 		# Calculating the average angular deviation of magnetic field
 

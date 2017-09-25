@@ -27,7 +27,7 @@
 
 from janus_fc_dat import fc_dat
 from datetime import timedelta
-from janus_time import calc_time_val
+from scipy.interpolate import interp1d
 
 ################################################################################
 ## DEFINE THE "fc_spec" CLASS.
@@ -50,7 +50,6 @@ class fc_spec( ) :
 		self._time      = time
 		self._curr_jump = curr_jump
 		self._curr_min  = curr_min
-                self._time_strt = calc_time_val( time )
 
 		if ( elev == None ) :
 			elev = [ None for c in range( self._n_cup ) ]
@@ -432,16 +431,30 @@ class fc_spec( ) :
 		# Return the location of the window with the maximum current.
 
 		return b_max
+
         #-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION TO FIND THE INDEX OF WINDOW WITH MAXIMUM CURRENT
+	# DEFINE THE FUNCTION TO ASSIGN THE MAGNETIC FIELD TO EACH DATUM. 
 	#-----------------------------------------------------------------------
 
-        def set_mag (self, mfi_t, mfi_b_x, mfi_b_y, mfi_b_x)
+        def set_mag( self, mfi_t, mfi_b_x, mfi_b_y, mfi_b_z ) :
 
-                b_x = interp1d( self.mfi_t, mfi_b_x,
-                                       bounds_error=False )( self.mag_t )
-                b_y = interp1d( self.mfi_t, mfi_b_y,
-                                       bounds_error=False )( self.mag_t )
-                b_z = interp1d( self.mfi_t, mfi_b_z,
-                                       bounds_error=False )( self.mag_t )
+                mfi_s = [ ( t - mfi_t[0] ) for t in mfi_t ]
+                print type(mfi_t)
+                fnc_b_x = interp1d( mfi_s, mfi_b_x )
+                fnc_b_y = interp1d( mfi_s, mfi_b_y )
+                fnc_b_z = interp1d( mfi_s, mfi_b_z )
 
+                for c in range( self['n_cup'] ) :
+
+                        for d in range( self['n_dir'] ) :
+
+                                for b in range( self['n_bin'] ) :
+                                        print self.arr[c][d][b]['time']
+                                        s = ( self.arr[c][d][b]['time'] - mfi_t[0] ).total_seconds()
+                                        print s
+                                        b_x = fnc_b_x( s )
+                                        b_y = fnc_b_y( s )
+                                        b_z = fnc_b_z( s )
+
+                                        self.arr[c][d][b].set_mag( ( b_x, b_y, b_z ) )
+                print self['n_cup']

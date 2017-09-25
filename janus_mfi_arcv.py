@@ -133,7 +133,6 @@ class mfi_arcv( object ) :
 		# strings, and as "datetime" epochs.
 
 		time_strt_val = calc_time_val( time_strt               )
-                print time_strt_val
 		time_stop_val = calc_time_val( time_strt_val + dur_sec )
 
 		time_strt_str = calc_time_str( time_strt_val )
