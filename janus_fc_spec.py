@@ -439,7 +439,7 @@ class fc_spec( ) :
         def set_mag( self, mfi_t, mfi_b_x, mfi_b_y, mfi_b_z ) :
 
                 mfi_s = [ ( t - mfi_t[0] ) for t in mfi_t ]
-                print type(mfi_t)
+
                 fnc_b_x = interp1d( mfi_s, mfi_b_x )
                 fnc_b_y = interp1d( mfi_s, mfi_b_y )
                 fnc_b_z = interp1d( mfi_s, mfi_b_z )
@@ -457,4 +457,3 @@ class fc_spec( ) :
                                         b_z = fnc_b_z( s )
 
                                         self.arr[c][d][b].set_mag( ( b_x, b_y, b_z ) )
-                print self['n_cup']
