@@ -436,25 +436,42 @@ class fc_spec( ) :
 	# DEFINE THE FUNCTION TO ASSIGN THE MAGNETIC FIELD TO EACH DATUM. 
 	#-----------------------------------------------------------------------
 
-        def set_mag( self, mfi_t, mfi_b_x, mfi_b_y, mfi_b_z ) :
+	def set_mag( self, mfi_t, mfi_b_x, mfi_b_y, mfi_b_z ) :
 
-                mfi_s = [ ( t - mfi_t[0] ) for t in mfi_t ]
-                print type(mfi_t)
-                fnc_b_x = interp1d( mfi_s, mfi_b_x )
-                fnc_b_y = interp1d( mfi_s, mfi_b_y )
-                fnc_b_z = interp1d( mfi_s, mfi_b_z )
+		mfi_s = [ ( t - mfi_t[0] ).total_seconds( ) for t in mfi_t ]
 
-                for c in range( self['n_cup'] ) :
+		fnc_b_x = interp1d( mfi_s, mfi_b_x )
+		fnc_b_y = interp1d( mfi_s, mfi_b_y )
+		fnc_b_z = interp1d( mfi_s, mfi_b_z )
 
-                        for d in range( self['n_dir'] ) :
+		print mfi_s
 
-                                for b in range( self['n_bin'] ) :
-                                        print self.arr[c][d][b]['time']
-                                        s = ( self.arr[c][d][b]['time'] - mfi_t[0] ).total_seconds()
-                                        print s
-                                        b_x = fnc_b_x( s )
-                                        b_y = fnc_b_y( s )
-                                        b_z = fnc_b_z( s )
+		try :
 
-                                        self.arr[c][d][b].set_mag( ( b_x, b_y, b_z ) )
-                print self['n_cup']
+			for c in range( self['n_cup'] ) :
+
+				for d in range( self['n_dir'] ) :
+
+					for b in range( self['n_bin'] ) :
+
+						s = ( self.arr[c][d][b]['time'] - mfi_t[0] ).total_seconds( )
+
+						b_x = fnc_b_x( s )
+						b_y = fnc_b_y( s )
+						b_z = fnc_b_z( s )
+
+						self.arr[c][d][b].set_mag( ( b_x, b_y, b_z ) )
+
+		except :
+
+			avg_b_x = sum( mfi_b_x ) / float( len( mfi_b_x ) )
+			avg_b_y = sum( mfi_b_y ) / float( len( mfi_b_y ) )
+			avg_b_z = sum( mfi_b_z ) / float( len( mfi_b_z ) )
+
+			for c in range( self['n_cup'] ) :
+
+				for d in range( self['n_dir'] ) :
+
+					for b in range( self['n_bin'] ) :
+
+						self.arr[c][d][b].set_mag( ( avg_b_x, avg_b_y, avg_b_z ) )

@@ -684,13 +684,13 @@ class core( QObject ) :
 		# Load the Wind/MFI magnetic field data associated with this
 		# spectrum.
 
-		( mfi_t, mfi_b_x, mfi_b_y, mfi_b_z  ) = \
-		          self.mfi_arcv.load_rang( self.time_val,
-		                                   self.fc_spec['dur'] )
-                print type(mfi_t)
+		( self.mfi_t, self.mfi_b_x, self.mfi_b_y, self.mfi_b_z ) = \
+		            self.mfi_arcv.load_rang( self.time_val - 6.,
+		                                     self.fc_spec['dur'] + 12. )
+
 		# Establish the number of data.
 
-		self.n_mfi = len( mfi_t )
+		self.n_mfi = len( self.mfi_t )
 
 		# If no magnetic field data were returned, abort with a signal
 		# that the data have changed.
@@ -701,18 +701,13 @@ class core( QObject ) :
 
 			return
 
-		# Store the loaded data.  As part of this step, shift the data's
-		# timestamps to be relative to the start time of this Wind/FC
-		# ion spectrum.
+		# Compute and store derived paramters.
 
-#		self.mfi_t = array( [ ( t - self.time_epc ).total_seconds( )
-#		                      for t in mfi_t                         ] )
+		self.mfi_s = [ ( t - self.fc_spec['time'] ).total_seconds( )
+		               for t in self.mfi_t                           ]
 
-		self.mfi_b_x   = mfi_b_x
-		self.mfi_b_y   = mfi_b_y
-		self.mfi_b_z   = mfi_b_z
-                self.mfi_b_vec = [ self.mfi_b_x, self.mfi_b_y, self.mfi_b_z ]
-
+                mfi_b_vec = [ self.mfi_b_x, self.mfi_b_y, self.mfi_b_z ]
+		"""
 		# Compute the magnetic field magnitude.
 
 		self.mfi_b = sqrt( self.mfi_b_x**2 + self.mfi_b_y**2
@@ -752,27 +747,6 @@ class core( QObject ) :
 		self.mfi_avg_mag_angles = array( [ mean( self.mfi_b_colat ),
 		                                   mean( self.mfi_b_lon   )  ] )
 
-		# Use interpolation to estimate a magnetic-field vector for each
-		# velocity bin.
-
-		self.mag_t   = self.fc_spec['rot'] * ( arange( self.fc_spec['n_bin'] ) + 0.5 )
-
-#		tk_lo        = where( self.mag_t < amin( self.mfi_t ) )
-#		tk_hi        = where( self.mag_t > amax( self.mfi_t ) )
-#
-#                mag_field = self.fc_spec.set_mag(self.mfi_t, self.mfi_b_x, self.mfi_b_y, self.mfi_b_z)
-#                print mag_field
-#
-#		self.mag_t[tk_lo] = amin( self.mfi_t )
-#		self.mag_t[tk_hi] = amax( self.mfi_t )
-#
-#		self.mag_x = interp1d( self.mfi_t, self.mfi_b_x,
-#		                       bounds_error=False )( self.mag_t )
-#		self.mag_y = interp1d( self.mfi_t, self.mfi_b_y,
-#		                       bounds_error=False )( self.mag_t )
-#		self.mag_z = interp1d( self.mfi_t, self.mfi_b_z,
-#		                       bounds_error=False )( self.mag_t )
-
 		# Calculating the average angular deviation of magnetic field
 
                 self.psi_b = sum( arccos( [ self.mfi_b_vec[i] * 
@@ -780,6 +754,12 @@ class core( QObject ) :
                                             self.mfi_b[i] for i in range(3) ] ))
 
                 self.psi_b_avg = self.psi_b/self.n_mfi
+		"""
+		# Use interpolation to estiamte the magnetic field vector for
+		# each datum in the FC spectrum.
+
+		self.fc_spec.set_mag( self.mfi_t, self.mfi_b_x,
+		                                  self.mfi_b_y, self.mfi_b_z )
 
 		# Message the user that new Wind/MFI data have been loaded.
 
@@ -788,7 +768,9 @@ class core( QObject ) :
 		# Emit a signal that indicates that a new Wind/MFI data have now
 		# been loaded.
 
-		self.emit( SIGNAL('janus_chng_mfi') )
+		### FIXME
+
+		###self.emit( SIGNAL('janus_chng_mfi') )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CHANGING THE MOM. SELCTION DIRECTION WINDOW.
