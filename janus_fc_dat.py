@@ -152,14 +152,12 @@ class fc_dat( ) :
 			return ( self._norm_b_x, self._norm_b_y, self._norm_b_z )
 		elif ( key == 'maglook' ) :
 			return ( self._maglook )
-
 		else :
 			raise KeyError( 'Invalid key for "fc_dat ".' )
 
-
 	def __setitem__( self, key, val ) :
 
-		raise KeyError('Reassignment not allowed after initialization')
+		raise KeyError('Reassignment not allowed after initialization.')
 
 
 	#-----------------------------------------------------------------------
