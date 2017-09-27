@@ -327,10 +327,27 @@ class core( QObject ) :
 
 		if ( var_mom_res ) :
 
-			self.mom_res  = None
+
+			self.mom_n_eta = 0
+
+			self.mom_eta_v = None
+			self.mom_eta_w = None
+			self.mom_eta_t = None
+
+			self.mom_n = None
+			self.mom_v = None
+			self.mom_w = None
+			self.mom_t = None
+			self.mom_r = None
+
+			self.mom_v_vec = None
+
+			self.mom_w_per = None
+			self.mom_w_par = None
+			self.mom_t_per = None
+			self.mom_t_par = None
 
 			self.mom_curr = None
-                        self.mom_n    = None
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion species and populations for the non-linear analysis.
@@ -1208,8 +1225,49 @@ class core( QObject ) :
 		# Calculate the expected currents based on the results of the
 		# (linear) moments analysis.
 
-		self.mom_curr = self.fc_spec.calc_curr_pop(
-		                                           self.mom_res['p_c'] )
+		mom_curr = tile( 0., [ self.n_alt, self.n_dir, self.n_vel ] )
+
+		if ( aniso ) :
+			for c in range( self.n_alt ) :
+				for d in range( self.n_dir ) :
+					mom_curr[c][d] =self.fc_spec.\
+					           arr[c][d][0].calc_curr_bmx(
+					           mom_n, mom_v_vec[0],
+					           mom_v_vec[1], mom_v_vec[2],
+					           mom_w_per, mom_w_par        )
+		else :
+			for c in range( self.n_alt ) :
+				for d in range( self.n_dir ) :
+					mom_curr[c][d] =self.fc_spec.\
+					           arr[c][d][0].calc_curr_max(
+					           mom_n, mom_v_vec[0],
+					           mom_v_vec[1], mom_v_vec[2],
+					           mom_w                       )
+
+		# Save the "mom_?" and "mom_?_???" values and select "eta_*"
+		# arrays.
+
+		self.mom_n = mom_n
+		self.mom_v = mom_v
+		self.mom_w = mom_w
+		self.mom_t = mom_t
+		self.mom_r = mom_r
+
+		self.mom_v_vec = mom_v_vec
+
+		self.mom_w_per = mom_w_per
+		self.mom_w_par = mom_w_par
+		self.mom_t_per = mom_t_per
+		self.mom_t_par = mom_t_par
+
+		self.mom_n_eta = n_eta
+
+		self.mom_eta_n = eta_n
+		self.mom_eta_v = eta_v
+		self.mom_eta_w = eta_w
+		self.mom_eta_t = eta_t
+
+		self.mom_curr = mom_curr
 
 		# Message the user that the moments analysis has completed.
 

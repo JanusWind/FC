@@ -433,7 +433,7 @@ class fc_spec( ) :
 		return b_max
 
         #-----------------------------------------------------------------------
-        # DEFINE THE FUNCTION TO ASSIGN THE MAGNETIC FIELD TO EACH DATUM. 
+        # DEFINE A FUNCTION TO ASSIGN MAGNETIC FIELD TO EACH DATUM. 
         #-----------------------------------------------------------------------
 
         def set_mag( self, mfi_t, mfi_b_x, mfi_b_y, mfi_b_z ) :
@@ -443,8 +443,6 @@ class fc_spec( ) :
                 fnc_b_x = interp1d( mfi_s, mfi_b_x )
                 fnc_b_y = interp1d( mfi_s, mfi_b_y )
                 fnc_b_z = interp1d( mfi_s, mfi_b_z )
-
-                print mfi_s
 
                 try :
 

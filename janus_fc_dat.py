@@ -67,8 +67,6 @@ class fc_dat( ) :
 		self._vel_del   = (  self['vel_stop']-self['vel_strt']      )
 		self._curr      = curr
 
-#                ( mfi_t, mfi_b_x, mfi_b_y, mfi_b_z ) = \
-#                     self.mfi_arcv.load_rang()
 
                 # TODO: Confirm these two formulae
 
@@ -169,7 +167,6 @@ class fc_dat( ) :
 		# Normalize the magnetic-field vector.
 
 		norm_b = calc_arr_norm( b_vec )
-
 		# Store the components of the normalized magnetic-field vector.
 
 		self._norm_b_x = norm_b[0]
@@ -208,7 +205,7 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT OF A POPULATION.
 	#-----------------------------------------------------------------------
 
-	def calc_curr_pop( self, pop ) :
+	def calc_curr_max( self, n, v_x, v_y, v_z, w ) :
 
 		# Note.  This function is based on Equation 2.34 from Maruca
 		#        (PhD thesis, 2012), but differs by a factor of $2$
@@ -219,30 +216,9 @@ class fc_dat( ) :
 		# perpendicular and parallel thermal speeds and a dummy
 		# magnetic field.
 
-		# If no population has been provided, abort.
+		# Calcualte the vector bulk velocity.
 
-		if ( pop is None ) :
-			return 0.
-
-		# Extract/compute the moments of the population.
-
-		n = pop['n']
-		v = pop['v_vec']
-
-		if ( pop['aniso'] ) :
-
-			w_per = pop['w_per']
-			w_par = pop['w_par']
-
-			ml2 = ( self['maglook'] )**2
-
-			w = sqrt( ( ( 1. - ml2 ) * w_per**2 ) + 
-			          (        ml2   * w_par**2 )   )
-
-                        print(w)
-		else :
-
-			w = pop['w']
+                v = [v_x, v_y, v_z]
 
 		# Calculate the component of the magnetic field unit vector
 		# along that lies along the look direction.
@@ -281,6 +257,31 @@ class fc_dat( ) :
 
 		return ret
 
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT (BI-MAXWELLIAN).
+	#-----------------------------------------------------------------------
+
+	def calc_curr_bmx( self,
+                           n, v_x, v_y, v_z,
+                           w_per, w_par          ) :
+
+
+		# Note.  This function is based on Equation 2.34 from Maruca
+		#        (PhD thesis, 2012), but differs by a factor of $2$
+		#        (i.e., the factor of $2$ from Equation 2.13, which is
+		#        automatically calibrated out of the Wind/FC data).
+
+		# Compute the effective thermal speed along this look direction.
+
+		ml2 = ( self['maglook'] )**2
+
+		w = sqrt( ( ( 1. - ml2 ) * w_per**2 ) + 
+		             (     ml2   * w_par**2 )   )
+
+
+                return self.calc_curr_max( n, v_x, v_y, v_z,
+                                           w                   )
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT OF MANY POP.'S.
 	#-----------------------------------------------------------------------
