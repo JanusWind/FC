@@ -97,7 +97,6 @@ class widget_mfi_ang_plot( QWidget ) :
 		self.pen_crv_colat = mkPen( color='r' )
 		self.pen_crv_lon   = mkPen( color='b' )
 
-
 		self.fnt = self.core.app.font( )
 
 		# Configure the plot: disable automatic adjustments and
@@ -118,7 +117,7 @@ class widget_mfi_ang_plot( QWidget ) :
 
 		labelStyle = {'color':'k'}
 		self.axs_x.setLabel( 'Time [s]'           , **labelStyle )
-		self.axs_y.setLabel( 'Magnetic Field Angle [degrees]', **labelStyle )
+		self.axs_y.setLabel( 'Elev. & Azim. [deg]', **labelStyle )
 
 		self.axs_x.label.setFont( self.fnt )
 		self.axs_y.label.setFont( self.fnt )
@@ -223,7 +222,7 @@ class widget_mfi_ang_plot( QWidget ) :
 	def rset_plt( self ) :
 
 		# Hide and remove each of this plot's elements.
-#
+
 		if ( self.crv_colat is not None ) :
 		     self.plt.removeItem( self.crv_colat )
 

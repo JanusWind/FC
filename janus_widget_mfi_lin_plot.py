@@ -212,7 +212,7 @@ class widget_mfi_lin_plot( QWidget ) :
 		                           self.core.mfi_b,
 		                           pen=self.pen_crv_m )
 		self.crv_n = PlotDataItem( self.core.mfi_s,
-		                           -array(self.core.mfi_b),
+		                           [ -b for b in self.core.mfi_b ],
 		                           pen=self.pen_crv_n )
 		self.crv_x = PlotDataItem( self.core.mfi_s,
 		                           self.core.mfi_b_x,
@@ -223,20 +223,12 @@ class widget_mfi_lin_plot( QWidget ) :
 		self.crv_z = PlotDataItem( self.core.mfi_s,
 		                           self.core.mfi_b_z,
 		                           pen=self.pen_crv_z )
-		# self.crv_colat = PlotDataItem( self.core.mfi_s,
-		#                            self.core.mfi_b_colat,
-		#                            pen=self.pen_crv_colat )
-		# self.crv_lon = PlotDataItem( self.core.mfi_s,
-		#                            self.core.mfi_b_lon,
-		#                            pen=self.pen_crv_lon )
 
 		self.plt.addItem( self.crv_m )
 		self.plt.addItem( self.crv_n )
 		self.plt.addItem( self.crv_x )
 		self.plt.addItem( self.crv_y )
 		self.plt.addItem( self.crv_z )
-		# self.plt.addItem( self.crv_colat )
-		# self.plt.addItem( self.crv_lon )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESETTING THIS PLOT (CLEARING ALL ELEMENTS).
@@ -275,8 +267,6 @@ class widget_mfi_lin_plot( QWidget ) :
 		self.crv_x = None
 		self.crv_y = None
 		self.crv_z = None
-		# self.crv_colat = None
-		# self.crv_lon = None
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "rset" SIGNAL.

@@ -208,26 +208,23 @@ class fc_dat( ) :
 
 	def calc_curr_mxw( self, v0_x, v0_y, v0_z, n, dv, w ) :
 
+
+		"""
+		if ( hasattr( w, '__len__' ) ) :
+			w_eff = #FIXME
+		else :
+			w_eff = w
+		"""
+
+
 		# Note.  This function is based on Equation 2.34 from Maruca
 		#        (PhD thesis, 2012), but differs by a factor of $2$
 		#        (i.e., the factor of $2$ from Equation 2.13, which is
 		#        automatically calibrated out of the Wind/FC data).
 
-		# Return the equivalent bi-Maxwellian response for equal
-		# perpendicular and parallel thermal speeds and a dummy
-		# magnetic field.
-
-		# If no population has been provided, abort.
-
-		if ( n is None ) :
-			return 0.
-
-		if ( dv is None ) :
-			dv = 0.
-
-		v0_vec = (v0_x, v0_y, v0_z)
-
 		# Calculate the total velocity using drift
+
+		v0_vec = ( v0_x, v0_y, v0_z )
 
 		v_vec = array( [ v0_vec[i] + dv*self['norm_b'][i]
 		                                for i in range(len(v0_vec)) ] )

@@ -1233,11 +1233,11 @@ class core( QObject ) :
 		# (linear) moments analysis.
 
 		self.mom_curr = self.fc_spec.calc_curr_pop(
-		                                     self.mom_res['v0_vec'][0], 
-		                                     self.mom_res['v0_vec'][1], 
-		                                     self.mom_res['v0_vec'][2], 
-		                                     mom_n, self.mom_res['dv'],
-		                                     mom_w	               )
+		                                    self.mom_res['v0_x'], 
+		                                    self.mom_res['v0_y'], 
+		                                    self.mom_res['v0_z'], 
+		                                    self.mom_res['n_p_c'], 0.,
+		                                    self.mom_res['w_p_c']      )
 
 		# Message the user that the moments analysis has completed.
 
@@ -1775,20 +1775,22 @@ class core( QObject ) :
 		# Establish which of the ion populations are in use, are valid,
 		# and have initial guesses.
 
-		for i in range ( self.nln_n_pop ) :
+		for p in range ( self.nln_n_pop ) :
 
-			if ( ( self.nln_pop_use[i]               ) and
-			     ( self.nln_pop_vld[i]               ) and
-			     ( self.nln_plas.arr_pop[i].valid(
+			if ( ( self.nln_pop_use[p]               ) and
+			     ( self.nln_pop_vld[p]               ) and
+			     ( self.nln_plas.arr_pop[p].valid(
 			                      require_val=True ) )     ) :
 
-				self.nln_gss_vld[i] = True
+				self.nln_gss_vld[p] = True
 
 			else :
 
-				self.nln_gss_vld[i] = False
+				self.nln_gss_vld[p] = False
 
 		self.nln_gss_pop = where( self.nln_gss_vld )[0]
+
+		self.nln_gss_n_pop = len( self.nln_gss_pop )
 
 		# Reset the "prm" and "cur_???" arrays.
 
@@ -1806,7 +1808,7 @@ class core( QObject ) :
 		#   -- Emit the signal that the NLN guess has been updated.
 		#   -- Return.
 
-		if ( ( len( self.nln_gss_pop ) == 0    ) or
+		if ( ( self.nln_gss_n_pop == 0         ) or
 		     ( 0 not in self.nln_gss_pop       ) or
 		     ( None in self.nln_plas['v0_vec'] ) or
 		     ( self.n_mfi == 0                 )    ) :
@@ -1815,35 +1817,86 @@ class core( QObject ) :
 
 			return
 
-		# Generate the intial guess array in the format expected.
+		# Generate the intial guess array (beginning with the reference
+		# velocity) and compute the expected  currents from each
+		# population.
 
-		prm = list( self.nln_plas['v0_vec'] )
+		pop_v0_vec = self.nln_plas['v0_vec']
 
-		for i in self.nln_gss_pop :
+		self.nln_gss_prm = list( pop_v0_vec )
 
-			prm.append( self.nln_plas.arr_pop[i]['n'] )
+		self.nln_gss_curr_ion = [ ]
 
-			if ( self.nln_plas.arr_pop[i]['drift'] ) :
-				prm.append( self.nln_plas.arr_pop[i]['dv'] )
+		for p in self.nln_gss_pop :
 
-			if ( self.nln_plas.arr_pop[i]['aniso'] ) :
-				prm.append( self.nln_plas.arr_pop[i]['w_per'] )
-				prm.append( self.nln_plas.arr_pop[i]['w_par'] )
+			# Extract the drift and anisotropy states of the population
+
+			pop_drift = self.nln_plas.arr_pop[p]['drift']
+			pop_aniso = self.nln_plas.arr_pop[p]['aniso']
+
+			# Extract the population's density and add it to the
+			# parameter array.
+
+			pop_n = self.nln_plas.arr_pop[p]['n']
+
+			self.nln_gss_prm.append( pop_n )
+
+			# If the population is drifting, extract its drift and
+			# add it to the parameter array.  Otherwise, set the
+			# drift as zero.
+
+			if ( pop_drift ) :
+
+				pop_dv = self.nln_plas.arr_pop[p]['dv']
+
+				self.nln_gss_prm.append( pop_dv )
+
 			else :
-				prm.append( self.nln_plas.arr_pop[i]['w'] )
 
-		self.nln_gss_prm = prm
+				pop_dv = 0.
 
-		# Calculate the expected currents based on the initial guess.
+			# If the population is anisotropic, extract its
+			# perpendicular and parallel thermal-speeds and add them
+			# to the parameter array.  Otherwise, extract its scalar
+			# thermal speed and add it to the parameter array.
 
-		self.nln_gss_curr_ion = self.fc_spec.calc_curr_plas(
-		                                             self.nln_gss_plas )
+			if ( pop_aniso ) :
+
+				pop_w     = ( self.nln_plas.arr_pop[p]['w_per'],
+				              self.nln_plas.arr_pop[p]['w_par']  )
+
+				self.nln_gss_prm.append( pop_w[0] )
+				self.nln_gss_prm.append( pop_w[1] )
+
+			else :
+
+				pop_w     = self.nln_plas.arr_pop[p]['w']
+
+				self.nln_gss_prm.append( pop_w )
+
+			# For each datum in the spectrum, compute the expected
+			# current from each population.
+
+			self.nln_gss_curr_ion.append(
+			     self.fc_spec.calc_curr(
+			         pop_v0_vec, pop_n, pop_dv, pop_w ) )
+
+		# Alter the axis order of the array of currents.
+
+		self.nln_gss_curr_ion = [ [ [ [ 
+		     self.nln_gss_curr_ion[p][c][d][b]
+		          for p in range( self.nln_gss_n_pop ) ]
+		          for b in range( self.fc_spec['n_bin']   ) ]
+		          for d in range( self.fc_spec['n_dir']   ) ]
+		          for c in range( self.fc_spec['n_cup']   ) ]
+
+		# For each datum in the spectrum, compute the total expected current (from all populations).
 
 		self.nln_gss_curr_tot = [ [ [
-		                       sum( self.nln_gss_curr_ion[c][d][b])
-		                       for b in range( self.fc_spec['n_bin'] ) ]
-		                       for d in range( self.fc_spec['n_dir'] ) ]
-		                       for c in range( self.fc_spec['n_cup'] ) ]
+		     sum( [ self.nln_gss_curr_ion[c][d][b] )
+		          for b in range( self.fc_spec['n_bin']   ) ]
+		          for d in range( self.fc_spec['n_dir']   ) ]
+		          for c in range( self.fc_spec['n_cup']   ) ]
 
 		# Propagate the new initial-guess for the non-linear analysis.
 
