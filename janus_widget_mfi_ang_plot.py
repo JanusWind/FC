@@ -160,8 +160,8 @@ class widget_mfi_ang_plot( QWidget ) :
 
 			# Establish the domain of the plot.
 
-			t_min = min( amin( self.core.mfi_t ), 0. )
-			t_max = max( amax( self.core.mfi_t ),
+			t_min = min( amin( self.core.mfi_s ), 0. )
+			t_max = max( amax( self.core.mfi_s ),
 			             self.core.fc_spec['dur']      )
 
 			# Establish the range of the plot.  As part of this,
@@ -206,10 +206,10 @@ class widget_mfi_ang_plot( QWidget ) :
 
 		# Generate and display each curve for the plot.
 
-		self.crv_colat = PlotDataItem( self.core.mfi_t,
+		self.crv_colat = PlotDataItem( self.core.mfi_s,
 		                               self.core.mfi_b_colat,
 		                               pen=self.pen_crv_colat )
-		self.crv_lon   = PlotDataItem( self.core.mfi_t,
+		self.crv_lon   = PlotDataItem( self.core.mfi_s,
 		                               self.core.mfi_b_lon,
 		                               pen=self.pen_crv_lon   )
 

@@ -125,12 +125,12 @@ class widget_mfi_info( format_TextEdit ) :
 
 		self.prnt_tab( 1 )
 		self.prnt_htm( '<i><font color="#0000FF">B<sub>&lambda;</sub></i> = ')
-		self.prnt_dcm( self.core.mfi_avg_mag_angles[0], 1, '<sup>o</sup>' )
+		self.prnt_dcm( self.core.mfi_amag_ang[0], 1, '<sup>o</sup>' )
 		self.prnt_brk( )
 
 		self.prnt_tab( 1 )
 		self.prnt_htm( '<i><font color="#FF0000">B<sub>&phi;</sub></i> = ')
-		self.prnt_dcm( self.core.mfi_avg_mag_angles[1], 1, '<sup>o</sup>' )
+		self.prnt_dcm( self.core.mfi_amag_ang[1], 1, '<sup>o</sup>' )
 		self.prnt_brk( )
 
 		self.prnt_brk( )

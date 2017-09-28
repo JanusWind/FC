@@ -763,11 +763,10 @@ class core( QObject ) :
 
 		mfi_b_colat       = arctan2( self.mfi_b_z, mfi_b_rho )
 		mfi_b_lon         = arctan2( self.mfi_b_y, self.mfi_b_x )
-		mfi_b_colat       = rad2deg( mfi_b_colat )
-		mfi_b_lon         = rad2deg( mfi_b_lon )
 
-		self.mfi_b_colat  = mfi_b_colat
-		self.mfi_b_lon    = mfi_b_lon
+		self.mfi_b_colat  = rad2deg( mfi_b_colat )
+		self.mfi_b_lon    = rad2deg( mfi_b_lon )
+
 		self.mfi_amag_ang = array( [ mean( self.mfi_b_colat ),
 		                                   mean( self.mfi_b_lon   )  ] )
 
@@ -778,9 +777,8 @@ class core( QObject ) :
 		                              for j in range(3))])
 	                              for i in range( len( self.mfi_nrm ) ) ]
 
-		print self.psi_b
-                self.psi_b_avg =sum( self.psi_b)/self.n_mfi
-		print self.psi_b_avg
+                self.psi_b_avg = rad2deg(sum( self.psi_b)/self.n_mfi)
+
 		# Use interpolation to estiamte the magnetic field vector for
 		# each datum in the FC spectrum.
 

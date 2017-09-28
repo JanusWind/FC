@@ -36,7 +36,7 @@ from pyqtgraph import mkPen, PlotDataItem, PlotWidget, setConfigOption
 
 # Load the necessary "numpy" array modules and numeric-function modules.
 
-from numpy import amax, amin
+from numpy import amax, amin, array
 
 
 ################################################################################
@@ -166,8 +166,8 @@ class widget_mfi_lin_plot( QWidget ) :
 
 			# Establish the domain of the plot.
 
-			t_min = min( amin( self.core.mfi_t ), 0. )
-			t_max = max( amax( self.core.mfi_t ),
+			t_min = min( amin( self.core.mfi_s ), 0. )
+			t_max = max( amax( self.core.mfi_s ),
 			             self.core.fc_spec['dur']     )
 
 			# Establish the range of the plot.  As part of this,
@@ -208,25 +208,25 @@ class widget_mfi_lin_plot( QWidget ) :
 
 		# Generate and display each curve for the plot.
 
-		self.crv_m = PlotDataItem( self.core.mfi_t,
+		self.crv_m = PlotDataItem( self.core.mfi_s,
 		                           self.core.mfi_b,
 		                           pen=self.pen_crv_m )
-		self.crv_n = PlotDataItem( self.core.mfi_t,
-		                           -self.core.mfi_b,
+		self.crv_n = PlotDataItem( self.core.mfi_s,
+		                           -array(self.core.mfi_b),
 		                           pen=self.pen_crv_n )
-		self.crv_x = PlotDataItem( self.core.mfi_t,
+		self.crv_x = PlotDataItem( self.core.mfi_s,
 		                           self.core.mfi_b_x,
 		                           pen=self.pen_crv_x )
-		self.crv_y = PlotDataItem( self.core.mfi_t,
+		self.crv_y = PlotDataItem( self.core.mfi_s,
 		                           self.core.mfi_b_y,
 		                           pen=self.pen_crv_y )
-		self.crv_z = PlotDataItem( self.core.mfi_t,
+		self.crv_z = PlotDataItem( self.core.mfi_s,
 		                           self.core.mfi_b_z,
 		                           pen=self.pen_crv_z )
-		# self.crv_colat = PlotDataItem( self.core.mfi_t,
+		# self.crv_colat = PlotDataItem( self.core.mfi_s,
 		#                            self.core.mfi_b_colat,
 		#                            pen=self.pen_crv_colat )
-		# self.crv_lon = PlotDataItem( self.core.mfi_t,
+		# self.crv_lon = PlotDataItem( self.core.mfi_s,
 		#                            self.core.mfi_b_lon,
 		#                            pen=self.pen_crv_lon )
 
