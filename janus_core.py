@@ -283,24 +283,35 @@ class core( QObject ) :
 
 		if ( var_mfi ) :
 
-			self.n_mfi       = 0
+			self.n_mfi        = 0
 
-			self.mfi_dur     = 0.
+			self.mfi_dur      = 0.
 
-			self.mfi_t       = None
-			self.mfi_b       = None
-			self.mfi_b_x     = None
-			self.mfi_b_y     = None
-			self.mfi_b_z     = None
+			self.mfi_t        = None
+			self.mfi_b        = None
+			self.mfi_b_x      = None
+			self.mfi_b_y      = None
+			self.mfi_b_z      = None
+			self.mfi_b_vec    = None
+			self.mfi_nrm      = None
 
-			self.mfi_avg_mag = None
-			self.mfi_avg_vec = None
-			self.mfi_avg_nrm = None
+			self.mfi_avg_mag  = None
+			self.mfi_avg_vec  = None
+			self.mfi_avg_nrm  = None
 
-			self.mfi_hat_dir = None
+			self.mfi_hat_dir  = None
 
-			self.psi_b       = None
-                        self.psi_b_avg   = None
+			self.psi_b        = None
+                        self.psi_b_avg    = None
+
+			self.mfi_s        = None
+
+			self.mfi_b_colat  = None
+			self.mfi_b_lon    = None
+			self.psi_b        = None
+			self.psi_b_avg    = None
+
+			self.mfi_amag_ang = None
 
 		# If requested, (re-)initialize the varaibles for the windows
 		# associated with automatic data selection for the moments
@@ -327,27 +338,10 @@ class core( QObject ) :
 
 		if ( var_mom_res ) :
 
-
-			self.mom_n_eta = 0
-
-			self.mom_eta_v = None
-			self.mom_eta_w = None
-			self.mom_eta_t = None
-
-			self.mom_n = None
-			self.mom_v = None
-			self.mom_w = None
-			self.mom_t = None
-			self.mom_r = None
-
-			self.mom_v_vec = None
-
-			self.mom_w_per = None
-			self.mom_w_par = None
-			self.mom_t_per = None
-			self.mom_t_par = None
+			self.mom_res  = None
 
 			self.mom_curr = None
+                        self.mom_n    = None
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion species and populations for the non-linear analysis.
@@ -723,12 +717,16 @@ class core( QObject ) :
 		self.mfi_s = [ ( t - self.fc_spec['time'] ).total_seconds( )
 		               for t in self.mfi_t                           ]
 
-                mfi_b_vec = [ self.mfi_b_x, self.mfi_b_y, self.mfi_b_z ]
-		"""
+                self.mfi_b_vec = [ ( self.mfi_b_x[i],
+		                     self.mfi_b_y[i],
+		                     self.mfi_b_z[i] )
+		                     for i in range( len( self.mfi_b_x ) ) ]
+
 		# Compute the magnetic field magnitude.
 
-		self.mfi_b = sqrt( self.mfi_b_x**2 + self.mfi_b_y**2
-		                                   + self.mfi_b_z**2 )
+		self.mfi_b = [sqrt(sum([self.mfi_b_vec[i][j]**2
+		                      for j in range( 3 ) ]               )   )
+		                      for i in range( len( self.mfi_b_vec ) ) ]
 
 		# Compute the average magetic field.
 
@@ -742,36 +740,47 @@ class core( QObject ) :
 
 		self.mfi_avg_nrm = self.mfi_avg_vec / self.mfi_avg_mag
 
+		self.mfi_nrm     = [(self.mfi_b_vec[i][0],
+		                     self.mfi_b_vec[i][1],
+		                     self.mfi_b_vec[i][2])/self.mfi_b[i]
+		                     for i in range( len( self.mfi_b ) ) ]
+
 		# Compute the dot product between the average, normalized
 		# magnetic field and each look direction.
 
 		self.mfi_hat_dir = array( [ [
-		          dot(self.fc_spec.arr[c][d][0]['dir'], self.mfi_avg_nrm )
+		          dot(self.fc_spec.arr[c][d][0]['dir'],
+		              self.mfi_avg_nrm                    )
 		          for d in range( self.fc_spec['n_dir'] ) ]
 		        for c in range( self.fc_spec['n_cup'] ) ] )
 
 		# Compute the mfi angles.
 		# These are useful diagnostic tools.
 
-		mfi_b_rho               = sqrt( mfi_b_x**2.0 + mfi_b_y**2.0 )
-		mfi_b_colat             = arctan2( mfi_b_z, mfi_b_rho )
-		mfi_b_lon               = arctan2( mfi_b_y, mfi_b_x )
-		mfi_b_colat             = rad2deg( mfi_b_colat )
-		mfi_b_lon               = rad2deg( mfi_b_lon )
+		mfi_b_rho      = [sqrt( self.mfi_b_x[i]**2.0 
+		                      + self.mfi_b_y[i]**2.0 )
+		                        for i in range( len( self.mfi_b_x ) ) ]
 
-		self.mfi_b_colat        = mfi_b_colat
-		self.mfi_b_lon          = mfi_b_lon
-		self.mfi_avg_mag_angles = array( [ mean( self.mfi_b_colat ),
+		mfi_b_colat       = arctan2( self.mfi_b_z, mfi_b_rho )
+		mfi_b_lon         = arctan2( self.mfi_b_y, self.mfi_b_x )
+		mfi_b_colat       = rad2deg( mfi_b_colat )
+		mfi_b_lon         = rad2deg( mfi_b_lon )
+
+		self.mfi_b_colat  = mfi_b_colat
+		self.mfi_b_lon    = mfi_b_lon
+		self.mfi_amag_ang = array( [ mean( self.mfi_b_colat ),
 		                                   mean( self.mfi_b_lon   )  ] )
 
 		# Calculating the average angular deviation of magnetic field
 
-                self.psi_b = sum( arccos( [ self.mfi_b_vec[i] * 
-					    self.mfi_avg_nrm[i] /
-                                            self.mfi_b[i] for i in range(3) ] ))
+		self.psi_b = [ arccos( [ sum (self.mfi_nrm[i][j] *
+		                              self.mfi_avg_nrm[j]
+		                              for j in range(3))])
+	                              for i in range( len( self.mfi_nrm ) ) ]
 
-                self.psi_b_avg = self.psi_b/self.n_mfi
-		"""
+		print self.psi_b
+                self.psi_b_avg =sum( self.psi_b)/self.n_mfi
+		print self.psi_b_avg
 		# Use interpolation to estiamte the magnetic field vector for
 		# each datum in the FC spectrum.
 
@@ -787,7 +796,7 @@ class core( QObject ) :
 
 		### FIXME
 
-		###self.emit( SIGNAL('janus_chng_mfi') )
+		self.emit( SIGNAL('janus_chng_mfi') )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CHANGING THE MOM. SELCTION DIRECTION WINDOW.
@@ -1225,49 +1234,12 @@ class core( QObject ) :
 		# Calculate the expected currents based on the results of the
 		# (linear) moments analysis.
 
-		mom_curr = tile( 0., [ self.n_alt, self.n_dir, self.n_vel ] )
-
-		if ( aniso ) :
-			for c in range( self.n_alt ) :
-				for d in range( self.n_dir ) :
-					mom_curr[c][d] =self.fc_spec.\
-					           arr[c][d][0].calc_curr_bmx(
-					           mom_n, mom_v_vec[0],
-					           mom_v_vec[1], mom_v_vec[2],
-					           mom_w_per, mom_w_par        )
-		else :
-			for c in range( self.n_alt ) :
-				for d in range( self.n_dir ) :
-					mom_curr[c][d] =self.fc_spec.\
-					           arr[c][d][0].calc_curr_max(
-					           mom_n, mom_v_vec[0],
-					           mom_v_vec[1], mom_v_vec[2],
-					           mom_w                       )
-
-		# Save the "mom_?" and "mom_?_???" values and select "eta_*"
-		# arrays.
-
-		self.mom_n = mom_n
-		self.mom_v = mom_v
-		self.mom_w = mom_w
-		self.mom_t = mom_t
-		self.mom_r = mom_r
-
-		self.mom_v_vec = mom_v_vec
-
-		self.mom_w_per = mom_w_per
-		self.mom_w_par = mom_w_par
-		self.mom_t_per = mom_t_per
-		self.mom_t_par = mom_t_par
-
-		self.mom_n_eta = n_eta
-
-		self.mom_eta_n = eta_n
-		self.mom_eta_v = eta_v
-		self.mom_eta_w = eta_w
-		self.mom_eta_t = eta_t
-
-		self.mom_curr = mom_curr
+		self.mom_curr = self.fc_spec.calc_curr_pop(
+		                                     self.mom_res['v0_vec'][0], 
+		                                     self.mom_res['v0_vec'][1], 
+		                                     self.mom_res['v0_vec'][2], 
+		                                     mom_n, self.mom_res['dv'],
+		                                     mom_w	               )
 
 		# Message the user that the moments analysis has completed.
 

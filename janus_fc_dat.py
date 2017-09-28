@@ -26,12 +26,11 @@
 ################################################################################
 
 from math import sqrt, acos, pi
-from numpy import interp, sin, cos, deg2rad, exp
+from numpy import interp, sin, cos, deg2rad, exp, array
 from scipy.special import erf
 
 from janus_const import const
 from janus_helper import calc_arr_norm, calc_arr_dot
-from janus_mfi_arcv import mfi_arcv
 
 
 ################################################################################
@@ -52,7 +51,6 @@ class fc_dat( ) :
 		self._volt_del  = volt_del
                 self._valid     = valid
                 self._time      = time
-#                self.mfi_arcv    = mfi_arcv( core=self )
 
 		self._volt_strt = (self._volt_cen - ( self._volt_del / 2. ) )
 		self._volt_stop = (self._volt_cen + ( self._volt_del / 2. ) )
@@ -67,6 +65,8 @@ class fc_dat( ) :
 		self._vel_del   = (  self['vel_stop']-self['vel_strt']      )
 		self._curr      = curr
 
+#                ( mfi_t, mfi_b_x, mfi_b_y, mfi_b_z ) = \
+#                     self.mfi_arcv.load_rang()
 
                 # TODO: Confirm these two formulae
 
@@ -167,6 +167,7 @@ class fc_dat( ) :
 		# Normalize the magnetic-field vector.
 
 		norm_b = calc_arr_norm( b_vec )
+
 		# Store the components of the normalized magnetic-field vector.
 
 		self._norm_b_x = norm_b[0]
@@ -202,10 +203,10 @@ class fc_dat( ) :
 		return interp( psi, self._spec._eff_deg, self._spec._eff_area )
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT OF A POPULATION.
+	# DEFINE THE FUNCTION TO CALCULATE EXPECTED MAXWELLIAN CURRENT.
 	#-----------------------------------------------------------------------
 
-	def calc_curr_max( self, n, v_x, v_y, v_z, w ) :
+	def calc_curr_mxw( self, v0_x, v0_y, v0_z, n, dv, w ) :
 
 		# Note.  This function is based on Equation 2.34 from Maruca
 		#        (PhD thesis, 2012), but differs by a factor of $2$
@@ -216,14 +217,25 @@ class fc_dat( ) :
 		# perpendicular and parallel thermal speeds and a dummy
 		# magnetic field.
 
-		# Calcualte the vector bulk velocity.
+		# If no population has been provided, abort.
 
-                v = [v_x, v_y, v_z]
+		if ( n is None ) :
+			return 0.
+
+		if ( dv is None ) :
+			dv = 0.
+
+		v0_vec = (v0_x, v0_y, v0_z)
+
+		# Calculate the total velocity using drift
+
+		v_vec = array( [ v0_vec[i] + dv*self['norm_b'][i]
+		                                for i in range(len(v0_vec)) ] )
 
 		# Calculate the component of the magnetic field unit vector
 		# along that lies along the look direction.
 
-		dlk_v   = -calc_arr_dot( self['dir'], v )
+		dlk_v   = -calc_arr_dot( self['dir'], v_vec )
 
 		# Calculate the exponential terms of the current.
 
@@ -252,36 +264,43 @@ class fc_dat( ) :
 
 		ret = ( (   1.e12 ) * ( 1. / 2. ) * ( const['q_p'] )
 		        * ( 1.e6 * n )
-		        * ( 1.e-4 * self.calc_eff_area( v ) )
+		        * ( 1.e-4 * self.calc_eff_area( v_vec ) )
 		        * ( ret_prn ) )
 
 		return ret
 
-
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT (BI-MAXWELLIAN).
+	# DEFINE THE FUNCTION TO CALCULATE EXPECTED BI-MAXWELLIAN CURRENT.
 	#-----------------------------------------------------------------------
 
-	def calc_curr_bmx( self,
-                           n, v_x, v_y, v_z,
-                           w_per, w_par          ) :
-
+	def calc_curr_bmxw( self, v0_x, v0_y, v0_z, n, dv, w_per, w_par ) :
 
 		# Note.  This function is based on Equation 2.34 from Maruca
 		#        (PhD thesis, 2012), but differs by a factor of $2$
 		#        (i.e., the factor of $2$ from Equation 2.13, which is
 		#        automatically calibrated out of the Wind/FC data).
 
-		# Compute the effective thermal speed along this look direction.
+		# Return the equivalent bi-Maxwellian response for equal
+		# perpendicular and parallel thermal speeds and a dummy
+		# magnetic field.
+
+		# If no population has been provided, abort.
+
+		if ( n is None ) :
+			return 0.
+
+		# Extract/compute the moments of the population.
+
+#		n = pop['n']
+#		v = pop['v_vec']
 
 		ml2 = ( self['maglook'] )**2
 
 		w = sqrt( ( ( 1. - ml2 ) * w_per**2 ) + 
-		             (     ml2   * w_par**2 )   )
+		          (        ml2   * w_par**2 )   )
 
+		return calc_curr_mxw(v0_x, v0_y, v0_z, n, dv, w)
 
-                return self.calc_curr_max( n, v_x, v_y, v_z,
-                                           w                   )
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT OF MANY POP.'S.
 	#-----------------------------------------------------------------------
