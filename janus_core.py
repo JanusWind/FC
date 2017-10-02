@@ -1673,7 +1673,7 @@ class core( QObject ) :
 
 		self.emit( SIGNAL('janus_chng_nln_gss') )   # This can be removed once 'make_nln_gss' is fixed.
 #
-#		self.make_nln_gss( )
+		self.make_nln_gss( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CHANGING A GUESS VALUE FOR ONE NLN PARAMETER.
@@ -1829,7 +1829,8 @@ class core( QObject ) :
 
 		for p in self.nln_gss_pop :
 
-			# Extract the drift and anisotropy states of the population
+			# Extract the drift and anisotropy states of the
+			# population
 
 			pop_drift = self.nln_plas.arr_pop[p]['drift']
 			pop_aniso = self.nln_plas.arr_pop[p]['aniso']
@@ -1863,7 +1864,7 @@ class core( QObject ) :
 			if ( pop_aniso ) :
 
 				pop_w     = ( self.nln_plas.arr_pop[p]['w_per'],
-				              self.nln_plas.arr_pop[p]['w_par']  )
+				              self.nln_plas.arr_pop[p]['w_par'])
 
 				self.nln_gss_prm.append( pop_w[0] )
 				self.nln_gss_prm.append( pop_w[1] )
@@ -1890,13 +1891,14 @@ class core( QObject ) :
 		          for d in range( self.fc_spec['n_dir']   ) ]
 		          for c in range( self.fc_spec['n_cup']   ) ]
 
-		# For each datum in the spectrum, compute the total expected current (from all populations).
+		# For each datum in the spectrum, compute the total expected
+		# current (from all populations).
 
-		self.nln_gss_curr_tot = [ [ [
-		     sum( [ self.nln_gss_curr_ion[c][d][b] )
+		self.nln_gss_curr_tot = \
+		     sum( [ [ [ self.nln_gss_curr_ion[c][d][b] 
 		          for b in range( self.fc_spec['n_bin']   ) ]
 		          for d in range( self.fc_spec['n_dir']   ) ]
-		          for c in range( self.fc_spec['n_cup']   ) ]
+		          for c in range( self.fc_spec['n_cup']   ) ] )
 
 		# Propagate the new initial-guess for the non-linear analysis.
 
@@ -1906,7 +1908,7 @@ class core( QObject ) :
 	# DEFINE THE FUNCTION FOR PROPAGATING THE GUESS FOR THE NLN ANALYSIS.
 	#-----------------------------------------------------------------------
 
-        def prop_nln_gss( self ) :
+	def prop_nln_gss( self ) :
 
 		# Emit a signal that indicates that the initial guess for the
 		# non-linear analysis has changed.
