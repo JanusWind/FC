@@ -639,7 +639,7 @@ class widget_fc_cup( QWidget ) :
 
 				# Extract the points of the fit curve.
 
-				x = [ self.core.fc_spec.arr[self.c][d][b][
+				x = [ self.core.fc_spec.arr[self.c][0][b][
 				                                    'vel_cen']
 				      for b in range(
 				                  self.core.fc_spec['n_bin'] ) ]

@@ -1893,11 +1893,11 @@ class core( QObject ) :
 		# current (from all populations).
 
 		self.nln_gss_curr_tot = \
-		     sum( [ [ [ self.nln_gss_curr_ion[c][d][b] 
-		          for b in range( self.fc_spec['n_bin']   ) ]
-		          for d in range( self.fc_spec['n_dir']   ) ]
-		          for c in range( self.fc_spec['n_cup']   ) ] )
-	
+		                    [ [ [ sum( self.nln_gss_curr_ion[c][d][b] )
+		                    for b in range( self.fc_spec['n_bin']   ) ]
+		                    for d in range( self.fc_spec['n_dir']   ) ]
+		                    for c in range( self.fc_spec['n_cup']   ) ]
+
 		# Propagate the new initial-guess for the non-linear analysis.
 
 		self.prop_nln_gss( )
@@ -2215,9 +2215,10 @@ class core( QObject ) :
 			            self.nln_plas.arr_pop[p]['m']   )
 
 			if ( self.nln_plas.arr_pop[p]['aniso'] ) :
-				cur_p = self.nln_plas.arr_pop[p]['q'] * \
-				        self.fc_spec.arr[c][d][0].\
-                                        calc_curr_bmx( d_vel_cen * sqm,
+                            w = [w_per, w_par]
+			    cur_p = self.nln_plas.arr_pop[p]['q'] * \
+				        self.fc_spec.calc_curr(
+                                                       d_vel_cen * sqm,
 					               d_vel_wid * sqm,
 				                       d_cup, d_dir,
 					               d_nrm_x, d_nrm_y,
@@ -2308,10 +2309,10 @@ class core( QObject ) :
 
 		( tk_c, tk_d, tk_b ) = where( self.nln_res_sel )
 
-		x_vel_cen = self.vel_cen[ tk_b ]
+		x_vel_cen = self.fc_spec['vel_cen'][ tk_b ]
 		x_vel_wid = self.vel_wid[ tk_b ]
-		x_cup     = self.cup[ tk_c ]
-		x_dir     = self.dir[ tk_c, tk_d ]
+		x_cup     = self.fc_spec['n_cup'][ tk_c ]
+		x_dir     = self.fc_spec['dir'][ tk_c, tk_d ]
 		x_mag_x   = self.mag_x[ tk_b ]
 		x_mag_y   = self.mag_y[ tk_b ]
 		x_mag_z   = self.mag_z[ tk_b ]
