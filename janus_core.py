@@ -792,8 +792,6 @@ class core( QObject ) :
 		# Emit a signal that indicates that a new Wind/MFI data have now
 		# been loaded.
 
-		### FIXME
-
 		self.emit( SIGNAL('janus_chng_mfi') )
 
 	#-----------------------------------------------------------------------
@@ -1216,7 +1214,7 @@ class core( QObject ) :
 
 		mom_w = mean( eta_w )
 
-		# Save the results of the moments analysis.
+		# Save the results of the moments analysis in a plas object.
 
 		self.mom_res = plas( )
 

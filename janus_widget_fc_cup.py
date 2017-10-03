@@ -326,8 +326,8 @@ class widget_fc_cup( QWidget ) :
 
 		else :
 
-			self.lim_x = [ self.core.fc_spec['vel_strt'][self.c][0 ],
-			               self.core.fc_spec['vel_stop'][self.c][-1]  ]
+			self.lim_x = [self.core.fc_spec['vel_strt'][self.c][0 ],
+			              self.core.fc_spec['vel_stop'][self.c][-1]]
 
 			arr_curr_flat = self.core.fc_spec['curr_flat']
 
@@ -372,7 +372,7 @@ class widget_fc_cup( QWidget ) :
 
 		# Generate a step function for each look direction associated
 		# with this widget.
-		#FIXME
+
 		self.stp = array( [ step(  self.core.fc_spec['vel_cen'][self.c] ,
 					   self.core.fc_spec['vel_del'][self.c] ,
 					   self.core.fc_spec['curr'][self.c][d])
