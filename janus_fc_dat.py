@@ -206,16 +206,17 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION TO CALCULATE EXPECTED MAXWELLIAN CURRENT.
 	#-----------------------------------------------------------------------
 
-	def calc_curr_mxw( self, v0_x, v0_y, v0_z, n, dv, w ) :
+	def calc_curr( self, v0, n, dv, w ) :
 
 
-		"""
 		if ( hasattr( w, '__len__' ) ) :
-			w_eff = #FIXME
+
+			ml2 = ( self['maglook'] )**2
+
+			w_eff = sqrt( ( ( 1. - ml2 ) * w[0]**2 ) +
+			            (          ml2   * w[1]**2 )   )
 		else :
 			w_eff = w
-		"""
-
 
 		# Note.  This function is based on Equation 2.34 from Maruca
 		#        (PhD thesis, 2012), but differs by a factor of $2$
@@ -224,10 +225,10 @@ class fc_dat( ) :
 
 		# Calculate the total velocity using drift
 
-		v0_vec = ( v0_x, v0_y, v0_z )
+#		v0_vec = ( v0_x, v0_y, v0_z )
 
-		v_vec = array( [ v0_vec[i] + dv*self['norm_b'][i]
-		                                for i in range(len(v0_vec)) ] )
+		v_vec = array( [ v0[i] + dv*self['norm_b'][i]
+		                                for i in range(len(v0)) ] )
 
 		# Calculate the component of the magnetic field unit vector
 		# along that lies along the look direction.
@@ -236,19 +237,19 @@ class fc_dat( ) :
 
 		# Calculate the exponential terms of the current.
 
-		ret_exp_1 = 1.e3 * w * sqrt( 2. / pi ) * exp(
+		ret_exp_1 = 1.e3 * w_eff * sqrt( 2. / pi ) * exp(
 		            - ( ( self['vel_strt'] - dlk_v   )
-		            / w )**2 / 2.                    )
-		ret_exp_2 = 1.e3 * w * sqrt( 2. / pi ) * exp(
+		            / w_eff )**2 / 2.                    )
+		ret_exp_2 = 1.e3 * w_eff * sqrt( 2. / pi ) * exp(
 		            - ( ( self['vel_stop'] - dlk_v   )
-		            / w )**2 / 2.                    )
+		            / w_eff )**2 / 2.                    )
 
 		# Calculate the "erf" terms.
 
 		ret_erf_1 = 1.e3 * dlk_v * erf( ( self['vel_strt']
-		            - dlk_v ) / ( sqrt(2.) * w )          )
+		            - dlk_v ) / ( sqrt(2.) * w_eff )          )
 		ret_erf_2 = 1.e3 * dlk_v * erf( ( self['vel_stop']
-		            - dlk_v ) / ( sqrt(2.) * w )        )
+		            - dlk_v ) / ( sqrt(2.) * w_eff )        )
 
 
 		# Calculate the parenthetical expression.
@@ -265,38 +266,6 @@ class fc_dat( ) :
 		        * ( ret_prn ) )
 
 		return ret
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION TO CALCULATE EXPECTED BI-MAXWELLIAN CURRENT.
-	#-----------------------------------------------------------------------
-
-	def calc_curr_bmxw( self, v0_x, v0_y, v0_z, n, dv, w_per, w_par ) :
-
-		# Note.  This function is based on Equation 2.34 from Maruca
-		#        (PhD thesis, 2012), but differs by a factor of $2$
-		#        (i.e., the factor of $2$ from Equation 2.13, which is
-		#        automatically calibrated out of the Wind/FC data).
-
-		# Return the equivalent bi-Maxwellian response for equal
-		# perpendicular and parallel thermal speeds and a dummy
-		# magnetic field.
-
-		# If no population has been provided, abort.
-
-		if ( n is None ) :
-			return 0.
-
-		# Extract/compute the moments of the population.
-
-#		n = pop['n']
-#		v = pop['v_vec']
-
-		ml2 = ( self['maglook'] )**2
-
-		w = sqrt( ( ( 1. - ml2 ) * w_per**2 ) + 
-		          (        ml2   * w_par**2 )   )
-
-		return calc_curr_mxw(v0_x, v0_y, v0_z, n, dv, w)
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT OF MANY POP.'S.

@@ -1232,10 +1232,8 @@ class core( QObject ) :
 		# Calculate the expected currents based on the results of the
 		# (linear) moments analysis.
 
-		self.mom_curr = self.fc_spec.calc_curr_pop(
-		                                    self.mom_res['v0_x'], 
-		                                    self.mom_res['v0_y'], 
-		                                    self.mom_res['v0_z'], 
+		self.mom_curr = self.fc_spec.calc_curr(
+		                                    self.mom_res['v0_vec'], 
 		                                    self.mom_res['n_p_c'], 0.,
 		                                    self.mom_res['w_p_c']      )
 
@@ -1899,7 +1897,7 @@ class core( QObject ) :
 		          for b in range( self.fc_spec['n_bin']   ) ]
 		          for d in range( self.fc_spec['n_dir']   ) ]
 		          for c in range( self.fc_spec['n_cup']   ) ] )
-
+	
 		# Propagate the new initial-guess for the non-linear analysis.
 
 		self.prop_nln_gss( )
@@ -2038,13 +2036,31 @@ class core( QObject ) :
 				# Select all seemingly valid measurements from
 				# this look direction that fall into this range
 				# range of inflow speeds.
+				a= where( 
+				  [ self.fc_spec.arr[c][d][b]['curr_valid'] 
+				    for b in range(self.fc_spec['n_bin'] )] )
 
-				tk = where( (
-                                         self.fc_spec.arr[c][d]['curr_valid'])  &
-				       ( self.fc_spec['vel_cen'][c][d][b]
-                                                                >=  v_min   )  &
-				       ( self.fc_spec['vel_cen'][c][d][b]
-                                                                <= v_max )  )[0]
+				tk_1 = where( 
+				       [ self.fc_spec.arr[c][d][b]['curr_valid']
+				      for b in range(self.fc_spec['n_bin'] ) ] )
+
+				tk_2= [ i for i, x in enumerate( self.fc_spec['vel_cen'][c] )
+				if v_min <= x <= v_max]
+
+				tk_1 = array(tk_1)
+				tk_2 = array(tk_2)
+
+				tk =tk_2
+
+#				tk = where(
+#                                   ([ self.fc_spec.arr[c][d][b]['curr_valid'] &
+#				      
+#				      for b in range(self.fc_spec['n_bin'])])
+#				    [i for i, x in enumerate(
+#				    self.fc_spec['vel_cen'][c][b] )
+#				    if ( x >= v_min  & x <= v_max ) ]) 
+#				   ( self.fc_spec['vel_cen'][c][b] >= v_min ) &
+#				   ( self.fc_spec['vel_cen'][c][b] <= v_max ) )
 
 				if ( len( tk ) > 0 ) :
 					self.nln_sel[c,d,tk] = True

@@ -297,13 +297,12 @@ class fc_spec( ) :
                 # this cannot be done (due to missing information), return
                 # "None".
 
-                if ( ( self._time is None ) or ( self._rot  is None ) ) :
+		if ( ( self._time is None ) or ( self._rot  is None ) ) :
+			return
 
-                        return None
+		else :
 
-                else :
-
-                        return ( self._time
+			return ( self._time
                                      + timedelta( seconds=(self._rot*b) )
                                      + timedelta( seconds=self._offset[c][d] ) )
 
@@ -343,13 +342,13 @@ class fc_spec( ) :
 	# DEFINE THE FUNCTION FOR CALC'ING EXPECTED CURRENT FROM A POPULATION.
 	#-----------------------------------------------------------------------
 
-	def calc_curr_pop( self, v0_x, v0_y, v0_z, n, dv, w) :
+	def calc_curr( self, v0, n, dv, w) :
 
 		# Return a 3-D list with the calculated current for each bin in
 		# the spectrum.
 
-		return [ [ [ self.arr[c][d][b].calc_curr_mxw( 
-		                    v0_x, v0_y, v0_z, n, dv, w      )
+		return [ [ [ self.arr[c][d][b].calc_curr( 
+		                    v0, n, dv, w      )
 		                    for b in range( self['n_bin'] ) ]
 		                    for d in range( self['n_dir'] ) ]
 		                    for c in range( self['n_cup'] ) ]
