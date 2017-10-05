@@ -144,7 +144,9 @@ class fc_spec( ) :
 
 	def __getitem__(self, key ) :
 
-		if ( key == 'n_cup' ) :
+		if ( key == 'curr_min' ) :
+			return self._curr_min
+		elif ( key == 'n_cup' ) :
 			return self._n_cup
 		elif ( key == 'n_dir' ) :
 			return self._n_dir
@@ -195,13 +197,16 @@ class fc_spec( ) :
 			return  [[ self.arr[c][0][b]['vel_del'] 
 					for b in range(self._n_bin)] 
 					for c in range(self._n_cup)]
-
 		elif ( key == 'curr' ) :
 			return [ [ [ self.arr[c][d][b]['curr']
 			             for b in range( self._n_bin ) ]
 			             for d in range( self._n_dir ) ]
 			             for c in range( self._n_cup ) ]
-
+		elif ( key == 'curr_valid' ) :
+			return [ [ [ self.arr[c][d][b]['curr_valid']
+			             for b in range( self._n_bin ) ]
+			             for d in range( self._n_dir ) ]
+			             for c in range( self._n_cup ) ]
 		elif ( key == 'curr_flat' ) :
 			return [ self.arr[c][d][b]['curr']
 			         for b in range( self._n_bin )

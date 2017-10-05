@@ -1971,6 +1971,9 @@ class core( QObject ) :
 
 		n_tk = len( tk_c )
 
+		arr_curr_valid = self.fc_spec['curr_valid']
+		arr_vel_cen    = self.fc_spec['vel_cen']
+
 		for j in range( n_tk ) :
 
 			# Extract the current look direction and convert it
@@ -2034,34 +2037,15 @@ class core( QObject ) :
 				# Select all seemingly valid measurements from
 				# this look direction that fall into this range
 				# range of inflow speeds.
-				a= where( 
-				  [ self.fc_spec.arr[c][d][b]['curr_valid'] 
-				    for b in range(self.fc_spec['n_bin'] )] )
 
-				tk_1 = where( 
-				       [ self.fc_spec.arr[c][d][b]['curr_valid']
-				      for b in range(self.fc_spec['n_bin'] ) ] )
+				tk = where( 
+				     ( array( arr_curr_valid[c][d] )
+				            >= self.fc_spec['curr_min'] ) &
+				     ( array( arr_vel_cen[c] ) >= v_min ) &
+				     ( array( arr_vel_cen[c] ) <= v_max )   )[0]
 
-				tk_2= [ i for i, x in enumerate( self.fc_spec['vel_cen'][c] )
-				if v_min <= x <= v_max]
-
-				tk_1 = array(tk_1)
-				tk_2 = array(tk_2)
-
-				tk =tk_2
-
-#				tk = where(
-#                                   ([ self.fc_spec.arr[c][d][b]['curr_valid'] &
-#				      
-#				      for b in range(self.fc_spec['n_bin'])])
-#				    [i for i, x in enumerate(
-#				    self.fc_spec['vel_cen'][c][b] )
-#				    if ( x >= v_min  & x <= v_max ) ]) 
-#				   ( self.fc_spec['vel_cen'][c][b] >= v_min ) &
-#				   ( self.fc_spec['vel_cen'][c][b] <= v_max ) )
-
-				if ( len( tk ) > 0 ) :
-					self.nln_sel[c,d,tk] = True
+				for b in tk :
+					self.nln_sel[c,d,b] = True
 
 		# Propagate the new data-selection for the non-linear analysis.
 
