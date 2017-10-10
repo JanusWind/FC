@@ -473,8 +473,3 @@ class fc_spec( ) :
 
 			for c in range( self['n_cup'] ) :
 
-				for d in range( self['n_dir'] ) :
-
-					for b in range( self['n_bin'] ) :
-
-						self.arr[c][d][b].set_mag( ( avg_b_x, avg_b_y, avg_b_z ) )

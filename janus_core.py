@@ -2822,6 +2822,22 @@ class core( QObject ) :
 
 				fl.write( '\n' )
 				fl.write( 'Species:    ' )
+			fl.write( txt_num.format( plas['v0_z'] ) )
+			fl.write( '\n' )
+			fl.write( txt_spc )
+			fl.write( txt_num.format( plas['sig_v0_x'] ) )
+			fl.write( txt_num.format( plas['sig_v0_y'] ) )
+			fl.write( txt_num.format( plas['sig_v0_z'] ) )
+
+			# Write the values for each species.
+
+			for spec in plas.arr_spec :
+
+				# Write the values for the general parameters of
+				# the species.
+
+				fl.write( '\n' )
+				fl.write( 'Species:    ' )
 				fl.write( spec['name'] )
 				fl.write( ' (' )
 				fl.write( spec['sym'] )
