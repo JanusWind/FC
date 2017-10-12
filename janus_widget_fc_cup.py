@@ -1154,7 +1154,7 @@ class widget_fc_cup( QWidget ) :
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_nln_sel_bin" SIGNAL.
-5#-----------------------------------------------------------------------
+        #-----------------------------------------------------------------------
 
 	def resp_chng_nln_sel_bin( self, c=None, d=None, b=None ) :
 

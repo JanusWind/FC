@@ -457,13 +457,17 @@ class fc_spec( ) :
 
 					for b in range( self['n_bin'] ) :
 
-						s = ( self.arr[c][d][b]['time'] - mfi_t[0] ).total_seconds( )
+						s = ( self.arr[c][d][b]['time']
+                                                    - mfi_t[0] ).total_seconds( )
 
 						b_x = fnc_b_x( s )
 						b_y = fnc_b_y( s )
 						b_z = fnc_b_z( s )
 
-						self.arr[c][d][b].set_mag( ( b_x, b_y, b_z ) )
+						self.arr[c][d][b].set_mag( ( b_x
+                                                                           , b_y
+                                                                           , b_z
+                                                                             ) )
 
 		except :
 
@@ -472,4 +476,12 @@ class fc_spec( ) :
 			avg_b_z = sum( mfi_b_z ) / float( len( mfi_b_z ) )
 
 			for c in range( self['n_cup'] ) :
+
+                                for d in range( self['n_dir'] ) :
+
+                                        for b in range( self['n_bin'] ) :
+
+                                                self.arr[c][d][b].set_mag( ( avg_b_x,
+                                                                             avg_b_y,
+                                                                             avg_b_z ) )
 
