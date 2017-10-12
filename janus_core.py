@@ -469,8 +469,8 @@ class core( QObject ) :
 
 			self.nln_gss_vld = tile( False, self.nln_n_pop )
 
-			self.nln_gss_pop      = array( [ ] )
-			self.nln_gss_prm      = array( [ ] )
+			self.nln_gss_pop      = [ ]
+			self.nln_gss_prm      = [ ]
 
 			self.nln_gss_curr_tot = None
 			self.nln_gss_curr_ion = None
@@ -1784,13 +1784,13 @@ class core( QObject ) :
 
 				self.nln_gss_vld[p] = False
 
-		self.nln_gss_pop = where( self.nln_gss_vld )[0]
+		self.nln_gss_pop = list( where( self.nln_gss_vld )[0] )
 
 		self.nln_gss_n_pop = len( self.nln_gss_pop )
 
 		# Reset the "prm" and "cur_???" arrays.
 
-		self.nln_gss_prm = array( [] )
+		self.nln_gss_prm = [ ]
 
 		self.nln_gss_curr_ion = None
 		self.nln_gss_curr_tot = None
@@ -2112,43 +2112,21 @@ class core( QObject ) :
 	# DEFINE THE FUNCTION FOR CALCULATING THE NLN MODEL CURRNET.
 	#-----------------------------------------------------------------------
 
-	def calc_nln_curr( self, pop, x, prm, ret_comp=False ) :
+	def calc_nln_curr( self, dat, prm ) :
 
-		# Extract the independent data variables (i.e., the
-		# specifications of the velocity windows and pointing
-		# directions).
+		# Initialize the returned list: the total calculated current for
+		# each datum.
 
-		d_vel_cen = x[0]
-		d_vel_wid = x[1]
-		d_cup     = x[2]
-		d_dir     = x[3]
-		d_mag_x   = x[4]
-		d_mag_y   = x[5]
-		d_mag_z   = x[6]
-
-		# Compute the normalized magnetic field values.
-
-		d_mag     = sqrt( d_mag_x**2 + d_mag_y**2 + d_mag_z**2 )
-
-		d_nrm_x   = d_mag_x / d_mag
-		d_nrm_y   = d_mag_y / d_mag
-		d_nrm_z   = d_mag_z / d_mag
+		curr = [ 0. for d in dat ]
 
 		# For each ion species, extract the passed parameters and
 		# calculate it's contribution to the total current.
 
-		if hasattr( x[0], '__iter__' ) :
-			curr = tile( 0., [ len( x[0] ), self.nln_n_pop ] )
-		else :
-			curr = tile( 0., self.nln_n_pop )
-
-		prm_v0_x  = prm[0]
-		prm_v0_y  = prm[1]
-		prm_v0_z  = prm[2]
+		prm_v0 = ( prm[0], prm[1], prm[2] )
 
 		k = 3
 
-		for p in pop :
+		for p in self.nln_gss_pop :
 
 			# Extract the density of population "p".
 
@@ -2165,22 +2143,15 @@ class core( QObject ) :
 
 				k += 1
 
-				prm_v_x = prm_v0_x + ( prm_dv * d_nrm_x )
-				prm_v_y = prm_v0_y + ( prm_dv * d_nrm_y )
-				prm_v_z = prm_v0_z + ( prm_dv * d_nrm_z )
-
 			else :
 
-				prm_v_x = prm_v0_x
-				prm_v_y = prm_v0_y
-				prm_v_z = prm_v0_z
+				prm_dv = 0.
 
 			# Extract the thermal speed(s).
 
 			if ( self.nln_plas.arr_pop[p]['aniso'] ) :
 
-				prm_w_per = prm[k  ]
-				prm_w_par = prm[k+1]
+				prm_w = ( prm[k], prm[k+1] )
 
 				k += 2
 
@@ -2191,7 +2162,18 @@ class core( QObject ) :
 				k += 1
 
 			# Add the contribution of this ion species to
-			# the total current.
+			# the total currents.
+
+			for d in range( len( dat ) ) :
+
+				curr[d] += dat[d].calc_curr(
+				                self.nln_plas.arr_pop[p]['m'],
+				                self.nln_plas.arr_pop[p]['q'],
+				                prm_v0, prm_n, prm_dv, prm_w   )
+
+			# TODO: Delete.
+
+			"""
 
 			sqm = sqrt( self.nln_plas.arr_pop[p]['q'] /
 			            self.nln_plas.arr_pop[p]['m']   )
@@ -2222,18 +2204,12 @@ class core( QObject ) :
 			else :
 				cur[p] = cur_p
 
-		# Return the total current from all modeled ion species.
+			"""
 
-		if hasattr( x[0], '__iter__' ) :
-			if ( ret_comp ) :
-				return cur[:,pop]
-			else :
-				return sum( cur, axis=1 )
-		else :
-			if ( ret_comp ) :
-				return cur[pop]
-			else :
-				return sum( cur, axis=0 )
+		# Return the list of total currents from all modeled ion
+		# species.
+
+		return curr
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RUNNING THE NON-LINEAR ANALYSIS.
@@ -2248,8 +2224,10 @@ class core( QObject ) :
 		# Load the list of ion populations to be analyzed and the intial
 		# guess of their parameters.
 
-		pop = self.nln_gss_pop
-		gss = self.nln_gss_prm
+		# TODO: Delete.
+
+		#####pop = self.nln_gss_pop
+		#####gss = self.nln_gss_prm
 
 		# If any of the following conditions are met, emit a signal that
 		# indicates that the results of the non-linear analysis have
@@ -2260,11 +2238,12 @@ class core( QObject ) :
 		#   -- No initial guess has been generated.
 		#   -- Insufficient data have been selected.
 
-		if ( ( self.fc_spec['n_bin'] == 0                   ) or
+		if ( ( self.fc_spec is None              ) or
+		     ( self.fc_spec['n_bin'] == 0        ) or
 		     ( self.n_mfi == 0                   ) or
-		     ( len( pop ) == 0                   ) or
-		     ( 0 not in pop                      ) or
-		     ( len( gss ) == 0                   ) or
+		     ( len( self.nln_gss_pop ) == 0      ) or
+		     ( 0 not in self.nln_gss_pop         ) or
+		     ( len( self.nln_gss_prm ) == 0      ) or
 		     ( self.nln_n_sel < self.nln_min_sel )    ) :
 
 			self.emit( SIGNAL('janus_mesg'),
@@ -2282,37 +2261,42 @@ class core( QObject ) :
 
 		def model( x, *p ) :
 
-			return self.calc_nln_curr( pop, x, array( p ) )
+			# TODO: Modify "calc_nln_curr" to use this new call
+			#       style.
 
-		# Save the data selection and then use it to generate data
-		# arrays for the non-linear fit.
+			return self.calc_nln_curr( x, p )
 
-		self.nln_res_sel = self.nln_sel.copy( )
+		# Extract the data selection.
 
-		( tk_c, tk_d, tk_b ) = where( self.nln_res_sel )
+		x = [ ]
 
-		x_vel_cen = self.fc_spec['vel_cen'][ tk_b ]
-		x_vel_wid = self.vel_wid[ tk_b ]
-		x_cup     = self.fc_spec['n_cup'][ tk_c ]
-		x_dir     = self.fc_spec['dir'][ tk_c, tk_d ]
-		x_mag_x   = self.mag_x[ tk_b ]
-		x_mag_y   = self.mag_y[ tk_b ]
-		x_mag_z   = self.mag_z[ tk_b ]
+		for c in range( self.fc_spec['n_cup'] ) :
 
-		x = array( [ x_vel_cen, x_vel_wid, x_cup, x_dir,
-		             x_mag_x, x_mag_y, x_mag_z           ] )
+			for d in range( self.fc_spec['n_dir'] ) :
 
-		y = self.curr[ tk_c, tk_d, tk_b ]
+				for b in range( self.fc_spec['n_bin'] ) :
+
+					if ( self.nln_res_sel[c][d][b] ) :
+
+						x.append(
+						     self.fc_spec.arr[c][d][b] )
+
+		y = [ xx['curr'] for xx in x ]
+
+		# Compute the uncertainties.
+
+		sigma = [ sqrt( yy ) for yy in y ]
 
 		# Attempt to perform the non-linear fit.  If this fails, reset
 		# the associated variables and abort.
 
 		try :
 
-			( fit, covar ) = curve_fit( model, x, y, gss,
-			                            sigma=sqrt(y)     )
+			( fit, covar ) = curve_fit( model, x, y, 
+			                            self.nln_gss_prm,
+			                            sigma=sigma       )
 
-			sigma = sqrt( diag( covar ) )
+			sig = sqrt( diag( covar ) )
 
 		except :
 
@@ -2323,35 +2307,6 @@ class core( QObject ) :
 			self.emit( SIGNAL('janus_chng_nln_res') )
 
 			return
-
-		# Calculate the expected currents based on the results of the
-		# non-linear analysis.
-
-		( tk_c, tk_d, tk_b ) = indices( ( self.fc_spec['n_cup'],
-                                                  self.fc_spec['n_dir'],
-		                                  self.fc_spec['n_bin']   ) )
-
-		tk_c      = tk_c.flatten( )
-		tk_d      = tk_d.flatten( )
-		tk_b      = tk_b.flatten( )
-
-		x_vel_cen = self.vel_cen[ tk_b ]
-		x_vel_wid = self.vel_wid[ tk_b ]
-		x_cup     = self.cup[ tk_c ]
-		x_dir     = self.dir[ tk_c, tk_d ]
-		x_mag_x   = self.mag_x[ tk_b ]
-		x_mag_y   = self.mag_y[ tk_b ]
-		x_mag_z   = self.mag_z[ tk_b ]
-
-		x         = array( [ x_vel_cen, x_vel_wid, x_cup, x_dir,
-		                     x_mag_x, x_mag_y, x_mag_z           ] )
-
-		self.nln_res_curr_ion = \
-		   reshape( self.calc_nln_curr( pop, x, fit, ret_comp=True ),
-		            ( self.fc_spec['n_cup'], self.fc_spec['n_dir'],
-                              self.fc_spec['n_bin'], len( pop )            ) )
-
-		self.nln_res_curr_tot = sum( self.nln_res_curr_ion, axis=3 )
 
 		# Save the properties and fit parameters for each ion species
 		# used in this analysis.
@@ -2367,9 +2322,9 @@ class core( QObject ) :
 		self.nln_res_plas['v0_x']     = fit[0]
 		self.nln_res_plas['v0_y']     = fit[1]
 		self.nln_res_plas['v0_z']     = fit[2]
-		self.nln_res_plas['sig_v0_x'] = sigma[0]
-		self.nln_res_plas['sig_v0_y'] = sigma[1]
-		self.nln_res_plas['sig_v0_z'] = sigma[2]
+		self.nln_res_plas['sig_v0_x'] = sig[0]
+		self.nln_res_plas['sig_v0_y'] = sig[1]
+		self.nln_res_plas['sig_v0_z'] = sig[2]
 		c = 3
 
 		for i in pop :
@@ -2400,15 +2355,15 @@ class core( QObject ) :
 			pop_sym   = self.nln_plas.arr_pop[i]['sym']
 
 			pop_n     = fit[c]
-			pop_sig_n = sigma[c]
+			pop_sig_n = sig[c]
 			c += 1
 
 			if ( pop_drift ) :
-				pop_dv = fit[c]
-				pop_sig_dv = sigma[c]
+				pop_dv     = fit[c]
+				pop_sig_dv = sig[c]
 				c += 1
 			else :
-				pop_dv = None
+				pop_dv     = None
 				pop_sig_dv = None
 
 			if ( pop_aniso ) :
@@ -2416,14 +2371,14 @@ class core( QObject ) :
 				pop_w_per     = fit[c  ]
 				pop_w_par     = fit[c+1]
 				pop_sig_w     = None
-				pop_sig_w_per = sigma[c  ]
-				pop_sig_w_par = sigma[c+1]
+				pop_sig_w_per = sig[c  ]
+				pop_sig_w_par = sig[c+1]
 				c += 2
 			else :
 				pop_w         = fit[c]
 				pop_w_per     = None
 				pop_w_par     = None
-				pop_sig_w     = sigma[c]
+				pop_sig_w     = sig[c]
 				pop_sig_w_per = None
 				pop_sig_w_par = None
 				c += 1
@@ -2433,12 +2388,20 @@ class core( QObject ) :
 			       name=pop_name, sym=pop_sym, n=pop_n, dv=pop_dv,
 			       w=pop_w, w_per=pop_w_per, w_par=pop_w_par,
 			       sig_n=pop_sig_n, sig_dv=pop_sig_dv, sig_w=pop_sig_w,
-			       sig_w_per=pop_sig_w_per, sig_w_par=pop_sig_w_par        )
+			       sig_w_per=pop_sig_w_per, sig_w_par=pop_sig_w_par     )
 
 		# Save the results of the this non-linear analysis to the
 		# results log.
 
 		self.series.add_spec( self.nln_res_plas )
+
+		# Calculate the expected currents based on the results of the
+		# non-linear analysis.
+
+		# FIXME
+
+		#####self.nln_res_curr_ion =
+		#####self.nln_res_curr_tot =
 
 		# Message the user that the non-linear analysis has finished.
 

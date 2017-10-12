@@ -206,6 +206,8 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION TO CALCULATE EXPECTED MAXWELLIAN CURRENT.
 	#-----------------------------------------------------------------------
 
+	# FIXME: Add in mass and charge as arguments.
+
 	def calc_curr( self, v0, n, dv, w ) :
 
 
