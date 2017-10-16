@@ -2333,8 +2333,8 @@ class core( QObject ) :
 				pop_sig_dv = sig[c]
 				c += 1
 			else :
-				pop_dv     = 0.
-				pop_sig_dv = 0.
+				pop_dv     = None
+				pop_sig_dv = None
 
 			if ( pop_aniso ) :
 				pop_w         = [ fit[c], fit[c+1] ]
@@ -2377,7 +2377,7 @@ class core( QObject ) :
 
 		self.nln_res_curr_ion = [ [ [ [
 		                     self.nln_res_curr_ion[p][c][d][b]
-		                     for p in range( self.nln_gss_n_pop ) ]
+		                     for p in range( len(self.nln_res_plas.arr_pop) ) ]
 		                     for b in range( self.fc_spec['n_bin']   ) ]
 		                     for d in range( self.fc_spec['n_dir']   ) ]
 		                     for c in range( self.fc_spec['n_cup']   ) ]

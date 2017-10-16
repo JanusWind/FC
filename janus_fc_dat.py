@@ -228,8 +228,11 @@ class fc_dat( ) :
 
 		# Calculate the total velocity using drift
 
-		v_vec = array( [ v0[i] + dv*self['norm_b'][i]
-		                                for i in range(len(v0)) ] )
+		if ( dv is None ) :
+			v_vec = [ v0[i] for i in range( len( v0 ) ) ]
+		else :
+			v_vec = [ v0[i] + dv*self['norm_b'][i]
+			                               for i in range(len(v0)) ]
 
 		# Calculate the component of the magnetic field unit vector
 		# along that lies along the look direction.
@@ -265,11 +268,10 @@ class fc_dat( ) :
 
 		# Calculate the expected current.
 
-		ret = ( (   1.e12 ) * ( 1. / 2. ) * q * ( 1.e6 * n )
-		      * ( 1.e-4 * self.calc_eff_area(   v_vec  )   )
-		      * ( ret_prn )  )
-
-		return ret
+		return (   ( 1.e12 ) * ( 1. / 2. )
+		         * ( q * const['q_p'] ) * ( 1.e6 * n )
+		         * ( 1.e-4 * self.calc_eff_area( v_vec ) )
+		         * ( ret_prn )                             )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT OF MANY POP.'S.
