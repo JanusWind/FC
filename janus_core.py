@@ -1231,7 +1231,9 @@ class core( QObject ) :
 		# (linear) moments analysis.
 
 		self.mom_curr = self.fc_spec.calc_curr(
-		                                    self.mom_res['v0_vec'], 
+		                                    self.mom_res['m_p'],
+		                                    self.mom_res['q_p'],
+		                                    self.mom_res['v0_vec'],
 		                                    self.mom_res['n_p_c'], 0.,
 		                                    self.mom_res['w_p_c']      )
 
@@ -1876,8 +1878,10 @@ class core( QObject ) :
 
 			self.nln_gss_curr_ion.append(
 			     self.fc_spec.calc_curr(
-			         pop_v0_vec, pop_n, pop_dv, pop_w ) )
-
+			                    self.nln_plas.arr_pop[p]['m'],
+			                    self.nln_plas.arr_pop[p]['q'],
+			                    pop_v0_vec, pop_n, pop_dv, pop_w ) )
+#			print(len(self.nln_gss_curr_ion[0][0][0]))
 		# Alter the axis order of the array of currents.
 
 		self.nln_gss_curr_ion = [ [ [ [ 
@@ -2171,41 +2175,6 @@ class core( QObject ) :
 				                self.nln_plas.arr_pop[p]['q'],
 				                prm_v0, prm_n, prm_dv, prm_w   )
 
-			# TODO: Delete.
-
-			"""
-
-			sqm = sqrt( self.nln_plas.arr_pop[p]['q'] /
-			            self.nln_plas.arr_pop[p]['m']   )
-
-			if ( self.nln_plas.arr_pop[p]['aniso'] ) :
-                            w = [w_per, w_par]
-			    cur_p = self.nln_plas.arr_pop[p]['q'] * \
-				        self.fc_spec.calc_curr(
-                                                       d_vel_cen * sqm,
-					               d_vel_wid * sqm,
-				                       d_cup, d_dir,
-					               d_nrm_x, d_nrm_y,
-                                                       d_nrm_z, prm_n, prm_v_x,
-				                       prm_v_y, prm_v_z,
-				                       prm_w_per, prm_w_par    )
-			else :
-				cur_p = self.nln_plas.arr_pop[p]['q'] * \
-				        self.fc_spec.arr[c][d][0].\
-                                        calc_curr_max( d_vel_cen * sqm,
-					               d_vel_wid * sqm,
-				                       d_cup, d_dir,
-				                       prm_n, prm_v_x,
-				                       prm_v_y, prm_v_z,
-				                       prm_w                  )
-
-			if hasattr( x[0], '__iter__' ) :
-				cur[:,p] = cur_p
-			else :
-				cur[p] = cur_p
-
-			"""
-
 		# Return the list of total currents from all modeled ion
 		# species.
 
@@ -2223,11 +2192,6 @@ class core( QObject ) :
 
 		# Load the list of ion populations to be analyzed and the intial
 		# guess of their parameters.
-
-		# TODO: Delete.
-
-		#####pop = self.nln_gss_pop
-		#####gss = self.nln_gss_prm
 
 		# If any of the following conditions are met, emit a signal that
 		# indicates that the results of the non-linear analysis have
@@ -2261,10 +2225,12 @@ class core( QObject ) :
 
 		def model( x, *p ) :
 
-			# TODO: Modify "calc_nln_curr" to use this new call
-			#       style.
-
 			return self.calc_nln_curr( x, p )
+
+                # Save the data selection and then use it to generate data
+		# arrays for the non-linear fit.
+
+		self.nln_res_sel = self.nln_sel.copy( )
 
 		# Extract the data selection.
 
@@ -2319,29 +2285,33 @@ class core( QObject ) :
 		self.nln_res_plas['b0_y']     = self.mfi_avg_vec[1]
 		self.nln_res_plas['b0_z']     = self.mfi_avg_vec[2]
 
-		self.nln_res_plas['v0_x']     = fit[0]
-		self.nln_res_plas['v0_y']     = fit[1]
-		self.nln_res_plas['v0_z']     = fit[2]
+#		self.nln_res_plas['v0_x']     = fit[0]
+#		self.nln_res_plas['v0_y']     = fit[1]
+#		self.nln_res_plas['v0_z']     = fit[2]
 		self.nln_res_plas['sig_v0_x'] = sig[0]
 		self.nln_res_plas['sig_v0_y'] = sig[1]
 		self.nln_res_plas['sig_v0_z'] = sig[2]
+		pop_v0_vec                    = [fit[0], fit[1], fit[2]]
+
 		c = 3
 
-		for i in pop :
+		self.nln_res_curr_ion = []
+
+		for p in self.nln_gss_pop :
 
 			# If necessary, add this population's species to the
 			# results.
 
-			spc_name = self.nln_plas.arr_pop[i].my_spec['name']
+			spc_name = self.nln_plas.arr_pop[p].my_spec['name']
 
 			if ( self.nln_res_plas.get_spec( spc_name ) is None ) :
 
 				spc_sym = \
-				         self.nln_plas.arr_pop[i].my_spec['sym']
+				         self.nln_plas.arr_pop[p].my_spec['sym']
 				spc_m   = \
-				         self.nln_plas.arr_pop[i].my_spec['m'  ]
+				         self.nln_plas.arr_pop[p].my_spec['m'  ]
 				spc_q   = \
-				         self.nln_plas.arr_pop[i].my_spec['q'  ]
+				         self.nln_plas.arr_pop[p].my_spec['q'  ]
 
 				self.nln_res_plas.add_spec(
 				                   name=spc_name, sym=spc_sym,
@@ -2349,10 +2319,10 @@ class core( QObject ) :
 
 			# Add the population itself to the results.
 
-			pop_drift = self.nln_plas.arr_pop[i]['drift']
-			pop_aniso = self.nln_plas.arr_pop[i]['aniso']
-			pop_name  = self.nln_plas.arr_pop[i]['name']
-			pop_sym   = self.nln_plas.arr_pop[i]['sym']
+			pop_drift = self.nln_plas.arr_pop[p]['drift']
+			pop_aniso = self.nln_plas.arr_pop[p]['aniso']
+			pop_name  = self.nln_plas.arr_pop[p]['name']
+			pop_sym   = self.nln_plas.arr_pop[p]['sym']
 
 			pop_n     = fit[c]
 			pop_sig_n = sig[c]
@@ -2363,32 +2333,37 @@ class core( QObject ) :
 				pop_sig_dv = sig[c]
 				c += 1
 			else :
-				pop_dv     = None
-				pop_sig_dv = None
+				pop_dv     = 0.
+				pop_sig_dv = 0.
 
 			if ( pop_aniso ) :
-				pop_w         = None
-				pop_w_per     = fit[c  ]
-				pop_w_par     = fit[c+1]
+				pop_w         = [ fit[c], fit[c+1] ]
+				pop_w_i       = None
 				pop_sig_w     = None
 				pop_sig_w_per = sig[c  ]
 				pop_sig_w_par = sig[c+1]
 				c += 2
 			else :
-				pop_w         = fit[c]
-				pop_w_per     = None
-				pop_w_par     = None
+				pop_w_i       = fit[c]
 				pop_sig_w     = sig[c]
-				pop_sig_w_per = None
-				pop_sig_w_par = None
 				c += 1
 
 			self.nln_res_plas.add_pop(
 			       spc=spc_name, drift=pop_drift, aniso=pop_aniso,
 			       name=pop_name, sym=pop_sym, n=pop_n, dv=pop_dv,
-			       w=pop_w, w_per=pop_w_per, w_par=pop_w_par,
-			       sig_n=pop_sig_n, sig_dv=pop_sig_dv, sig_w=pop_sig_w,
-			       sig_w_per=pop_sig_w_per, sig_w_par=pop_sig_w_par     )
+			       w=pop_w_i, w_per=pop_w[0], w_par=pop_w[1],
+			       sig_n=pop_sig_n, sig_dv=pop_sig_dv, 
+			       sig_w=pop_sig_w, sig_w_per=pop_sig_w_per,
+			       sig_w_par=pop_sig_w_par                         )
+
+			# For each datum in the spectrum, compute the expected
+			# current from each population.
+
+			self.nln_res_curr_ion.append(
+			     self.fc_spec.calc_curr ( 
+			                  self.nln_plas.arr_pop[p]['m'],
+			                  self.nln_plas.arr_pop[p]['q'],
+			                  pop_v0_vec, pop_n, pop_dv, pop_w ) )
 
 		# Save the results of the this non-linear analysis to the
 		# results log.
@@ -2400,8 +2375,20 @@ class core( QObject ) :
 
 		# FIXME
 
-		#####self.nln_res_curr_ion =
-		#####self.nln_res_curr_tot =
+		self.nln_res_curr_ion = [ [ [ [
+		                     self.nln_res_curr_ion[p][c][d][b]
+		                     for p in range( self.nln_gss_n_pop ) ]
+		                     for b in range( self.fc_spec['n_bin']   ) ]
+		                     for d in range( self.fc_spec['n_dir']   ) ]
+		                     for c in range( self.fc_spec['n_cup']   ) ]
+
+		self.nln_res_curr_tot =[ [ [ 
+		                           sum( self.nln_res_curr_ion[c][d][b] )
+		                     for b in range( self.fc_spec['n_bin']   ) ]
+		                     for d in range( self.fc_spec['n_dir']   ) ]
+		                     for c in range( self.fc_spec['n_cup']   ) ]
+
+
 
 		# Message the user that the non-linear analysis has finished.
 

@@ -206,10 +206,16 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION TO CALCULATE EXPECTED MAXWELLIAN CURRENT.
 	#-----------------------------------------------------------------------
 
-	# FIXME: Add in mass and charge as arguments.
+	def calc_curr( self, m, q, v0, n, dv, w ) :
 
-	def calc_curr( self, v0, n, dv, w ) :
+		# Note.  This function is based on Equation 2.34 from Maruca
+		#        (PhD thesis, 2012), but differs by a factor of $2$
+		#        (i.e., the factor of $2$ from Equation 2.13, which is
+		#        automatically calibrated out of the Wind/FC data).
 
+		# Check whether thermal velocity is a 2-D list, which implies
+		# anisotropy. If it is calculate the effective thermal velocity,
+		# else continue.
 
 		if ( hasattr( w, '__len__' ) ) :
 
@@ -220,14 +226,7 @@ class fc_dat( ) :
 		else :
 			w_eff = w
 
-		# Note.  This function is based on Equation 2.34 from Maruca
-		#        (PhD thesis, 2012), but differs by a factor of $2$
-		#        (i.e., the factor of $2$ from Equation 2.13, which is
-		#        automatically calibrated out of the Wind/FC data).
-
 		# Calculate the total velocity using drift
-
-#		v0_vec = ( v0_x, v0_y, v0_z )
 
 		v_vec = array( [ v0[i] + dv*self['norm_b'][i]
 		                                for i in range(len(v0)) ] )
@@ -237,20 +236,24 @@ class fc_dat( ) :
 
 		dlk_v   = -calc_arr_dot( self['dir'], v_vec )
 
+		# Calculate the square-root of charge to mass ratio.
+
+		sqm = sqrt( q/m )
+
 		# Calculate the exponential terms of the current.
 
 		ret_exp_1 = 1.e3 * w_eff * sqrt( 2. / pi ) * exp(
-		            - ( ( self['vel_strt'] - dlk_v   )
+		            - ( ( sqm * self['vel_strt'] - dlk_v   )
 		            / w_eff )**2 / 2.                    )
 		ret_exp_2 = 1.e3 * w_eff * sqrt( 2. / pi ) * exp(
-		            - ( ( self['vel_stop'] - dlk_v   )
+		            - ( ( sqm * self['vel_stop'] - dlk_v   )
 		            / w_eff )**2 / 2.                    )
 
 		# Calculate the "erf" terms.
 
-		ret_erf_1 = 1.e3 * dlk_v * erf( ( self['vel_strt']
+		ret_erf_1 = 1.e3 * dlk_v * erf( ( sqm * self['vel_strt']
 		            - dlk_v ) / ( sqrt(2.) * w_eff )          )
-		ret_erf_2 = 1.e3 * dlk_v * erf( ( self['vel_stop']
+		ret_erf_2 = 1.e3 * dlk_v * erf( ( sqm * self['vel_stop']
 		            - dlk_v ) / ( sqrt(2.) * w_eff )        )
 
 
@@ -262,10 +265,9 @@ class fc_dat( ) :
 
 		# Calculate the expected current.
 
-		ret = ( (   1.e12 ) * ( 1. / 2. ) * ( const['q_p'] )
-		        * ( 1.e6 * n )
-		        * ( 1.e-4 * self.calc_eff_area( v_vec ) )
-		        * ( ret_prn ) )
+		ret = ( (   1.e12 ) * ( 1. / 2. ) * q * ( 1.e6 * n )
+		      * ( 1.e-4 * self.calc_eff_area(   v_vec  )   )
+		      * ( ret_prn )  )
 
 		return ret
 
