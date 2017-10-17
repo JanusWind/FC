@@ -124,12 +124,12 @@ class widget_mfi_info( format_TextEdit ) :
 		self.prnt_brk( )
 
 		self.prnt_tab( 1 )
-		self.prnt_htm( '<i><font color="#0000FF">B<sub>&lambda;</sub></i> = ')
+		self.prnt_htm( '<i><font color="#8B008B">B<sub>&lambda;</sub></i> = ')
 		self.prnt_dcm( self.core.mfi_amag_ang[0], 1, '<sup>o</sup>' )
 		self.prnt_brk( )
 
 		self.prnt_tab( 1 )
-		self.prnt_htm( '<i><font color="#FF0000">B<sub>&phi;</sub></i> = ')
+		self.prnt_htm( '<i><font color="#FFD700">B<sub>&phi;</sub></i> = ')
 		self.prnt_dcm( self.core.mfi_amag_ang[1], 1, '<sup>o</sup>' )
 		self.prnt_brk( )
 
