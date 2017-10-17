@@ -273,10 +273,10 @@ class core( QObject ) :
 			self.time_txt = ''
 			self.time_vld = True
 
-			self.mag_t    = None
-			self.mag_x    = None
-			self.mag_y    = None
-			self.mag_z    = None
+			self.mag_t    = None   ##spot
+			self.mag_x    = None   ##spot
+			self.mag_y    = None   ##spot
+			self.mag_z    = None   ##spot
 
 		# If requested, (re-)initialize the varaibles for the Wind/MFI
 		# data associated with this spectrum.
@@ -292,17 +292,14 @@ class core( QObject ) :
 			self.mfi_b_x      = None
 			self.mfi_b_y      = None
 			self.mfi_b_z      = None
-			self.mfi_b_vec    = None
-			self.mfi_nrm      = None
+			self.mfi_b_vec    = None   ##spot
+			self.mfi_nrm      = None   ##spot
 
-			self.mfi_avg_mag  = None
+			self.mfi_avg_mag  = None   ##spot
 			self.mfi_avg_vec  = None
-			self.mfi_avg_nrm  = None
+			self.mfi_avg_nrm  = None   ##spot
 
-			self.mfi_hat_dir  = None
-
-			self.psi_b        = None
-                        self.psi_b_avg    = None
+			self.mfi_hat_dir  = None   ##spot
 
 			self.mfi_s        = None
 
@@ -341,7 +338,6 @@ class core( QObject ) :
 			self.mom_res  = None
 
 			self.mom_curr = None
-                        self.mom_n    = None
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion species and populations for the non-linear analysis.
@@ -490,7 +486,7 @@ class core( QObject ) :
 
 		if ( var_nln_res ) :
 
-			self.nln_res_plas     = plas( enforce=False )
+			self.nln_res_plas     = None
 
 			self.nln_res_sel      = None
 
@@ -816,7 +812,7 @@ class core( QObject ) :
 		# Emit a signal that a change has occured to the moments window
 		# parameters.
 
-		self.emit( SIGNAL('janus_chng_mom_win_dir') )
+		self.emit( SIGNAL('janus_chng_mom_win') )
 
 		# Call the automatic selection of data for the moments analysis.
 
@@ -844,7 +840,7 @@ class core( QObject ) :
 		# Emit a signal that a change has occured to the moments window
 		# parameters.
 
-		self.emit( SIGNAL('janus_chng_mom_win_bin') )
+		self.emit( SIGNAL('janus_chng_mom_win') )
 
 		# Call the automatic selection of data for the moments analysis.
 
@@ -859,7 +855,7 @@ class core( QObject ) :
 		# Re-initialize the data-selection variables for the moments
 		# analysis.
 
-		self.rset_var( var_nln_sel=True )
+		self.rset_var( var_mom_sel=True )
 
 		# Initially, deselect all look directions and bins.
 
@@ -869,6 +865,17 @@ class core( QObject ) :
 		self.mom_sel_bin = [ [ [ False for b in range(self.fc_spec['n_bin']) ]
                                                for d in range(self.fc_spec['n_dir']) ]
 		                               for c in range(self.fc_spec['n_cup']) ]
+
+		# If the "mom_win_???" variables are invalid, abort.
+
+		if ( ( self.mom_win_dir is None ) or
+		     ( self.mom_win_bin is None )    ) :
+
+			self.vldt_mom_sel( emit_all=True )
+
+			self.anls_mom( )
+
+			return
 
 		# Find the maximum current window (of "self.mom_win_bin" bins)
 		# for each direction
@@ -2277,6 +2284,8 @@ class core( QObject ) :
 		# Save the properties and fit parameters for each ion species
 		# used in this analysis.
 
+		self.nln_res_plas = plas( enforce=False )
+
 		self.nln_res_plas.covar       = covar.copy( )
 
 		self.nln_res_plas['time']     = self.time_epc
@@ -2372,8 +2381,6 @@ class core( QObject ) :
 
 		# Calculate the expected currents based on the results of the
 		# non-linear analysis.
-
-		# FIXME
 
 		self.nln_res_curr_ion = [ [ [ [
 		                     self.nln_res_curr_ion[p][c][d][b]
@@ -2585,8 +2592,8 @@ class core( QObject ) :
 				if ( self.n_mfi == 0 ) :
 					self.stop_auto_run = True
 					break
-				if ( ( self.dyn_mom       ) and
-				     ( self.mom_n is None )     ) :
+				if ( ( self.dyn_mom         ) and
+				     ( self.mom_res is None )     ) :
 					self.stop_auto_run = True
 					break
 				if ( ( self.dyn_nln               ) and

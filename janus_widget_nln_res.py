@@ -92,6 +92,13 @@ class widget_nln_res( format_TextEdit ) :
 
 		self.clear( )
 
+		# If there are no results from the non-linear analysis (either
+		# because it was never run or it failed), abort.
+
+		if ( self.core.nln_res_plas is None ) :
+
+			return
+
 		# Print the results for each population that was considered in
 		# the non-linear analysis, grouping the populations by their
 		# species.
@@ -108,7 +115,7 @@ class widget_nln_res( format_TextEdit ) :
 		# self.prnt_htm(str(self.core.nln_res_plas.arr_spec))
 		# self.prnt_brk( )
 		# self.prnt_brk( )
-        #
+		#
 		# velocities =
 
 		first_spc = True

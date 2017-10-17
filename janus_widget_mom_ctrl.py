@@ -103,7 +103,7 @@ class widget_mom_ctrl( QWidget ) :
 	def make_txt( self ) :
 
 		# Update the "win_dir" text-box based on the value stored in
-		# "core". 
+		# "core".
 
 		if ( self.core.mom_win_dir is None ) :
 

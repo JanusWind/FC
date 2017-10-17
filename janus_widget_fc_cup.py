@@ -560,6 +560,8 @@ class widget_fc_cup( QWidget ) :
 		# For each plot in the grid, generate and display a fit curve
 		# based on the results of the analysis.
 
+		vel_cen = self.core.fc_spec['vel_cen'][self.c]
+
 		for d in d_lst :
 
 			# Determine the location of this plot within the grid
@@ -596,8 +598,10 @@ class widget_fc_cup( QWidget ) :
 
 					# Extract the points for this fit curve.
 
-					x = array( self.core.fc_spec['vel_cen'][self.c][0] )
-					y = curr_ion[self.c][d][0][n]
+					x = array( vel_cen )
+					y = array( [ curr_ion[self.c][d][b][n]
+					      for b in range(
+					        self.core.fc_spec['n_bin'] ) ] )
 
 					# Select only those points for which
 					# the fit current is strictly positive.
