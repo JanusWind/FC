@@ -176,15 +176,27 @@ class widget_mfi_ang_plot( QWidget ) :
 			b_max = max( b_max_c, b_max_l )
 			b_min = min( b_min_c, b_min_l )
 
+			ang_max = max( [ max(self.core.mfi_b_colat),
+			                 max(self.core.mfi_b_lon) ] )
+			ang_min = min( [ min(self.core.mfi_b_colat), 
+			                 min(self.core.mfi_b_lon) ] )
+
+			ang_mid = ( ang_max + ang_min ) / 2
+			ang_del = ( ang_max - ang_min ) / 2
+			rng_del = max( [1.5 * ang_del, 90 ] )
+
+			rng_min = max( [ ang_mid - ang_del/2, -180 ] )
+			rng_max = min( [ ang_mid + ang_del/2, +360 ] )
+
 			d_t_0 = t_max - t_min
 
 			d_t = max( 1.5 + d_t_0, 3. )
 
 			t_max = t_min + d_t
 
-			b_min = b_min - 0.2*abs(b_min)
-			b_max = b_max + 0.2*abs(b_max)
-
+			b_min = rng_min
+			b_max = rng_max
+			print rng_max, rng_min
 		else :
 
 			t_min = 0.001

@@ -359,20 +359,6 @@ class fc_spec( ) :
 		                    for c in range( self['n_cup'] ) ]
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR CALC'ING EXPECTED CURRENT OF MANY POPULATIONS.
-	#-----------------------------------------------------------------------
-
-	def calc_curr_plas( self, plas ) :
-
-		# Return a 4-D list with the calculated current for each bin in
-		# the spectrum due to each population in plas.
-
-		return [ [ [ self.arr[c][d][b].calc_curr_plas( plas )
-		                      for b in range( self['n_bin'] ) ]
-		                      for d in range( self['n_dir'] ) ]
-		                      for c in range( self['n_cup'] ) ]
-
-	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CALCULATING TOTAL CURRENT IN A GIVEN WINDOW.
 	#-----------------------------------------------------------------------
 

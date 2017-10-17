@@ -1881,24 +1881,24 @@ class core( QObject ) :
 			                    self.nln_plas.arr_pop[p]['m'],
 			                    self.nln_plas.arr_pop[p]['q'],
 			                    pop_v0_vec, pop_n, pop_dv, pop_w ) )
-#			print(len(self.nln_gss_curr_ion[0][0][0]))
+
 		# Alter the axis order of the array of currents.
 
 		self.nln_gss_curr_ion = [ [ [ [ 
-		     self.nln_gss_curr_ion[p][c][d][b]
-		          for p in range( self.nln_gss_n_pop ) ]
-		          for b in range( self.fc_spec['n_bin']   ) ]
-		          for d in range( self.fc_spec['n_dir']   ) ]
-		          for c in range( self.fc_spec['n_cup']   ) ]
+		                     self.nln_gss_curr_ion[p][c][d][b]
+		                     for p in range( self.nln_gss_n_pop      ) ]
+		                     for b in range( self.fc_spec['n_bin']   ) ]
+		                     for d in range( self.fc_spec['n_dir']   ) ]
+		                     for c in range( self.fc_spec['n_cup']   ) ]
 
 		# For each datum in the spectrum, compute the total expected
 		# current (from all populations).
 
-		self.nln_gss_curr_tot = \
-		                    [ [ [ sum( self.nln_gss_curr_ion[c][d][b] )
-		                    for b in range( self.fc_spec['n_bin']   ) ]
-		                    for d in range( self.fc_spec['n_dir']   ) ]
-		                    for c in range( self.fc_spec['n_cup']   ) ]
+		self.nln_gss_curr_tot = [ [ [ 
+		                     sum( self.nln_gss_curr_ion[c][d][b]     )
+		                     for b in range( self.fc_spec['n_bin']   ) ]
+		                     for d in range( self.fc_spec['n_dir']   ) ]
+		                     for c in range( self.fc_spec['n_cup']   ) ]
 
 		# Propagate the new initial-guess for the non-linear analysis.
 
@@ -2285,13 +2285,13 @@ class core( QObject ) :
 		self.nln_res_plas['b0_y']     = self.mfi_avg_vec[1]
 		self.nln_res_plas['b0_z']     = self.mfi_avg_vec[2]
 
-#		self.nln_res_plas['v0_x']     = fit[0]
-#		self.nln_res_plas['v0_y']     = fit[1]
-#		self.nln_res_plas['v0_z']     = fit[2]
+		pop_v0_vec                    = [fit[0], fit[1], fit[2]]
+		self.nln_res_plas['v0_x']     = fit[0]
+		self.nln_res_plas['v0_y']     = fit[1]
+		self.nln_res_plas['v0_z']     = fit[2]
 		self.nln_res_plas['sig_v0_x'] = sig[0]
 		self.nln_res_plas['sig_v0_y'] = sig[1]
 		self.nln_res_plas['sig_v0_z'] = sig[2]
-		pop_v0_vec                    = [fit[0], fit[1], fit[2]]
 
 		c = 3
 

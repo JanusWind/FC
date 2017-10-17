@@ -65,9 +65,6 @@ class fc_dat( ) :
 		self._vel_del   = (  self['vel_stop']-self['vel_strt']      )
 		self._curr      = curr
 
-#                ( mfi_t, mfi_b_x, mfi_b_y, mfi_b_z ) = \
-#                     self.mfi_arcv.load_rang()
-
                 # TODO: Confirm these two formulae
 
 		self._the       = ( 90 + self._elev ) * pi/180
@@ -94,7 +91,6 @@ class fc_dat( ) :
 #
 #               return self.__dict__['_'+key]
 #
-
 		if ( key == 'spec' ) :
 			return self._spec
 		elif ( key == 'valid' ) :
@@ -231,33 +227,33 @@ class fc_dat( ) :
 		if ( dv is None ) :
 			v_vec = [ v0[i] for i in range( len( v0 ) ) ]
 		else :
-			v_vec = [ v0[i] + dv*self['norm_b'][i]
-			                               for i in range(len(v0)) ]
+			v_vec = [ v0[i] + dv * self['norm_b'][i]
+			                           for i in range( len( v0 ) ) ]
 
 		# Calculate the component of the magnetic field unit vector
 		# along that lies along the look direction.
 
 		dlk_v   = -calc_arr_dot( self['dir'], v_vec )
 
-		# Calculate the square-root of charge to mass ratio.
+		# Scale the velocities with charge to mass ratio.
 
-		sqm = sqrt( q/m )
+		vel_strt = self['vel_strt'] * sqrt( q/m )
+		vel_stop = self['vel_stop'] * sqrt( q/m )
 
 		# Calculate the exponential terms of the current.
 
 		ret_exp_1 = 1.e3 * w_eff * sqrt( 2. / pi ) * exp(
-		            - ( ( sqm * self['vel_strt'] - dlk_v   )
-		            / w_eff )**2 / 2.                    )
+		                   - ( ( vel_strt - dlk_v  ) / w_eff )**2 / 2. )
+
 		ret_exp_2 = 1.e3 * w_eff * sqrt( 2. / pi ) * exp(
-		            - ( ( sqm * self['vel_stop'] - dlk_v   )
-		            / w_eff )**2 / 2.                    )
+		                   - ( ( vel_stop - dlk_v  ) / w_eff )**2 / 2. )
 
 		# Calculate the "erf" terms.
 
-		ret_erf_1 = 1.e3 * dlk_v * erf( ( sqm * self['vel_strt']
-		            - dlk_v ) / ( sqrt(2.) * w_eff )          )
-		ret_erf_2 = 1.e3 * dlk_v * erf( ( sqm * self['vel_stop']
-		            - dlk_v ) / ( sqrt(2.) * w_eff )        )
+		ret_erf_1 = 1.e3 * dlk_v * erf( ( vel_strt - dlk_v ) /
+		                                ( sqrt(2.) * w_eff ) )
+		ret_erf_2 = 1.e3 * dlk_v * erf( ( vel_stop - dlk_v ) /
+		                                ( sqrt(2.) * w_eff ) )
 
 
 		# Calculate the parenthetical expression.
@@ -272,11 +268,3 @@ class fc_dat( ) :
 		         * ( q * const['q_p'] ) * ( 1.e6 * n )
 		         * ( 1.e-4 * self.calc_eff_area( v_vec ) )
 		         * ( ret_prn )                             )
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT OF MANY POP.'S.
-	#-----------------------------------------------------------------------
-
-	def calc_curr_plas( self, plas ) :
-
-		return [ self.calc_curr_pop( pop ) for pop in plas.arr_pop ]
