@@ -136,6 +136,7 @@ class widget_nln_res( format_TextEdit ) :
 			                + ' (<i>' + spc['sym']
 			                + '</i>):</b></u>'     )
 
+
 			# Print the results for each population of this species.
 
 			first_pop = True
@@ -175,7 +176,9 @@ class widget_nln_res( format_TextEdit ) :
 				lab_t_per = '<i>T</i><sub>&perp;<i>' + \
 				                 sym + '</i></sub>'
 				lab_t_par = '<i>T</i><sub>||<i>' + \
-				                 sym + '</i></sub>'
+			                 sym + '</i></sub>'
+				lab_s     = '<i>S<sub>' + spc['sym'] + '</sub></i>'
+				lab_k     = '<i>K<sub>' + spc['sym'] + '</sub></i>'
 
 				# Print the population's density.
 
@@ -279,7 +282,6 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_tab( 3 )
 					self.prnt_htm( lab_r + ' = ' )
 					self.prnt_dcm( pop['r'], 2 )
-
 				else :
 
 					self.prnt_brk( )
@@ -289,7 +291,17 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
 					self.prnt_dcm( pop['sig_w'], 1, 'km/s' )
 
+				if ( pop == 0 ) :
 
+	       				self.prnt_brk( )
+	       				self.prnt_tab( 2 )
+	       				self.prnt_htm( lab_s + ' = ' )
+	       				self.prnt_dcm( spc['s'], 2 )
+	
+	       				self.prnt_brk( )
+	       				self.prnt_tab( 2 )
+	       				self.prnt_htm( lab_k + ' = ' )
+	       				self.prnt_dcm( spc['k'] - 3, 2 )
 
 				# Print the population's temperature(s).
 
