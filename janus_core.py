@@ -2354,7 +2354,10 @@ class core( QObject ) :
 				c += 2
 			else :
 				pop_w_i       = fit[c]
+				pop_w         = [ None, None ]
 				pop_sig_w     = sig[c]
+				pop_sig_w_per = None 
+				pop_sig_w_par = None
 				c += 1
 
 			self.nln_res_plas.add_pop(

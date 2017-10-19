@@ -213,7 +213,7 @@ class fc_dat( ) :
 		# anisotropy. If it is calculate the effective thermal velocity,
 		# else continue.
 
-		if ( hasattr( w, '__len__' ) ) :
+		if ( hasattr( w, '__len__' ) and ( w is not None ) ) :
 
 			ml2 = ( self['maglook'] )**2
 
