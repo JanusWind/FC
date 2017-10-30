@@ -234,19 +234,6 @@ class widget_nln_res( format_TextEdit ) :
 					     self.core.nln_res_plas['sig_v0_z'],
 					     0, 'km/s'                         )
 
-					# self.prnt_brk()
-					# velocities = [[lab_v_x, "", lab_v_y, "", lab_v_z, ""],
-					# ["", "sig", "", "sig", "", "sig"],
-					# [self.prnt_dcm(self.core.nln_res_plas['v0_x']),
-					# self.core.nln_res_plas['v0_y'],
-					# self.core.nln_res_plas['v0_y']]]
-					# velocities = tabulate(velocities).split("\n")
-					# for row in velocities:
-					# 	self.prnt_htm(row)
-					# 	self.prnt_brk()
-					# self.prnt_htm(str(velocities))
-					# self.prnt_brk()
-
 				elif ( pop['drift'] ) :
 
 					self.prnt_brk( )
@@ -254,7 +241,7 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_htm( lab_dv + ' = ' )
 					self.prnt_dcm( pop['dv'], 1 )
 					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm( pop['sig_dv'], 1, 'km/s' )
+					self.prnt_dcm( pop['sig_dv'], 1, 'km/s')
 
 				# Print the population's thermal speed(s).
 
@@ -291,40 +278,42 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
 					self.prnt_dcm( pop['sig_w'], 1, 'km/s' )
 
-				if  ( len( self.core.nln_res_plas.lst_pop( spc)
-				                                       ) > 1 ) :
-
-	       				self.prnt_brk( )
-	       				self.prnt_tab( 2 )
-	       				self.prnt_htm( lab_s + ' = ' )
-	       				self.prnt_dcm( spc['s'], 2 )
-	
-	       				self.prnt_brk( )
-	       				self.prnt_tab( 2 )
-	       				self.prnt_htm( lab_k + ' = ' )
-	       				self.prnt_dcm( spc['k'] - 3, 2 )
-	
 				# Print the population's temperature(s).
 
-				# self.prnt_brk( )
-				# self.prnt_tab( 2 )
-				# self.prnt_htm( lab_t + ' = ' )
-				# self.prnt_dcm( pop['t'], 1, 'kK' )
-                #
-				# if ( pop['aniso'] ) :
-                #
-				# 	self.prnt_brk( )
-				# 	self.prnt_tab( 3 )
-				# 	self.prnt_htm( lab_t_per + ' = ' )
-				# 	self.prnt_dcm( pop['t_per'], 1, 'kK' )
-				# 	self.prnt_brk( )
-				# 	self.prnt_tab( 3 )
-				# 	self.prnt_htm( lab_t_par + ' = ' )
-				# 	self.prnt_dcm( pop['t_par'], 1, 'kK' )
-				# 	self.prnt_brk( )
-				# 	self.prnt_tab( 3 )
-				# 	self.prnt_htm( lab_r + ' = ' )
-				# 	self.prnt_dcm( pop['r'], 2 )
+				self.prnt_brk( )
+				self.prnt_tab( 2 )
+				self.prnt_htm( lab_t + ' = ' )
+				self.prnt_dcm( pop['t'], 1, 'kK' )
+
+				if ( pop['aniso'] ) :
+
+					self.prnt_brk( )
+				 	self.prnt_tab( 3 )
+				 	self.prnt_htm( lab_t_per + ' = ' )
+				 	self.prnt_dcm( pop['t_per'], 1, 'kK' )
+				 	self.prnt_brk( )
+				 	self.prnt_tab( 3 )
+				 	self.prnt_htm( lab_t_par + ' = ' )
+				 	self.prnt_dcm( pop['t_par'], 1, 'kK' )
+				 #	self.prnt_brk( )
+				 #	self.prnt_tab( 3 )
+				 #	self.prnt_htm( lab_r + ' = ' )
+				 #	self.prnt_dcm( pop['r'], 2 )
+
+				# Print the Skewness and Excess Kurtosis value
+
+#				if  ( len( self.core.nln_res_plas.lst_pop( spc)
+#				                                       ) > 1 ) :
+#
+#	       				self.prnt_brk( )
+#	       				self.prnt_tab( 2 )
+#	       				self.prnt_htm( lab_s + ' = ' )
+#	       				self.prnt_dcm( spc['s'], 2 )
+#	
+#	       				self.prnt_brk( )
+#	       				self.prnt_tab( 2 )
+#	       				self.prnt_htm( lab_k + ' = ' )
+#	       				self.prnt_dcm( spc['k'] - 3, 2 )
 
 				# Clear the first population indicator.
 

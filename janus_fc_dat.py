@@ -215,10 +215,11 @@ class fc_dat( ) :
 
 		if ( hasattr( w, '__len__' ) and ( w is not None ) ) :
 
-			ml2 = ( self['maglook'] )**2
+			if ( w is not None ) :
+				ml2 = ( self['maglook'] )**2
 
-			w_eff = sqrt( ( ( 1. - ml2 ) * w[0]**2 ) +
-			            (          ml2   * w[1]**2 )   )
+				w_eff = sqrt( ( ( 1. - ml2 ) * w[0]**2 ) +
+			                    (          ml2   * w[1]**2 )   )
 		else :
 			w_eff = w
 

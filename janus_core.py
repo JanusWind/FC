@@ -35,6 +35,7 @@ import os.path
 
 # Load the modules necessary for handling dates and times.
 
+import time
 from time import sleep
 from datetime import datetime, timedelta
 from janus_time import calc_time_epc, calc_time_sec, calc_time_val
@@ -2195,6 +2196,8 @@ class core( QObject ) :
 
 		# Re-initialize the output of the non-linear analysis.
 
+		start = time.time()
+
 		self.rset_var( var_nln_res=True )
 
 		# Load the list of ion populations to be analyzed and the intial
@@ -2347,27 +2350,39 @@ class core( QObject ) :
 
 			if ( pop_aniso ) :
 				pop_w         = [ fit[c], fit[c+1] ]
-				pop_w_i       = None
-				pop_sig_w     = None
+#				pop_w_i       = None
+#				pop_sig_w     = None
 				pop_sig_w_per = sig[c  ]
 				pop_sig_w_par = sig[c+1]
+
+				self.nln_res_plas.add_pop(
+				       spc=spc_name, drift=pop_drift,
+				       aniso=pop_aniso, name=pop_name,
+				       sym=pop_sym, n=pop_n, dv=pop_dv,
+				       w=None, w_per=pop_w[0], w_par=pop_w[1],
+				       sig_n=pop_sig_n, sig_dv=pop_sig_dv, 
+				       sig_w=None, sig_w_per=pop_sig_w_per,
+				       sig_w_par=pop_sig_w_par                 )
+
 				c += 2
+
 			else :
-				pop_w_i       = fit[c]
-				pop_w         = [ None, None ]
+				pop_w       = fit[c]
+#				pop_w         = [ None, None ]
 				pop_sig_w     = sig[c]
 				pop_sig_w_per = None 
 				pop_sig_w_par = None
+
+				self.nln_res_plas.add_pop(
+				       spc=spc_name, drift=pop_drift,
+				       aniso=pop_aniso, name=pop_name,
+				       sym=pop_sym, n=pop_n, dv=pop_dv,
+				       w=pop_w, w_per=None, w_par=None,
+				       sig_n=pop_sig_n, sig_dv=pop_sig_dv, 
+				       sig_w=pop_sig_w, sig_w_per=pop_sig_w_per,
+				       sig_w_par=pop_sig_w_par                 )
+
 				c += 1
-
-			self.nln_res_plas.add_pop(
-			       spc=spc_name, drift=pop_drift, aniso=pop_aniso,
-			       name=pop_name, sym=pop_sym, n=pop_n, dv=pop_dv,
-			       w=pop_w_i, w_per=pop_w[0], w_par=pop_w[1],
-			       sig_n=pop_sig_n, sig_dv=pop_sig_dv, 
-			       sig_w=pop_sig_w, sig_w_per=pop_sig_w_per,
-			       sig_w_par=pop_sig_w_par                         )
-
 			# For each datum in the spectrum, compute the expected
 			# current from each population.
 
@@ -2406,6 +2421,8 @@ class core( QObject ) :
 
 		# Emit a signal that indicates that the results of the
 		# non-linear analysis have changed.
+
+		print 'It took','%.6f'% (time.time()-start), 'seconds.'
 
 		self.emit( SIGNAL('janus_chng_nln_res') )
 
