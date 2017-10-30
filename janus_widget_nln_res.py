@@ -42,8 +42,6 @@ from math import log10, floor
 
 from janus_helper import round_sig
 
-from tabulate import tabulate
-
 
 ################################################################################
 ## DEFINE CLASS "widget_nln_res" TO CUSTOMIZE "format_TextEdit" FOR NLN OUTPUT.
@@ -102,21 +100,6 @@ class widget_nln_res( format_TextEdit ) :
 		# Print the results for each population that was considered in
 		# the non-linear analysis, grouping the populations by their
 		# species.
-
-		# self.prnt_htm("lalalala")
-		# self.prnt_brk( )
-		# self.prnt_brk( )
-		# self.prnt_htm(str(type(self.core.nln_res_plas.arr_spec)))
-		# self.prnt_brk( )
-		# self.prnt_brk( )
-		# self.prnt_htm(str(dir(self.core.nln_res_plas.arr_spec)))
-		# self.prnt_brk( )
-		# self.prnt_brk( )
-		# self.prnt_htm(str(self.core.nln_res_plas.arr_spec))
-		# self.prnt_brk( )
-		# self.prnt_brk( )
-		#
-		# velocities =
 
 		first_spc = True
 
@@ -177,8 +160,10 @@ class widget_nln_res( format_TextEdit ) :
 				                 sym + '</i></sub>'
 				lab_t_par = '<i>T</i><sub>||<i>' + \
 			                 sym + '</i></sub>'
-				lab_s     = '<i>S<sub>' + spc['sym'] + '</sub></i>'
-				lab_k     = '<i>K<sub>' + spc['sym'] + '</sub></i>'
+				lab_s     = '<i>S<sub>' + spc['sym'] + \
+				            '</sub></i>'
+				lab_k     = '<i>K<sub>' + spc['sym'] + \
+				            '</sub></i>'
 
 				# Print the population's density.
 
@@ -295,25 +280,21 @@ class widget_nln_res( format_TextEdit ) :
 				 	self.prnt_tab( 3 )
 				 	self.prnt_htm( lab_t_par + ' = ' )
 				 	self.prnt_dcm( pop['t_par'], 1, 'kK' )
-				 #	self.prnt_brk( )
-				 #	self.prnt_tab( 3 )
-				 #	self.prnt_htm( lab_r + ' = ' )
-				 #	self.prnt_dcm( pop['r'], 2 )
 
 				# Print the Skewness and Excess Kurtosis value
 
-#				if  ( len( self.core.nln_res_plas.lst_pop( spc)
-#				                                       ) > 1 ) :
-#
-#	       				self.prnt_brk( )
-#	       				self.prnt_tab( 2 )
-#	       				self.prnt_htm( lab_s + ' = ' )
-#	       				self.prnt_dcm( spc['s'], 2 )
-#	
-#	       				self.prnt_brk( )
-#	       				self.prnt_tab( 2 )
-#	       				self.prnt_htm( lab_k + ' = ' )
-#	       				self.prnt_dcm( spc['k'] - 3, 2 )
+				if  ( len( self.core.nln_res_plas.lst_pop( spc)
+				                                       ) > 1 ) :
+
+	       				self.prnt_brk( )
+	       				self.prnt_tab( 2 )
+	       				self.prnt_htm( lab_s + ' = ' )
+	       				self.prnt_dcm( spc['s'], 2 )
+	
+	       				self.prnt_brk( )
+	       				self.prnt_tab( 2 )
+	       				self.prnt_htm( lab_k + ' = ' )
+	       				self.prnt_dcm( spc['k'] - 3, 2 )
 
 				# Clear the first population indicator.
 
