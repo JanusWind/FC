@@ -35,6 +35,7 @@ import os.path
 
 # Load the modules necessary for handling dates and times.
 
+import time
 from time import sleep
 from datetime import datetime, timedelta
 from janus_time import calc_time_epc, calc_time_sec, calc_time_val
@@ -305,6 +306,10 @@ class core( QObject ) :
 			self.mfi_avg_nrm = None
 
 			self.mfi_hat_dir = None
+                        self.mfi_b_colat = None
+                        self.mfi_b_lon   = None
+
+                        self.mfi_avg_mag_angles = None
 
 			self.psi_b       = None
                         self.psi_b_avg   = None
@@ -936,7 +941,6 @@ class core( QObject ) :
 		self.mfi_b = sqrt( self.mfi_b_x**2 + self.mfi_b_y**2
 		                                   + self.mfi_b_z**2 )
 
-
 		# Compute the average magetic field.
 
 		self.mfi_avg_vec = array( [ mean( self.mfi_b_x ),
@@ -994,7 +998,7 @@ class core( QObject ) :
 
 		# Calculating the average angular deviation of magnetic field
 
-                self.psi_b = sum( arccos( [ self.mfi_b_vec[i] * 
+                self.psi_b = arccos( sum( [ self.mfi_b_vec[i] * 
 					    self.mfi_avg_nrm[i] /
                                             self.mfi_b[i] for i in range(3) ] ))
 
@@ -2974,6 +2978,7 @@ class core( QObject ) :
 
 		# Re-initialize the output of the non-linear analysis.
 
+                start = time.time( )
 		self.rset_var( var_nln_res=True )
 
 		# Load the list of ion populations to be analyzed and the intial
@@ -3175,6 +3180,8 @@ class core( QObject ) :
 
 		# Emit a signal that indicates that the results of the
 		# non-linear analysis have changed.
+
+                print 'It took','%.6f'% (time.time()-start), 'seconds.'
 
 		self.emit( SIGNAL('janus_chng_nln_res') )
 
