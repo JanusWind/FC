@@ -919,7 +919,8 @@ class widget_fc_cup( QWidget ) :
 
 		# If no spectrum has been loaded, abort.
 
-		if ( self.core.fc_spec['n_bin'] <= 0 ) :
+		if ( ( self.core.fc_spec is None       ) or
+		     ( self.core.fc_spec['n_bin'] <= 0 )    ) :
 
 			return
 
