@@ -284,32 +284,33 @@ class core( QObject ) :
 
 		if ( var_mfi ) :
 
-			self.n_mfi        = 0
+			self.n_mfi         = 0
 
-			self.mfi_dur      = 0.
+			self.mfi_dur       = 0.
 
-			self.mfi_t        = None
-			self.mfi_b        = None
-			self.mfi_b_x      = None
-			self.mfi_b_y      = None
-			self.mfi_b_z      = None
-			self.mfi_b_vec    = None   ##spot
-			self.mfi_nrm      = None   ##spot
+			self.mfi_t         = None
+                        self.n_mfi         = None
+			self.mfi_b         = None
+			self.mfi_b_x       = None
+			self.mfi_b_y       = None
+			self.mfi_b_z       = None
+			self.mfi_b_vec     = None   ##spot
+			self.mfi_nrm       = None   ##spot
 
-			self.mfi_avg_mag  = None   ##spot
-			self.mfi_avg_vec  = None
-			self.mfi_avg_nrm  = None   ##spot
+			self.mfi_avg_mag   = None   ##spot
+			self.mfi_avg_vec   = None
+			self.mfi_avg_nrm   = None   ##spot
 
-			self.mfi_hat_dir  = None   ##spot
+			self.mfi_hat_dir   = None   ##spot
 
-			self.mfi_s        = None
+			self.mfi_s         = None
 
-			self.mfi_b_colat  = None
-			self.mfi_b_lon    = None
-			self.psi_b        = None
-			self.psi_b_avg    = None
+			self.mfi_b_colat   = None
+			self.mfi_b_lon     = None
+			self.mfi_psi_b     = None
+			self.mfi_psi_b_avg = None
 
-			self.mfi_amag_ang = None
+			self.mfi_amag_ang  = None
 
 		# If requested, (re-)initialize the varaibles for the windows
 		# associated with automatic data selection for the moments
@@ -769,12 +770,12 @@ class core( QObject ) :
 
 		# Calculating the average angular deviation of magnetic field
 
-		self.psi_b = [ arccos( [ sum (self.mfi_nrm[i][j] *
-		                              self.mfi_avg_nrm[j]
-		                              for j in range(3))])
+		self.mfi_psi_b = [ arccos( [ sum ( self.mfi_nrm[i][j] *
+		                               self.mfi_avg_nrm[j]
+		                               for j in range( 3 )      ) ] )
 	                              for i in range( len( self.mfi_nrm ) ) ]
 
-                self.psi_b_avg = rad2deg(sum( self.psi_b)/self.n_mfi)
+                self.mfi_psi_b_avg = rad2deg( sum ( self.mfi_psi_b )/self.n_mfi )
 
 		# Use interpolation to estiamte the magnetic field vector for
 		# each datum in the FC spectrum.
@@ -1675,10 +1676,8 @@ class core( QObject ) :
 		# Run the "make_nln_gss" function to update the "self.nln_gss_"
 		# arrays, widgets, etc.
 
-		# FIXME
+		self.emit( SIGNAL('janus_chng_nln_gss') )
 
-		self.emit( SIGNAL('janus_chng_nln_gss') )   # This can be removed once 'make_nln_gss' is fixed.
-#
 		self.make_nln_gss( )
 
 	#-----------------------------------------------------------------------

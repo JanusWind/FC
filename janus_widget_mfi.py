@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 ################################################################################
 ##
 ## Janus -- GUI Software for Processing Thermal-Ion Measurements from the
@@ -59,6 +61,6 @@ class widget_mfi( QTabWidget ) :
 		self.wdg_ang_plot = widget_mfi_ang_plot( self.core )
 		self.wdg_info     = widget_mfi_info( self.core     )
 
-		self.addTab( self.wdg_lin_plot, 'MFI Data'     )
-		self.addTab( self.wdg_ang_plot, 'Angular Plot' )
-		self.addTab( self.wdg_info, 'Summary'          )
+		self.addTab( self.wdg_lin_plot, 'MFI'     )
+		self.addTab( self.wdg_ang_plot, u'θ, λ'   )
+		self.addTab( self.wdg_info, '<B>'         )
