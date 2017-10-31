@@ -43,7 +43,7 @@ from numpy import amax, amin
 ## DEFINE THE "widget_mfi_angular_plot" CLASS FOR "QWidget" TO PLOT MFI DATA.
 ################################################################################
 
-class widget_mfi_ang_plot( QWidget ) :
+class widget_mfi_lon_plot( QWidget ) :
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE INITIALIZATION FUNCTION.
@@ -53,7 +53,7 @@ class widget_mfi_ang_plot( QWidget ) :
 
 		# Inherit all attributes of an instance of "QWidget".
 
-		super( widget_mfi_ang_plot, self ).__init__( )
+		super( widget_mfi_lon_plot, self ).__init__( )
 
 		# Store the Janus core.
 
@@ -94,7 +94,6 @@ class widget_mfi_ang_plot( QWidget ) :
 		# Initialize and store the pens and fonts.
 
 		self.pen_vbx       = mkPen( color='k' )
-		self.pen_crv_colat = mkPen( color='#8B008B' )
 		self.pen_crv_lon   = mkPen( color='#FFD700' )
 
 		self.fnt = self.core.app.font( )
@@ -117,7 +116,7 @@ class widget_mfi_ang_plot( QWidget ) :
 
 		labelStyle = {'color':'k'}
 		self.axs_x.setLabel( 'Time [s]'           , **labelStyle )
-		self.axs_y.setLabel( 'Elev. & Azim. [deg]', **labelStyle )
+		self.axs_y.setLabel( 'Azim. [deg]', **labelStyle )
 
 		self.axs_x.label.setFont( self.fnt )
 		self.axs_y.label.setFont( self.fnt )
@@ -134,7 +133,6 @@ class widget_mfi_ang_plot( QWidget ) :
 
 		# Initialize the curves that will be added to this plot.
 
-		self.crv_colat = None
 		self.crv_lon   = None
 
 		# Populate this plot and adjust it's settings.
@@ -167,10 +165,8 @@ class widget_mfi_ang_plot( QWidget ) :
 			# ensure that the range satisfies a minimum size and has
 			# sufficient padding.
 
-			ang_max = max( [ max( self.core.mfi_b_colat),
-			                 max( self.core.mfi_b_lon) ] )
-			ang_min = min( [ min( self.core.mfi_b_colat), 
-			                 min( self.core.mfi_b_lon) ] )
+			ang_max = max( self.core.mfi_b_lon)
+			ang_min = min( self.core.mfi_b_lon)
 
                         ang_max += 0.1 * ang_max
                         ang_min -= 0.1 * abs( ang_min )
@@ -201,14 +197,10 @@ class widget_mfi_ang_plot( QWidget ) :
 
 		# Generate and display each curve for the plot.
 
-		self.crv_colat = PlotDataItem( self.core.mfi_s,
-		                               self.core.mfi_b_colat,
-		                               pen=self.pen_crv_colat )
 		self.crv_lon   = PlotDataItem( self.core.mfi_s,
 		                               self.core.mfi_b_lon,
 		                               pen=self.pen_crv_lon   )
 
-		self.plt.addItem( self.crv_colat )
 		self.plt.addItem( self.crv_lon   )
 
 	#-----------------------------------------------------------------------
@@ -219,16 +211,12 @@ class widget_mfi_ang_plot( QWidget ) :
 
 		# Hide and remove each of this plot's elements.
 
-		if ( self.crv_colat is not None ) :
-		     self.plt.removeItem( self.crv_colat )
-
 		if ( self.crv_lon is not None ) :
 		     self.plt.removeItem( self.crv_lon   )
 
 		# Permanently delete this plot's elements by setting each of the
 		# variables that store them to "None".
 
-		self.crv_colat = None
 		self.crv_lon   = None
 
 	#-----------------------------------------------------------------------
@@ -250,3 +238,4 @@ class widget_mfi_ang_plot( QWidget ) :
 		# Regenerate the plot.
 
 		self.make_plt( )
+
