@@ -262,14 +262,10 @@ class core( QObject ) :
 			self.mfi_b_x       = None
 			self.mfi_b_y       = None
 			self.mfi_b_z       = None
-			self.mfi_b_vec     = None   ##spot
-			self.mfi_nrm       = None   ##spot
 
-			self.mfi_avg_mag   = None   ##spot
+			self.mfi_avg_mag   = None
 			self.mfi_avg_vec   = None
-			self.mfi_avg_nrm   = None   ##spot
-
-			self.mfi_hat_dir   = None   ##spot
+			self.mfi_avg_nrm   = None
 
 			self.mfi_s         = None
 
@@ -683,18 +679,14 @@ class core( QObject ) :
 		# Compute and store derived paramters.
 
 		self.mfi_s = [ ( t - self.fc_spec['time'] ).total_seconds( )
-		               for t in self.mfi_t                           ]
-
-                self.mfi_b_vec = [ ( self.mfi_b_x[i],
-		                     self.mfi_b_y[i],
-		                     self.mfi_b_z[i] )
-		                     for i in range( len( self.mfi_b_x ) ) ]
+		                                       for t in self.mfi_t ]
 
 		# Compute the magnetic field magnitude.
 
-		self.mfi_b = [sqrt(sum([self.mfi_b_vec[i][j]**2
-		                      for j in range( 3 ) ]               )   )
-		                      for i in range( len( self.mfi_b_vec ) ) ]
+		self.mfi_b = [ sqrt( self.mfi_b_x[i]**2 +
+                                     self.mfi_b_y[i]**2 +
+                                     self.mfi_b_z[i]**2 )
+                                     for i in range( len( self.mfi_b_x ) ) ]
 
 		# Compute the average magetic field.
 
@@ -708,22 +700,11 @@ class core( QObject ) :
 
 		self.mfi_avg_nrm = self.mfi_avg_vec / self.mfi_avg_mag
 
-		self.mfi_nrm     = [(self.mfi_b_vec[i][0],
-		                     self.mfi_b_vec[i][1],
-		                     self.mfi_b_vec[i][2])/self.mfi_b[i]
-		                     for i in range( len( self.mfi_b ) ) ]
-
-		# Compute the dot product between the average, normalized
-		# magnetic field and each look direction.
-
-		self.mfi_hat_dir = array( [ [
-		          dot(self.fc_spec.arr[c][d][0]['dir'],
-		              self.mfi_avg_nrm                    )
-		          for d in range( self.fc_spec['n_dir'] ) ]
-		        for c in range( self.fc_spec['n_cup'] ) ] )
+		mfi_nrm     = [ ( self.mfi_b_x[i], self.mfi_b_y[i],
+		                  self.mfi_b_z[i] ) /self.mfi_b[i]
+		                  for i in range( len( self.mfi_b ) ) ]
 
 		# Compute the mfi angles.
-		# These are useful diagnostic tools.
 
 		mfi_b_rho      = [sqrt( self.mfi_b_x[i]**2.0 
 		                      + self.mfi_b_y[i]**2.0 )
@@ -740,12 +721,12 @@ class core( QObject ) :
 
 		# Calculating the average angular deviation of magnetic field
 
-		self.mfi_psi_b = [ arccos( [ sum ( self.mfi_nrm[i][j] *
+		self.mfi_psi_b = [ arccos( [ sum ( mfi_nrm[i][j] *
 		                               self.mfi_avg_nrm[j]
 		                               for j in range( 3 )      ) ] )
-	                              for i in range( len( self.mfi_nrm ) ) ]
+	                              for i in range( len( mfi_nrm ) ) ]
 
-                self.mfi_psi_b_avg = rad2deg( sum ( self.mfi_psi_b )/self.n_mfi )
+                self.mfi_psi_b_avg = rad2deg(sum ( self.mfi_psi_b )/self.n_mfi )
 
 		# Use interpolation to estiamte the magnetic field vector for
 		# each datum in the FC spectrum.
@@ -2377,7 +2358,7 @@ class core( QObject ) :
 		# Emit a signal that indicates that the results of the
 		# non-linear analysis have changed.
 
-		print 'It took','%.6f'% (time.time()-start), 'seconds.'
+                self.nln_res_runtime = (time.time()-start)
 
 		self.emit( SIGNAL('janus_chng_nln_res') )
 
