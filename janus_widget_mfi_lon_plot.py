@@ -115,7 +115,7 @@ class widget_mfi_lon_plot( QWidget ) :
 		#####self.plt.showGrid( True, True )
 
 		labelStyle = {'color':'k'}
-		self.axs_x.setLabel( 'Time [s]'           , **labelStyle )
+		self.axs_x.setLabel( 'Time [s]'   , **labelStyle )
 		self.axs_y.setLabel( 'Azim. [deg]', **labelStyle )
 
 		self.axs_x.label.setFont( self.fnt )
