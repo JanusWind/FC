@@ -40,7 +40,7 @@ from numpy import amax, amin
 
 
 ################################################################################
-## DEFINE THE "widget_mfi_angular_plot" CLASS FOR "QWidget" TO PLOT MFI DATA.
+## DEFINE THE "widget_mfi_lon_plot" CLASS FOR "QWidget" TO PLOT MFI DATA.
 ################################################################################
 
 class widget_mfi_lon_plot( QWidget ) :
@@ -93,8 +93,8 @@ class widget_mfi_lon_plot( QWidget ) :
 
 		# Initialize and store the pens and fonts.
 
-		self.pen_vbx       = mkPen( color='k' )
-		self.pen_crv_lon   = mkPen( color='#FFD700' )
+		self.pen_vbx     = mkPen( color='k' )
+		self.pen_crv_lon = mkPen( color='#FFD700' )
 
 		self.fnt = self.core.app.font( )
 
@@ -159,17 +159,17 @@ class widget_mfi_lon_plot( QWidget ) :
 
 			t_min = min( amin( self.core.mfi_s ), 0. )
 			t_max = max( amax( self.core.mfi_s ),
-			             self.core.fc_spec['dur']      )
+			             self.core.fc_spec['dur']    )
 
 			# Establish the range of the plot.  As part of this,
 			# ensure that the range satisfies a minimum size and has
 			# sufficient padding.
 
-			ang_max = max( self.core.mfi_b_lon)
-			ang_min = min( self.core.mfi_b_lon)
+			ang_max = max( self.core.mfi_b_lon )
+			ang_min = min( self.core.mfi_b_lon )
 
-                        ang_max += 0.1 * ang_max
-                        ang_min -= 0.1 * abs( ang_min )
+                        ang_max =  5. +  ang_max
+                        ang_min = -5. +  ang_min
 
 			d_t_0 = t_max - t_min
 
@@ -187,7 +187,7 @@ class widget_mfi_lon_plot( QWidget ) :
 
 		# Set the range of the axis of each plot.
 
-		self.plt.setXRange( t_min, t_max, padding=0.0 )
+		self.plt.setXRange( t_min,   t_max,   padding=0.0 )
 		self.plt.setYRange( ang_min, ang_max, padding=0.0 )
 
 		# If the core contains no Wind/MFI magnetic field data, return.

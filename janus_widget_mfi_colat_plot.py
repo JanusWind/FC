@@ -40,7 +40,7 @@ from numpy import amax, amin
 
 
 ################################################################################
-## DEFINE THE "widget_mfi_angular_plot" CLASS FOR "QWidget" TO PLOT MFI DATA.
+## DEFINE THE "widget_mfi_colat_plot" CLASS FOR "QWidget" TO PLOT MFI DATA.
 ################################################################################
 
 class widget_mfi_colat_plot( QWidget ) :
@@ -94,7 +94,7 @@ class widget_mfi_colat_plot( QWidget ) :
 		# Initialize and store the pens and fonts.
 
 		self.pen_vbx       = mkPen( color='k' )
-		self.pen_crv_colat   = mkPen( color='#FFD700' )
+		self.pen_crv_colat = mkPen( color='#8B008B' )
 
 		self.fnt = self.core.app.font( )
 
@@ -115,8 +115,8 @@ class widget_mfi_colat_plot( QWidget ) :
 		#####self.plt.showGrid( True, True )
 
 		labelStyle = {'color':'k'}
-		self.axs_x.setLabel( 'Time [s]'           , **labelStyle )
-		self.axs_y.setLabel( 'Azim. [deg]', **labelStyle )
+		self.axs_x.setLabel( 'Time [s]'   , **labelStyle )
+		self.axs_y.setLabel( 'Elev. [deg]', **labelStyle )
 
 		self.axs_x.label.setFont( self.fnt )
 		self.axs_y.label.setFont( self.fnt )
@@ -133,7 +133,7 @@ class widget_mfi_colat_plot( QWidget ) :
 
 		# Initialize the curves that will be added to this plot.
 
-		self.crv_colat   = None
+		self.crv_colat = None
 
 		# Populate this plot and adjust it's settings.
 
@@ -159,17 +159,17 @@ class widget_mfi_colat_plot( QWidget ) :
 
 			t_min = min( amin( self.core.mfi_s ), 0. )
 			t_max = max( amax( self.core.mfi_s ),
-			             self.core.fc_spec['dur']      )
+			             self.core.fc_spec['dur']    )
 
 			# Establish the range of the plot.  As part of this,
 			# ensure that the range satisfies a minimum size and has
 			# sufficient padding.
 
-			ang_max = max( self.core.mfi_b_colat)
-			ang_min = min( self.core.mfi_b_colat)
+			ang_max = max( self.core.mfi_b_colat )
+			ang_min = min( self.core.mfi_b_colat )
 
-                        ang_max += 0.1 * ang_max
-                        ang_min -= 0.1 * abs( ang_min )
+                        ang_max =  5. + ang_max
+                        ang_min = -5. + ang_min
 
 			d_t_0 = t_max - t_min
 
@@ -182,12 +182,12 @@ class widget_mfi_colat_plot( QWidget ) :
 			t_min = 0.001
 			t_max = 3.500
 
-			ang_min = -360
-			ang_max =  360
+			ang_min = -90
+			ang_max =  90
 
 		# Set the range of the axis of each plot.
 
-		self.plt.setXRange( t_min, t_max, padding=0.0 )
+		self.plt.setXRange( t_min,   t_max,   padding=0.0 )
 		self.plt.setYRange( ang_min, ang_max, padding=0.0 )
 
 		# If the core contains no Wind/MFI magnetic field data, return.
@@ -198,8 +198,8 @@ class widget_mfi_colat_plot( QWidget ) :
 		# Generate and display each curve for the plot.
 
 		self.crv_colat   = PlotDataItem( self.core.mfi_s,
-		                               self.core.mfi_b_colat,
-		                               pen=self.pen_crv_colat   )
+		                                 self.core.mfi_b_colat,
+		                                 pen=self.pen_crv_colat )
 
 		self.plt.addItem( self.crv_colat   )
 

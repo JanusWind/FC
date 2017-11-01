@@ -209,33 +209,6 @@ class core( QObject ) :
 		               var_nln_set = True, var_nln_gss = True,
 		               var_nln_sel = True, var_nln_res = True,
 		               var_dsp     = True, var_dyn     = True          )
-
-		# Define the data array with values for effective collecting
-		# area, "eff_area", as a function of inflow angle, "deg".
-
-		self.eff_deg  = arange( 0., 91., dtype = float )
-		
-		self.eff_area = array( [
-		      33.820000, 33.830000, 33.830000, 33.820000, 33.810000,
-		      33.800000, 33.780000, 33.770000, 33.760000, 33.740000,
-		      33.720000, 33.690000, 33.680000, 33.640000, 33.620000,
-		      33.590000, 33.550000, 33.510000, 33.470000, 33.430000,
-		      33.387000, 33.341000, 33.293000, 33.243000, 33.182000,
-		      33.128000, 33.063000, 32.996000, 32.928000, 32.859000,
-		      32.778000, 32.707000, 32.616000, 32.535000, 32.445000,
-		      32.346000, 32.249000, 32.001000, 31.615000, 31.140000,
-		      30.588200, 29.971700, 29.300000, 28.570000, 27.790000,
-		      26.940000, 25.869997, 24.650000, 23.299996, 21.830000,
-		      20.259996, 18.590001, 16.829996, 14.970001, 13.019996,
-		      10.990001, 8.8779956, 6.6850016, 4.5209962, 2.5750016,
-		      0.96799784, 0.0053996863, 0.0000000, 0.0000000, 0.0000000,
-		      0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000,
-		      0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000,
-		      0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000,
-		      0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000,
-		      0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000,
-		      0.0000000                                              ] )
-
 		
 		# Initialize the value of the indicator variable of whether the
 		# automatic analysis should be aborted.
@@ -274,11 +247,6 @@ class core( QObject ) :
 			self.time_txt = ''
 			self.time_vld = True
 
-			self.mag_t    = None   ##spot
-			self.mag_x    = None   ##spot
-			self.mag_y    = None   ##spot
-			self.mag_z    = None   ##spot
-
 		# If requested, (re-)initialize the varaibles for the Wind/MFI
 		# data associated with this spectrum.
 
@@ -294,14 +262,10 @@ class core( QObject ) :
 			self.mfi_b_x       = None
 			self.mfi_b_y       = None
 			self.mfi_b_z       = None
-			self.mfi_b_vec     = None   ##spot
-			self.mfi_nrm       = None   ##spot
 
-			self.mfi_avg_mag   = None   ##spot
+			self.mfi_avg_mag   = None
 			self.mfi_avg_vec   = None
-			self.mfi_avg_nrm   = None   ##spot
-
-			self.mfi_hat_dir   = None   ##spot
+			self.mfi_avg_nrm   = None
 
 			self.mfi_s         = None
 
@@ -487,6 +451,8 @@ class core( QObject ) :
 		# the results of the non-linear analysis.
 
 		if ( var_nln_res ) :
+
+			self.nln_res_runtime  = 0.
 
 			self.nln_res_plas     = None
 
@@ -713,18 +679,14 @@ class core( QObject ) :
 		# Compute and store derived paramters.
 
 		self.mfi_s = [ ( t - self.fc_spec['time'] ).total_seconds( )
-		               for t in self.mfi_t                           ]
-
-                self.mfi_b_vec = [ ( self.mfi_b_x[i],
-		                     self.mfi_b_y[i],
-		                     self.mfi_b_z[i] )
-		                     for i in range( len( self.mfi_b_x ) ) ]
+		                                       for t in self.mfi_t ]
 
 		# Compute the magnetic field magnitude.
 
-		self.mfi_b = [sqrt(sum([self.mfi_b_vec[i][j]**2
-		                      for j in range( 3 ) ]               )   )
-		                      for i in range( len( self.mfi_b_vec ) ) ]
+		self.mfi_b = [ sqrt( self.mfi_b_x[i]**2 +
+                                     self.mfi_b_y[i]**2 +
+                                     self.mfi_b_z[i]**2 )
+                                     for i in range( len( self.mfi_b_x ) ) ]
 
 		# Compute the average magetic field.
 
@@ -738,22 +700,11 @@ class core( QObject ) :
 
 		self.mfi_avg_nrm = self.mfi_avg_vec / self.mfi_avg_mag
 
-		self.mfi_nrm     = [(self.mfi_b_vec[i][0],
-		                     self.mfi_b_vec[i][1],
-		                     self.mfi_b_vec[i][2])/self.mfi_b[i]
-		                     for i in range( len( self.mfi_b ) ) ]
-
-		# Compute the dot product between the average, normalized
-		# magnetic field and each look direction.
-
-		self.mfi_hat_dir = array( [ [
-		          dot(self.fc_spec.arr[c][d][0]['dir'],
-		              self.mfi_avg_nrm                    )
-		          for d in range( self.fc_spec['n_dir'] ) ]
-		        for c in range( self.fc_spec['n_cup'] ) ] )
+		mfi_nrm     = [ ( self.mfi_b_x[i], self.mfi_b_y[i],
+		                  self.mfi_b_z[i] ) /self.mfi_b[i]
+		                  for i in range( len( self.mfi_b ) ) ]
 
 		# Compute the mfi angles.
-		# These are useful diagnostic tools.
 
 		mfi_b_rho      = [sqrt( self.mfi_b_x[i]**2.0 
 		                      + self.mfi_b_y[i]**2.0 )
@@ -770,12 +721,12 @@ class core( QObject ) :
 
 		# Calculating the average angular deviation of magnetic field
 
-		self.mfi_psi_b = [ arccos( [ sum ( self.mfi_nrm[i][j] *
+		self.mfi_psi_b = [ arccos( [ sum ( mfi_nrm[i][j] *
 		                               self.mfi_avg_nrm[j]
 		                               for j in range( 3 )      ) ] )
-	                              for i in range( len( self.mfi_nrm ) ) ]
+	                              for i in range( len( mfi_nrm ) ) ]
 
-                self.mfi_psi_b_avg = rad2deg( sum ( self.mfi_psi_b )/self.n_mfi )
+                self.mfi_psi_b_avg = rad2deg(sum ( self.mfi_psi_b )/self.n_mfi )
 
 		# Use interpolation to estiamte the magnetic field vector for
 		# each datum in the FC spectrum.
@@ -2349,39 +2300,25 @@ class core( QObject ) :
 
 			if ( pop_aniso ) :
 				pop_w         = [ fit[c], fit[c+1] ]
-#				pop_w_i       = None
-#				pop_sig_w     = None
+				pop_sig_w     = None
 				pop_sig_w_per = sig[c  ]
 				pop_sig_w_par = sig[c+1]
-
-				self.nln_res_plas.add_pop(
-				       spc=spc_name, drift=pop_drift,
-				       aniso=pop_aniso, name=pop_name,
-				       sym=pop_sym, n=pop_n, dv=pop_dv,
-				       w=None, w_per=pop_w[0], w_par=pop_w[1],
-				       sig_n=pop_sig_n, sig_dv=pop_sig_dv, 
-				       sig_w=None, sig_w_per=pop_sig_w_per,
-				       sig_w_par=pop_sig_w_par                 )
-
 				c += 2
-
 			else :
-				pop_w       = fit[c]
-#				pop_w         = [ None, None ]
+				pop_w         = fit[c]
 				pop_sig_w     = sig[c]
 				pop_sig_w_per = None 
 				pop_sig_w_par = None
-
-				self.nln_res_plas.add_pop(
-				       spc=spc_name, drift=pop_drift,
-				       aniso=pop_aniso, name=pop_name,
-				       sym=pop_sym, n=pop_n, dv=pop_dv,
-				       w=pop_w, w_per=None, w_par=None,
-				       sig_n=pop_sig_n, sig_dv=pop_sig_dv, 
-				       sig_w=pop_sig_w, sig_w_per=pop_sig_w_per,
-				       sig_w_par=pop_sig_w_par                 )
-
 				c += 1
+
+			self.nln_res_plas.add_pop(
+			       spc=spc_name, drift=pop_drift,
+			       aniso=pop_aniso, name=pop_name,
+			       sym=pop_sym, n=pop_n, dv=pop_dv, w=pop_w,
+			       sig_n=pop_sig_n, sig_dv=pop_sig_dv, 
+			       sig_w=pop_sig_w, sig_w_per=pop_sig_w_per,
+			       sig_w_par=pop_sig_w_par                    )
+
 			# For each datum in the spectrum, compute the expected
 			# current from each population.
 
@@ -2421,7 +2358,7 @@ class core( QObject ) :
 		# Emit a signal that indicates that the results of the
 		# non-linear analysis have changed.
 
-		print 'It took','%.6f'% (time.time()-start), 'seconds.'
+                self.nln_res_runtime = (time.time()-start)
 
 		self.emit( SIGNAL('janus_chng_nln_res') )
 

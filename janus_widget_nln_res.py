@@ -97,6 +97,14 @@ class widget_nln_res( format_TextEdit ) :
 
 			return
 
+                # Print the length of time it takes to run the non-linear
+                # analysis
+
+                self.prnt_htm( 'Non-linear run time = ' )
+                self.prnt_dcm( self.core.nln_res_runtime, 4,'sec' )
+                self.prnt_brk( )
+                self.prnt_brk( )
+
 		# Print the results for each population that was considered in
 		# the non-linear analysis, grouping the populations by their
 		# species.

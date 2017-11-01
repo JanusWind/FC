@@ -1420,40 +1420,46 @@ class pop( object ) :
 
 		self.my_plas = my_plas
 		self.my_spec = my_spec
-
 		self.drift   = bool( drift )
 		self.aniso   = bool( aniso )
 
-		self.name    = None
-		self.sym     = None
-
-		self.n       = None
-		self.dv      = None
-		self.w       = None
-		self.w_per   = None
-		self.w_par   = None
-
+		self.name      = None
+		self.sym       = None
+		self.n         = None
+		self.dv        = None
+		self.w         = None
+		self.w_per     = None
+		self.w_par     = None
 		self.sig_n     = None
 		self.sig_dv    = None
 		self.sig_w     = None
 		self.sig_w_per = None
 		self.sig_w_par = None
 
-		self["name"   ] = name
-		self["sym"    ] = sym
-
-		self["n"      ] = n
-		self["dv"     ] = dv
-		self["w"      ] = w
-		self["w_per"  ] = w_per
-		self["w_par"  ] = w_par
-
-		self["sig_n"    ] = sig_n
-		self["sig_dv"   ] = sig_dv
-		self["sig_w"    ] = sig_w
-		self["sig_w_per"] = sig_w_per
-		self["sig_w_par"] = sig_w_par
-
+		if ( name is not None ) :
+			self['name'] = name
+		if ( sym is not None ) :
+			self['sym'] = sym
+		if ( n is not None ) :
+			self['n'] = n
+		if ( dv is not None ) :
+			self['dv'] = dv
+		if ( w is not None ) :
+			self['w'] = w
+		if ( w_per is not None ) :
+			self['w_per'] = w_per
+		if ( w_par is not None ) :
+			self['w_par'] = w_par
+		if ( sig_n is not None ) :
+			self['sig_n'] = sig_n
+		if ( sig_dv is not None ) :
+			self['sig_dv'] = sig_dv
+		if ( sig_w is not None ) :
+			self['sig_w'] = sig_w
+		if ( sig_w_per is not None ) :
+			self['sig_w_per'] = sig_w_per
+		if ( sig_w_par is not None ) :
+			self['sig_w_par'] = sig_w_par
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RETRIEVING THE VALUE OF A GIVEN KEY.
@@ -2047,23 +2053,39 @@ class pop( object ) :
 
 			if ( self.aniso ) :
 
-				raise KeyError( 'Population is anisotropic.' )
+				if ( ( hasattr( value, '__len__' ) ) and
+				     ( len( value ) == 2     )     ) :
 
-				return
+					self['w_per'] = value[0]
+					self['w_par'] = value[1]
 
-			value = float( value )
+				else :
 
-			if ( ( self.my_plas.enforce ) and
-			     ( value <= 0           )     ) :
+					raise KeyError(
+					          'Population is anisotropic.' )
 
-				self.w = None
+			else :
 
-				raise ValueError(
-				      'Thermal speed enforced to be positive.' )
+				if ( hasattr( value, '__len__' ) ) :
 
-				return
+					raise KeyError(
+					            'Population is isotropic.' )
 
-			self.w = value
+				else :
+
+					value = float( value )
+
+					if ( ( self.my_plas.enforce ) and
+					     ( value <= 0           )     ) :
+
+						self.w = None
+
+						raise ValueError(
+						      'Thermal speed enforced to be positive.' )
+
+					else :
+
+						self.w = value
 
 		elif ( key == 'w_per' ) :
 
