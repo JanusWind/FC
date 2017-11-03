@@ -296,8 +296,7 @@ class widget_nln_res( format_TextEdit ) :
 				self.prnt_brk( )
 				self.prnt_brk( )
        				self.prnt_tab( 1 )
-  				self.prnt_htm( '<u>' + 'Higher Order Moments' +
-                                                                       '</u>' )
+  				self.prnt_htm( '<u>Higher-Order Moments:</u>' )
 
        				self.prnt_brk( )
        				self.prnt_tab( 2 )

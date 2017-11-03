@@ -1215,7 +1215,6 @@ class widget_fc_cup( QWidget ) :
 
 			self.make_crv( d_lst=[d] )
 
-
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_nln_sel_all" SIGNAL.
 	#-----------------------------------------------------------------------

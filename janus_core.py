@@ -1627,8 +1627,6 @@ class core( QObject ) :
 		# Run the "make_nln_gss" function to update the "self.nln_gss_"
 		# arrays, widgets, etc.
 
-		self.emit( SIGNAL('janus_chng_nln_gss') )
-
 		self.make_nln_gss( )
 
 	#-----------------------------------------------------------------------
