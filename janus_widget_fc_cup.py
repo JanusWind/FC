@@ -316,7 +316,7 @@ class widget_fc_cup( QWidget ) :
 
 	def make_lim( self ) :
 
-		# If no spectrum has been loaded, use to default limits;
+		# If no spectrum has been loaded, use the default limits;
 		# otherwise, use the spectral data to compute axis limits.
 
 		if ( self.core.fc_spec is None ) :
