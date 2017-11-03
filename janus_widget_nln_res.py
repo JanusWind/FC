@@ -289,20 +289,25 @@ class widget_nln_res( format_TextEdit ) :
 				 	self.prnt_htm( lab_t_par + ' = ' )
 				 	self.prnt_dcm( pop['t_par'], 1, 'kK' )
 
-				# Print the Skewness and Excess Kurtosis value
+			# Print the Skewness and Excess Kurtosis value
 
-				if  ( len( self.core.nln_res_plas.lst_pop( spc)
-				                                       ) > 1 ) :
+			if  ( len( self.core.nln_res_plas.lst_pop( spc)
+			                                       ) > 1 ) :
+				self.prnt_brk( )
+				self.prnt_brk( )
+       				self.prnt_tab( 1 )
+  				self.prnt_htm( '<u>' + 'Higher Order Moments' +
+                                                                       '</u>' )
 
-	       				self.prnt_brk( )
-	       				self.prnt_tab( 2 )
-	       				self.prnt_htm( lab_s + ' = ' )
-	       				self.prnt_dcm( spc['s'], 2 )
-	
-	       				self.prnt_brk( )
-	       				self.prnt_tab( 2 )
-	       				self.prnt_htm( lab_k + ' = ' )
-	       				self.prnt_dcm( spc['k'] - 3, 2 )
+       				self.prnt_brk( )
+       				self.prnt_tab( 2 )
+       				self.prnt_htm( lab_s + ' = ' )
+       				self.prnt_dcm( spc['s'], 3 )
+
+       				self.prnt_brk( )
+       				self.prnt_tab( 2 )
+       				self.prnt_htm( lab_k + ' = ' )
+       				self.prnt_dcm( spc['k'] - 3, 3 )
 
 				# Clear the first population indicator.
 
