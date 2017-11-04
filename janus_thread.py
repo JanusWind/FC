@@ -43,21 +43,23 @@ def n_thread( ) :
 	n = 0
 
 	for thr in ThreadList( ) :
-		if ( ( thr._Thread__target is thread_load_spec    ) or
-		     ( thr._Thread__target is thread_auto_mom_sel ) or
-		     ( thr._Thread__target is thread_chng_mom_sel ) or
-		     ( thr._Thread__target is thread_anls_mom     ) or
-		     ( thr._Thread__target is thread_chng_nln_spc ) or
-		     ( thr._Thread__target is thread_chng_nln_pop ) or
-		     ( thr._Thread__target is thread_chng_nln_set ) or
-		     ( thr._Thread__target is thread_chng_nln_gss ) or
-		     ( thr._Thread__target is thread_chng_nln_sel ) or
-		     ( thr._Thread__target is thread_anls_nln     ) or
-		     ( thr._Thread__target is thread_chng_dsp     ) or
-		     ( thr._Thread__target is thread_chng_dyn     ) or
-		     ( thr._Thread__target is thread_auto_run     ) or
-		     ( thr._Thread__target is thread_save_res     ) or
-		     ( thr._Thread__target is thread_xprt_res     )    ) :
+		if ( ( thr._Thread__target is thread_load_spec        ) or
+		     ( thr._Thread__target is thread_anls_mom         ) or
+		     ( thr._Thread__target is thread_anls_nln         ) or
+		     ( thr._Thread__target is thread_chng_dsp         ) or
+		     ( thr._Thread__target is thread_chng_dyn         ) or
+		     ( thr._Thread__target is thread_auto_run         ) or
+		     ( thr._Thread__target is thread_save_res         ) or
+		     ( thr._Thread__target is thread_xprt_res         ) or
+		     ( thr._Thread__target is thread_chng_mom_sel     ) or
+                     ( thr._Thread__target is thread_auto_mom_sel     ) or
+		     ( thr._Thread__target is thread_chng_nln_spc     ) or
+		     ( thr._Thread__target is thread_chng_nln_pop     ) or
+		     ( thr._Thread__target is thread_chng_nln_set     ) or
+		     ( thr._Thread__target is thread_chng_nln_gss     ) or
+		     ( thr._Thread__target is thread_chng_nln_sel     ) or
+		     ( thr._Thread__target is thread_chng_mom_win_dir ) or
+		     ( thr._Thread__target is thread_chng_mom_win_bin )   ) :
 			n += 1
 
 	return n
@@ -78,34 +80,6 @@ def thread_load_spec( core, time_req, get_prev=False, get_next=False ) :
 
 
 ################################################################################
-## DEFINE THE WRAPPER FOR THE FUNCTION "core.auto_mom_sel".
-################################################################################
-
-def thread_auto_mom_sel( core, win_azm, win_cur ) :
-
-	core.emit( SIGNAL('janus_busy_end') )
-	core.emit( SIGNAL('janus_busy_beg') )
-
-	core.auto_mom_sel( win_azm=win_azm, win_cur=win_cur )
-
-	core.emit( SIGNAL('janus_busy_end') )
-
-
-################################################################################
-## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_mom_sel".
-################################################################################
-
-def thread_chng_mom_sel( core, t, p, v ) :
-
-	core.emit( SIGNAL('janus_busy_end') )
-	core.emit( SIGNAL('janus_busy_beg') )
-
-	core.chng_mom_sel( t, p, v )
-
-	core.emit( SIGNAL('janus_busy_end') )
-
-
-################################################################################
 ## DEFINE THE WRAPPER FOR THE FUNCTION "core.anls_mom" (WITH "chng_dsp").
 ################################################################################
 
@@ -118,6 +92,120 @@ def thread_anls_mom( core ) :
 	core.chng_dsp( 'mom' )
 
 	core.emit( SIGNAL('janus_busy_end') )
+
+
+################################################################################
+## DEFINE THE WRAPPER FOR THE FUNCTION "core.anls_nln" (WITH "chng_dsp").
+################################################################################
+
+def thread_anls_nln( core ) :
+
+	core.emit( SIGNAL('janus_busy_end') )
+	core.emit( SIGNAL('janus_busy_beg') )
+
+	core.anls_nln( )
+	core.chng_dsp( 'nln' )
+
+	core.emit( SIGNAL('janus_busy_end') )
+
+
+################################################################################
+## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_dsp".
+################################################################################
+
+def thread_chng_dsp( core, value ) :
+
+	core.emit( SIGNAL('janus_busy_end') )
+	core.emit( SIGNAL('janus_busy_beg') )
+
+	core.chng_dsp( value )
+
+	core.emit( SIGNAL('janus_busy_end') )
+
+
+################################################################################
+## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_dyn".
+################################################################################
+
+def thread_chng_dyn( core, anal, value ) :
+
+	core.emit( SIGNAL('janus_busy_end') )
+	core.emit( SIGNAL('janus_busy_beg') )
+
+	core.chng_dyn( anal, value )
+
+	core.emit( SIGNAL('janus_busy_end') )
+
+
+################################################################################
+## DEFINE THE WRAPPER FOR THE FUNCTION "core.auto_run".
+################################################################################
+
+def thread_auto_run( core, t_strt, t_stop,
+                     get_next=None, err_halt=None, pause=None ) :
+
+        core.emit( SIGNAL('janus_busy_end') )
+        core.emit( SIGNAL('janus_busy_beg') )
+
+        core.auto_run( t_strt, t_stop, get_next, err_halt, pause )
+
+        core.emit( SIGNAL('janus_busy_end') )
+
+
+################################################################################
+## DEFINE THE WRAPPER FOR THE FUNCTION "core.save_res".
+################################################################################
+
+def thread_save_res( core, nm_fl, exit=False ) :
+
+	core.emit( SIGNAL('janus_busy_end') )
+	core.emit( SIGNAL('janus_busy_beg') )
+
+	core.save_res( nm_fl, exit )
+
+	core.emit( SIGNAL('janus_busy_end') )
+
+
+################################################################################
+## DEFINE THE WRAPPER FOR THE FUNCTION "core.xprt_res".
+################################################################################
+
+def thread_xprt_res( core, nm_fl, exit=False ) :
+
+	core.emit( SIGNAL('janus_busy_end') )
+	core.emit( SIGNAL('janus_busy_beg') )
+
+	core.xprt_res( nm_fl, exit )
+
+	core.emit( SIGNAL('janus_busy_end') )
+
+
+################################################################################
+## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_mom_sel".
+################################################################################
+
+def thread_chng_mom_sel( core, c, d, b ) :
+
+	core.emit( SIGNAL('janus_busy_end') )
+	core.emit( SIGNAL('janus_busy_beg') )
+
+	core.chng_mom_sel( c, d, b )
+
+	core.emit( SIGNAL('janus_busy_end') )
+
+
+################################################################################
+## DEFINE THE WRAPPER FOR THE FUNCTION "core.auto_mom_sel".
+################################################################################
+
+def thread_auto_mom_sel( core ) :
+
+        core.emit( SIGNAL('janus_busy_end') )
+        core.emit( SIGNAL('janus_busy_beg') )
+
+        core.auto_mom_sel( )
+
+        core.emit( SIGNAL('janus_busy_end') )
 
 
 ################################################################################
@@ -174,103 +262,45 @@ def thread_chng_nln_gss( core, i, param, val ) :
 	core.chng_nln_gss( i, param, val )
 
 	core.emit( SIGNAL('janus_busy_end') )
-
+ 
 
 ################################################################################
 ## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_nln_sel".
 ################################################################################
 
-def thread_chng_nln_sel( core, t, p, v ) :
+def thread_chng_nln_sel( core, c, d, b ) :
+
+        core.emit( SIGNAL('janus_busy_end') )
+        core.emit( SIGNAL('janus_busy_beg') )
+
+        core.chng_nln_sel( c, d, b )
+
+        core.emit( SIGNAL('janus_busy_end') )
+
+
+################################################################################
+## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_mom_win_dir".
+################################################################################
+
+def thread_chng_mom_win_dir( core, val ) :
 
 	core.emit( SIGNAL('janus_busy_end') )
 	core.emit( SIGNAL('janus_busy_beg') )
 
-	core.chng_nln_sel( t, p, v )
+	core.chng_mom_win_dir( val )
 
 	core.emit( SIGNAL('janus_busy_end') )
 
 
 ################################################################################
-## DEFINE THE WRAPPER FOR THE FUNCTION "core.anls_nln" (WITH "chng_dsp").
+## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_mom_win_bin".
 ################################################################################
 
-def thread_anls_nln( core ) :
-
-	core.emit( SIGNAL('janus_busy_end') )
-	core.emit( SIGNAL('janus_busy_beg') )
-
-	core.anls_nln( )
-	core.chng_dsp( 'nln' )
-
-	core.emit( SIGNAL('janus_busy_end') )
-
-
-################################################################################
-## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_dsp".
-################################################################################
-
-def thread_chng_dsp( core, value ) :
+def thread_chng_mom_win_bin( core, val ) :
 
 	core.emit( SIGNAL('janus_busy_end') )
 	core.emit( SIGNAL('janus_busy_beg') )
 
-	core.chng_dsp( value )
-
-	core.emit( SIGNAL('janus_busy_end') )
-
-
-################################################################################
-## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_dyn".
-################################################################################
-
-def thread_chng_dyn( core, anal, value ) :
-
-	core.emit( SIGNAL('janus_busy_end') )
-	core.emit( SIGNAL('janus_busy_beg') )
-
-	core.chng_dyn( anal, value )
-
-	core.emit( SIGNAL('janus_busy_end') )
-
-
-################################################################################
-## DEFINE THE WRAPPER FOR THE FUNCTION "core.auto_run".
-################################################################################
-
-def thread_auto_run( core, t_strt, t_stop,
-                     get_next=None, err_halt=None, pause=None ) :
-
-	core.emit( SIGNAL('janus_busy_end') )
-	core.emit( SIGNAL('janus_busy_beg') )
-
-	core.auto_run( t_strt, t_stop, get_next, err_halt, pause )
-
-	core.emit( SIGNAL('janus_busy_end') )
-
-
-################################################################################
-## DEFINE THE WRAPPER FOR THE FUNCTION "core.save_res".
-################################################################################
-
-def thread_save_res( core, nm_fl, exit=False ) :
-
-	core.emit( SIGNAL('janus_busy_end') )
-	core.emit( SIGNAL('janus_busy_beg') )
-
-	core.save_res( nm_fl, exit )
-
-	core.emit( SIGNAL('janus_busy_end') )
-
-
-################################################################################
-## DEFINE THE WRAPPER FOR THE FUNCTION "core.xprt_res".
-################################################################################
-
-def thread_xprt_res( core, nm_fl, exit=False ) :
-
-	core.emit( SIGNAL('janus_busy_end') )
-	core.emit( SIGNAL('janus_busy_beg') )
-
-	core.xprt_res( nm_fl, exit )
+	core.chng_mom_win_bin( val )
 
 	core.emit( SIGNAL('janus_busy_end') )

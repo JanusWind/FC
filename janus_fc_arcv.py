@@ -35,10 +35,13 @@ from datetime import datetime, timedelta
 
 from janus_time import calc_time_str, calc_time_val, calc_time_epc
 
+from janus_fc_spec import fc_spec
+
 # Load the necessary "numpy" array modules.
 
-from numpy import abs, amax, amin, append, arange, argsort, array, tile, \
-                  transpose, where
+from numpy import argsort, array
+
+from operator import attrgetter		  
 
 # Load the modules necessary for file I/O (including FTP).
 
@@ -50,7 +53,22 @@ from glob import glob
 
 from ftplib import FTP
 
-from scipy.io.idl import readsav
+
+################################################################################
+## DEFINE THE CLASS fc_tag TO HAVE SPECTRA FOR PARTICULAR TIME STAMP
+################################################################################
+
+class fc_tag() :
+	
+	#-----------------------------------------------------------------------
+	# DEFINE THE INITIALIZATION FUNCTION.
+	#-----------------------------------------------------------------------
+
+	def __init__( self, c=None, s=None, epoch=None ) :
+
+		self.c     = c
+		self.s     = s
+		self.epoch = epoch
 
 
 ################################################################################
@@ -65,7 +83,7 @@ class fc_arcv( object ) :
 
 	def __init__( self, core=None, buf=3600., tol=3600.,
 	                    n_file_max=None, n_date_max=None,
-	                    use_idl=False, path=None, verbose=True ) :
+	                    path=None, verbose=True           ) :
 
 		# Save the arguments for later use.
 
@@ -75,103 +93,39 @@ class fc_arcv( object ) :
 		self.path       = path
 		self.n_file_max = n_file_max
 		self.n_date_max = n_date_max
-		self.use_idl    = use_idl
 		self.verbose    = verbose
 
 		# Validate the values of the "self.max_*" parameters and, if
 		# necessary, provide values for them.
 
-		if ( use_idl ) :
-			n_file_max_def = float( 'infinity' )
-			n_date_max_def = 40
-		else :
-			n_file_max_def = float( 'infinity' )
-			n_date_max_def = 40
+		if ( ( self.n_file_max is None ) or
+		     ( self.n_file_max < 0     )    ) :
+			self.n_file_max = float( 'infinity' )
 
-		if ( self.n_file_max is None ) :
-			self.n_file_max = n_file_max_def
-		elif ( self.n_file_max < 0 ) :
-			self.n_file_max = n_file_max_def
-
-		if ( self.n_date_max is None ) :
-			self.n_date_max = n_date_max_def
-		elif ( self.n_date_max <= 0 ) :
-			self.n_date_max = n_date_max_def
+		if ( ( self.n_date_max is None ) or
+		     ( self.n_date_max <= 0    )    ) :
+			self.n_date_max = 40
 
 		# If no path has been requested by the user, use the default
 		# one.
 
 		if ( self.path is None ) :
 
-			self.path = os.path.join( os.path.dirname( __file__ ),
+			self.path = os.path.join( os.path.dirname( __file__ ),		# double underscore ??		
 			                          'data', 'fc'                 )
 
-		# Initialize the array of dates loaded.
+		# Initialize arrays of date and times loaded.
 
-		self.date_str = array( [ ] )
-		self.date_ind = array( [ ] )
+		self.arr_cdf  = [ ]
+		self.arr_date = [ ]
 
-		self.n_date = 0
-		self.t_date = 0
-
-		# Initialize the arrays that will store the data from the loaded
-		# spectra.
-
-		self.fc_time_epc   = tile(  0., ( 0 ) )
-		self.fc_cup1_azm   = tile(  0., ( 0, 20 ) )
-		self.fc_cup2_azm   = tile(  0., ( 0, 20 ) )
-		self.fc_cup1_c_vol = tile(  0., ( 0, 31 ) )
-		self.fc_cup2_c_vol = tile(  0., ( 0, 31 ) )
-		self.fc_cup1_d_vol = tile(  0., ( 0, 31 ) )
-		self.fc_cup2_d_vol = tile(  0., ( 0, 31 ) )
-		self.fc_cup1_cur   = tile(  0., ( 0, 20, 31 ) )
-		self.fc_cup2_cur   = tile(  0., ( 0, 20, 31 ) )
-		self.fc_ind        = tile( -1 , ( 0 ) )
-
-		self.n_fc = 0
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR RETURNING THE NUMBER OF LOADED SPECTRA.
-	#-----------------------------------------------------------------------
-
-	def num_spec( self, tmin=None, tmax=None ) :
-
-		# CAUTION!  This function only counts spectra that have already
-		#           been loaded into this archive from the data files.
-
-		# First, handle the easy cases: i.e., the case of no spectra
-		# having been loaded into the archive and the case of both
-		# "tm??" values being "None".
-
-		if ( self.n_fc == 0 ) :
-			return 0
-
-		if ( ( tmin is None ) and ( tmax is None ) ) :
-			return self.n_fc
-
-		# Identify the subset of spectra with timestamps between "tmin"
-		# and "tmax" and return the size of that subset.
-
-		if ( tmin is not None ) :
-			con_tmin = ( self.fc_time_epc >= calc_time_epc( tmin ) )
-		else :
-			con_tmin = tile( True, self.n_fc )
-
-		if ( tmax is not None ) :
-			con_tmax = ( self.fc_time_epc <= calc_time_epc( tmax ) )
-		else :
-			con_tmax = tile( True, self.n_fc )
-
-		tk_con = where( con_tmin & con_tmax )[0]
-
-		return len( tk_con )
+		self.arr_tag  = [ ]
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING (AND RETURNING) AN ION SPECTRUM.
 	#-----------------------------------------------------------------------
 
-	def load_spec( self, time, get_prev=False, get_next=False,
-	                           tmin=None, tmax=None            ) :
+	def load_spec( self, time, get_prev=False, get_next=False ) :	
 
 		# If both "get_????" keywords are "True", abort.
 
@@ -205,7 +159,7 @@ class fc_arcv( object ) :
 		#        already been loaded as that's the first thing that
 		#        "self.load_date( )" does.
 
-		self.load_date( date_req_str )
+		self.load_date( date_req_str )		
 
 		if ( scnd_req_val <= self.buf ) :
 			self.load_date( date_pre_str )
@@ -215,108 +169,101 @@ class fc_arcv( object ) :
 
 		# If no spectra have been loaded, abort.
 
-		if ( self.n_fc <= 0 ) :
+		if ( len( self.arr_tag ) == 0 ) :
 			self.mesg_txt( 'none' )
 			return None
 
-		# Identify the subset of spectra with timestamps between "tmin"
-		# and "tmax".
+		# Locate the spectrum whose timestamp is closest to the
+		# one requested.
 
-		if ( tmin is not None ) :
-			con_tmin = ( self.fc_time_epc >= calc_time_epc( tmin ) )
-		else :
-			con_tmin = tile( True, self.n_fc )
+		adt = [ abs(tag.epoch - time_req_epc) for tag in self.arr_tag ]
 
-		if ( tmax is not None ) :
-			con_tmax = ( self.fc_time_epc <= calc_time_epc( tmax ) )
-		else :
-			con_tmax = tile( True, self.n_fc )
+		adt_min = min( adt )
 
-		tk_con = where( con_tmin & con_tmax )[0]
+		tk = [ a for a in range( len( adt ) ) if adt[a] == adt_min ][0]
 
-		# If no spectra had timestamps in the specified range, abort.
+		if ( get_prev ) :
+			tk -= 1
+		if ( get_next ) :
+			tk +=1
 
-		if ( len( tk_con ) <= 0 ) :
+		if( ( tk <  0                   ) or
+		    ( tk >= len( self.arr_tag ) )    ) :
 			self.mesg_txt( 'none' )
 			return None
 
-		# Compute the time difference between the timestamps within the
-		# "tm??" range and the requested time.  Identify the index of
-		# the smallest absolute in this array and the index of the
-		# corresponding spectrum.
-
-		dt = array( [ ( epc - time_req_epc ).total_seconds( )
-		              for epc in self.fc_time_epc[tk_con]     ] )
-
-		dt_abs = abs( dt )
-
-		dt_abs_min = amin( dt_abs )
-
-		tk_dt = where( dt_abs == dt_abs_min )[0][0]
-
-		tk_req = tk_con[tk_dt]
-
-		# Set the spectrum with index "tk_req" to be returned.  If the
-		# (chronologically) next or previous spectrum has been
-		# requested, find it and set it to be returned instead.
-
-		tk = tk_req
-
-		if ( ( get_prev ) and ( not get_next ) ) :
-
-			tk_sub = where( dt < dt[tk_dt] )[0]
-
-			if ( len( tk_sub ) <= 0 ) :
-				self.mesg_txt( 'none' )
-				return None
-
-			tk_dt_prev = where( dt == amax( dt[tk_sub] ) )[0][0]
-
-			tk = tk_con[tk_dt_prev]
-
-		if ( ( get_next ) and ( not get_prev ) ) :
-
-			tk_sub = where( dt > dt[tk_dt] )[0]
-
-			if ( len( tk_sub ) <= 0 ) :
-				self.mesg_txt( 'none' )
-				return None
-
-			tk_dt_next = where( dt == amin( dt[tk_sub] ) )[0][0]
-
-			tk = tk_con[tk_dt_next]
 
 		# If the selected spectrum is not within the the request
 		# tolerence, abort.
 
-		if ( abs( ( self.fc_time_epc[tk] - time_req_epc
-		                             ).total_seconds( ) ) > self.tol ) :
+		if ( ( adt[tk] ).total_seconds() > self.tol ) :		#In case of Data gap for a long time  
 			self.mesg_txt( 'none' )
 			return None
 
+
+		# If the selected spectrum is not within the the request
+		# tolerence, abort.
+	
 		# Extract the spectrum to be returned.
 
-		ret_time_epc = self.fc_time_epc[tk]
-		ret_cup1_azm = self.fc_cup1_azm[tk]
-		ret_cup2_azm = self.fc_cup2_azm[tk]
-		ret_cup1_c_vol = self.fc_cup1_c_vol[tk]
-		ret_cup2_c_vol = self.fc_cup2_c_vol[tk]
-		ret_cup1_d_vol = self.fc_cup1_d_vol[tk]
-		ret_cup2_d_vol = self.fc_cup2_d_vol[tk]
-		ret_cup1_cur = self.fc_cup1_cur[tk]
-		ret_cup2_cur = self.fc_cup2_cur[tk]
+		cdf = self.arr_cdf[self.arr_tag[tk].c]
+		s   = self.arr_tag[ tk ].s
+
+		# Find actual no. of voltage bins 
+
+		n_bin_max = 31
+		n_dir = 20
+
+		for n_bin_1 in range( n_bin_max ) :
+			if ( n_bin_1 == n_bin_max + 1 ) :
+				break
+			if ( cdf['cup1_EperQ'][s][n_bin_1] >= 
+					     cdf['cup1_EperQ'][s][n_bin_1+1] ) :
+				break
+		n_bin_1 += 1
+
+		for n_bin_2 in range( n_bin_max ) :
+			if ( n_bin_2 == n_bin_max + 1 ) :
+				break
+			if ( cdf['cup2_EperQ'][s][n_bin_2] >= 
+					     cdf['cup2_EperQ'][s][n_bin_2+1] ) :
+				break
+		n_bin_2 += 1
+
+		n_bin = min( [ n_bin_1, n_bin_2 ] )
+
+		# Assigning all retrieved data to parameter values
+
+		time = cdf['Epoch'][s]			
+
+		elev = [ float( cdf['inclination_angle'][0] ), float( cdf['inclination_angle'][1] ) ]
+
+		azim = [ [ float( cdf['cup1_azimuth'][s][d] ) for d in range( n_dir ) ],
+			 [ float( cdf['cup2_azimuth'][s][d] ) for d in range( n_dir ) ]  ]
+
+		volt_cen=[ [ float( cdf['cup1_EperQ'][s][b] ) for b in range( n_bin ) ],
+			   [ float( cdf['cup2_EperQ'][s][b] ) for b in range( n_bin ) ]  ]
+
+		volt_del=[ [ float( cdf['cup1_EperQ_DEL'][s][b] ) for b in range( n_bin ) ],
+			   [ float( cdf['cup2_EperQ_DEL'][s][b] ) for b in range( n_bin ) ]  ]
+
+		curr = [ [ [ float( cdf['cup1_qflux'][s][d][b] ) for b in range( n_bin ) ] for d in range( n_dir ) ],
+			 [ [ float( cdf['cup2_qflux'][s][d][b] ) for b in range( n_bin ) ] for d in range( n_dir ) ]  ]
+
+
+		spec = fc_spec( n_bin, elev=elev, azim=azim, volt_cen=volt_cen,\
+					volt_del=volt_del, curr=curr,  time=time )
 
 		# Request a cleanup of the data loaded into this archive.
 
-		self.cleanup_date( )
+		self.cleanup_date( )	
 
+		#print spec['n_bin'],spec['n_cup'], spec['time'],spec.arr[1][0][0]['elev']
 		# Return the selected spetrum to the user.
+		#print spec.arr[0][0][0]['volt_strt'], spec.arr[0][0][0]['volt_stop']
+		return spec
 
-		return ( ret_time_epc  ,
-		         ret_cup1_azm  , ret_cup2_azm  ,
-		         ret_cup1_c_vol, ret_cup2_c_vol,
-		         ret_cup1_d_vol, ret_cup2_d_vol,
-		         ret_cup1_cur  , ret_cup2_cur    )
+		#fc_arcv().load_spec(1224246301)
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING ALL SPECTRA FROM DATE-SPECIFIED FILE.
@@ -327,12 +274,10 @@ class fc_arcv( object ) :
 		# Determine whether or not the requested date has already been
 		# loaded.  If it has, abort.
 
-		if ( self.n_date > 0 ) :
+		arr = [ date for date in self.arr_date if date == date_str ]
 
-			tk = where( self.date_str == date_str )[0]
-
-			if ( len( tk ) > 0 ) :
-				return
+		if ( len( arr ) > 0 ) :
+			return
 
 		# Extract the year, month, and day portions of the "date_str"
 		# string.
@@ -341,173 +286,71 @@ class fc_arcv( object ) :
 		str_mon  = date_str[5:7]
 		str_day  = date_str[8:10]
 
-		# Attempt to load and extract data from the appropriate file.
+		# Determine the name of the file that contains data from the
+		# requested date.
 
-		# Note.  The default data file format is CDF, and the code will
-		#        attempt to download the appropriate CDF file from
-		#        CDAWeb if it doesn't find one in the specified
-		#        directory.  However, the user may also request that
-		#        IDL "SAVE" files be used instead.
+		fl0 = 'wi_sw-ion-dist_swe-faraday_' + \
+		       str_year + str_mon + str_day + '_v??.cdf'
 
-		if ( self.use_idl ) :
+		fl0_path = os.path.join( self.path, fl0 )
 
-			# Determine the path and name of the file corresponding
-			# to the requested date.
+		gb = glob( fl0_path )	# returns all files with common names in argument
 
-			fl = 'wind_janus_fc_' + str_year + '-' + \
-			                        str_mon + '-' + str_day + '.idl'
+		# If the file does not exist, attempt to download it.
 
-			fl_path = os.path.join( self.path, fl )
-
-			# If the file exists, attempt to load it; otherwise,
-			# abort.
-
-			self.mesg_txt( 'load', date_str )
-
-			if ( os.path.isfile( fl_path ) ) :
-				try :
-					dat = readsav( fl_path )
-				except :
-					self.mesg_txt( 'fail', date_str )
-					return
-			else :
-				self.mesg_txt( 'fail', date_str )
-				return
-
-			# Determine the number of spectra loaded.  If no spectra
-			# were loaded, return.
-
-			n_sub = len( dat.sec )
-
-			if ( n_sub <= 0 ) :
-				self.mesg_txt( 'fail', date_str )
-				return
-
-			# Separate the loaded data into parameter arrays.
-
-			sub_time_val = dat.sec + calc_time_val( date_str )
-
-			sub_time_epc = array( [ calc_time_epc( t_val )
-			                        for t_val in sub_time_val ] )
-
-			sub_cup1_azm   = dat.cup1_angles
-			sub_cup2_azm   = dat.cup2_angles
-			sub_cup1_c_vol = dat.cup1_eperq
-			sub_cup2_c_vol = dat.cup2_eperq
-			sub_cup1_d_vol = dat.cup1_eqdel
-			sub_cup2_d_vol = dat.cup2_eqdel
-
-			sub_cup1_cur = 1E12 * array( [ 
-			                  transpose( dat.currents[s,0,:,:] +
-			                             dat.currents[s,2,:,:] )
-			                  for s in range( n_sub )            ] )
-			sub_cup2_cur = 1E12 * array( [ 
-			                  transpose( dat.currents[s,1,:,:] +
-			                             dat.currents[s,3,:,:] )
-			                  for s in range( n_sub )            ] )
-
-			sub_ind = tile( self.t_date, n_sub )
-
+		if ( len( gb ) > 0 ) :				# Take the last one : gb[-1]
+			fl_path = gb[-1]
 		else :
-
-			# Determine the name of the file that contains data from
-			# the requested date.
-
-			fl0 = 'wi_sw-ion-dist_swe-faraday_' + \
-			      str_year + str_mon + str_day + '_v??.cdf'
-
-			fl0_path = os.path.join( self.path, fl0 )
-
-			gb = glob( fl0_path )
-
-			# If the file does not exist, attempt to download it.
-
-			if ( len( gb ) > 0 ) :
-				fl_path = gb[-1]
-			else :
-				try :
-					self.mesg_txt( 'ftp', date_str )
-					ftp = FTP( 'cdaweb.gsfc.nasa.gov' )
-					ftp.login( )
-					ftp.cwd(
-					      'pub/data/wind/swe/swe_faraday/' )
-					ftp.cwd( str_year )
-					ls = ftp.nlst( fl0 )
-					fl = ls[-1]
-					fl_path = os.path.join( self.path, fl )
-					ftp.retrbinary( "RETR " + fl,
-					           open( fl_path, 'wb' ).write )
-				except :
-					self.mesg_txt( 'fail', date_str )
-					return
-
-			# If the file now exists, try to load it; otherwise,
-			# abort.
-
-			self.mesg_txt( 'load', date_str )
-
-			if ( os.path.isfile( fl_path ) ) :
-				try :
-					cdf = pycdf.CDF( fl_path )
-				except :
-					self.mesg_txt( 'fail', date_str )
-					return
-			else :
+			try :
+				self.mesg_txt( 'ftp', date_str )
+				ftp = FTP( 'cdaweb.gsfc.nasa.gov' )
+				ftp.login( )
+				ftp.cwd( 'pub/data/wind/swe/swe_faraday/' )
+				ftp.cwd( str_year )
+				ls = ftp.nlst( fl0 )
+				fl = ls[-1]
+				fl_path = os.path.join( self.path, fl )
+				ftp.retrbinary( "RETR " + fl,
+					        open( fl_path, 'wb' ).write )
+			except :
 				self.mesg_txt( 'fail', date_str )
 				return
 
-			# Separate the loaded data into parameter arrays, and
-			# determine the number of spectra loaded.
+		# If the file now exists, try to load it; otherwise, abort.
 
-			sub_time_epc   = array( cdf['Epoch']          )
-			sub_cup1_azm   = array( cdf['cup1_azimuth']   )
-			sub_cup2_azm   = array( cdf['cup2_azimuth']   )
-			sub_cup1_c_vol = array( cdf['cup1_EperQ']     )
-			sub_cup2_c_vol = array( cdf['cup2_EperQ']     )
-			sub_cup1_d_vol = array( cdf['cup1_EperQ_DEL'] )
-			sub_cup2_d_vol = array( cdf['cup1_EperQ_DEL'] )
-			sub_cup1_cur   = array( cdf['cup1_qflux']     )
-			sub_cup2_cur   = array( cdf['cup2_qflux']     )
+		self.mesg_txt( 'load', date_str )
 
-			n_sub = len( sub_time_epc )
+		if ( os.path.isfile( fl_path ) ) :
+			try :
+				cdf = pycdf.CDF( fl_path )
+			except :
+				self.mesg_txt( 'fail', date_str )
+				return
+		else :
+			self.mesg_txt( 'fail', date_str )
+			return
 
-			sub_ind = tile( self.t_date, n_sub )
+		# Add the CDF object and tags for each spectrum to the arrays.
 
-		# Add the loaded and formatted Wind/FC spectra to the archive.
+		c = len( self.arr_cdf )
 
-		self.fc_time_epc   = append( self.fc_time_epc  ,
-		                                        sub_time_epc  , axis=0 )
-		self.fc_cup1_azm   = append( self.fc_cup1_azm  ,
-		                                        sub_cup1_azm  , axis=0 )
-		self.fc_cup2_azm   = append( self.fc_cup2_azm  ,
-		                                        sub_cup2_azm  , axis=0 )
-		self.fc_cup1_c_vol = append( self.fc_cup1_c_vol,
-		                                        sub_cup1_c_vol, axis=0 )
-		self.fc_cup2_c_vol = append( self.fc_cup2_c_vol,
-		                                        sub_cup2_c_vol, axis=0 )
-		self.fc_cup1_d_vol = append( self.fc_cup1_d_vol,
-		                                        sub_cup1_d_vol, axis=0 )
-		self.fc_cup2_d_vol = append( self.fc_cup2_d_vol,
-		                                        sub_cup2_d_vol, axis=0 )
-		self.fc_cup1_cur   = append( self.fc_cup1_cur  ,
-		                                        sub_cup1_cur  , axis=0 )
-		self.fc_cup2_cur   = append( self.fc_cup2_cur  ,
-		                                        sub_cup2_cur  , axis=0 )
-		self.fc_ind        = append( self.fc_ind,  sub_ind    , axis=0 )
+		self.arr_cdf  = self.arr_cdf  + [ cdf ]		# arr_cdf and arr_date of same size	
+		self.arr_date = self.arr_date + [ date_str ]
 
-		self.n_fc = self.n_fc + n_sub
+		n_spec = len( cdf['Epoch'] )
+		self.arr_tag = self.arr_tag + [ fc_tag( c=c, s=s,
+		                                epoch=cdf['Epoch'][s] )
+		                                for s in range( n_spec ) ]
 
-		# Append the array of loaded dates with this one.
+		self.arr_tag = sorted( self.arr_tag, key=attrgetter('epoch') )
 
-		self.date_str = append( self.date_str, [ date_str    ] )
-		self.date_ind = append( self.date_ind, [ self.n_date ] )
 
-		self.n_date += 1
-		self.t_date += 1
+
 
 		# Request a clean-up of the files in the data directory.
 
-		self.cleanup_file( )
+		#self.cleanup_file( )
+
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CLEANING UP THIS ARCHIVE.
@@ -518,35 +361,24 @@ class fc_arcv( object ) :
 		# If the number of dates is less than or equal to the maximum,
 		# abort (as nothing needs to be done).
 
-		if ( self.n_date <= self.n_date_max ) :
+		if ( len(self.arr_date) <= self.n_date_max ) :
 			return
 
-		# Delete dates (and all associated data) from this archive so
-		# that the number of loaded dates equals the maximum allowed.
+		# How to get the entire list of arr_cdf, arr_data, arr_tag for 
+		#all downloded data. ...Showing for only the requested one ...
 
-		n_rm = self.n_date - self.n_date_max
+		self.arr_tag = [ tag for tag in self.arr_tag if tag.c != 0 ]
 
-		ind_min = self.t_date - self.n_date_max
+		self.arr_cdf  = self.arr_cdf[1:]
+		self.arr_date = self.arr_date[1:]
 
-		self.date_str = self.date_str[n_rm:]
-		self.date_ind = self.date_ind[n_rm:]
+		for t in range( len( self.arr_tag ) ) :
+			self.arr_tag[t].c -= 1
 
-		self.n_date -= n_rm
-
-		tk   = where( self.fc_ind >= ind_min )[0]
-
-		self.n_fc = len( tk )
-
-		self.fc_time_epc   = self.fc_time_epc[tk]
-		self.fc_cup1_azm   = self.fc_cup1_azm[tk]
-		self.fc_cup2_azm   = self.fc_cup2_azm[tk]
-		self.fc_cup1_c_vol = self.fc_cup1_c_vol[tk]
-		self.fc_cup2_c_vol = self.fc_cup2_c_vol[tk]
-		self.fc_cup1_d_vol = self.fc_cup1_d_vol[tk]
-		self.fc_cup2_d_vol = self.fc_cup2_d_vol[tk]
-		self.fc_cup1_cur   = self.fc_cup1_cur[tk]
-		self.fc_cup2_cur   = self.fc_cup2_cur[tk]
-		self.fc_ind        = self.fc_ind[tk]
+		# In case there are multiple dates to be removed; \
+		#special case time 12 a.m.
+		
+		self.cleanup_date()
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CLEANING UP THE DATA DIRECTORY.
@@ -564,12 +396,8 @@ class fc_arcv( object ) :
 		# type (as specified by the "use_*" keywords) in the data
 		# directory.
 
-		if ( self.use_idl ) :
-			file_name = array( glob(
-			         os.path.join( self.path, 'wind_janus_fc*' ) ) )
-		else :
-			file_name = array( glob(
-			         os.path.join( self.path, 'wi_sw-ion*'     ) ) )
+		file_name = array( glob(
+			 os.path.join( self.path, 'wi_sw-ion*'     ) ) )
 
 		n_file = len( file_name )
 

@@ -36,8 +36,7 @@ from pyqtgraph import mkPen, PlotDataItem, PlotWidget, setConfigOption
 
 # Load the necessary "numpy" array modules and numeric-function modules.
 
-from numpy import amax, amin
-
+from numpy import amax, amin, array
 
 ################################################################################
 ## DEFINE THE "widget_mfi_lin_plot" CLASS FOR "QWidget" TO PLOT MFI DATA.
@@ -165,9 +164,9 @@ class widget_mfi_lin_plot( QWidget ) :
 
 			# Establish the domain of the plot.
 
-			t_min = min( amin( self.core.mfi_t ), 0. )
-			t_max = max( amax( self.core.mfi_t ),
-			             self.core.dur_sec        )
+			t_min = min( amin( self.core.mfi_s ), 0. )
+			t_max = max( amax( self.core.mfi_s ),
+			             self.core.fc_spec['dur']     )
 
 			# Establish the range of the plot.  As part of this,
 			# ensure that the range satisfies a minimum size and has
@@ -207,19 +206,19 @@ class widget_mfi_lin_plot( QWidget ) :
 
 		# Generate and display each curve for the plot.
 
-		self.crv_m = PlotDataItem( self.core.mfi_t,
+		self.crv_m = PlotDataItem( self.core.mfi_s,
 		                           self.core.mfi_b,
 		                           pen=self.pen_crv_m )
-		self.crv_n = PlotDataItem( self.core.mfi_t,
-		                           -self.core.mfi_b,
+		self.crv_n = PlotDataItem( self.core.mfi_s,
+		                           [ -b for b in self.core.mfi_b ],
 		                           pen=self.pen_crv_n )
-		self.crv_x = PlotDataItem( self.core.mfi_t,
+		self.crv_x = PlotDataItem( self.core.mfi_s,
 		                           self.core.mfi_b_x,
 		                           pen=self.pen_crv_x )
-		self.crv_y = PlotDataItem( self.core.mfi_t,
+		self.crv_y = PlotDataItem( self.core.mfi_s,
 		                           self.core.mfi_b_y,
 		                           pen=self.pen_crv_y )
-		self.crv_z = PlotDataItem( self.core.mfi_t,
+		self.crv_z = PlotDataItem( self.core.mfi_s,
 		                           self.core.mfi_b_z,
 		                           pen=self.pen_crv_z )
 
@@ -251,6 +250,13 @@ class widget_mfi_lin_plot( QWidget ) :
 
 		if ( self.crv_z is not None ) :
 			self.plt.removeItem( self.crv_z )
+
+		# if ( self.crv_colat is not None ) :
+		# 	self.plt.removeItem( self.crv_colat )
+
+		# if ( self.crv_lon is not None ) :
+		# 	self.plt.removeItem( self.crv_lon )
+
 
 		# Permanently delete this plot's elements by setting each of the
 		# variables that store them to "None".

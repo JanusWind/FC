@@ -164,9 +164,9 @@ class widget_nln_gss( QWidget ) :
 
 		# Display the bulk velocity.
 
-		val_vel_x = self.core.nln_pyon.v0_x
-		val_vel_y = self.core.nln_pyon.v0_y
-		val_vel_z = self.core.nln_pyon.v0_z
+		val_vel_x = self.core.nln_plas.v0_x
+		val_vel_y = self.core.nln_plas.v0_y
+		val_vel_z = self.core.nln_plas.v0_z
 
 		if ( val_vel_x is not None ) :
 			self.vel_x.setTextUpdate( str( val_vel_x ) )
@@ -182,16 +182,16 @@ class widget_nln_gss( QWidget ) :
 			# Display the population's full name (with symbol)
 
 			self.arr_name[i].setText(
-			        self.core.nln_pyon.arr_pop[i]['full_name_sym'] )
+			        self.core.nln_plas.arr_pop[i]['full_name_sym'] )
 
 			# Extract the values of the population's bulk
 			# parameters.
 
-			val_n  = self.core.nln_pyon.arr_pop[i]['n']
-			val_d  = self.core.nln_pyon.arr_pop[i]['dv']
-			val_ws = self.core.nln_pyon.arr_pop[i]['w']
-			val_we = self.core.nln_pyon.arr_pop[i]['w_per']
-			val_wa = self.core.nln_pyon.arr_pop[i]['w_par']
+			val_n  = self.core.nln_plas.arr_pop[i]['n']
+			val_d  = self.core.nln_plas.arr_pop[i]['dv']
+			val_ws = self.core.nln_plas.arr_pop[i]['w']
+			val_we = self.core.nln_plas.arr_pop[i]['w_per']
+			val_wa = self.core.nln_plas.arr_pop[i]['w_par']
 
 			# If possible, update the text.
 
@@ -222,12 +222,12 @@ class widget_nln_gss( QWidget ) :
 
 			# Determine which text boxes should be visible.
 
-			if ( self.core.nln_pyon.arr_pop[i]['drift'] ) :
+			if ( self.core.nln_plas.arr_pop[i]['drift'] ) :
 				self.arr_d[i].show( )
 			else :
 				self.arr_d[i].hide( )
 
-			if ( self.core.nln_pyon.arr_pop[i]['aniso'] ) :
+			if ( self.core.nln_plas.arr_pop[i]['aniso'] ) :
 				self.arr_ws[i].hide( )
 				self.arr_we[i].show( )
 				self.arr_wa[i].show( )

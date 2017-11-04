@@ -25,7 +25,7 @@
 ## LOAD THE NECESSARY MODULES.
 ################################################################################
 
-from math import log10, floor
+from math import log10, floor, sqrt, fsum
 
 
 ################################################################################
@@ -49,6 +49,32 @@ def round_sig( val, sig ) :
 
 		return round( val,
 		              sig - int( floor( log10( abs( val ) ) ) ) - 1 )
+
+
+################################################################################
+## DEFINE THE FUNCTION FOR COMPUTING UNIT VECTOR 
+################################################################################
+
+# Define the function for computing unit vector
+
+def calc_arr_norm( v ):
+
+	mag = sqrt( fsum( [ c**2 for c in v ]) )
+
+	return tuple( [ ( c/mag) for c in v ] )
+
+
+################################################################################
+## DEFINE THE FUNCTION FOR COMPUTING DOT PRODUCT
+################################################################################
+
+# Define the function for computing dot product
+
+def calc_arr_dot( u,v ) :
+	if ( len(u) != len(v) ) :
+		raise TypeError( 'Unequal lengths.' )
+	return fsum([ x[0]*x[1] for x in zip(u,v) ]) 
+
 
 """
 # Define the function for converting a numerical value to a string with a

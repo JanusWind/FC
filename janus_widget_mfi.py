@@ -1,4 +1,5 @@
 # -*- coding: utf8 -*-
+
 ################################################################################
 ##
 ## Janus -- GUI Software for Processing Thermal-Ion Measurements from the
@@ -30,9 +31,10 @@
 
 from PyQt4.QtGui import QTabWidget
 
-from janus_widget_mfi_lin_plot import widget_mfi_lin_plot
-from janus_widget_mfi_ang_plot import widget_mfi_ang_plot
-from janus_widget_mfi_info     import widget_mfi_info
+from janus_widget_mfi_lin_plot   import widget_mfi_lin_plot
+from janus_widget_mfi_lon_plot   import widget_mfi_lon_plot
+from janus_widget_mfi_colat_plot import widget_mfi_colat_plot
+from janus_widget_mfi_info       import widget_mfi_info
 
 ################################################################################
 ## DEFINE THE "widget_mfi" CLASS TO CUSTOMIZE "QTabWidget" FOR Wind/MFI DATA.
@@ -56,10 +58,12 @@ class widget_mfi( QTabWidget ) :
 
 		# Intialize this widget's sub-widgets and add them as tabs.
 
-		self.wdg_lin_plot = widget_mfi_lin_plot( self.core )
-		self.wdg_ang_plot = widget_mfi_ang_plot( self.core )
-		self.wdg_info     = widget_mfi_info( self.core     )
+		self.wdg_lin_plot   = widget_mfi_lin_plot( self.core   )
+		self.wdg_lon_plot   = widget_mfi_lon_plot( self.core   )
+		self.wdg_colat_plot = widget_mfi_colat_plot( self.core )
+		self.wdg_info       = widget_mfi_info( self.core       )
 
-		self.addTab( self.wdg_lin_plot, 'MFI'     )
-		self.addTab( self.wdg_ang_plot, u'θ, λ' )
-		self.addTab( self.wdg_info, '<B>'          )
+		self.addTab( self.wdg_lin_plot,  'MFI' )
+		self.addTab( self.wdg_lon_plot,   u'θ' )
+		self.addTab( self.wdg_colat_plot, u'λ' )
+		self.addTab( self.wdg_info,      '<B>' )

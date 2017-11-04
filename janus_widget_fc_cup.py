@@ -96,27 +96,27 @@ class widget_fc_cup( QWidget ) :
 
 		self.core = core
 
-		self.t = None
-		self.t = 0 if ( cup == 1 ) else self.t
-		self.t = 1 if ( cup == 2 ) else self.t
+		self.c = None
+		self.c = 0 if ( cup == 1 ) else self.c
+		self.c = 1 if ( cup == 2 ) else self.c
 
 		# Prepare to respond to signals received from the Janus core.
 
 		self.connect( self.core, SIGNAL('janus_rset'), self.resp_rset )
 		self.connect( self.core, SIGNAL('janus_chng_spc'),
 		                                            self.resp_chng_spc )
-		self.connect( self.core, SIGNAL('janus_chng_mom_sel_cur'),
-		                                    self.resp_chng_mom_sel_cur )
-		self.connect( self.core, SIGNAL('janus_chng_mom_sel_azm'),
-		                                    self.resp_chng_mom_sel_azm )
+		self.connect( self.core, SIGNAL('janus_chng_mom_sel_bin'),
+		                                    self.resp_chng_mom_sel_bin )
+		self.connect( self.core, SIGNAL('janus_chng_mom_sel_dir'),
+		                                    self.resp_chng_mom_sel_dir )
 		self.connect( self.core, SIGNAL('janus_chng_mom_sel_all'),
 		                                    self.resp_chng_mom_sel_all )
 		self.connect( self.core, SIGNAL('janus_chng_mom_res'),
 		                                        self.resp_chng_mom_res )
 		self.connect( self.core, SIGNAL('janus_chng_nln_gss'),
 		                                        self.resp_chng_nln_gss )
-		self.connect( self.core, SIGNAL('janus_chng_nln_sel_cur'),
-		                                    self.resp_chng_nln_sel_cur )
+		self.connect( self.core, SIGNAL('janus_chng_nln_sel_bin'),
+		                                    self.resp_chng_nln_sel_bin )
 		self.connect( self.core, SIGNAL('janus_chng_nln_sel_all'),
 		                                    self.resp_chng_nln_sel_all )
 		self.connect( self.core, SIGNAL('janus_chng_nln_res'),
@@ -202,9 +202,9 @@ class widget_fc_cup( QWidget ) :
 			size = '10pt'
 
 		self.lab_axs_x = LabelItem( self.txt_axs_x, angle=0  ,
-		                            color='k', size=size       )
+		                            color='b', size=size       )
 		self.lab_axs_y = LabelItem( self.txt_axs_y, angle=270, 
-		                            color='k', size=size       )
+		                            color='b', size=size       )
 
 		self.grd.addItem( self.lab_axs_x, self.n_plt_y + 1, 2,
 		                                  1, self.n_plt_x      )
@@ -278,13 +278,13 @@ class widget_fc_cup( QWidget ) :
 
 				# Compute the plot number of this plot.
 
-				p = self.calc_ind_p( j, i )
+				d = self.calc_ind_d( j, i )
 
 
 				# If creating this plot would exceed the
 				# specified number of plots, don't create it.
 
-				if ( p >= self.n_plt ) :
+				if ( d >= self.n_plt ) :
 					continue
 
 				# Create and store this plot, adjust its limits,
@@ -316,23 +316,22 @@ class widget_fc_cup( QWidget ) :
 
 	def make_lim( self ) :
 
-		# If no spectrum has been loaded, use to default limits;
+		# If no spectrum has been loaded, use the default limits;
 		# otherwise, use the spectral data to compute axis limits.
 
-		if ( self.core.n_vel <= 0 ) :
+		if ( self.core.fc_spec is None ) :
 
 			self.lim_x = [ 250. , 750. ]
 			self.lim_y = [   0.7,  70. ]
 
 		else :
 
-			self.lim_x = [ amin( self.core.vel_cen -
-			                     ( self.core.vel_wid / 2. ) ),
-			               amax( self.core.vel_cen +
-			                     ( self.core.vel_wid / 2. ) ) ]
+			self.lim_x = [self.core.fc_spec['vel_strt'][self.c][0 ],
+			              self.core.fc_spec['vel_stop'][self.c][-1]]
 
-			self.lim_y = [ amin( self.core.cur ),
-			               amax( self.core.cur )  ]
+			arr_curr_flat = self.core.fc_spec['curr_flat']
+
+			self.lim_y = [ min(arr_curr_flat), max(arr_curr_flat)  ]
 
 			if ( self.log_y ) :
 				self.lim_y[1] = self.lim_y[1] ** 1.1
@@ -356,12 +355,12 @@ class widget_fc_cup( QWidget ) :
 	# DEFINE THE FUNCTION FOR CREATING THE PLOTS' HISTOGRAMS (AND LABELS).
 	#-----------------------------------------------------------------------
 
-	def make_hst( self, cur_min=0.69 ) :
+	def make_hst( self, curr_min=0.69 ) :
 
 		# If no spectrum has been loaded, clear any existing histograms
 		# and abort.
 
-		if ( self.core.n_vel <= 0 ) :
+		if ( self.core.fc_spec is None ) :
 
 			self.rset_hst( )
 
@@ -374,14 +373,14 @@ class widget_fc_cup( QWidget ) :
 		# Generate a step function for each look direction associated
 		# with this widget.
 
-		self.stp = array( [ step( self.core.vel_cen,
-		                          self.core.vel_wid,
-		                          self.core.cur[self.t,p] )
-		                    for p in range( self.core.n_azm ) ] )
+		self.stp = array( [ step(  self.core.fc_spec['vel_cen'][self.c] ,
+					   self.core.fc_spec['vel_del'][self.c] ,
+					   self.core.fc_spec['curr'][self.c][d])
+						for d in range(self.core.fc_spec['n_dir']) ])
 
-		stp_pnt = array( [ array( self.stp[p]\
-		                              .calc_pnt( lev_min=cur_min ) )
-		                   for p in range( self.core.n_azm )         ] )
+		stp_pnt = array( [ array( self.stp[d]\
+		                              .calc_pnt( lev_min=curr_min ) )
+		                for d in range( self.core.fc_spec['n_dir'] ) ] )
 
 		self.stp_x = stp_pnt[:,0,:]
 		self.stp_y = stp_pnt[:,1,:]
@@ -402,13 +401,13 @@ class widget_fc_cup( QWidget ) :
 		# For each plot in the grid, adjust its limits, add a histogram,
 		# and add a direction label.
 
-		for p in range( min( self.core.n_azm, self.n_plt ) ) :
+		for d in range( min( self.core.fc_spec['n_dir'], self.n_plt ) ) :
 
 			# Determine the location of this plot within the grid
 			# layout.
 
-			j = self.calc_ind_j( p )
-			i = self.calc_ind_i( p )
+			j = self.calc_ind_j( d )
+			i = self.calc_ind_i( d )
 
 			# If this plot does not exist, move onto the next one.
 
@@ -438,12 +437,12 @@ class widget_fc_cup( QWidget ) :
 			# Update this plot's label with appropriate text
 			# indicating the pointing direction.
 
-			r_alt = round( self.core.alt[self.t]   )
-			r_azm = round( self.core.azm[self.t,p] )
+			r_alt = round( self.core.fc_spec['elev'][self.c] )
+			r_dir = round( self.core.fc_spec['azim'][self.c][d])
 
 			txt = ( u'({0:+.0f}\N{DEGREE SIGN}, ' + 
 			        u'{1:+.0f}\N{DEGREE SIGN})'     ).format(
-			                                          r_alt, r_azm )
+			                                          r_alt, r_dir )
 
 			self.lbl[j,i].setText( txt, color=(0,0,0) )
 			#self.lbl[j,i].setFont( self.fnt           )
@@ -451,8 +450,8 @@ class widget_fc_cup( QWidget ) :
 			# Generate the histogram for the data from this look
 			# direction and display it in the plot.
 
-			self.hst[j,i] = PlotDataItem( self.asp_x[p,:],
-			                              self.asp_y[p,:],
+			self.hst[j,i] = PlotDataItem( self.asp_x[d,:],
+			                              self.asp_y[d,:],
 			                              pen=self.pen_hst )
 
 			self.plt[j,i].addItem( self.hst[j,i] )
@@ -461,17 +460,23 @@ class widget_fc_cup( QWidget ) :
 	# DEFINE THE FUNCTION FOR CREATING THE PLOTS' SELECTION POINTS.
 	#-----------------------------------------------------------------------
 
-	def make_pnt( self, cur_min=0.69 ) :
+	def make_pnt( self, curr_min=0.69 ) :
 
 		# Add selection points to each plot.
 
-		for p in range( min( self.core.n_azm, self.n_plt ) ) :
+		if ( self.core.fc_spec is None ) :
+
+			return
+
+		# Add selection points to each plot.
+
+		for d in range( min( self.core.fc_spec['n_dir'], self.n_plt ) ) :
 
 			# Determine the location of this plot within the grid
 			# layout.
 
-			j = self.calc_ind_j( p )
-			i = self.calc_ind_i( p )
+			j = self.calc_ind_j( d )
+			i = self.calc_ind_i( d )
 
 			# If this plot does not exist, move onto the next one.
 
@@ -480,84 +485,90 @@ class widget_fc_cup( QWidget ) :
 
 			# Add the selection points to this plot.
 
-			for v in range( self.core.n_vel ) :
+			for b in range( self.core.fc_spec['n_bin'] ) :
 
-				sel_cur = False
-				sel_azm = True
+				sel_bin = False
+				sel_dir = True
 				sel_alt = None
 
 				if ( ( self.core.dsp == 'mom'          ) and 
-				     ( self.core.mom_sel_cur
-					                   is not None ) and
-				     ( self.core.mom_sel_azm
-				                           is not None )     ) :
+				     ( self.core.mom_sel_bin
+						           is not None ) and
+				     ( self.core.mom_sel_dir
+					                   is not None )     ) :
 
-					sel_cur = \
-					       self.core.mom_sel_cur[self.t,p,v]
-					sel_azm = \
-					       self.core.mom_sel_azm[self.t,p]
+					sel_bin = \
+					       self.core.mom_sel_bin[self.c][d][b]
+					sel_dir = \
+					       self.core.mom_sel_dir[self.c][d]
 
 				elif ( ( self.core.dsp == 'gsl'        ) and 
 				       ( self.core.nln_sel is not None )     ) :
 
-					sel_cur = self.core.nln_sel[self.t,p,v]
+					sel_bin = self.core.nln_sel[self.c][d][b]
 
 				elif ( ( self.core.dsp == 'nln'        ) and 
 				       ( self.core.nln_res_sel
-				                           is not None )     ) :
+					                   is not None )     ) :
 
-					sel_cur = \
-					       self.core.nln_res_sel[self.t,p,v]
+					sel_bin = \
+					       self.core.nln_res_sel[self.c][d][b]
 
 					if ( self.core.nln_sel is None ) :
 						sel_alt = None
 					else :
 						sel_alt = \
-						   self.core.nln_sel[self.t,p,v]
+						   self.core.nln_sel[self.c][d][b]
 
-				self.chng_pnt( j, i, v, sel_cur,
-				               sel_azm=sel_azm,
-				               sel_alt=sel_alt   )
+				self.chng_pnt( j, i, b, sel_bin,
+					       sel_dir=sel_dir,
+					       sel_alt=sel_alt   )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CREATING THE PLOTS' FIT CURVES.
 	#-----------------------------------------------------------------------
 
-	def make_crv( self, p_lst=None ) :
+	def make_crv( self, d_lst=None ) :
 
 		# If no "list" of "p" index-values has been provided by the
 		# user, assume that the curves in all plots should be
 		# (re-)rendered.
 
-		if ( p_lst is None ) :
-			p_lst = range( min( self.core.n_azm, self.n_plt ) )
+		if ( self.core.fc_spec is None ) :
+			return
+
+		if ( d_lst is None ) :
+			d_lst = range( min( self.core.fc_spec['n_dir'],
+			               self.n_plt                       ) )
 
 		# If the results of the analysis are missing, abort; otherwise,
 		# extract the current values to be plotted.
 
 		if ( self.core.dsp == 'mom' ) :
-			cur     = self.core.mom_cur
-			cur_ion = None
+			curr     = self.core.mom_curr
+			curr_ion = None
 		elif ( self.core.dsp == 'gsl' ) :
-			cur     = self.core.nln_gss_cur_tot
-			cur_ion = self.core.nln_gss_cur_ion
+			curr     = self.core.nln_gss_curr_tot
+			curr_ion = self.core.nln_gss_curr_ion
 		elif ( self.core.dsp == 'nln' ) :
-			cur     = self.core.nln_res_cur_tot
-			cur_ion = self.core.nln_res_cur_ion
+			curr     = self.core.nln_res_curr_tot
+			curr_ion = self.core.nln_res_curr_ion
 		else :
-			cur     = None
-			cur_ion = None
+			curr     = None
+			curr_ion = None
 
 		# For each plot in the grid, generate and display a fit curve
 		# based on the results of the analysis.
 
-		for p in p_lst :
+		vel_cen = self.core.fc_spec['vel_cen'][self.c]
+
+		for d in d_lst :
 
 			# Determine the location of this plot within the grid
 			# layout.
 
-			j = self.calc_ind_j( p )
-			i = self.calc_ind_i( p )
+			j = self.calc_ind_j( d )
+			i = self.calc_ind_i( d )
 
 			# If this plot does not exist, move onto the next grid
 			# element.
@@ -581,14 +592,16 @@ class widget_fc_cup( QWidget ) :
 			# Create and add the curve of the individual
 			# contributions to the modeled current to the plot.
 
-			if ( cur_ion is not None ) :
+			if ( curr_ion is not None ) :
 
-				for n in range( len( cur_ion[self.t,p,0,:] ) ) :
+				for n in range( len( curr_ion[self.c][d][0] ) ) :
 
 					# Extract the points for this fit curve.
 
-					x = self.core.vel_cen
-					y = cur_ion[self.t,p,:,n]
+					x = array( vel_cen )
+					y = array( [ curr_ion[self.c][d][b][n]
+					      for b in range(
+					        self.core.fc_spec['n_bin'] ) ] )
 
 					# Select only those points for which
 					# the fit current is strictly positive.
@@ -626,35 +639,44 @@ class widget_fc_cup( QWidget ) :
 			# Create, store, and add to the plot a curve for the
 			# total fit current.
 
-			if ( cur is not None ) :
+			if ( curr is not None ) :
 
 				# Extract the points of the fit curve.
 
-				x = self.core.vel_cen
-				y = cur[self.t,p,:]
+				x = [ self.core.fc_spec.arr[self.c][0][b][
+				                                    'vel_cen']
+				      for b in range(
+				                  self.core.fc_spec['n_bin'] ) ]
+
+				y = curr[self.c][d]
+
+				x = array( x )
+				y = array( y )
 
 				# Select only those points for which the fit
 				# current is strictly positive.
 
-				tk = where( y > 0. )[0]
+				valid = [ yy > 0. for yy in y ]
+
+				n_a = sum( valid )
+
+				ax = [ xx for xx, vv in zip( x, valid ) if vv ]
+				ay = [ yy for yy, vv in zip( y, valid ) if vv ]
 
 				# If at least two points were selected, proceed
 				# with plotting.
 
-				if ( len( tk ) >= 2 ) :
+				if ( n_a >= 2 ) :
 
-					# Generate the adjusted points for this
-					# curve.
+					# If needed, convert to a logarithmic
+					# scale.
 
 					if ( self.log_x ) :
-						ax = log10( x[tk] )
-					else :
-						ax = x[tk]
-
+						ax = [ log10( xx )
+						       for xx in ax ]
 					if ( self.log_y ) :
-						ay = log10( y[tk] )
-					else :
-						ay = y[tk]
+						ay = [ log10( yy )
+					               for yy in ay ]
 
 					# Create, store, and add to the plot
 					# this fit curve.
@@ -668,51 +690,50 @@ class widget_fc_cup( QWidget ) :
 	# DEFINE THE FUNCTION FOR CHANGING THE VISIBILITY OF A DATUM'S POINTS.
 	#-----------------------------------------------------------------------
 
-	def chng_pnt( self, j, i, v, sel_cur,
-	              sel_azm=True, sel_alt=None ) :
+	def chng_pnt( self, j, i, b, sel_bin,
+	              sel_dir=True, sel_alt=None ) :
 
 		# If this point already exists, remove it from its plot and
 		# delete it.
 
-		if ( self.pnt[j,i,v] is not None ) :
-			self.plt[j,i].removeItem( self.pnt[j,i,v] )
-			self.pnt[j,i,v] = None
+		if ( self.pnt[j,i,b] is not None ) :
+			self.plt[j,i].removeItem( self.pnt[j,i,b] )
+			self.pnt[j,i,b] = None
 
 		# If the user gave no alternative selection state for this
 		# datum, use the primary state for the secondary state.
 
-		sel_alt = sel_cur if ( sel_alt is None ) else sel_alt
+		sel_alt = sel_bin if ( sel_alt is None ) else sel_alt
 
 		# If this point was not selected (based on both its primary and
 		# secondary states), return (since there's nothing more to be
 		# done).
 
-		if ( ( not sel_cur ) and ( not sel_alt ) ) :
+		if ( ( not sel_bin ) and ( not sel_alt ) ) :
 			return
 
-		# Determine the "p" index corresponding to this look direction.
+		# Determine the "d" index corresponding to this look direction.
 
-		p = self.calc_ind_p( j, i )
+		d = self.calc_ind_d( j, i )
 
 		# Computed the adjusted point location in the "ViewBox".
 
 		if ( self.log_x ) :
-			ax = log10( self.core.vel_cen[v] )
+			ax = log10( self.core.fc_spec['vel_cen'][self.c][b] )
 		else :
-			ax = self.core.vel_cen[v]
-
+			ax = self.core.fc_spec['vel_cen'][self.c][b]
 		if ( self.log_y ) :
-			ay = log10( self.core.cur[self.t,p,v] )
+			ay = log10( self.core.fc_spec['curr'][self.c][d][b] )
 		else :
-			ay = self.core.cur[self.t,p,v]
+			ay = self.core.fc_spec['curr'][self.c][d][b]
 
 		# Select the color for the point (i.e., the brush and pen used
 		# to render it) based on whether or not this datum's look
 		# direction has been selected and whether or not the primary and
 		# secondary selection states match.
 
-		if ( sel_azm ) :
-			if ( sel_cur == sel_alt ) :
+		if ( sel_dir ) :
+			if ( sel_bin == sel_alt ) :
 				pen   = self.pen_pnt_c
 				brush = self.bsh_pnt_c
 			else :
@@ -730,7 +751,7 @@ class widget_fc_cup( QWidget ) :
 		#        are "False", this function returns before it reaches
 		#        this point.
 
-		if ( sel_cur ) :
+		if ( sel_bin ) :
 			if ( sel_alt ) :
 				symbol = 's'
 			else :
@@ -745,13 +766,13 @@ class widget_fc_cup( QWidget ) :
 		else :
 			size = 6
 
-		self.pnt[j,i,v] = PlotDataItem( [ax], [ay],
+		self.pnt[j,i,b] = PlotDataItem( [ax], [ay],
 		                                symbol=symbol,
 		                                symbolSize=size,
 		                                symbolPen=pen,
 		                                symbolBrush=brush )
 
-		self.plt[j,i].addItem( self.pnt[j,i,v] )
+		self.plt[j,i].addItem( self.pnt[j,i,b] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESETTING THE PLOTS' HISTOGRAMS (AND LABELS).
@@ -810,11 +831,11 @@ class widget_fc_cup( QWidget ) :
 				# Remove and then delete each of this plot's
 				# selection points.
 
-				for v in range( self.core.n_vel ) :
-					if ( self.pnt[j,i,v] is not None ) :
+				for b in range( self.n_k ) :
+					if ( self.pnt[j,i,b] is not None ) :
 						self.plt[j,i].removeItem(
-						               self.pnt[j,i,v] )
-						self.pnt[j,i,v] = None
+						               self.pnt[j,i,b] )
+						self.pnt[j,i,b] = None
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESETTING THE PLOTS' FIT CURVES.
@@ -850,38 +871,37 @@ class widget_fc_cup( QWidget ) :
 						self.crv_ion[j,i,n] = None
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION CALCULATING THE INDEX "i" FROM THE INDEX "p".
+	# DEFINE THE FUNCTION CALCULATING THE INDEX "i" FROM THE INDEX "d".
 	#-----------------------------------------------------------------------
 
-	def calc_ind_i( self, p ) :
+	def calc_ind_i( self, d ) :
 
 		# Return the index "i" (i.e., column in the grid of plots)
-		# corresponding to the index "p" (i.e., azimuth value) passed by
-		# the user.
+		# corresponding to the index "d" (i.e., look direction value)
+		# passed by the user.
 
-		return p % self.n_plt_x
+		return d % self.n_plt_x
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION CALCULATING THE INDEX "j" FROM THE INDEX "p".
+	# DEFINE THE FUNCTION CALCULATING THE INDEX "j" FROM THE INDEX "d".
 	#-----------------------------------------------------------------------
 
-	def calc_ind_j( self, p ) :
+	def calc_ind_j( self, d ) :
 
 		# Return the index "j" (i.e., row in the grid of plots)
-		# corresponding to the index "p" (i.e., azimuth value) passed by
-		# the user.
-
-		return int( floor( p / ( 1. * self.n_plt_x ) ) )
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION CALCULATING INDEX "p" FROM INDICES "j" AND "i".
-	#-----------------------------------------------------------------------
-
-	def calc_ind_p( self, j, i ) :
-
-		# Return the index "p" (i.e., azimuth value) corresponding to
-		# the indices "j" and "i" (i.e., location in the grid of plots)
+		# corresponding to the index "d" (i.e., look direction value)
 		# passed by the user.
+
+                return int( floor( d / ( 1. * self.n_plt_x ) ) )
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION CALCULATING INDEX "d" FROM INDICES "j" AND "i".
+	#-----------------------------------------------------------------------
+
+	def calc_ind_d( self, j, i ) :
+
+		# Return the index "d" (i.e., look direction value) 
+		# corresponding to the indices "j" and "i" (i.e., location in 
+		# the grid of plots) passed by the user.
 
 		return i + ( j * self.n_plt_x )
 
@@ -899,7 +919,8 @@ class widget_fc_cup( QWidget ) :
 
 		# If no spectrum has been loaded, abort.
 
-		if ( self.core.n_vel <= 0 ) :
+		if ( ( self.core.fc_spec is None       ) or
+		     ( self.core.fc_spec['n_bin'] <= 0 )    ) :
 
 			return
 
@@ -910,24 +931,24 @@ class widget_fc_cup( QWidget ) :
 		j = tk[0][0]
 		i = tk[1][0]
 
-		# Determine the azimuth index corresponding to this plot.
+		# Determine the look direction corresponding to this plot.
 
-		p = self.calc_ind_p( j, i )
+		d = self.calc_ind_d( j, i )
 
 		# Extract the data shown in this plot.  Convert them first to
 		# their adjusted values, and then to their equivalent pixel
 		# positions in the "ViewBox".
 
-		dat_x = self.core.vel_cen
-		dat_y = self.core.cur[self.t,p]
+		dat_x = self.core.fc_spec['vel_cen'][self.c]
+		dat_y = self.core.fc_spec['curr'][self.c][d]
 
 		dat_ax = log10( dat_x ) if ( self.log_x ) else dat_x
 		dat_ay = log10( dat_y ) if ( self.log_y ) else dat_y
 
-		dat_a = tile( None, self.core.n_vel )
+		dat_a = tile( None, self.core.fc_spec['n_bin'] )
 
-		for v in range( self.core.n_vel ) :
-			dat_a[v] = QPointF( dat_ax[v], dat_ay[v] )
+		for b in range( self.core.fc_spec['n_bin'] ) :
+			dat_a[b] = QPointF( dat_ax[b], dat_ay[b] )
 
 		dat_p = array( [
 		             self.plt[j,i].mapFromView( da ) for da in dat_a ] )
@@ -948,7 +969,7 @@ class widget_fc_cup( QWidget ) :
 
 		dst = sqrt( ( dat_px - evt_px )**2 + ( dat_py - evt_py )**2 )
 
-		v = where( dst == amin( dst ) )[0][0]
+		b = where( dst == amin( dst ) )[0][0]
 
 		# If the distance between the nearest datum and the mouse click
 		# is within a set tolerance, invert the selection of that datum
@@ -957,25 +978,25 @@ class widget_fc_cup( QWidget ) :
 
 		tol = 25.
 
-		if ( dst[v] <= tol ) :
+		if ( dst[b] <= tol ) :
 
 			if ( self.core.dsp == 'mom' ) :
 
 				Thread( target=thread_chng_mom_sel,
 				        args=( self.core,
-				               self.t, p, v ) ).start()
+				               self.c, d, b ) ).start()
 
 			elif ( self.core.dsp == 'gsl' ) :
 
 				Thread( target=thread_chng_nln_sel,
 				        args=( self.core,
-				               self.t, p, v ) ).start()
+				               self.c, d, b ) ).start()
 
 			elif ( self.core.dsp == 'nln' ) :
 
 				Thread( target=thread_chng_nln_sel,
 				        args=( self.core,
-				               self.t, p, v ) ).start()
+				               self.c, d, b ) ).start()
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "rset" SIGNAL.
@@ -1004,31 +1025,31 @@ class widget_fc_cup( QWidget ) :
 		self.make_hst( )
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_mom_sel_cur" SIGNAL.
+	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_mom_sel_bin" SIGNAL.
 	#-----------------------------------------------------------------------
 
-	def resp_chng_mom_sel_cur( self, t=None, p=None, v=None ) :
+	def resp_chng_mom_sel_bin( self, c=None, d=None, b=None ) :
 
 		# If one of the keyword arguments is missing, invalid, or
 		# non-applicable to this widget, abort.
 
-		if ( ( t is None ) or ( p is None ) or ( v is None ) ) :
+		if ( ( c is None ) or ( d is None ) or ( b is None ) ) :
 			return
 
 		try :
-			t = int( t )
-			p = int( p )
-			v = int( v )
+			c = int( c )
+			d = int( d )
+			b = int( b )
 		except :
 			return
 
-		if ( t != self.t ) :
+		if ( c != self.c ) :
 			return
 
-		if ( ( p < 0 ) or ( p >= self.core.n_azm ) ) :
+		if ( ( d < 0 ) or ( d >= self.core.fc_spec['n_dir'] ) ) :
 			return
 
-		if ( ( v < 0 ) or ( v >= self.core.n_vel ) ) :
+		if ( ( b < 0 ) or ( b >= self.core.fc_spec['n_bin'] ) ) :
 			return
 
 		# If the results of the moments analysis are being displayed,
@@ -1041,38 +1062,38 @@ class widget_fc_cup( QWidget ) :
 			# Determine the location of this plot within the grid
 			# layout.
 
-			j = self.calc_ind_j( p )
-			i = self.calc_ind_i( p )
+			j = self.calc_ind_j( d )
+			i = self.calc_ind_i( d )
 
 			# Update the color and visibility of the plot point
 			# corresponding to the specified datum.
 
-			self.chng_pnt( j, i, v,
-			               self.core.mom_sel_cur[t,p,v],
-			               sel_azm=self.core.mom_sel_azm[t,p] )
+			self.chng_pnt( j, i, b,
+			               self.core.mom_sel_bin[c][d][b],
+			               sel_dir=self.core.mom_sel_dir[c][ d] )
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_mom_sel_azm" SIGNAL.
+	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_mom_sel_dir" SIGNAL.
 	#-----------------------------------------------------------------------
 
-	def resp_chng_mom_sel_azm( self, t=None, p=None ) :
+	def resp_chng_mom_sel_dir( self, c=None, d=None ) :
 
 		# If one of the keyword arguments is missing, invalid, or
 		# non-applicable to this widget, abort.
 
-		if ( ( t is None ) or ( p is None ) ) :
+		if ( ( c is None ) or ( d is None ) ) :
 			return
 
 		try :
-			t = int( t )
-			p = int( p )
+			c = int( c )
+			d = int( d )
 		except :
 			return
 
-		if ( t != self.t ) :
+		if ( c != self.c ) :
 			return
 
-		if ( ( p < 0 ) or ( p >= self.core.n_azm ) ) :
+		if ( ( d < 0 ) or ( d >= self.core.fc_spec['n_dir'] ) ) :
 			return
 
 		# If the results of the moments analysis are being displayed and
@@ -1086,16 +1107,16 @@ class widget_fc_cup( QWidget ) :
 			# Determine the location of this plot within the grid
 			# layout.
 
-			j = self.calc_ind_j( p )
-			i = self.calc_ind_i( p )
+			j = self.calc_ind_j( d )
+			i = self.calc_ind_i( d )
 
 			# Update the color and visibility of the plot points
 			# corresponding to each of this look direction's data.
 
-			for v in range( self.core.n_vel ) :
-				self.chng_pnt( j, i, v,
-				            self.core.mom_sel_cur[t,p,v],
-				            sel_azm=self.core.mom_sel_azm[t,p] )
+			for b in range( self.core.fc_spec['n_bin'] ) :
+				self.chng_pnt( j, i, b,
+				            self.core.mom_sel_bin[c][d][b],
+				            sel_dir=self.core.mom_sel_dir[c][d] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_mom_sel_all" SIGNAL.
@@ -1137,63 +1158,62 @@ class widget_fc_cup( QWidget ) :
 			self.make_crv( )
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_nln_sel_cur" SIGNAL.
-	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_nln_sel_bin" SIGNAL.
+        #-----------------------------------------------------------------------
 
-	def resp_chng_nln_sel_cur( self, t=None, p=None, v=None ) :
+	def resp_chng_nln_sel_bin( self, c=None, d=None, b=None ) :
 
 		# If one of the keyword arguments is missing, invalid, or
 		# non-applicable to this widget, abort.
 
-		if ( ( t is None ) or ( p is None ) or ( v is None ) ) :
+		if ( ( c is None ) or ( d is None ) or ( b is None ) ) :
 			return
 
 		try :
-			t = int( t )
-			p = int( p )
-			v = int( v )
+			c = int( c )
+			d = int( d )
+			b = int( b )
 		except :
 			return
 
-		if ( t != self.t ) :
+		if ( c != self.c ) :
 			return
 
-		if ( ( p < 0 ) or ( p >= self.core.n_azm ) ) :
+		if ( ( d < 0 ) or ( d >= self.core.fc_spec['n_dir'] ) ) :
 			return
 
-		if ( ( v < 0 ) or ( v >= self.core.n_vel ) ) :
+		if ( ( b < 0 ) or ( b >= self.core.fc_spec['n_bin'] ) ) :
 			return
 
 		# Determine the location of this plot within the grid layout.
 
-		j = self.calc_ind_j( p )
-		i = self.calc_ind_i( p )
+		j = self.calc_ind_j( d )
+		i = self.calc_ind_i( d )
 
 		# If the point selection for the non-linear analysis is being
 		# displayed, update the color and visibility of the plot point
-		# corresponding to the datum "[t,p,v]" based on a possible
+		# corresponding to the datum "[c,d,b]" based on a possible
 		# change in the selection status of that datum.
 
 		if ( self.core.dsp == 'gsl' ) :
 
-			self.chng_pnt( j, i, v,
-			               self.core.nln_sel[t,p,v] )
+			self.chng_pnt( j, i, b,
+			               self.core.nln_sel[self.c][d][b] )
 
 			self.make_crv( )
 
 		elif ( self.core.dsp == 'nln' ) :
 
 			if ( self.core.nln_res_sel is None ) :
-				self.chng_pnt( j, i, v,
+				self.chng_pnt( j, i, b,
 				              False,
-				              sel_alt=self.core.nln_sel[t,p,v] )			
+				              sel_alt=self.core.nln_sel[self.c][d][b] )			
 			else :
-				self.chng_pnt( j, i, v,
-				              self.core.nln_res_sel[t,p,v],
-				              sel_alt=self.core.nln_sel[t,p,v] )
+				self.chng_pnt( j, i, b,
+				              self.core.nln_res_sel[self.c][d][b],
+				              sel_alt=self.core.nln_sel[self.c][d][b] )
 
-			self.make_crv( p_lst=[p] )
-
+			self.make_crv( d_lst=[d] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_nln_sel_all" SIGNAL.

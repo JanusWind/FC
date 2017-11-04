@@ -93,9 +93,9 @@ class widget_mfi_ang_plot( QWidget ) :
 
 		# Initialize and store the pens and fonts.
 
-		self.pen_vbx   = mkPen( color='k' )
-		self.pen_crv_colat = mkPen( color='b' )
-		self.pen_crv_lon   = mkPen( color='r' )
+		self.pen_vbx       = mkPen( color='k' )
+		self.pen_crv_colat = mkPen( color='#8B008B' )
+		self.pen_crv_lon   = mkPen( color='#FFD700' )
 
 
 		self.fnt = self.core.app.font( )
@@ -118,7 +118,8 @@ class widget_mfi_ang_plot( QWidget ) :
 
 		labelStyle = {'color':'k'}
 		self.axs_x.setLabel( 'Time [s]'           , **labelStyle )
-		self.axs_y.setLabel( 'Magnetic Field Angles [degrees]', **labelStyle )
+		self.axs_y.setLabel( 'Elev. & Azim. [deg]', **labelStyle )
+
 
 		self.axs_x.label.setFont( self.fnt )
 		self.axs_y.label.setFont( self.fnt )
@@ -160,22 +161,21 @@ class widget_mfi_ang_plot( QWidget ) :
 
 			# Establish the domain of the plot.
 
-			t_min = min( amin( self.core.mfi_t ), 0. )
-			t_max = max( amax( self.core.mfi_t ),
-			             self.core.dur_sec        )
+			t_min = min( amin( self.core.mfi_s ), 0. )
+			t_max = max( amax( self.core.mfi_s ),
+			             self.core.fc_spec['dur']      )
 
 			# Establish the range of the plot.  As part of this,
 			# ensure that the range satisfies a minimum size and has
 			# sufficient padding.
 
-			b_max_c = amax( self.core.mfi_b_colat )
-			b_min_c = amin( self.core.mfi_b_colat )
+			ang_max = max( [ max( self.core.mfi_b_colat),
+			                 max( self.core.mfi_b_lon) ] )
+			ang_min = min( [ min( self.core.mfi_b_colat), 
+			                 min( self.core.mfi_b_lon) ] )
 
-			b_max_l = amax( self.core.mfi_b_lon )
-			b_min_l = amin( self.core.mfi_b_lon )
-
-			b_max = max( b_max_c, b_max_l )
-			b_min = min( b_min_c, b_min_l )
+                        ang_max += 0.1 * ang_max
+                        ang_min -= 0.1 * abs( ang_min )
 
 			d_t_0 = t_max - t_min
 
@@ -183,21 +183,19 @@ class widget_mfi_ang_plot( QWidget ) :
 
 			t_max = t_min + d_t
 
-			b_min = b_min - 0.2*abs(b_min)
-			b_max = b_max + 0.2*abs(b_max)
-
 		else :
 
 			t_min = 0.001
 			t_max = 3.500
 
-			b_min = -360
-			b_max =  360
+			ang_min = -360
+			ang_max =  360
 
 		# Set the range of the axis of each plot.
 
 		self.plt.setXRange( t_min, t_max, padding=0.0 )
-		self.plt.setYRange( b_min, b_max, padding=0.0 )
+		self.plt.setYRange( ang_min, ang_max, padding=0.0 )
+
 
 		# If the core contains no Wind/MFI magnetic field data, return.
 
@@ -206,10 +204,10 @@ class widget_mfi_ang_plot( QWidget ) :
 
 		# Generate and display each curve for the plot.
 
-		self.crv_colat = PlotDataItem( self.core.mfi_t,
+		self.crv_colat = PlotDataItem( self.core.mfi_s,
 		                               self.core.mfi_b_colat,
 		                               pen=self.pen_crv_colat )
-		self.crv_lon   = PlotDataItem( self.core.mfi_t,
+		self.crv_lon   = PlotDataItem( self.core.mfi_s,
 		                               self.core.mfi_b_lon,
 		                               pen=self.pen_crv_lon   )
 
@@ -223,7 +221,7 @@ class widget_mfi_ang_plot( QWidget ) :
 	def rset_plt( self ) :
 
 		# Hide and remove each of this plot's elements.
-#
+
 		if ( self.crv_colat is not None ) :
 		     self.plt.removeItem( self.crv_colat )
 

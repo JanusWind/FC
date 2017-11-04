@@ -1,4 +1,4 @@
-Changes from the previous version:
+Changes from the previous version: (Development)
 
 1. Added calculation of 2 higer order moments and beta (perp and par) to janus_pyon.py
 2. Fixed some existing bugs.
