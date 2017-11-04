@@ -40,10 +40,10 @@ from numpy import amax, amin
 
 
 ################################################################################
-## DEFINE THE "widget_mfi_plot" CLASS TO CUSTOMIZE "QWidget" TO PLOT MFI DATA.
+## DEFINE THE "widget_mfi_colat_plot" CLASS FOR "QWidget" TO PLOT MFI DATA.
 ################################################################################
 
-class widget_mfi_plot( QWidget ) :
+class widget_mfi_colat_plot( QWidget ) :
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE INITIALIZATION FUNCTION.
@@ -53,7 +53,7 @@ class widget_mfi_plot( QWidget ) :
 
 		# Inherit all attributes of an instance of "QWidget".
 
-		super( widget_mfi_plot, self ).__init__( )
+		super( widget_mfi_colat_plot, self ).__init__( )
 
 		# Store the Janus core.
 
@@ -93,12 +93,8 @@ class widget_mfi_plot( QWidget ) :
 
 		# Initialize and store the pens and fonts.
 
-		self.pen_vbx   = mkPen( color='k' )
-		self.pen_crv_m = mkPen( color='k' )
-		self.pen_crv_n = mkPen( color='k' )
-		self.pen_crv_x = mkPen( color='r' )
-		self.pen_crv_y = mkPen( color='g' )
-		self.pen_crv_z = mkPen( color='b' )
+		self.pen_vbx       = mkPen( color='k' )
+		self.pen_crv_colat = mkPen( color='#8B008B' )
 
 		self.fnt = self.core.app.font( )
 
@@ -119,8 +115,8 @@ class widget_mfi_plot( QWidget ) :
 		#####self.plt.showGrid( True, True )
 
 		labelStyle = {'color':'k'}
-		self.axs_x.setLabel( 'Time [s]'           , **labelStyle )
-		self.axs_y.setLabel( 'Magnetic Field [nT]', **labelStyle )
+		self.axs_x.setLabel( 'Time [s]'   , **labelStyle )
+		self.axs_y.setLabel( 'Elev. [deg]', **labelStyle )
 
 		self.axs_x.label.setFont( self.fnt )
 		self.axs_y.label.setFont( self.fnt )
@@ -137,11 +133,7 @@ class widget_mfi_plot( QWidget ) :
 
 		# Initialize the curves that will be added to this plot.
 
-		self.crv_m = None
-		self.crv_n = None
-		self.crv_x = None
-		self.crv_y = None
-		self.crv_z = None
+		self.crv_colat = None
 
 		# Populate this plot and adjust it's settings.
 
@@ -165,40 +157,38 @@ class widget_mfi_plot( QWidget ) :
 
 			# Establish the domain of the plot.
 
-			t_min = min( amin( self.core.mfi_t ), 0. )
-			t_max = max( amax( self.core.mfi_t ),
-			             self.core.dur_sec        )
+			t_min = min( amin( self.core.mfi_s ), 0. )
+			t_max = max( amax( self.core.mfi_s ),
+			             self.core.fc_spec['dur']    )
 
 			# Establish the range of the plot.  As part of this,
 			# ensure that the range satisfies a minimum size and has
 			# sufficient padding.
 
-			b_max = amax( self.core.mfi_b )
-			b_min = - b_max
+			ang_max = max( self.core.mfi_b_colat )
+			ang_min = min( self.core.mfi_b_colat )
+
+                        ang_max =  5. + ang_max
+                        ang_min = -5. + ang_min
 
 			d_t_0 = t_max - t_min
-			d_b_0 = b_max - b_min
 
 			d_t = max( 1.5 + d_t_0, 3. )
-			d_b = max( 1.2 * d_b_0, 5. )
-			
+
 			t_max = t_min + d_t
-
-			b_min = b_min - ( d_b - d_b_0 ) / 2.
-			b_max = b_max + ( d_b - d_b_0 ) / 2.
-
+			
 		else :
 
 			t_min = 0.001
 			t_max = 3.500
 
-			b_min = -2.5
-			b_max =  2.5
+			ang_min = -90
+			ang_max =  90
 
 		# Set the range of the axis of each plot.
 
-		self.plt.setXRange( t_min, t_max, padding=0.0 )
-		self.plt.setYRange( b_min, b_max, padding=0.0 )
+		self.plt.setXRange( t_min,   t_max,   padding=0.0 )
+		self.plt.setYRange( ang_min, ang_max, padding=0.0 )
 
 		# If the core contains no Wind/MFI magnetic field data, return.
 
@@ -207,27 +197,11 @@ class widget_mfi_plot( QWidget ) :
 
 		# Generate and display each curve for the plot.
 
-		self.crv_m = PlotDataItem( self.core.mfi_t,
-		                           self.core.mfi_b,
-		                           pen=self.pen_crv_m )
-		self.crv_n = PlotDataItem( self.core.mfi_t,
-		                           -self.core.mfi_b,
-		                           pen=self.pen_crv_n )
-		self.crv_x = PlotDataItem( self.core.mfi_t,
-		                           self.core.mfi_b_x,
-		                           pen=self.pen_crv_x )
-		self.crv_y = PlotDataItem( self.core.mfi_t,
-		                           self.core.mfi_b_y,
-		                           pen=self.pen_crv_y )
-		self.crv_z = PlotDataItem( self.core.mfi_t,
-		                           self.core.mfi_b_z,
-		                           pen=self.pen_crv_z )
+		self.crv_colat   = PlotDataItem( self.core.mfi_s,
+		                                 self.core.mfi_b_colat,
+		                                 pen=self.pen_crv_colat )
 
-		self.plt.addItem( self.crv_m )
-		self.plt.addItem( self.crv_n )
-		self.plt.addItem( self.crv_x )
-		self.plt.addItem( self.crv_y )
-		self.plt.addItem( self.crv_z )
+		self.plt.addItem( self.crv_colat   )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESETTING THIS PLOT (CLEARING ALL ELEMENTS).
@@ -237,29 +211,13 @@ class widget_mfi_plot( QWidget ) :
 
 		# Hide and remove each of this plot's elements.
 
-		if ( self.crv_m is not None ) :
-			self.plt.removeItem( self.crv_m )
-
-		if ( self.crv_n is not None ) :
-			self.plt.removeItem( self.crv_n )
-
-		if ( self.crv_x is not None ) :
-			self.plt.removeItem( self.crv_x )
-
-		if ( self.crv_y is not None ) :
-			self.plt.removeItem( self.crv_y )
-
-		if ( self.crv_z is not None ) :
-			self.plt.removeItem( self.crv_z )
+		if ( self.crv_colat is not None ) :
+		     self.plt.removeItem( self.crv_colat   )
 
 		# Permanently delete this plot's elements by setting each of the
 		# variables that store them to "None".
 
-		self.crv_m = None
-		self.crv_n = None
-		self.crv_x = None
-		self.crv_y = None
-		self.crv_z = None
+		self.crv_colat   = None
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "rset" SIGNAL.
@@ -280,3 +238,4 @@ class widget_mfi_plot( QWidget ) :
 		# Regenerate the plot.
 
 		self.make_plt( )
+

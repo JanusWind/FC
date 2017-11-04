@@ -49,21 +49,18 @@ from glob import glob
 
 from ftplib import FTP
 
-from scipy.io.idl import readsav
-
 
 ################################################################################
-## DEFINE THE "mfi_arcv" CLASS FOR ACCESSING THE ARCHIVE OF Wind/MFI DATA.
+## DEFINE THE "spin_arcv" CLASS FOR ACCESSING THE ARCHIVE OF Wind SPIN DATA.
 ################################################################################
 
-class mfi_arcv( object ) :
+class spin_arcv( object ) :
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE INITIALIZATION FUNCTION.
 	#-----------------------------------------------------------------------
 
 	def __init__( self, core=None, buf=3600., tol=0.,
-	                    use_k0=False,
 	                    n_file_max=None, n_date_max=None,
 	                    path=None, verbose=True           ) :
 
@@ -100,7 +97,7 @@ class mfi_arcv( object ) :
 		if ( self.path is None ) :
 
 			self.path = os.path.join( os.path.dirname( __file__ ),
-			                          'data', 'mfi'                )
+			                          'data', 'spin'               )
 
 		# Initialize the array of dates loaded.
 
@@ -112,60 +109,55 @@ class mfi_arcv( object ) :
 
 		# Initialize the data arrays.
 
-		self.mfi_t   = array( [ ] )
-		self.mfi_b_x = array( [ ] )
-		self.mfi_b_y = array( [ ] )
-		self.mfi_b_z = array( [ ] )
-		self.mfi_ind = array( [ ] )
+		self.spin_t   = array( [ ] )
+		self.spin_w   = array( [ ] )
+		self.spin_ind = array( [ ] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING (AND RETURNING) A range OF THE DATA.
 	#-----------------------------------------------------------------------
 
-	def load_rang( self, time_strt, dur_sec ) :
+	def load_spin( self, time ) :
 
-		# Compute the requested start and stop times as values, as
-		# strings, and as "datetime" epochs.
+		# Compute the requested time both as a standard-format string
+		# and a "datetime" object.
 
-		time_strt_val = calc_time_val( time_strt               )
-		time_stop_val = calc_time_val( time_strt_val + dur_sec )
-
-		time_strt_str = calc_time_str( time_strt_val )
-		time_stop_str = calc_time_str( time_stop_val )
-
-		time_strt_epc = calc_time_epc( time_strt_val )
-		time_stop_epc = calc_time_epc( time_stop_val )
+		time_str = calc_time_str( time )
+		time_epc = calc_time_epc( time )
 
 		# Construct an array of the dates requested.
 
-		date_req = array( [ ] )
+		req_date = [ ]
 
-		date_i = ( calc_time_str( time_strt_val - self.buf ) )[0:10]
-		time_i = calc_time_val( date_i + '/00:00:00.000' ) 
+		tm_strt = time_epc - timedelt( seconds=buf )
+		tm_stop = time_epc + timedelt( seconds=buf )
 
-		while ( time_i < ( time_stop_val + self.buf ) ) :
+		dt_strt = datetime( tm_strt.year, tm_strt.month, tm_strt.day )
+		dt_stop = datetime( tm_stop.year, tm_stop.month, tm_stop.day )
 
-			# Add the current date to the array of dates to be
-			# loaded.
+		dt_i = dt_strt
 
-			date_req = append( date_req, [ date_i ] )
-
-			# Move on to the next date.
-
-			# Note.  This may look a bit odd, but may be necessary
-			#        to avoid issues with leap seconds.  An
-			#        additional leap-second concern is the posiblity
-			#        of "date_req" containing duplicates, but that
-			#        shouldn't be too much of an issue even if it
-			#        does occur.
-
-			time_i = time_i + 86400.
-			date_i = ( calc_time_str( time_i ) )[0:10]
-			time_i = calc_time_val( date_i + '/00:00:00.000' )
+		while ( dt_i <= dt_stop ) :
+			date_i = ( calc_time_str( dt_i ) )[0:10]
+			req_date.append( date_i )
+			dt_i += timedelta( 1 )
 
 		# For each date in "date_i", load the data (if necessary).
 
-		[ self.load_date( dt ) for dt in date_req ]
+		for date in req_date :
+			self.load_date( date )
+
+
+
+
+
+
+
+
+
+
+
+
 
 		# Identify and extract the requested range of Wind/MFI data.
 

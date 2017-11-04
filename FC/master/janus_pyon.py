@@ -32,9 +32,9 @@ from janus_const import const
 ################################################################################
 
 PARAM = [ 'b0', 'v0', 'n', 'v', 'dv', 'v0', 'w', 'w2', 'r', 't', 'beta',
-          'ac', 'time', 's','m','q'                                            ]
+          'ac', 'time', 's','m','q', 'k', 'beta_par', 'beta_per'               ]
 
-COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat' ]
+COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat'  ]
 
 SIGMA = [ 'sig', 'sigma' ]
 
@@ -204,10 +204,12 @@ class plas( object ) :
 
 		# Attempting to split the "key" string into substrings based on
 		# the "_" token.  If this fails, abort.
-		# Also ensuring that 
 
 		try :
-			arr=key.split('_')
+#			arr=arr.lower()
+			arr = key.split( '_' )
+			for i in range(len(arr)):
+				arr[i] = arr[i].lower()
 		except :
 			return None
 
@@ -448,6 +450,23 @@ class plas( object ) :
 
 				self.v0_z = float( value )
 
+		elif ( key == 'v0_vec' ) :
+
+			try :
+				l = len( value )
+			except :
+				l = 0
+
+			if ( l != 3 ) :
+				raise TypeError( 'Array of length 3 required.' )
+			else :
+				if ( value[0] is not None ) :
+					self.v0_x = float( value[0] )
+				if ( value[1] is not None ) :
+					self.v0_y = float( value[1] )
+				if ( value[2] is not None ) :
+					self.v0_z = float( value[2] )
+
 		elif ( key == 'sig_v0_x' ) :
 
 			self.sig_v0_x = None
@@ -495,6 +514,23 @@ class plas( object ) :
 			if ( value is not None ) :
 
 				self.b0_z = float( value )
+
+		elif ( key == 'b0_vec' ) :
+
+			try :
+				l = len( value )
+			except :
+				l = 0
+
+			if ( l != 3 ) :
+				raise TypeError( 'Array of length 3 required.' )
+			else :
+				if ( value[0] is not None ) :
+					self.b0_x = float( value[0] )
+				if ( value[1] is not None ) :
+					self.b0_y = float( value[1] )
+				if ( value[2] is not None ) :
+					self.b0_z = float( value[2] )
 
 		else :
 
@@ -612,7 +648,7 @@ class plas( object ) :
 	             name=None, sym=None, n=None, dv=None,
 	             w=None, w_per=None, w_par=None,
 	             sig_n=None, sig_dv=None, sig_w=None,
-	             sig_w_per=None, sig_w_par=None            ) :
+	             sig_w_per=None, sig_w_par=None       ) :
 
 		self.arr_pop.append( pop( self,
 		                          self.get_spec( spc ),
@@ -839,8 +875,10 @@ class spec( object ) :
 
 			dv_mag = self['dv']
 
-			if ( dv_mag is None ) :
+			if   ( dv_mag is None ) :
 				return None
+			elif ( dv_mag == 0. ) :
+				return ( 0., 0., 0. )
 
 			b0_hat = self.my_plas.get_b0_hat( )
 
@@ -961,6 +999,24 @@ class spec( object ) :
 
 			return sqrt( w2 )
 
+		elif ( key == 'w3' ) :
+
+			w = self['w']
+
+			if ( w is None ) :
+				return None
+
+			return  w**3
+
+		elif ( key == 'w4' ) :
+
+			w = self['w']
+
+			if ( w is None ) :
+				return None
+
+			return  w**4
+
 		elif ( key == 'r' ) :
 
 			w2_per = self['w2_per']
@@ -1009,6 +1065,145 @@ class spec( object ) :
 
 			return ( 1.E-3 / const['k_b'] ) * \
 			       self.m * const['m_p'] * ( 1.E6 * w2 )
+
+                elif ( key == 'w3_par' ) :
+
+			w_par = self['w_par']
+
+			if ( w_par is None ) :
+				return None
+
+			return  w_par**3
+
+ 
+                elif ( key == 'w4_par' ) :
+
+			w2_par = self['w2_par']
+
+			if ( w2_par is None ) :
+				return None
+
+			return  w2_par**2
+
+                elif ( key == 'beta_par' ) :
+
+                        arr_pop = self.my_plas.lst_pop( self )
+
+                        if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+                                return None
+
+                        b0 = self.my_plas.get_b0_mag( )
+
+                        n       = self['n']
+                        t_par   = self['t_par']
+                        
+                        arr_n      = [ p['n'] for p in arr_pop ]
+
+                        for ( p, obj ) in enumerate( arr_pop ) : 
+                                ret = ( n * 1.E6 ) * const['k_b'] * ( t_par * 1.E3 )
+                                ret /= ( b0 / 1.E9 )**2 / ( 2. * const['mu_0'] )
+
+                        return  ret
+
+                elif ( key == 'beta_per' ) :
+
+                        arr_pop = self.my_plas.lst_pop( self )
+
+                        if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+                                return None
+
+                        b0 = self.my_plas.get_b0_mag( )
+
+                        n       = self['n']
+                        t_par   = self['t_per']
+                        
+                        arr_n      = [ p['n'] for p in arr_pop ]
+
+                        for ( p, obj ) in enumerate( arr_pop ) : 
+                                ret = ( n * 1.E6 ) * const['k_b'] * ( t_per * 1.E3 )
+                                ret /= ( b0 / 1.E9 )**2 / ( 2. * const['mu_0'] )
+
+                        return  ret
+
+                elif ( key == 's' ) :
+
+			arr_pop = self.my_plas.lst_pop( self )
+
+			if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+				return None
+
+			if ( len( arr_pop ) == 1 ) :
+				return 0.
+
+			n       = self['n']
+                        w_par   = self['w_par']
+                        w2_par  = self['w2_par']
+                        w3_par  = self['w3_par']
+                        dv      = self['dv']
+                        w3      = self['w3']
+
+			arr_n      = [ p['n'     ] for p in arr_pop ]
+			arr_dv     = [ p['dv'    ] for p in arr_pop ]
+			arr_w2_par = [ p['w2_par'] for p in arr_pop ]
+
+                        if ( ( None in arr_n      ) or
+			     ( None in arr_dv     ) or
+			     ( None in arr_w2_par )    ) :
+				return None
+
+                        ret = 0.
+
+                        for ( p, obj ) in enumerate( arr_pop ) :
+                                ret += ( arr_n[p] * arr_dv[p]**3 )
+				ret += ( 3 * arr_n[p]
+                                           * arr_dv[p] * arr_w2_par[p] )
+
+                        return ( ( ret / ( n * w3 ) )
+			           - ( ( dv**3  ) / w3 )
+			           - ( ( 3 * dv*w2_par) / w3 ) )
+
+                elif ( key == 'k' ) :
+
+			arr_pop = self.my_plas.lst_pop( self )
+
+			if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+				return None
+
+			if ( len( arr_pop ) == 1 ) :
+				return 0.
+
+			n       = self['n']
+                        w_par   = self['w_par']
+                        w2_par  = self['w2_par']
+                        w4_par  = self['w4_par']
+                        dv      = self['dv']
+                        w4      = self['w4']
+
+			arr_n      = [ p['n'     ] for p in arr_pop ]
+			arr_dv     = [ p['dv'    ] for p in arr_pop ]
+			arr_w2_par = [ p['w2_par'] for p in arr_pop ]
+			arr_w4_par = [ p['w4_par'] for p in arr_pop ]
+
+                        if ( ( None in arr_n      ) or
+			     ( None in arr_dv     ) or
+			     ( None in arr_w2_par )    ) :
+				return None
+
+                        ret = 0.
+
+                        for ( p, obj ) in enumerate( arr_pop ) :
+                                ret +=  arr_n[p] * ( arr_dv[p]**4 )
+                                ret -= ( 4 * arr_n[p] 
+                                            * dv * arr_dv[p]**3 )
+				ret +=  ( 6 * arr_n[p]
+                                            * arr_w2_par[p] * ( arr_dv[p]**2 ) )
+				ret -= (12 * arr_n[p]
+                                            * dv * arr_w2_par[p] * arr_dv[p] )
+                                ret +=  ( 3 * arr_n[p] * arr_w4_par[p] )
+
+                        return ( ( ret / ( n * w4 )               )
+                                   + 6 * ( ( ( dv*w_par )**2/w4 ) )
+                                   + 3 * (  dv**4/w4    )         )
 
 		else :
 
@@ -1221,44 +1416,50 @@ class pop( object ) :
 	              n=None, dv=None, w=None,
 	              w_per=None, w_par=None,
 	              sig_n=None, sig_dv=None, sig_w=None,
-	              sig_w_per=None, sig_w_par=None     ) :
+	              sig_w_per=None, sig_w_par=None       ) :
 
 		self.my_plas = my_plas
 		self.my_spec = my_spec
-
 		self.drift   = bool( drift )
 		self.aniso   = bool( aniso )
 
-		self.name    = None
-		self.sym     = None
-
-		self.n       = None
-		self.dv      = None
-		self.w       = None
-		self.w_per   = None
-		self.w_par   = None
-
+		self.name      = None
+		self.sym       = None
+		self.n         = None
+		self.dv        = None
+		self.w         = None
+		self.w_per     = None
+		self.w_par     = None
 		self.sig_n     = None
 		self.sig_dv    = None
 		self.sig_w     = None
 		self.sig_w_per = None
 		self.sig_w_par = None
 
-		self["name"   ] = name
-		self["sym"    ] = sym
-
-		self["n"      ] = n
-		self["dv"     ] = dv
-		self["w"      ] = w
-		self["w_per"  ] = w_per
-		self["w_par"  ] = w_par
-
-		self["sig_n"    ] = sig_n
-		self["sig_dv"   ] = sig_dv
-		self["sig_w"    ] = sig_w
-		self["sig_w_per"] = sig_w_per
-		self["sig_w_par"] = sig_w_par
-
+		if ( name is not None ) :
+			self['name'] = name
+		if ( sym is not None ) :
+			self['sym'] = sym
+		if ( n is not None ) :
+			self['n'] = n
+		if ( dv is not None ) :
+			self['dv'] = dv
+		if ( w is not None ) :
+			self['w'] = w
+		if ( w_per is not None ) :
+			self['w_per'] = w_per
+		if ( w_par is not None ) :
+			self['w_par'] = w_par
+		if ( sig_n is not None ) :
+			self['sig_n'] = sig_n
+		if ( sig_dv is not None ) :
+			self['sig_dv'] = sig_dv
+		if ( sig_w is not None ) :
+			self['sig_w'] = sig_w
+		if ( sig_w_per is not None ) :
+			self['sig_w_per'] = sig_w_per
+		if ( sig_w_par is not None ) :
+			self['sig_w_par'] = sig_w_par
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RETRIEVING THE VALUE OF A GIVEN KEY.
@@ -1468,6 +1669,33 @@ class pop( object ) :
 			else :
 				return w_par**2
 
+		elif ( key == 'w4' ) :
+
+			w = self['w']
+
+			if ( w is None ):
+				return None
+			else :
+				return w**4
+
+		elif ( key == 'w4_per' ) :
+
+			w_per = self['w_per']
+
+			if ( w_per is None ):
+				return None
+			else :
+				return w_per**4
+
+		elif ( key == 'w4_par' ) :
+
+			w_par = self['w_par']
+
+			if ( w_par is None ):
+				return None
+			else :
+				return w_par**4
+
 		elif ( key == 'r' ) :
 
 			if ( self.aniso ) :
@@ -1544,6 +1772,55 @@ class pop( object ) :
 			else :
 				return None
 
+                elif ( key == 'beta_par' ) :
+
+                        arr_pop = self.my_plas.lst_pop( self )
+
+                        if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+                                return None
+
+                        b0 = self.my_plas.get_b0_mag( )
+
+                        n       = self['n']
+                        t_par   = self['t_par']
+                        
+                        arr_n      = [ p['n'] for p in arr_pop ]
+
+                        for ( p, obj ) in enumerate( arr_pop ) : 
+                                ret = ( n * 1.E6 ) * const['k_b'] * ( t_par * 1.E3 )
+                                ret /= ( b0 / 1.E9 )**2 / ( 2. * const['mu_0'] )
+
+                        return  ret
+
+                elif ( key == 'beta_per' ) :
+
+                        arr_pop = self.my_plas.lst_pop( self )
+
+                        if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+                                return None
+
+                        b0 = self.my_plas.get_b0_mag( )
+
+                        n       = self['n']
+                        t_par   = self['t_per']
+                        
+                        arr_n      = [ p['n'] for p in arr_pop ]
+
+                        for ( p, obj ) in enumerate( arr_pop ) : 
+                                ret = ( n * 1.E6 ) * const['k_b'] * ( t_per * 1.E3 )
+                                ret /= ( b0 / 1.E9 )**2 / ( 2. * const['mu_0'] )
+
+                        return  ret
+
+                elif ( key == 's' ) :
+
+                        return 0.
+
+                elif ( key == 'k' ) :
+
+                        return 3.
+
+
 		else :
 
 			raise KeyError( 'Invalid key.' )
@@ -1553,7 +1830,7 @@ class pop( object ) :
 	#-----------------------------------------------------------------------
 
 	def __setitem__( self, key, value ) :
-	
+
 
 		# Based on the "key" in question, validate the "value".  If it
 		# is valid, store the new value (and make any appropriate
@@ -1776,23 +2053,39 @@ class pop( object ) :
 
 			if ( self.aniso ) :
 
-				raise KeyError( 'Population is anisotropic.' )
+				if ( ( hasattr( value, '__len__' ) ) and
+				     ( len( value ) == 2     )     ) :
 
-				return
+					self['w_per'] = value[0]
+					self['w_par'] = value[1]
 
-			value = float( value )
+				else :
 
-			if ( ( self.my_plas.enforce ) and
-			     ( value <= 0           )     ) :
+					raise KeyError(
+					          'Population is anisotropic.' )
 
-				self.w = None
+			else :
 
-				raise ValueError(
-				      'Thermal speed enforced to be positive.' )
+				if ( hasattr( value, '__len__' ) ) :
 
-				return
+					raise KeyError(
+					            'Population is isotropic.' )
 
-			self.w = value
+				else :
+
+					value = float( value )
+
+					if ( ( self.my_plas.enforce ) and
+					     ( value <= 0           )     ) :
+
+						self.w = None
+
+						raise ValueError(
+						      'Thermal speed enforced to be positive.' )
+
+					else :
+
+						self.w = value
 
 		elif ( key == 'w_per' ) :
 
@@ -1987,5 +2280,7 @@ class pop( object ) :
 			if ( self.w is None ) :
 
 				return False
+
+		# Return "True".
 
 		return True

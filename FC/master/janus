@@ -39,7 +39,7 @@ from janus import janus
 ## LAUNCH THE "janus" INTERFACE (FOR NOT PARTICULAR TIMESTAMP).
 ################################################################################
 
-# Initialize an instance of "janus" (without asking for any spectral data to be 
+# Initialize an instance of "janus" (without asking for any spectral data to be
 # loaded.).
 
 janus( )

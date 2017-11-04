@@ -42,6 +42,8 @@ from math import log10, floor
 
 from janus_helper import round_sig
 
+from tabulate import tabulate
+
 
 ################################################################################
 ## DEFINE CLASS "widget_nln_res" TO CUSTOMIZE "format_TextEdit" FOR NLN OUTPUT.
@@ -90,6 +92,21 @@ class widget_nln_res( format_TextEdit ) :
 
 		self.clear( )
 
+		# If there are no results from the non-linear analysis (either
+		# because it was never run or it failed), abort.
+
+		if ( self.core.nln_res_plas is None ) :
+
+			return
+
+                # Print the length of time it takes to run the non-linear
+                # analysis
+
+                self.prnt_htm( 'Non-linear run time = ' )
+                self.prnt_dcm( self.core.nln_res_runtime, 4,'sec' )
+                self.prnt_brk( )
+                self.prnt_brk( )
+
 		# Print the results for each population that was considered in
 		# the non-linear analysis, grouping the populations by their
 		# species.
@@ -100,6 +117,8 @@ class widget_nln_res( format_TextEdit ) :
 
 			# Unless this is the first species, skip a line.
 
+			self.prnt_htm(str(spc) + "\n\n\n")
+
 			if ( not first_spc ) :
 				self.prnt_brk( )
 				self.prnt_brk( )
@@ -109,6 +128,7 @@ class widget_nln_res( format_TextEdit ) :
 			self.prnt_htm( '<b><u>' + spc['name']
 			                + ' (<i>' + spc['sym']
 			                + '</i>):</b></u>'     )
+
 
 			# Print the results for each population of this species.
 
@@ -149,11 +169,15 @@ class widget_nln_res( format_TextEdit ) :
 				lab_t_per = '<i>T</i><sub>&perp;<i>' + \
 				                 sym + '</i></sub>'
 				lab_t_par = '<i>T</i><sub>||<i>' + \
-				                 sym + '</i></sub>'
+			                 sym + '</i></sub>'
+				lab_s     = '<i>S<sub>' + spc['sym'] + \
+				            '</sub></i>'
+				lab_k     = '<i>K<sub>' + spc['sym'] + \
+				            '</sub></i>'
 
 				# Print the population's density.
 
-				dcm = max( [ 1, 2 - int( floor( log10( 
+				dcm = max( [ 1, 2 - int( floor( log10(
 				                       abs( pop['n'] ) ) ) ) ] )
 
 				self.prnt_brk( )
@@ -212,7 +236,7 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_htm( lab_dv + ' = ' )
 					self.prnt_dcm( pop['dv'], 1 )
 					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm( pop['sig_dv'], 1, 'km/s' )
+					self.prnt_dcm( pop['sig_dv'], 1, 'km/s')
 
 				# Print the population's thermal speed(s).
 
@@ -240,7 +264,6 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_tab( 3 )
 					self.prnt_htm( lab_r + ' = ' )
 					self.prnt_dcm( pop['r'], 2 )
-
 				else :
 
 					self.prnt_brk( )
@@ -249,8 +272,6 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_dcm( pop['w'], 1 )
 					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
 					self.prnt_dcm( pop['sig_w'], 1, 'km/s' )
-
-
 
 				# Print the population's temperature(s).
 
@@ -262,17 +283,32 @@ class widget_nln_res( format_TextEdit ) :
 				if ( pop['aniso'] ) :
 
 					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_t_per + ' = ' )
-					self.prnt_dcm( pop['t_per'], 1, 'kK' )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_t_par + ' = ' )
-					self.prnt_dcm( pop['t_par'], 1, 'kK' )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_r + ' = ' )
-					self.prnt_dcm( pop['r'], 2 )
+				 	self.prnt_tab( 3 )
+				 	self.prnt_htm( lab_t_per + ' = ' )
+				 	self.prnt_dcm( pop['t_per'], 1, 'kK' )
+				 	self.prnt_brk( )
+				 	self.prnt_tab( 3 )
+				 	self.prnt_htm( lab_t_par + ' = ' )
+				 	self.prnt_dcm( pop['t_par'], 1, 'kK' )
+
+			# Print the Skewness and Excess Kurtosis value
+
+			if  ( len( self.core.nln_res_plas.lst_pop( spc)
+			                                       ) > 1 ) :
+				self.prnt_brk( )
+				self.prnt_brk( )
+       				self.prnt_tab( 1 )
+  				self.prnt_htm( '<u>Higher-Order Moments:</u>' )
+
+       				self.prnt_brk( )
+       				self.prnt_tab( 2 )
+       				self.prnt_htm( lab_s + ' = ' )
+       				self.prnt_dcm( spc['s'], 3 )
+
+       				self.prnt_brk( )
+       				self.prnt_tab( 2 )
+       				self.prnt_htm( lab_k + ' = ' )
+       				self.prnt_dcm( spc['k'] - 3, 3 )
 
 				# Clear the first population indicator.
 

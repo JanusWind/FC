@@ -21,7 +21,7 @@
 ################################################################################
 
 
-###############################################################################
+#################################################################################
 ## LOAD THE NECESSARY MODULES.
 ################################################################################
 
@@ -35,6 +35,7 @@ import os.path
 
 # Load the modules necessary for handling dates and times.
 
+import time
 from time import sleep
 from datetime import datetime, timedelta
 from janus_time import calc_time_epc, calc_time_sec, calc_time_val
@@ -54,10 +55,10 @@ from janus_mfi_arcv import mfi_arcv
 
 # Load the necessary array modules and mathematical functions.
 
-from numpy import amax, amin, append, arccos, arange, argsort, array, average, \
-                  cos, deg2rad, diag, dot, exp, indices, interp, mean, pi,     \
-                  polyfit, rad2deg, reshape, sign, sin, sum, sqrt, std, tile,  \
-                  transpose, where, zeros
+from numpy import amax, amin, append, arccos, arctan2, arange, argsort, array, \
+                    average, cos, deg2rad, diag, dot, exp, indices, interp, \
+                    mean, pi, polyfit, rad2deg, reshape, sign, sin, sum, sqrt, \
+                    std, tile, transpose, where, zeros
 
 from numpy.linalg import lstsq
 
@@ -68,6 +69,8 @@ from scipy.stats import pearsonr, spearmanr
 
 from janus_helper import round_sig
 
+from janus_fc_spec import fc_spec
+
 # Load the "pyon" module.
 
 from janus_pyon import plas, series
@@ -75,6 +78,10 @@ from janus_pyon import plas, series
 # Load the modules necessary for saving results to a data file.
 
 import pickle
+
+# Load the modules necessary for copying.
+
+from copy import deepcopy
 
 
 ################################################################################
@@ -92,14 +99,16 @@ class core( QObject ) :
 	# | rset              |                              |
 	# | chng_spc          |                              |
 	# | chng_mfi          |                              |
-	# | chng_mom_sel_cur  | t, p, v                      |
-	# | chng_mom_sel_azm  | t, p                         |
+	# | chng_mom_win      |                              |
+	# | chng_mom_sel_bin  | c, d, b                      |
+	# | chng_mom_sel_dir  | c, d                         |
 	# | chng_mom_sel_all  |                              |
 	# | chng_mom_res      |                              |
+	# | chng_nln_pop      | i                            |
 	# | chng_nln_ion      |                              |
 	# | chng_nln_set      |                              |
 	# | chng_nln_gss      |                              |
-	# | chng_nln_sel_cur  | t, p, v                      |
+	# | chng_nln_sel_bin  | c, d, b                      |
 	# | chng_nln_sel_all  |                              |
 	# | chng_nln_res      |                              |
 	# | chng_dsp          |                              |
@@ -114,7 +123,7 @@ class core( QObject ) :
 
 	def __init__( self, app=None, time=None ) :
 
-		# Inheret all attributes of the "QObject" class.
+		# Inherit all attributes of the "QObject" class.
 
 		# Note.  This class does not directly provide any graphical
 		#        interface.  Rather, the functions of the "QObject"
@@ -191,42 +200,16 @@ class core( QObject ) :
 
 		# Initialize the variables that will contain the Wind/FC ion
 		# spectrum's data; the associated Wind/MFI magnetic field data;
-		# and the settings, data selections, and results from all 
+		# and the settings, data selections, and results from all
 		# analyses.
 
-		self.rset_var( var_swe=True, var_mfi=True,
-		               var_mom_win=True, var_mom_sel=True,
-		               var_mom_res=True, var_nln_ion=True,
-		               var_nln_set=True, var_nln_gss=True,
-		               var_nln_sel=True, var_nln_res=True, 
-		               var_dsp=True, var_dyn=True          )
-
-		# Define the data array with values for effective collecting
-		# area, "eff_area", as a function of inflow angle, "deg".
-
-		self.eff_deg  = arange( 0., 91., dtype=float )
-
-		self.eff_area = 1.e-5 * array( [
-		      3382000.0, 3383000.0, 3383000.0, 3382000.0, 3381000.0,
-		      3380000.0, 3378000.0, 3377000.0, 3376000.0, 3374000.0,
-		      3372000.0, 3369000.0, 3368000.0, 3364000.0, 3362000.0,
-		      3359000.0, 3355000.0, 3351000.0, 3347000.0, 3343000.0,
-		      3338700.0, 3334100.0, 3329300.0, 3324300.0, 3318200.0,
-		      3312800.0, 3306300.0, 3299600.0, 3292800.0, 3285900.0,
-		      3277800.0, 3270700.0, 3261600.0, 3253500.0, 3244500.0,
-		      3234600.0, 3224900.0, 3200100.0, 3161500.0, 3114000.0,
-		      3058820.0, 2997170.0, 2930000.0, 2857000.0, 2779000.0,
-		      2694000.0, 2586999.7, 2465000.0, 2329999.6, 2183000.0,
-		      2025999.6, 1859000.1, 1682999.6, 1497000.1, 1301999.6,
-		      1099000.1, 887799.56, 668500.16, 452099.62, 257500.16,
-		      96799.784, 539.96863, 0.0000000, 0.0000000, 0.0000000,
-		      0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000,
-		      0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000,
-		      0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000,
-		      0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000,
-		      0.0000000, 0.0000000, 0.0000000, 0.0000000, 0.0000000,
-		      0.0000000                                              ] )
-
+		self.rset_var( var_swe     = True, var_mfi     = True,
+		               var_mom_win = True, var_mom_sel = True,
+		               var_mom_res = True, var_nln_ion = True,
+		               var_nln_set = True, var_nln_gss = True,
+		               var_nln_sel = True, var_nln_res = True,
+		               var_dsp     = True, var_dyn     = True          )
+		
 		# Initialize the value of the indicator variable of whether the
 		# automatic analysis should be aborted.
 
@@ -245,65 +228,54 @@ class core( QObject ) :
 	#-----------------------------------------------------------------------
 
 	def rset_var( self,
-	              var_swe=False, var_mfi=False,
-	              var_mom_win=False, var_mom_sel=False,
-	              var_mom_res=False, var_nln_ion=False,
-	              var_nln_set=False, var_nln_gss=False,
-	              var_nln_sel=False, var_nln_res=False, 
-	              var_dsp=False, var_dyn=False          ) :
+	              var_swe     = False, var_mfi     = False,
+	              var_mom_win = False, var_mom_sel = False,
+	              var_mom_res = False, var_nln_ion = False,
+	              var_nln_set = False, var_nln_gss = False,
+	              var_nln_sel = False, var_nln_res = False,
+	              var_dsp     = False, var_dyn     = False          ) :
+
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion spectrum's data.
 
 		if ( var_swe ) :
 
+			self.fc_spec  = None
+
 			self.time_epc = None
 			self.time_val = None
 			self.time_txt = ''
 			self.time_vld = True
-
-			self.rot_sec = 3.
-			self.dur_sec = 0.
-
-			self.alt     = None
-			self.azm     = None
-			self.vel_cen = None
-			self.vel_wid = None
-			self.cur     = None
-			self.cur_vld = None
-
-			self.cur_jmp = 100.
-			self.cur_min =   1.
-
-			self.mag_t = None
-			self.mag_x = None
-			self.mag_y = None
-			self.mag_z = None
-
-			self.n_alt = 0
-			self.n_azm = 0
-			self.n_vel = 0
 
 		# If requested, (re-)initialize the varaibles for the Wind/MFI
 		# data associated with this spectrum.
 
 		if ( var_mfi ) :
 
-			self.n_mfi = 0
+			self.n_mfi         = 0
 
-			self.mfi_dur = 0.
+			self.mfi_dur       = 0.
 
-			self.mfi_t   = None
-			self.mfi_b   = None
-			self.mfi_b_x = None
-			self.mfi_b_y = None
-			self.mfi_b_z = None
+			self.mfi_t         = None
+                        self.n_mfi         = None
+			self.mfi_b         = None
+			self.mfi_b_x       = None
+			self.mfi_b_y       = None
+			self.mfi_b_z       = None
 
-			self.mfi_avg_mag = None
-			self.mfi_avg_vec = None
-			self.mfi_avg_nrm = None
+			self.mfi_avg_mag   = None
+			self.mfi_avg_vec   = None
+			self.mfi_avg_nrm   = None
 
-			self.mfi_hat_dir = None
+			self.mfi_s         = None
+
+			self.mfi_b_colat   = None
+			self.mfi_b_lon     = None
+			self.mfi_psi_b     = None
+			self.mfi_psi_b_avg = None
+
+			self.mfi_amag_ang  = None
 
 		# If requested, (re-)initialize the varaibles for the windows
 		# associated with automatic data selection for the moments
@@ -311,68 +283,35 @@ class core( QObject ) :
 
 		if ( var_mom_win ) :
 
-			self.mom_win_azm_req = 7
-			self.mom_win_cur_req = 7
-
-			self.mom_win_azm_txt = ''
-			self.mom_win_cur_txt = ''
-
-			self.mom_win_azm = self.mom_win_azm_req
-			self.mom_win_cur = self.mom_win_azm_req
+			self.mom_win_dir = 7
+			self.mom_win_bin = 7
 
 		# If requested, (re-)initialize the variables associated with
 		# the data seleciton for the moments analysis.
 
 		if ( var_mom_sel ) :
 
-			self.mom_n_sel_azm = 0
-			self.mom_n_sel_cur = None
+			self.mom_min_sel_dir = 5
+			self.mom_min_sel_bin = 3
 
-			self.mom_min_sel_azm = 5
-			self.mom_min_sel_cur = 3
-
-			self.mom_sel_azm = None
-			self.mom_sel_cur = None
+			self.mom_sel_dir     = None
+			self.mom_sel_bin     = None
 
 		# If requested, (re-)initialize and store the variables
 		# associated with the results of the moments analysis.
 
 		if ( var_mom_res ) :
 
-			self.mom_n_eta = 0
+			self.mom_res  = None
 
-			self.mom_eta_ind_t = None
-			self.mom_eta_ind_p = None
-
-			self.mom_eta_n = None
-			self.mom_eta_v = None
-			self.mom_eta_w = None
-			self.mom_eta_t = None
-
-			self.mom_corr_pears = None
-			self.mom_corr_spear = None
-
-			self.mom_n = None
-			self.mom_v = None
-			self.mom_w = None
-			self.mom_t = None
-			self.mom_r = None
-
-			self.mom_v_vec = None
-
-			self.mom_w_per = None
-			self.mom_w_par = None
-			self.mom_t_per = None
-			self.mom_t_par = None
-
-			self.mom_cur = None
+			self.mom_curr = None
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion species and populations for the non-linear analysis.
 
 		# Note.  This includes both the "self.nln_spc_?" and
 		#        "self.nln_pop_?" arrays.  These are done together since
-		#        they are so interconnected by the "self.nln_pyon"
+		#        they are so interconnected by the "self.nln_plas"
 		#        object, which is also handled here.
 
 		if ( var_nln_ion ) :
@@ -380,7 +319,7 @@ class core( QObject ) :
 			self.nln_n_spc = 4
 			self.nln_n_pop = 5
 
-			self.nln_pyon = plas( enforce=True )
+			self.nln_plas = plas( enforce=True )
 
 			self.nln_pop_use = tile( False, self.nln_n_pop )
 			self.nln_pop_vld = tile( False, self.nln_n_pop )
@@ -388,44 +327,44 @@ class core( QObject ) :
 			for s in range ( self.nln_n_spc ) :
 
 				if ( s == 0 ) :
-					self.nln_pyon.add_spec( name='Proton',
+					self.nln_plas.add_spec( name='Proton',
 					                   sym='p', m=1., q=1. )
 				elif ( s == 1 ) :
-					self.nln_pyon.add_spec( name='Alpha' ,
+					self.nln_plas.add_spec( name='Alpha' ,
 					                   sym='a', m=4., q=2. )
 				else :
-					self.nln_pyon.add_spec( )
+					self.nln_plas.add_spec( )
 
 			for p in range ( self.nln_n_pop ) :
 
 				if ( p == 0 ) :
 					self.nln_pop_use[p] = True
 					self.nln_pop_vld[p] = True
-					self.nln_pyon.add_pop(
+					self.nln_plas.add_pop(
 					        'p', name='Core', sym='c',
 					        drift=False, aniso=True    )
 				elif ( p == 1 ) :
 					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = True
-					self.nln_pyon.add_pop(
+					self.nln_plas.add_pop(
 					        'p', name='Beam', sym='b',
 					        drift=True , aniso=False   )
 				elif ( p == 2 ) :
 					self.nln_pop_use[p] = True
 					self.nln_pop_vld[p] = True
-					self.nln_pyon.add_pop(
+					self.nln_plas.add_pop(
 					        'a', name='Core', sym='c',
 					        drift=True , aniso=True    )
 				elif ( p == 3 ) :
 					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = True
-					self.nln_pyon.add_pop(
+					self.nln_plas.add_pop(
 					        'a', name='Beam', sym='b',
 					        drift=True , aniso=False   )
 				else :
 					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = False
-					self.nln_pyon.add_pop( None )
+					self.nln_plas.add_pop( None )
 
 		# If requested, (re-)initialize the variables associated with
 		# the settings for the automatic initial guess generation and
@@ -442,36 +381,36 @@ class core( QObject ) :
 			self.nln_set_sel_b   = tile( None , self.nln_n_pop )
 			self.nln_set_sel_vld = tile( False, self.nln_n_pop )
 
-			self.nln_set_gss_n[0] =  1.00
-			self.nln_set_gss_n[1] =  0.20
-			self.nln_set_gss_n[2] =  0.02
-			self.nln_set_gss_n[3] =  0.01
+			self.nln_set_gss_n[0]   =  1.00
+			self.nln_set_gss_n[1]   =  0.20
+			self.nln_set_gss_n[2]   =  0.02
+			self.nln_set_gss_n[3]   =  0.01
 
-			self.nln_set_gss_d[1] =  0.03
-			self.nln_set_gss_d[2] =  0.01
-			self.nln_set_gss_d[3] =  0.05
+			self.nln_set_gss_d[1]   =  0.03
+			self.nln_set_gss_d[2]   =  0.01
+			self.nln_set_gss_d[3]   =  0.05
 
-			self.nln_set_gss_w[0] =  1.00
-			self.nln_set_gss_w[1] =  1.25
-			self.nln_set_gss_w[2] =  1.00
-			self.nln_set_gss_w[3] =  1.25
+			self.nln_set_gss_w[0]   =  1.00
+			self.nln_set_gss_w[1]   =  1.25
+			self.nln_set_gss_w[2]   =  1.00
+			self.nln_set_gss_w[3]   =  1.25
 
 			self.nln_set_gss_vld[0] = True
 			self.nln_set_gss_vld[1] = True
 			self.nln_set_gss_vld[2] = True
 			self.nln_set_gss_vld[3] = True
 
-			self.nln_set_sel_a[0] = -3.00
-			self.nln_set_sel_a[1] = -3.00
-			self.nln_set_sel_a[2] = -3.00
-			self.nln_set_sel_a[3] = -3.00
-			self.nln_set_sel_a[4] = -3.00
+			self.nln_set_sel_a[0]   = -3.00
+			self.nln_set_sel_a[1]   = -3.00
+			self.nln_set_sel_a[2]   = -3.00
+			self.nln_set_sel_a[3]   = -3.00
+			self.nln_set_sel_a[4]   = -3.00
 
-			self.nln_set_sel_b[0] =  3.00
-			self.nln_set_sel_b[1] =  3.00
-			self.nln_set_sel_b[2] =  3.00
-			self.nln_set_sel_b[3] =  3.00
-			self.nln_set_sel_b[4] =  3.00
+			self.nln_set_sel_b[0]   =  3.00
+			self.nln_set_sel_b[1]   =  3.00
+			self.nln_set_sel_b[2]   =  3.00
+			self.nln_set_sel_b[3]   =  3.00
+			self.nln_set_sel_b[4]   =  3.00
 
 			self.nln_set_sel_vld[0] = True
 			self.nln_set_sel_vld[1] = True
@@ -485,26 +424,26 @@ class core( QObject ) :
 		if ( var_nln_gss ) :
 
 			for p in range( self.nln_n_pop ) :
-				self.nln_pyon.arr_pop[p]['n']     = None
-				self.nln_pyon.arr_pop[p]['dv']    = None
-				self.nln_pyon.arr_pop[p]['w']     = None
-				self.nln_pyon.arr_pop[p]['w_per'] = None
-				self.nln_pyon.arr_pop[p]['w_par'] = None
+				self.nln_plas.arr_pop[p]['n']     = None
+				self.nln_plas.arr_pop[p]['dv']    = None
+				self.nln_plas.arr_pop[p]['w']     = None
+				self.nln_plas.arr_pop[p]['w_per'] = None
+				self.nln_plas.arr_pop[p]['w_par'] = None
 
 			self.nln_gss_vld = tile( False, self.nln_n_pop )
 
-			self.nln_gss_pop = array( [ ] )
-			self.nln_gss_prm = array( [ ] )
+			self.nln_gss_pop      = [ ]
+			self.nln_gss_prm      = [ ]
 
-			self.nln_gss_cur_tot = None
-			self.nln_gss_cur_ion = None
+			self.nln_gss_curr_tot = None
+			self.nln_gss_curr_ion = None
 
 		# If requested, (re-)initialize the variables associated with
 		# the data selection for the non-linear analysis.
 
 		if ( var_nln_sel ) :
 
-			self.nln_sel = None
+			self.nln_sel     = None
 
 			self.nln_n_sel   = 0
 			self.nln_min_sel = 30
@@ -514,12 +453,14 @@ class core( QObject ) :
 
 		if ( var_nln_res ) :
 
-			self.nln_res_plas = plas( enforce=False )
+			self.nln_res_runtime  = 0.
 
-			self.nln_res_sel = None
+			self.nln_res_plas     = None
 
-			self.nln_res_cur_tot = None
-			self.nln_res_cur_ion = None
+			self.nln_res_sel      = None
+
+			self.nln_res_curr_tot = None
+			self.nln_res_curr_ion = None
 
 		# If requested, (re-)initialize the variables which indicate of
 		# the analyses have their results displayed in widgets which
@@ -545,8 +486,7 @@ class core( QObject ) :
 	#-----------------------------------------------------------------------
 
 	def load_spec( self, time_req=None,
-	               get_prev=False, get_next=False,
-	               tmin=None, tmax=None            ) :
+	               get_prev=False, get_next=False ) :
 
 
 		# Reset the variables that contain the Wind/FC ion spectrum's
@@ -559,10 +499,10 @@ class core( QObject ) :
 
 		self.emit( SIGNAL('janus_rset') )
 
-		self.rset_var( var_swe=True, var_mfi=True,
-		               var_mom_sel=True, var_mom_res=True,
-		               var_nln_gss=True, var_nln_sel=True,
-		               var_nln_res=True                    )
+		self.rset_var( var_swe     = True, var_mfi     = True,
+		               var_mom_sel = True, var_mom_res = True,
+		               var_nln_gss = True, var_nln_sel = True,
+		               var_nln_res = True                         )
 
 
 		# If a special code has been entered, take the specified action.
@@ -582,6 +522,14 @@ class core( QObject ) :
 
 			return
 
+		if ( str( time_req ).lower( ) == 'haiku' ) :
+
+			self.emit( SIGNAL('janus_chng_spc') )
+
+			self.emit( SIGNAL('janus_mesg'),
+			           'core', 'begin', 'haiku' )
+
+			return
 
 		# Convert the argument "time_req" into the standard, second-
 		# precision, string format.  If this conversion returns "None",
@@ -636,30 +584,29 @@ class core( QObject ) :
 		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'fc' )
 
 
+
 		# Load the Wind/FC ion spectrum with a timestamp closest to that
 		# requested.
 
-		spec = self.fc_arcv.load_spec( self.time_txt,
-		                               get_prev=get_prev,
-		                               get_next=get_next,
-		                               tmin=tmin, tmax=tmax )
-
+		self.fc_spec = self.fc_arcv.load_spec( self.time_txt,
+		                                       get_prev=get_prev,
+		                                       get_next=get_next )
 
 		# If no spectrum was found, abort.
 
-		if ( spec is None ) :
-
+		if ( self.fc_spec is None ) :
 			self.emit( SIGNAL('janus_chng_spc') )
-
 			return
 
 
+		# Message the user that a new Wind/FC ion spectrum is about to
+		# be loaded.
+
+		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'fc' )
+
 		# Extract the parameters of the loaded Wind/FC ion spectrum.
-
-		( time_epc,
-		  cup1_azm  , cup2_azm  , cup1_c_vol, cup2_c_vol,
-		  cup1_d_vol, cup2_d_vol, cup1_cur  , cup2_cur    ) = spec
-
+		  
+		time_epc = self.fc_spec[ 'time' ]
 
 		# Calculate and store the spectrum's properly formatted
 		# timestamp both as a float and as a string.
@@ -669,223 +616,40 @@ class core( QObject ) :
 		self.time_txt = calc_time_sec( time_epc )
 		self.time_vld = True
 
-
-		# Convert bin centers and widths from voltages [V] to velocities
-		# [km/s].
-
-		cup1_vol_a = cup1_c_vol - ( cup1_d_vol / 2. )
-		cup1_vol_b = cup1_c_vol + ( cup1_d_vol / 2. )
-
-		cup2_vol_a = cup2_c_vol - ( cup2_d_vol / 2. )
-		cup2_vol_b = cup2_c_vol + ( cup2_d_vol / 2. )
-
-		cup1_c_vel = 1E-3 * sqrt( 2 * const['q_p'] * cup1_c_vol /
-		                          const['m_p']                    )
-		cup1_vel_a = 1E-3 * sqrt( 2 * const['q_p'] * cup1_vol_a /
-		                          const['m_p']                    )
-		cup1_vel_b = 1E-3 * sqrt( 2 * const['q_p'] * cup1_vol_b /
-		                          const['m_p']                    )
-
-		cup2_c_vel = 1E-3 * sqrt( 2 * const['q_p'] * cup2_c_vol /
-		                          const['m_p']                    )
-		cup2_vel_a = 1E-3 * sqrt( 2 * const['q_p'] * cup2_vol_a /
-		                          const['m_p']                    )
-		cup2_vel_b = 1E-3 * sqrt( 2 * const['q_p'] * cup2_vol_b /
-		                          const['m_p']                    )
-
-		cup1_d_vel = cup1_vel_b - cup1_vel_a
-		cup2_d_vel = cup2_vel_b - cup2_vel_a
-
-
-		# Determine the number of valid speed windows by searching
-		# through the "c_vel_?" arrays and indentifying the first time
-		# that an element is immediately followed by an element with a
-		# smaller value.
-
-		# Note.  The velocity windows should be assending order, and
-		#        unused windows sould occur at the end of the "?_vel_?"
-		#        and be indicated by having their corresponding elements
-		#        in these arrays set to the instrument's minimum value
-		#        for that parameter.
-
-		n_vel = 1
-
-		while ( ( n_vel < len( cup1_c_vel ) ) and
-		        ( n_vel < len( cup2_c_vel ) )     ) :
-
-			if ( ( cup1_c_vel[n_vel] < cup1_c_vel[n_vel-1] ) or
-			     ( cup2_c_vel[n_vel] < cup2_c_vel[n_vel-1] )    ) :
-				break
-			else :
-				n_vel += 1
-
-
-		# Truncate the arrays to remove fill data.
-
-		cup1_c_vel = cup1_c_vel[0:n_vel]
-		cup1_d_vel = cup1_d_vel[0:n_vel]
-		cup1_cur   = cup1_cur[:,0:n_vel]
-
-		cup2_c_vel = cup2_c_vel[0:n_vel]
-		cup2_d_vel = cup2_d_vel[0:n_vel]
-		cup2_cur   = cup2_cur[:,0:n_vel]
-
-
-		# Merge and store the arrays from the two cups.  As part of this
-		# step, define the array of altitudes.
-
-		# CAUTION!  There is currently no check to ensure that "c_vel_1"
-		#           and "c_vel_2" are (to with floating point precision)
-		#           identical.  Likewise, there is no check on "d_vel_1"
-		#           and "d_vel_2".
-
-		self.alt     = array( [ 15., -15. ] )           # deg
-		self.azm     = array( [ cup1_azm, cup2_azm ] )  # deg
-		self.vel_cen = cup1_c_vel                       # km/s
-		self.vel_wid = cup1_d_vel                       # km/s
-		self.cur     = array( [ cup1_cur, cup2_cur ] )  # pA
-
-
-		# Store the counts of velocity bins and angles.
-
-		self.n_alt =  2
-		self.n_azm = 20
-		self.n_vel = n_vel
-
-
-		# Examine each measured current value and determine whether or
-		# not it's valid for use in the proceding analyses.
-
-		self.cur_vld = tile( True,
-		                     [ self.n_alt, self.n_azm, self.n_vel ] )
-
-		for t in range( self.n_alt ) :
-
-			if ( n_vel < 2 ) :
-				continue
-
-			for p in range( self.n_azm ) :
-
-				for v in range( self.n_vel ) :
-
-					if ( self.cur[t,p,v] < self.cur_min ) :
-						self.cur_vld[t,p,v] = False
-						continue
-
-					if ( v == 0 ) :
-						if ( self.cur[t,p,v] >
-						     ( self.cur_jmp *
-						       self.cur[t,p,v+1] ) ) :
-							self.cur_vld[t,p,v] = \
-							                   False
-							continue
-
-					if ( v == ( self.n_vel - 1 ) ) :
-						if ( self.cur[t,p,v] >
-						     ( self.cur_jmp *
-						       self.cur[t,p,v-1] ) ) :
-							self.cur_vld[t,p,v] = \
-							                   False
-							continue
-
-					if ( ( self.cur[t,p,v] >
-					       ( self.cur_jmp *
-					         self.cur[t,p,v-1] ) ) and
-					     ( self.cur[t,p,v] >
-					       ( self.cur_jmp *
-					         self.cur[t,p,v+1] ) )     ) :
-						self.cur_vld[t,p,v] = False
-
-
-		# Estimate the duration of each spectrum and the mean time
-		# offset of each velocity bin.
-
-		self.rot_sec = 3.
-
-		self.dur_sec = self.rot_sec * self.n_vel
-
-		self.mag_t = self.rot_sec * ( arange( self.n_vel ) + 0.5 )
-
-
 		# Message the user that a new Wind/FC ion spectrum has been
 		# loaded.
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'fc' )
-
 
 		# Emit a signal that indicates that a new Wind/FC ion spectrum
 		# has now been loaded.
 
 		self.emit( SIGNAL('janus_chng_spc') )
 
-
 		# Load the associated Wind/MFI magnetic field data associated
 		# with this spectrum.
 
 		self.load_mfi( )
 
-
 		# If requested, run the moments analysis.
 
 		if ( self.dyn_mom ) :
-			self.anls_mom( )
+			self.auto_mom_sel( )
 
-
-
-
-
-
-
-		# FIXME
-		"""
-		# If requested (and required), generate an initial guess for
-		# the non-linear analysis.
-
-		if ( ( self.dyn_gss                 ) and 
-		     ( len( self.nln_gss_prm ) == 0 )     ) :
-			self.auto_nln_gss( )
-
-
-		# If requested (and required), select data for the non-linear
-		# analysis.
-
-		if ( ( self.dyn_sel         ) and 
-		     ( self.nln_sel is None )     ) :
-			self.auto_nln_sel( )
-
-
-		# If requested (and required), run the non-linear analysis.
-
-		if ( ( self.dyn_nln            ) and 
-		     ( self.nln_res_n_ion == 0 )     ) :
-			self.anls_nln( )
-		"""
-
-
-
-
-
-
-
-	#-----------------------------------------------------------------------
+  #-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING THE Wind/MFI MAGNETIC FIELD DATA.
 	#-----------------------------------------------------------------------
 
 	def load_mfi( self ) :
 
-
 		# Reset the contents of the "self.mfi_*" arrays.
 
 		self.rset_var( var_mfi=True )
 
-
 		# If no Wind/FC ion spectrum has been loaded, abort.
 
-		if ( ( self.time_epc is None ) or
-		     ( self.n_vel    is None ) or
-		     ( self.n_vel    == 0    )    ) :
+		if ( self.fc_spec is None ) :
 			return
-
 
 		# Message the user that new Wind/MFI data are about to be
 		# loaded.
@@ -896,14 +660,13 @@ class core( QObject ) :
 		# Load the Wind/MFI magnetic field data associated with this
 		# spectrum.
 
-		( mfi_t, mfi_b_x, mfi_b_y, mfi_b_z  ) = \
-		          self.mfi_arcv.load_rang( self.time_val, self.dur_sec )
-
+		( self.mfi_t, self.mfi_b_x, self.mfi_b_y, self.mfi_b_z ) = \
+		            self.mfi_arcv.load_rang( self.time_val - 6.,
+		                                     self.fc_spec['dur'] + 12. )
 
 		# Establish the number of data.
 
-		self.n_mfi = len( mfi_t )
-
+		self.n_mfi = len( self.mfi_t )
 
 		# If no magnetic field data were returned, abort with a signal
 		# that the data have changed.
@@ -914,30 +677,23 @@ class core( QObject ) :
 
 			return
 
+		# Compute and store derived paramters.
 
-		# Store the loaded data.  As part of this step, shift the data's
-		# timestamps to be relative to the start time of this Wind/FC
-		# ion spectrum.
-
-		self.mfi_t = array( [ ( t - self.time_epc ).total_seconds( )
-		                      for t in mfi_t                         ] )
-
-		self.mfi_b_x = mfi_b_x
-		self.mfi_b_y = mfi_b_y
-		self.mfi_b_z = mfi_b_z
-
+		self.mfi_s = [ ( t - self.fc_spec['time'] ).total_seconds( )
+		                                       for t in self.mfi_t ]
 
 		# Compute the magnetic field magnitude.
 
-		self.mfi_b = sqrt( self.mfi_b_x**2 + self.mfi_b_y**2
-		                                   + self.mfi_b_z**2 )
-
-
+		self.mfi_b = [ sqrt( self.mfi_b_x[i]**2 +
+                                     self.mfi_b_y[i]**2 +
+                                     self.mfi_b_z[i]**2 )
+                                     for i in range( len( self.mfi_b_x ) ) ]
+    
 		# Compute the average magetic field.
 
 		self.mfi_avg_vec = array( [ mean( self.mfi_b_x ),
 		                            mean( self.mfi_b_y ),
-		                            mean( self.mfi_b_z )  ] )
+		                            mean( self.mfi_b_z ) ] )
 
 		self.mfi_avg_mag = sqrt( self.mfi_avg_vec[0]**2 +
 		                         self.mfi_avg_vec[1]**2 +
@@ -945,626 +701,221 @@ class core( QObject ) :
 
 		self.mfi_avg_nrm = self.mfi_avg_vec / self.mfi_avg_mag
 
+		mfi_nrm     = [ ( self.mfi_b_x[i], self.mfi_b_y[i],
+		                  self.mfi_b_z[i] ) /self.mfi_b[i]
+		                  for i in range( len( self.mfi_b ) ) ]
 
-		# Compute the dot product between the average, normalized
-		# magnetic field and each look direction.
+		# Compute the mfi angles.
 
-		self.mfi_hat_dir = array( [ [
-		          dot( self.calc_dir_look( self.alt[t], self.azm[t,p] ),
-		               self.mfi_avg_nrm )
-		          for p in range( self.n_azm ) ]
-		        for t in range( self.n_alt ) ] )
+		mfi_b_rho      = [sqrt( self.mfi_b_x[i]**2.0 
+		                      + self.mfi_b_y[i]**2.0 )
+		                        for i in range( len( self.mfi_b_x ) ) ]
 
+		mfi_b_colat       = arctan2( self.mfi_b_z, mfi_b_rho )
+		mfi_b_lon         = arctan2( self.mfi_b_y, self.mfi_b_x )
 
-		# Use interpolation to estimate a magnetic-field vector for each
-		# velocity bin.
+		self.mfi_b_colat  = rad2deg( mfi_b_colat )
+		self.mfi_b_lon    = rad2deg( mfi_b_lon )
 
-		var_t = self.mag_t
+		self.mfi_amag_ang = array( [ mean( self.mfi_b_colat ),
+		                                   mean( self.mfi_b_lon   )  ] )
 
-		tk_lo = where( var_t < amin( self.mfi_t ) )
-		tk_hi = where( var_t > amax( self.mfi_t ) )
+		# Calculating the average angular deviation of magnetic field
 
-		var_t[tk_lo] = amin( self.mfi_t )
-		var_t[tk_hi] = amax( self.mfi_t )
+		self.mfi_psi_b = [ arccos( [ sum ( mfi_nrm[i][j] *
+		                               self.mfi_avg_nrm[j]
+		                               for j in range( 3 )      ) ] )
+	                              for i in range( len( mfi_nrm ) ) ]
 
-		self.mag_x = interp1d( self.mfi_t, self.mfi_b_x,
-		                       bounds_error=False        )( var_t )
-		self.mag_y = interp1d( self.mfi_t, self.mfi_b_y,
-		                       bounds_error=False        )( var_t )
-		self.mag_z = interp1d( self.mfi_t, self.mfi_b_z,
-		                       bounds_error=False        )( var_t )
+                self.mfi_psi_b_avg = rad2deg(sum ( self.mfi_psi_b )/self.n_mfi )
 
+		# Use interpolation to estiamte the magnetic field vector for
+		# each datum in the FC spectrum.
+
+		self.fc_spec.set_mag( self.mfi_t, self.mfi_b_x,
+		                                  self.mfi_b_y, self.mfi_b_z )
 
 		# Message the user that new Wind/MFI data have been loaded.
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mfi' )
-
 
 		# Emit a signal that indicates that a new Wind/MFI data have now
 		# been loaded.
 
 		self.emit( SIGNAL('janus_chng_mfi') )
 
-
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR COMPUTING A DOT PRODUCT OR ARRAY THEREOF.
+	# DEFINE THE FUNCTION FOR CHANGING THE MOM. SELCTION DIRECTION WINDOW.
 	#-----------------------------------------------------------------------
+ 
+	def chng_mom_win_dir( self, val ) :
 
-	def calc_arr_dot( self, a, b ) :
-
-
-		# CAUTION!  It is assumed that "a" and "b" are "numpy" arrays.
-		#           For increased speed, no checks are made of this.
-
-
-		# If "a" and "b" are arrays of vectors, return an array where
-		# each element is the dot product between the corresponding
-		# element of "a" and that of "b".  If one of the arguments is
-		# an array of vectors and the other is simply a vector, each an
-		# array of the dot product between each element of the former
-		# with the latter.  Otherwise, return the dot product between
-		# "a" and "b".
-
-		if ( hasattr( a[0], '__iter__' ) and
-		     hasattr( b[0], '__iter__' )     ) :
-
-			return array( [ dot( a[i], b[i] )
-			                for i in range(
-			                         min( [ len(a), len(b) ] ) ) ] )
-
-		elif ( hasattr( a[0], '__iter__' ) ) :
-
-			return array( [ dot( v, b ) for v in a ] )
-
-		elif ( hasattr( b[0], '__iter__' ) ) :
-
-			return array( [ dot( a, v ) for v in b ] )
-
+		# Try to convert the "val" argument to an integer and store it.
+		# If this fails, store "None".
+    
+		if ( val is None ) :
+			self.mom_win_dir = None
 		else :
+			try :
+				self.mom_win_dir = int( val )
+				if ( self.mom_win_dir < self.mom_min_sel_dir ) :
+					self.mom_win_dir = None
+			except :
+				self.mom_win_dir = None
 
-			return dot( a, b )
+		# Emit a signal that a change has occured to the moments window
+		# parameters.
 
+		self.emit( SIGNAL('janus_chng_mom_win') )
+
+		# Call the automatic selection of data for the moments analysis.
+
+		self.auto_mom_sel( )
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR COMPUTING A UNIT VECTOR OR ARRAY THEREOF.
+	# DEFINE THE FUNCTION FOR CHANGING THE MOMENTS SELCTION BIN WINDOW.
 	#-----------------------------------------------------------------------
+  
+	def chng_mom_win_bin( self, val ) :
 
-	def calc_arr_nrm( self, a ) :
+		# Try to convert the "val" argument to an integer and store it.
+		# If this fails, store "None".
 
-
-		# CAUTION!  It is assumed that "a" is a "numpy" array.  For
-		#           increased speed, no check are made of this.
-
-
-		# If "a" is an array of vectors, return an array where each
-		# element is the normalized version of the corresponding
-		# elements of "a".  Otherwise, return the normalized version of
-		# "a".
-
-		if ( hasattr( a[0], '__iter__' ) ) :
-
-			return array( [ v / sqrt( sum( v**2 ) ) for v in a ] )
-
+		if ( val is None ) :
+			self.mom_win_bin = None
 		else :
+			try :
+				self.mom_win_bin = int( val )
+				if ( self.mom_win_bin < self.mom_min_sel_bin ) :
+					self.mom_win_bin = None
+			except :
+				self.mom_win_bin = None
 
-			return a / sqrt( sum( a**2 ) )
+		# Emit a signal that a change has occured to the moments window
+		# parameters.
 
+		self.emit( SIGNAL('janus_chng_mom_win') )
 
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR CLIPPING A VALUE OR ARRAY OF VALUES.
-	#-----------------------------------------------------------------------
+		# Call the automatic selection of data for the moments analysis.
 
-	def calc_arr_clp( self, a, lwr, upr ) :
-
-
-		# If "a" is an array of vectors, return a clipped version of
-		# "a" where each element falls between "lwr" and "upr".
-		# Otherwise, clip "a" as a scalar.
-
-		if hasattr( a, '__iter__' ) :
-
-			return array( [ min( [ max( [ v, lwr ] ), upr ] )
-			                for v in a                        ] )
-
-		else :
-
-			return min( [ max( [ a, lwr ] ), upr ] )
-
+		self.auto_mom_sel( )
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR CONVERT ALT-AZM TO A CARTESIAN UNIT VECTOR.
+	# DEFINE THE FUNCTION FOR AUTOMATIC DATA SELECTION FOR THE MOMENTS ANLS.
 	#-----------------------------------------------------------------------
 
-	def calc_dir_look( self, alt, azm ) :
-
-
-		# Convert altitude and azimuth the spherical coordinates.
-
-		the = - alt + 90.
-		phi = - azm
-
-
-		# Convert from spherical to rectangular coordinates and return
-		# the result.
-
-		ret = array( [ 
-		        sin( deg2rad( the ) ) * cos( deg2rad( phi ) ),
-		        sin( deg2rad( the ) ) * sin( deg2rad( phi ) ),
-		        cos( deg2rad( the ) )                          ] )
-
-		if ( ret.ndim > 1 ) :
-			return transpose( ret )
-		else :
-			return ret
-
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR CALCULATING THE EFFECTIVE AREA OF THE CUP.
-	#-----------------------------------------------------------------------
-
-	def calc_eff_area( self, d, v ) :
-
-
-		# Note.  The argument "d" is a vector (in a Cartesian coordinate
-		#        system) that indicates the look direction of the cup.
-		#        The argument "v" is a similar vector that indicates the
-		#        particle velocity.  The magnitudes of "d" and "v" are
-		#        irrelevant as the angle between "d" and "-v" is the
-		#        only parameter used in this function.  The returned
-		#        value of the effective collecting area is in units of
-		#        square centimeters.
-
-
-		# Normalize the look direction and particle velocity.
-
-		dn = self.calc_arr_nrm( d )
-		vn = self.calc_arr_nrm( v )
-
-
-		# Calculate the particle inflow angle (in degrees) relative to
-		# the cup normal (i.e., the cup pointing direction).
-
-		psi = rad2deg( arccos( self.calc_arr_dot( dn, -vn ) ) )
-		psi = self.calc_arr_clp( psi, 0., 90. )
-
-
-		# Return the effective collecting area corresponding to "psi".
-
-		if hasattr( psi, '__iter__' ) :
-
-			return array( [
-			            interp( p, self.eff_deg, self.eff_area )
-			            for p in psi                             ] )
-
-		else :
-
-			return interp( psi, self.eff_deg, self.eff_area )
-
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT (MAXWELLIAN).
-	#-----------------------------------------------------------------------
-
-	def calc_cur_max( self,
-	                  vel_cen, vel_wid,
-	                  dir_alt, dir_azm,
-	                  prm_n, prm_v_x, prm_v_y, prm_v_z, prm_w ) :
-
-
-		# Return the equivalent bi-Maxwellian response for equal
-		# perpendicular and parallel thermal speeds and a dummy
-		# magnetic field.
-
-		return self.calc_cur_bmx( vel_cen, vel_wid,
-		                          dir_alt, dir_azm, 1., 0., 0.,
-		                          prm_n, prm_v_x, prm_v_y, prm_v_z,
-		                          prm_w, prm_w                      )
-
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR CALCULATING EXPECTED CURRENT (BI-MAXWELLIAN).
-	#-----------------------------------------------------------------------
-
-	def calc_cur_bmx( self,
-	                  vel_cen, vel_wid,
-	                  dir_alt, dir_azm,
-	                  mag_x, mag_y, mag_z,
-	                  prm_n, prm_v_x, prm_v_y, prm_v_z,
-	                  prm_w_per, prm_w_par              ) :
-
-
-		# Note.  This function is based on Equation 2.34 from Maruca
-		#        (PhD thesis, 2012), but differs by a factor of $2$
-		#        (i.e., the factor of $2$ from Equation 2.13, which is
-		#        automatically calibrated out of the Wind/FC data).
-
-
-		# Calcualte the vector bulk velocity.
-
-		prm_v = array( [ prm_v_x, prm_v_y, prm_v_z ] )
-
-		if ( prm_v.ndim > 1 ) :
-			prm_v = transpose( prm_v )
-
-
-		# Calculate the look direction as a cartesian unit vector.
-
-		dlk = self.calc_dir_look( dir_alt, dir_azm )
-
-
-		# Calculate the direction of the magnetic field as a cartesian
-		# unit vector.
-
-		mag = array( [ mag_x, mag_y, mag_z ] )
-
-		if ( mag.ndim > 1 ) :
-			mag = transpose( mag )
-
-		dmg = self.calc_arr_nrm( mag )
-
-
-		# Calculate the component of the magnetic field unit vector
-		# along that lies along the look direction.
-
-		dmg_dlk = self.calc_arr_dot( dmg, dlk )
-
-
-		# Compute the effective thermal speed along this look direction.
-
-
-		prm_w = sqrt( ( ( 1. - dmg_dlk**2 ) * prm_w_per**2 ) + 
-		              (        dmg_dlk**2   * prm_w_par**2 )   )
-
-
-		# Calcuate the exponential terms of the current.
-
-		ret_exp_1 = 1.e3 * prm_w * sqrt( 2. / pi ) * exp(
-		            - ( ( vel_cen - ( vel_wid / 2. )
-		            - self.calc_arr_dot( dlk, -prm_v ) )
-		            / prm_w )**2 / 2. )
-		ret_exp_2 = 1.e3 * prm_w * sqrt( 2. / pi ) * exp(
-		            - ( ( vel_cen + ( vel_wid / 2. )
-		            - self.calc_arr_dot( dlk, -prm_v ) )
-		            / prm_w )**2 / 2. )
-
-
-		# Calculate the "erf" terms.
-
-		ret_erf_1 = 1.e3 * self.calc_arr_dot( dlk, -prm_v ) * erf(
-		            ( vel_cen - ( vel_wid / 2. )
-		            - self.calc_arr_dot( dlk, -prm_v ) )
-		            / ( sqrt(2.) * prm_w ) )
-		ret_erf_2 = 1.e3 * self.calc_arr_dot( dlk, -prm_v ) * erf(
-		            ( vel_cen + ( vel_wid / 2. )
-		            - self.calc_arr_dot( dlk, -prm_v ) )
-		            / ( sqrt(2.) * prm_w ) )
-
-
-		# Calculate the parenthetical expression.
-
-		ret_prn = ( ( ret_exp_2 + ret_erf_2 ) -
-		            ( ret_exp_1 + ret_erf_1 )   )
-
-
-		# Calculate the expected current.
-
-		ret = ( ( 1.e12 ) * ( 1. / 2. ) * ( const['q_p'] )
-		        * ( 1.e6 * prm_n )
-		        * ( 1.e-4 * self.calc_eff_area( dlk, prm_v ) )
-		        * ( ret_prn ) )
-
-
-		# Return the calculated value for the expected current.
-
-		return ret
-
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR AUTOMATIC DATA SELECTION FOR THE MOMENTS ANAL.
-	#-----------------------------------------------------------------------
-
-	def auto_mom_sel( self,
-	                  win_azm=None, win_cur=None, no_anls_mom=False ) :
-
-
-		# Note.  The each of the "win_???" keywords is expected to be
-		#        either an integer or a string-expression of an integer.
-
+	def auto_mom_sel( self ) :
 
 		# Re-initialize the data-selection variables for the moments
 		# analysis.
 
-		self.rset_var( var_nln_sel=True )
+		self.rset_var( var_mom_sel=True )
 
+		# Initially, deselect all look directions and bins.
 
-		# If it exists, store the value of each of the "win_???"
-		# keywords as a string.
+		self.mom_sel_dir = [ [ False for d in range(self.fc_spec['n_dir']) ]
+                                             for c in range(self.fc_spec['n_cup']) ]
 
-		# Note.  This step is used to provide a record of keyword
-		#        input that cannot be converted to an integer.  In
-		#        such cases, the corresponding variable 
-		#        "self.req_win_???" is given a value of "None".  This
-		#        invalid input is principally saved so that it can be
-		#        displayed in the user-input text-box.
+		self.mom_sel_bin = [ [ [ False for b in range(self.fc_spec['n_bin']) ]
+                                               for d in range(self.fc_spec['n_dir']) ]
+		                               for c in range(self.fc_spec['n_cup']) ]
 
-		if ( win_azm is not None ) :
-			self.mom_win_azm_txt = str( win_azm )
+		# If the "mom_win_???" variables are invalid, abort.
 
-		if ( win_cur is not None ) :
-			self.mom_win_cur_txt = str( win_cur )
+		if ( ( self.mom_win_dir is None ) or
+		     ( self.mom_win_bin is None )    ) :
 
-
-		# Attempt to extract any user-provided widths.
-
-		# Note.  No change is made to the value of a given
-		#        "self.mom_win_???_req" variable if the value of the
-		#        corresponding "win_???" keyword is "None" (either 
-		#        because the user passed no value or passed a value of
-		#        "None").  If the user passes an invalid value, though,
-		#        "self.mom_win_???_req" is set to "None" and no change
-		#        is made to the corresponding "self.mom_win_???" value.
-
-		if ( win_azm is not None ) :
-			try :
-				self.mom_win_azm_req = int( win_azm )
-			except :
-				self.mom_win_azm_req = None
-
-		if ( win_cur is not None ) :
-			try :
-				self.mom_win_cur_req = int( win_cur )
-			except :
-				self.mom_win_cur_req = None
-
-
-		# Begin by setting the window sizes to those requested by the
-		# user (if available).
-
-		if ( self.mom_win_azm_req is not None ) :
-			self.mom_win_azm = self.mom_win_azm_req
-
-		if ( self.mom_win_cur_req is not None ) :
-			self.mom_win_cur = self.mom_win_cur_req
-
-
-		# Now, validate (and, if necessary, adjust) the sizes of the
-		# automatic selection windows.
-
-		self.mom_win_azm = max( self.mom_win_azm, self.mom_min_sel_azm )
-		self.mom_win_azm = min( self.mom_win_azm, self.n_azm           )
-
-		self.mom_win_cur = max( self.mom_win_cur, self.mom_min_sel_cur )
-		self.mom_win_cur = min( self.mom_win_cur, self.n_vel           )
-
-
-		# First, select the look directions with the strongest signal,
-		# which are indicated in the "self.mom_sel_azm" array.
-
-		self.auto_mom_sel_azm( )
-
-
-		# Second, for each selected look direction, select the data with
-		# the strongest signal and indicate this selection in the
-		# "self.mom_sel_cur" array.
-
-		self.auto_mom_sel_cur( )
-
-
-		# Instruct each of the registered widgets to update based on the
-		# potential change in selection status of each datum.
-
-		# Emit a signal that indicates that the selection status of all
-		# data for the moments analysis has changed.
-
-		self.emit( SIGNAL('janus_chng_mom_sel_all') )
-
-
-		# Validate the new data selection (i.e., make sure that the two
-		# "self.mom_sel_???" arrays are self consistent).
-
-		self.vldt_mom_sel( )
-
-
-		# Unless requested otherwise, run the moments analysis (and
-		# then, if the non-linear analysis is set to be dynamically
-		# updated, run that analysis as well).
-
-		if ( not no_anls_mom ) :
+			self.vldt_mom_sel( emit_all=True )
 
 			self.anls_mom( )
 
+			return
 
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR AUTO-SELECTING LOOK DIRECTIONS FOR MOMENTS.
-	#-----------------------------------------------------------------------
+		# Find the maximum current window (of "self.mom_win_bin" bins)
+		# for each direction
+		dir_max_ind  = [ [ self.fc_spec.find_max_curr( c, d,
+		                             win=self.mom_win_bin            )
+		                             for d in range(self.fc_spec['n_dir']) ]
+		                             for c in range(self.fc_spec['n_cup']) ]
 
-	def auto_mom_sel_azm( self ) :
+		dir_max_curr = [ [ self.fc_spec.calc_tot_curr( c, d,
+		                             dir_max_ind[c][d],
+		                             win=self.mom_win_bin           )
+		                             for d in range(self.fc_spec['n_dir']) ]
+		                             for c in range(self.fc_spec['n_cup']) ]
 
+		# Compute "cup_max_ind" (two element list)
+		# List of indices with maximum current for each cup
 
-		# CAUTION!  It is strongly recommended that this function only
-		#           be called by "self.auto_mom_sel( )", which first
-		#           calls "self.auto_mom_sel_azm( )" and then calls
-		#           "self.auto_mom_sel_cur( )".  Neither of the calls
-		#           to the "self.auto_mom_sel_???( )" functions
-		#           validates the data or updates the
-		#           "self.n_mom_sel_???" counters; this is instead
-		#           handled by "self.auto_mom_sel( )" with a call to
-		#           "self.vldt_mom_sel( )".
+		cup_max_ind  = [ 0 for c in range( self.fc_spec['n_cup'] ) ]
 
+		for c in range( self.fc_spec['n_cup'] ) :
 
-		# Initially, deselect all look directions.
+			curr_sum_max = 0.
 
-		self.mom_sel_azm = tile( False, [ self.n_alt, self.n_azm ] )
+			for d in range( self.fc_spec['n_dir'] ) :
 
-		self.mom_n_sel_azm = 0
+				curr_sum = sum( [ dir_max_curr[c][
+				                  (d+i)%self.fc_spec['n_dir']]
+				                  for i in range(
+				                           self.mom_win_dir) ] )
 
+				if ( curr_sum > curr_sum_max ) :
+					cup_max_ind[c] = d
+					curr_sum_max   = curr_sum
 
-		# Initialize the "max_cur" and "mm_cur" arrays.
+		# Populate "self.mom_sel_bin" and "self.mom_sel_dir"
+		# appropriately.
 
-		# Note.  The former will be populated with the maximum current
-		#        seen in each velocity window.  The latter (the min-max
-		#        array) will be populated with the minimum value over a
-		#        running, circular "p"-window of "self.mom_win_azm"
-		#        elements from the "max_cur" array.
+		for c in range( self.fc_spec['n_cup'] ) :
 
-		max_cur = zeros( [ self.n_alt, self.n_azm ] )
-		mm_cur  = zeros( [ self.n_alt, self.n_azm ] )
+			for pd in range( cup_max_ind[c],
+			                 cup_max_ind[c] + self.mom_win_dir ) :
 
+				# Compute the actual direction-index (versus the
+				# pseudo-direction-index).
 
-		# Populate the "max_cur" array.
+				d = pd % self.fc_spec['n_dir']
+                                self.mom_sel_dir[c][d] = True
 
-		for t in range( self.n_alt ) :
+				# Select the bins in this look direction's
+				# maximal window
 
-			for p in range( self.n_azm ) :
+				for b in range( dir_max_ind[c][d],
+				                dir_max_ind[c][d]
+				                          + self.mom_win_bin ) :
+					self.mom_sel_bin[c][d][b] = True
 
-				tk = where( self.cur_vld[t,p,:] )[0]
+                # Validate the new data selection (which includes populating
+		# the "self.mom_sel_dir" array).
 
-				if ( len( tk ) > 0 ) :
-					max_cur[t,p] = max( self.cur[t,p,tk] )
-				else :
-					max_cur[t,p] = 0.
+		self.vldt_mom_sel( emit_all=True )
 
+		# Run the moments analysis (and then, if the non-linear analysis
+		# is set to be dynamically updated, run that analysis as well).
 
-		# Populate the "mm_cur" array.
-
-		for t in range( self.n_alt ) :
-
-			for p in range( self.n_azm ) :
-
-				for w in range( self.mom_win_azm ) :
-
-					mm_cur[t,p] += \
-					             max_cur[t,(p+w)%self.n_azm]
-
-
-		# Find the location of the maximum value of each row of the
-		# "mm_cur" array and use this location to update the
-		# corresponding row of "self.mom_sel_azm".
-
-		for t in range( self.n_alt ) :
-
-			p0 = where( mm_cur[t,:] == 
-			                 amax( mm_cur[t,:] ) )[0][0]
-
-			for p in range( p0, p0+self.mom_win_azm ) :
-
-				self.mom_sel_azm[t,p%self.n_azm] = True
-
-
-		# Record the number of selected look directions.
-
-		self.mom_n_sel_azm = len( where( self.mom_sel_azm )[0] )
-
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNC. FOR AUTO-SELECTING INDIVIDUAL DATA FOR MOMENTS ALAL.
-	#-----------------------------------------------------------------------
-
-	def auto_mom_sel_cur( self ) :
-
-
-		# CAUTION!  It is strongly recommended that this function only
-		#           be called by "self.auto_mom_sel( )", which first
-		#           calls "self.auto_mom_sel_azm( )" and then calls
-		#           "self.auto_mom_sel_cur( )".  Neither of the calls
-		#           to the "self.auto_mom_sel_???( )" functions
-		#           validates the data or updates the
-		#           "self.n_mom_sel_???" counters; this is instead
-		#           handled by "self.auto_mom_sel( )" with a call to
-		#           "self.vldt_mom_sel( )".
-
-
-		# CAUTION!  This function only selects data from look directions
-		#           that have already been selected (i.e., those for
-		#           which their corresponding elements of
-		#           "self.mom_sel_azm" is "True".  It is assumed that
-		#           the function "self.auto_sel_azm( )" is called
-		#           immediately prior a call of this function.
-
-
-		# Initially, de-select all data.
-
-		self.mom_sel_cur = tile( False, [ self.n_alt, self.n_azm,
-		                                  self.n_vel              ] )
-
-		self.mom_n_sel_cur = tile( 0, [ self.n_alt, self.n_azm ] )
-
-
-		# Loop through all look directions.  For each that has been
-		# selected, select a portion of the data therefrom.
-
-		v_rng = arange( self.n_vel )
-
-		for t in range( self.n_alt ) :
-
-			for p in range( self.n_azm ) :
-
-				# If the current look direction was not
-				# selected, move on to the next one as clearly
-				# no data should be selected from this one.
-
-				if ( not self.mom_sel_azm[t,p] ) :
-					continue
-
-				# Consider all spans of "self.mom_win_cur"
-				# indices and select the data from the one with
-				# the highest total current.
-
-				v_0   = 0
-				cur_0 = 0.
-
-				for v in range( self.n_vel - self.mom_win_cur) :
-
-					tk = where( ( v_rng >= v           ) &
-					            ( v_rng < ( v +
-					                self.mom_win_cur ) ) &
-					            ( self.cur_vld[t,p,:]  )   )
-
-					if ( len( tk ) > 0 ) :
-						cur_v = sum( self.cur[t,p,tk] )
-					else :
-						cur_v = 0.
-
-					if ( cur_v > cur_0 ) :
-						v_0   = v
-						cur_0 = cur_v
-
-				self.mom_sel_cur[
-				          t,p,v_0:(v_0+self.mom_win_cur)] = True
-
-
-		# Record the number of data selected in each look direction.
-
-		self.mom_n_sel_cur = array( [ [
-		                len( where( self.mom_sel_cur[t,p,:] )[0] )
-		                              for p in range( self.n_azm ) ]
-		                                for t in range( self.n_alt ) ] )
-
+		self.anls_mom( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CHANGING THE SELECTION OF A SINGLE POINT.
 	#-----------------------------------------------------------------------
 
-	def chng_mom_sel( self, t, p, v ) :
-
+	def chng_mom_sel( self, c, d, b ) :
 
 		# Change the selection of the requested datum.
 
-		self.mom_sel_cur[t,p,v] = not self.mom_sel_cur[t,p,v]
-
+		self.mom_sel_bin[c][d][b] = not self.mom_sel_bin[c][d][b]
 
 		# Emit a signal that indicates that the datum's selection status
 		# for the moments analysis has changed.
 
-		self.emit( SIGNAL('janus_chng_mom_sel_cur'), t, p, v )
-
+		self.emit( SIGNAL('janus_chng_mom_sel_bin'), c, d, b )
 
 		# Validate the new data selection (i.e., make sure that the two
 		# "self.sel_???" arrays are mutually-consistent) and update the
 		# "self.n_sel_???" counters.
 
 		self.vldt_mom_sel( )
-
 
 		# Ensure that the moments analysis has been set for "dyanmic"
 		# mode (since the user presumably wants it this way).  Rerun the
@@ -1579,22 +930,20 @@ class core( QObject ) :
 
 		self.anls_mom( )
 
-
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR VALIDATING THE DATA SELECTION.
 	#-----------------------------------------------------------------------
 
-	def vldt_mom_sel( self ) :
-
+	def vldt_mom_sel( self, emit_all=False ) :
 
 		# Note.  This function ensures that the two "self.mom_sel_???"
-		#        arrays are mutually consistent.  For each set of "t"-
-		#        and "p"-values, "self.mom_sel_azm[t,p]" can only be
-		#        "True" if at least "self.min_sel_cur" of the elements
-		#        in "self.mom_sel_cur[t,p,:]" are "True".  However, if
-		#        fewer than "self.mom_min_sel_azm" sets of "t"- and
-		#        "p"-values satisfy this criterion, all elements of
-		#        "self.mom_sel_azm" are given the value "False".
+		#        arrays are mutually consistent.  For each set of "c"-
+		#        and "d"-values, "self.mom_sel_dir[c,d]" can only be
+		#        "True" if at least "self.min_sel_bin" of the elements
+		#        in "self.mom_sel_bin[c,d,:]" are "True".  However, if
+		#        fewer than "self.mom_min_sel_dir" sets of "c"- and
+		#        "d"-values satisfy this criterion, all elements of
+		#        "self.mom_sel_dir" are given the value "False".		
 		#
 		#        Additionally, this functions serves to update the
 		#        "self.mom_n_sel_???" counters.
@@ -1602,57 +951,62 @@ class core( QObject ) :
 
 		# Save the initial selection of pointing directions.
 
-		old_mom_sel_azm = self.mom_sel_azm
+		old_mom_sel_dir = deepcopy( self.mom_sel_dir )
 
-
-		# Update the counter "self.mom_n_sel_cur" (i.e., the number of
+		# Update the counter "self.mom_n_sel_bin" (i.e., the number of
 		# selected data in each pointing direction).
 
-		self.mom_n_sel_cur = array( [ [
-		                len( where( self.mom_sel_cur[t,p,:] )[0] )
-		                              for p in range( self.n_azm ) ]
-		                                for t in range( self.n_alt ) ] )
+		self.mom_n_sel_bin = [ [ sum( self.mom_sel_bin[c][d] )
+		                       for d in range( self.fc_spec['n_dir'] ) ]
+		                       for c in range( self.fc_spec['n_cup'] ) ]
 
 		# Create a new selection of pointing directions based on the
 		# data selection, and then update the counter
-		# "self.mom_n_sel_azm".
+		# "self.mom_n_sel_dir".
 
-		self.mom_sel_azm = array( [ [
-		           self.mom_n_sel_cur[t,p] >= self.mom_min_sel_cur
-		                              for p in range( self.n_azm ) ]
-		                                for t in range( self.n_alt ) ] )
-
-		self.mom_n_sel_azm = len( where( self.mom_sel_azm )[0] )
-
+		self.mom_sel_dir = [ [
+		              self.mom_n_sel_bin[c][d] >= self.mom_min_sel_bin
+		                       for d in range( self.fc_spec['n_dir'] ) ]
+		                       for c in range( self.fc_spec['n_cup'] ) ]
 
 		# Determine the total number of selected pointing directions; if
-		# this number is less than the minimum "self.mom_min_sel_azm",
+		# this number is less than the minimum "self.mom_min_sel_dir",
 		# deselect all pointing directions.
 
-		mom_n_sel_azm = len( where( self.mom_sel_azm )[0] )
+		self.mom_n_sel_dir = \
+		               sum( [ sum( sub ) for sub in self.mom_sel_dir ] )
 
-		if ( mom_n_sel_azm < self.mom_min_sel_azm ) :
+		if ( self.mom_n_sel_dir < self.mom_min_sel_dir ) :
 
-			self.mom_sel_azm = tile( False,
-			                         [ self.n_alt, self.n_azm ] )
+			self.mom_sel_dir = [ [ False
+			               for d in range( self.fc_spec['n_dir'] ) ]
+			               for c in range( self.fc_spec['n_cup'] ) ]
 
-			self.mom_n_sel_azm = 0
+			self.mom_n_sel_dir = 0
 
+		# Emit (if necessary) the appropriate update signal(s).
 
-		# Identify differences between the new and old versions of
-		# "self.mom_sel_azm".  For each pointing direction whose
-		# selection status for the moments analysis has changed, emit a
-		# signal indicating this.
+		if ( emit_all ) :
 
-		( tk_t, tk_p ) = where( self.mom_sel_azm != old_mom_sel_azm )
+			self.emit( SIGNAL('janus_chng_mom_sel_all') )
 
-		n_tk = len( tk_t )
+		else :
 
-		for k in range( n_tk ) :
+			# Identify differences between the new and old versions
+			# of "self.mom_sel_dir".  For each pointing direction
+			# whose selection status for the moments analysis has
+			# changed, emit a signal indicating this.
 
-			self.emit( SIGNAL('janus_chng_mom_sel_azm'),
-			           tk_t[k], tk_p[k]                  )
+			for c in range( self.fc_spec['n_cup'] ) :
 
+				for d in range( self.fc_spec['n_dir'] ) :
+
+					if ( self.mom_sel_dir[c][d]
+					            != old_mom_sel_dir[c][d] ) :
+
+						self.emit( SIGNAL(
+						      'janus_chng_mom_sel_dir'),
+						      c, d )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RUNNING THE MOMENTS ANALYSIS.
@@ -1660,33 +1014,26 @@ class core( QObject ) :
 
 	def anls_mom( self ) :
 
-
 		# Re-initialize and the output of the moments analysis.
 
 		self.rset_var( var_mom_res=True )
 
-
 		# If the point-selection arrays have not been populated, run
 		# the automatic point selection.
 
-		if ( ( self.mom_sel_azm is None ) or
-		     ( self.mom_sel_cur is None )    ) :
+		if ( ( self.mom_sel_dir is None ) or
+		     ( self.mom_sel_bin is None )    ) :
 
-			self.auto_mom_sel( no_anls_mom=True )
-
+			self.auto_mom_sel( )
 
 		# If any of the following conditions are met, emit a signal that
 		# indicates that the results of the moments analysis have
 		# changed, and then abort.
 		#   -- No (valid) ion spectrum has been requested.
-		#   -- No ion spectrum has been loaded.
-		#   -- The primary ion species is not available for analysis.
-		#   -- No initial guess has been generated.
 		#   -- Insufficient data have been selected.
 
-		if ( ( self.time_epc is None                     ) or
-		     ( self.n_vel == 0                           ) or
-		     ( self.mom_n_sel_azm < self.mom_min_sel_azm )    ) :
+		if ( ( self.fc_spec is None                      ) or
+		     ( self.mom_n_sel_dir < self.mom_min_sel_dir )    ) :
 
 			self.emit( SIGNAL('janus_mesg'),
 			           'core', 'norun', 'mom' )
@@ -1695,17 +1042,14 @@ class core( QObject ) :
 
 			return
 
-
 		# Message the user that the moments analysis has begun.
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'mom' )
 
-
-		# Extract the "t"- and "p"-indices of each selected pointing
+		# Extract the "c"- and "d"-indices of each selected pointing
 		# direction.
 
-		( tk_t, tk_p ) = where( self.mom_sel_azm )
-
+		( tk_c, tk_d ) = where( self.mom_sel_dir )
 
 		# Initialize the "eta_*" arrays.
 
@@ -1715,10 +1059,7 @@ class core( QObject ) :
 		#        thermal speed, and temperature derived for each of the
 		#        analyzed look directions.
 
-		n_eta = self.mom_n_sel_azm
-
-		eta_phi = tile( 0., n_eta )
-		eta_the = tile( 0., n_eta )
+		n_eta = self.mom_n_sel_dir
 
 		eta_dlk = tile( 0., [ n_eta, 3 ] )  # Cartesian look direction
 
@@ -1728,7 +1069,6 @@ class core( QObject ) :
 		eta_v   = tile( 0., n_eta )         # inflow speed
 		eta_w   = tile( 0., n_eta )         # thermal speed
 		eta_t   = tile( 0., n_eta )         # temperature
-
 
 		# For each of the selected look directions, identify the
 		# selected data therefrom and calculate the estimator of the
@@ -1744,31 +1084,26 @@ class core( QObject ) :
 
 		for k in range( n_eta ) :
 
-			# Extract the "t"- and "p"-values for this direction.
+			# Extract the "c"- and "d"-values for this direction.
 
-			t = tk_t[k]
-			p = tk_p[k]
+			c = tk_c[k]
+			d = tk_d[k]
 
-			# Store the $\theta$- and $\phi$-values for this look
-			# direction.
+			# Calculate the look direction using "c"- and "d"-values
 
-			eta_the[k] = - self.alt[t] + 90.
-			eta_phi[k] = - self.azm[t,p]
+			eta_dlk[k] = self.fc_spec.arr[c][d][0]['dir']
 
-			# Convert the look direction from altitude-azimuth to a
-			# Cartesian unit vector.
-
-			eta_dlk[k,:] = self.calc_dir_look( self.alt[t],
-			                                   self.azm[t,p] )
-
-			# Extract the "v" values of the selected data from this
+			# Extract the "b" values of the selected data from this
 			# look direction.
 
-			v = where( self.mom_sel_cur[t,p,:] )[0]
+                        b = [i for i, x in enumerate( self.mom_sel_bin[c][d] )
+                                                                  if x==True    ]
 
-			eta_v[k] = - sum( self.cur[t,p,v] ) / \
-			                sum( self.cur[t,p,v] / self.vel_cen[v] )
-
+			eta_v[k] = - sum( [ self.fc_spec['curr'][c][d][i] 
+                                                for i in b] ) / \
+                                     sum( [ self.fc_spec['curr'][c][d][i]    /
+                                            self.fc_spec['vel_cen'][c][i]
+                                                for i in b]   )
 
 		# Use singular value decomposition (in the form of least squares
 		# analysis) to calculate the best-fit bulk speed for the solar
@@ -1776,48 +1111,48 @@ class core( QObject ) :
 
 		mom_v_vec = lstsq( eta_dlk, eta_v )[0]
 
-		mom_v = sqrt( mom_v_vec[0]**2 + mom_v_vec[1]**2
-		                              + mom_v_vec[2]**2 )
-
-
 		# For each of the selected look directions, use the derived
 		# value of "mom_v_vec" to estimate its effective collecting
 		# area, the number density, and the thermal speed.
 
 		for k in range( n_eta ) :
 
-			# Extract the "t"- and "p"-values for this direction.
+			# Extract the "c"- and "d"-values for this direction.
 
-			t = tk_t[k]
-			p = tk_p[k]
+			c = tk_c[k]
+			d = tk_d[k]
 
 			# Calculate the effective collecting area for this look
 			# direction.
 
-			eta_eca[k] = self.calc_eff_area( eta_dlk[k,:],
-			                                 mom_v_vec     )
+			eta_eca[k] = self.fc_spec.arr[c][d][0].\
+                                                  calc_eff_area( mom_v_vec )
 
-			# Extract the "v" indices of the selected data from this
+			# Extract the "b" indices of the selected data from this
 			# look direction.
 
-			v = where( self.mom_sel_cur[t,p,:] )[0]
+                        b = [i for i, x in enumerate( self.mom_sel_bin[c][d] )
+                                                                if x==True   ]
 
 			# Estimate the number density and thermal speed based on
 			# the selected data from this look direction.
 
-			eta_n[k] = 1e-6 * ( ( 1. / const['q_p'] )
-			           / ( 1.e-4 * eta_eca[k] )
-			           * sum( ( 1.e-12 * self.cur[t,p,v] ) /
-			                  ( 1.e3 * self.vel_cen[v]   )   ) )
+			eta_n[k] = 1e-6 * ( ( 1. / const['q_p'] ) /
+			           ( 1.e-4 * eta_eca[k] ) *
+			             sum([
+                                   ( 1.e-12 * self.fc_spec['curr'][c][d][i] ) /
+			           ( 1.e3 *   self.fc_spec['vel_cen'][c][i] )
+                                              for i in b ]                  ) )
 
-			eta_w[k] = 1e-3 * sqrt( max( [ 0.,
-			           ( ( 1. / const['q_p'] )
-			           / ( 1.e-4 * eta_eca[k] )
-			           / ( 1.e6 * eta_n[k] )
-			           * sum( ( 1.e-12 * self.cur[t,p,v] ) *
-			                  ( 1.e3 * self.vel_cen[v]   )   ) )
-			           - ( 1e3 * eta_v[k] )**2               ] ) )
-
+			eta_w[k] = 1.e-3 * sqrt( max( [ 0.,
+			           ( ( 1. / const['q_p']  ) /
+			           ( 1.e-4 * eta_eca[k]   ) /
+			           ( 1.e6 * eta_n[k]      ) *
+			             sum( [
+                                   ( 1.e-12 * self.fc_spec['curr'][c][d][i] ) *
+			           ( 1.e3   * self.fc_spec['vel_cen'][c][i] )
+                                              for i in b ]                  ) )
+			         - ( 1.e3 * eta_v[k] )**2             ]     ) )
 
 		# Compute the effective temperature for each of the analyzed
 		# look directions.
@@ -1825,10 +1160,10 @@ class core( QObject ) :
 		eta_t = ( 1.E-3 / const['k_b'] ) * \
 		        const['m_p'] * ( ( 1.E3 * eta_w )**2 )
 
+		# Calculate a net estimators of the number density and thermal
+		# speed.
 
-		# Calculate a net estimator of the number density.
-
-		# Note.  The total signal for a look direction is roughly 
+		# Note.  The total signal for a look direction is roughly
 		#        proportional to its effective collecting area.  Thus,
 		#        the reciprical of the effective collecting area can be
 		#        thought of a crude indicator of the uncertainty in the
@@ -1837,165 +1172,39 @@ class core( QObject ) :
 
 		mom_n = average( eta_n, weights=eta_eca**2 )
 
+		mom_w = mean( eta_w )
 
-		# Initialize the temporary variable the indicates whether or not
-		# the temperature anisotropy analysis has been successfully
-		# performed.  If there are some magnetic field data, at least
-		# attempt the analysis.  Otherewise, skip it.
+		# Save the results of the moments analysis in a plas object.
 
-		if ( self.n_mfi > 0 ) :
-			aniso = True
-		else :
-			aniso = False
+		self.mom_res = plas( )
 
+		self.mom_res['v0_vec'] = mom_v_vec
 
-		# If indicated, attempt to compute the components of thermal
-		# speed and temperature.  If this fails (or could not be
-		# attempted because of a lack of magnetic field data), simply
-		# compute the scalar values.
+		self.mom_res.add_spec( name='Proton', sym='p', m=1., q=1. )
 
-		if ( aniso ) :
-
-			# Construct the "data" arrays that will be used to
-			# determine the components of the thermal speed.
-
-			# Note.  Assuming a bi-Maxwellian distribution, the
-			#        square of a look direction's thermal speed
-			#        should be a linear function of the square of
-			#        the dot product between the look direction and
-			#        the direction of the magnetic field.  See
-			#        Equation 2.32 by Maruca (PhD thesis, 2012).
-
-			dat_x = array( [ self.mfi_hat_dir[tk_t[k],tk_p[k]]
-			                 for k in range( n_eta )          ] )**2
-
-			dat_y = eta_w**2
-
-			# If the "x" data array has insufficient coverage for a
-			# reliable linear fit, abort the anisotropy analysis.
-
-			if ( amax( dat_x ) == amin( dat_x ) ) :
-				aniso = False
-
-		if ( aniso ) :
-
-			# Perform the linear fit.
-
-			( f_slope, f_icept ) = polyfit( dat_x, dat_y, 1 )
-
-			# If the returned fit parameters are non-physical, abort
-			# the anisotropy analysis.
-
-			if ( (   f_icept             <= 0 ) or
-			     ( ( f_icept + f_slope ) <= 0 )    ) :
-				aniso = False
-
-		if ( aniso ) :
-
-			# Use the values returned for the fit parameters to
-			# calculate the components of thermal speed and
-			# temperature.
-
-			mom_w_per = sqrt( f_icept )
-			mom_w_par = sqrt( f_icept + f_slope )
-
-			mom_t_per = ( 1.E-3 / const['k_b'] ) * \
-			            const['m_p'] * ( 1.E6 * f_icept )
-			mom_t_par = ( 1.E-3 / const['k_b'] ) * \
-			            const['m_p'] * \
-			            ( 1.E6 * ( f_icept + f_slope ) )
-
-			# Compute the scalar thermal speed and temperature.
-
-			mom_w = sqrt( ( (2./3.) *   f_icept             ) +
-			              ( (1./3.) * ( f_icept + f_slope ) )   )
-			mom_t = ( (2./3.) * mom_t_per ) + \
-			        ( (1./3.) * mom_t_par )
-
-			# Compute the estimate temperature anisotropy ratio.
-
-			mom_r = mom_t_per / mom_t_par
-
-		else :
-
-			mom_w = mean( eta_w )
-			mom_t = ( 1.E-3 / const['k_b'] ) * \
-			        const['m_p'] * ( 1.E3 * mom_w )**2
-
-			mom_w_per = None
-			mom_w_par = None
-			mom_t_per = None
-			mom_t_par = None
-			mom_r     = None
-
+		self.mom_res.add_pop( 'p',
+		                      drift=False, aniso=False,
+		                      name='Core', sym='c',
+		                      n=mom_n, w=mom_w          )
 
 		# Calculate the expected currents based on the results of the
 		# (linear) moments analysis.
 
-		mom_cur = tile( 0., [ self.n_alt, self.n_azm, self.n_vel ] )
-
-		if ( aniso ) :
-			for t in range( self.n_alt ) :
-				for p in range( self.n_azm ) :
-					mom_cur[t,p,:] = self.calc_cur_bmx(
-					           self.vel_cen, self.vel_wid,
-					           self.alt[t], self.azm[t,p],
-					           self.mfi_avg_nrm[0],
-					           self.mfi_avg_nrm[1],
-					           self.mfi_avg_nrm[2],
-					           mom_n, mom_v_vec[0],
-					           mom_v_vec[1], mom_v_vec[2],
-					           mom_w_per, mom_w_par        )
-		else :
-			for t in range( self.n_alt ) :
-				for p in range( self.n_azm ) :
-					mom_cur[t,p,:] = self.calc_cur_max(
-					           self.vel_cen, self.vel_wid,
-					           self.alt[t], self.azm[t,p],
-					           mom_n, mom_v_vec[0],
-					           mom_v_vec[1], mom_v_vec[2],
-					           mom_w                       )
-
-
-		# Save the "mom_?" and "mom_?_???" values and select "eta_*"
-		# arrays.
-
-		self.mom_n = mom_n
-		self.mom_v = mom_v
-		self.mom_w = mom_w
-		self.mom_t = mom_t
-		self.mom_r = mom_r
-
-		self.mom_v_vec = mom_v_vec
-
-		self.mom_w_per = mom_w_per
-		self.mom_w_par = mom_w_par
-		self.mom_t_per = mom_t_per
-		self.mom_t_par = mom_t_par
-
-		self.mom_n_eta = n_eta
-
-		self.mom_eta_ind_t = tk_t
-		self.mom_eta_ind_p = tk_p
-
-		self.mom_eta_n = eta_n
-		self.mom_eta_v = eta_v
-		self.mom_eta_w = eta_w
-		self.mom_eta_t = eta_t
-
-		self.mom_cur = mom_cur
-
+		self.mom_curr = self.fc_spec.calc_curr(
+		                                    self.mom_res['m_p'],
+		                                    self.mom_res['q_p'],
+		                                    self.mom_res['v0_vec'],
+		                                    self.mom_res['n_p_c'], 0.,
+		                                    self.mom_res['w_p_c']      )
 
 		# Message the user that the moments analysis has completed.
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mom' )
 
-
 		# Emit a signal that indicates that the results of the moments
 		# analysis have changed.
 
 		self.emit( SIGNAL('janus_chng_mom_res') )
-
 
 		# Update the initial guess for the non-linear analysis if
 		# dynamic updating has been requested.  If it wasn't, make sure
@@ -2042,35 +1251,35 @@ class core( QObject ) :
 
 		if   ( param == 'name' ) :
 			try :
-				self.nln_pyon.arr_spec[s]['name'] = str( val )
+				self.nln_plas.arr_spec[s]['name'] = str( val )
 			except :
-				self.nln_pyon.arr_spec[s]['name'] = None
+				self.nln_plas.arr_spec[s]['name'] = None
 
 		elif ( param == 'sym' ) :
 			try :
-				self.nln_pyon.arr_spec[s]['sym'] = str( val )
+				self.nln_plas.arr_spec[s]['sym'] = str( val )
 			except :
-				self.nln_pyon.arr_spec[s]['sym'] = None
+				self.nln_plas.arr_spec[s]['sym'] = None
 
 		elif ( param == 'm' ) :
 			try :
 				val = float( val )
 				if ( val >= 0 ) :
-					self.nln_pyon.arr_spec[s]['m'] = val
+					self.nln_plas.arr_spec[s]['m'] = val
 				else :
-					self.nln_pyon.arr_spec[s]['m'] = None
+					self.nln_plas.arr_spec[s]['m'] = None
 			except :
-				self.nln_pyon.arr_spec[s]['m'] = None
+				self.nln_plas.arr_spec[s]['m'] = None
 
 		elif ( param == 'q' ) :
 			try :
 				val = float( val )
 				if ( val >= 0 ) :
-					self.nln_pyon.arr_spec[s]['q'] = val
+					self.nln_plas.arr_spec[s]['q'] = val
 				else :
-					self.nln_pyon.arr_spec[s]['q'] = None
+					self.nln_plas.arr_spec[s]['q'] = None
 			except :
-				self.nln_pyon.arr_spec[s]['q'] = None
+				self.nln_plas.arr_spec[s]['q'] = None
 
 		# Propagate the changes to the ion population.
 
@@ -2080,8 +1289,7 @@ class core( QObject ) :
 	# DEFINE THE FUNCTION FOR CHANGING A NLN POPULATION.
 	#-----------------------------------------------------------------------
 
-	def chng_nln_pop( self, i, param, val,
-	                  pop_name=None, pop_sym=None ) :
+	def chng_nln_pop( self, i, param, val ) :
 
 		# Ensure that "i" is a valid ion-population index.
 
@@ -2101,55 +1309,79 @@ class core( QObject ) :
 
 			if ( ( val >= 0              ) and
 			     ( val <  self.nln_n_spc )     ) :
+
+				# If the population's name and/or symbol would
+				# contradict with a population already
+				# associated with the new species, clear out
+				# both.
+
+				if ( ( self.nln_plas.get_pop( 
+				          self.nln_plas.arr_spec[
+				                         val]['sym'],
+				          self.nln_plas.arr_pop[
+				                           i]['name'] )
+				                             is not None) or
+				     ( self.nln_plas.get_pop( 
+				          self.nln_plas.arr_spec[
+				                         val]['sym'],
+				          self.nln_plas.arr_pop[
+				                           i]['sym']  )
+				                             is not None)    ) :
+
+					self.nln_plas.arr_pop[i]['name'] = None
+					self.nln_plas.arr_pop[i]['sym']  = None
+
+					self.emit( SIGNAL('janus_chng_nln_pop'), i )
+
 				try :
-					self.nln_pyon.arr_pop[i]['spec'] = \
-					             self.nln_pyon.arr_spec[val]
+					self.nln_plas.arr_pop[i]['spec'] = \
+					             self.nln_plas.arr_spec[val]
 				except :
-					self.nln_pyon.arr_pop[i]['spec'] = None
+					self.nln_plas.arr_pop[i]['spec'] = None
 			else :
-				self.nln_pyon.arr_pop[i]['spec'] = None
+				self.nln_plas.arr_pop[i]['spec'] = None
 
 			if ( pop_name is not None ) :
 				try :
-					self.nln_pyon.arr_pop[i]['name'] = \
+					self.nln_plas.arr_pop[i]['name'] = \
 					                         str( pop_name )
 				except :
-					self.nln_pyon.arr_pop[i]['name'] = None
+					self.nln_plas.arr_pop[i]['name'] = None
 
 			if ( pop_sym is not None ) :
 				try :
-					self.nln_pyon.arr_pop[i]['sym'] = \
+					self.nln_plas.arr_pop[i]['sym'] = \
 					                          str( pop_sym )
 				except :
-					self.nln_pyon.arr_pop[i]['sym'] = None
+					self.nln_plas.arr_pop[i]['sym'] = None
 
 		if ( param == 'name' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['name'] = str( val )
+				self.nln_plas.arr_pop[i]['name'] = str( val )
 			except :
-				self.nln_pyon.arr_pop[i]['name'] = None
+				self.nln_plas.arr_pop[i]['name'] = None
 
 		if ( param == 'sym' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['sym'] = str( val )
+				self.nln_plas.arr_pop[i]['sym'] = str( val )
 			except :
-				self.nln_pyon.arr_pop[i]['sym'] = None
+				self.nln_plas.arr_pop[i]['sym'] = None
 
 		if ( param == 'drift' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['drift'] = bool( val )
+				self.nln_plas.arr_pop[i]['drift'] = bool( val )
 			except :
-				self.nln_pyon.arr_pop[i]['drift'] = None
+				self.nln_plas.arr_pop[i]['drift'] = None
 
 		if ( param == 'aniso' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['aniso'] = bool( val )
+				self.nln_plas.arr_pop[i]['aniso'] = bool( val )
 			except :
-				self.nln_pyon.arr_pop[i]['aniso'] = None
+				self.nln_plas.arr_pop[i]['aniso'] = None
 
 		# Propagate the changes to the ion population.
 
@@ -2166,7 +1398,7 @@ class core( QObject ) :
 		for p in range( self.nln_n_pop ) :
 
 			self.nln_pop_vld[p] = \
-			     self.nln_pyon.arr_pop[p].valid( require_val=False )
+			     self.nln_plas.arr_pop[p].valid( require_val=False )
 
 		# Emit a signal that indicates that the ion parameters for the
 		# non-linear analysis have changed.
@@ -2253,7 +1485,7 @@ class core( QObject ) :
 		if   ( ( self.nln_set_gss_n[i] is None ) or
 		       ( self.nln_set_gss_w[i] is None )    ) :
 			self.nln_set_gss_vld[i] = False
-		elif ( ( self.nln_pyon.arr_pop[i]['drift'] ) and
+		elif ( ( self.nln_plas.arr_pop[i]['drift'] ) and
 		       ( self.nln_set_gss_d[i] is None     )     ) :
 			self.nln_set_gss_vld[i] = False
 		else :
@@ -2320,7 +1552,7 @@ class core( QObject ) :
 		# (sucessfully), run the "make_nln_gss" function (to update the
 		# "self.nln_gss_" arrays, widgets, etc.) and then abort.
 
-		if ( self.mom_n is None ) :
+		if ( self.mom_res is None ) :
 
 			self.make_nln_gss( )
 
@@ -2330,13 +1562,10 @@ class core( QObject ) :
 		# non-drifting species).
 
 		try :
-			self.nln_pyon['v0_x'] = round( self.mom_v_vec[0], 1 )
-			self.nln_pyon['v0_y'] = round( self.mom_v_vec[1], 1 )
-			self.nln_pyon['v0_z'] = round( self.mom_v_vec[2], 1 )
+			self.nln_plas['v0_vec'] = [
+			         round( v, 1 ) for v in self.mom_res['v0_vec'] ]
 		except :
-			self.nln_pyon['v0_x'] = None
-			self.nln_pyon['v0_y'] = None
-			self.nln_pyon['v0_z'] = None
+			pass
 
 		# Attempt to generate an initial guess of the parameters for
 		# each ion population.
@@ -2356,53 +1585,43 @@ class core( QObject ) :
 			# density.
 
 			try :
-				self.nln_pyon.arr_pop[i]['n'] = round_sig(
-				         self.nln_set_gss_n[i] * self.mom_n, 4 )
+				self.nln_plas.arr_pop[i]['n'] = round_sig(
+				                      self.nln_set_gss_n[i]
+				                      * self.mom_res['n_p'], 4 )
 			except :
-				self.nln_pyon.arr_pop[i]['n'] = None
+				self.nln_plas.arr_pop[i]['n'] = None
 
 			# Generate (if necessary) the initial guess for this
 			# population's differential flow.
 
-			if ( self.nln_pyon.arr_pop[i]['drift'] ) :
+			if ( self.nln_plas.arr_pop[i]['drift'] ) :
 				try :
-					sgn = sign( dot( self.mom_v_vec,
-					                 self.mfi_avg_nrm ) )
+					sgn = sign( dot(
+					             self.mom_res['v0_vec'],
+					             self.mfi_avg_nrm        ) )
 					if ( sgn == 0. ) :
 						sgn = 1.
-					self.nln_pyon.arr_pop[i]['dv'] = \
-					    round_sig(
-					        sgn * self.mom_v
+					self.nln_plas.arr_pop[i]['dv'] = \
+					    round_sig( 
+					        sgn * self.mom_res['v0_mag']
 					            * self.nln_set_gss_d[i], 4 )
 				except :
-					self.nln_pyon.arr_pop[i]['dv'] = None
+					self.nln_plas.arr_pop[i]['dv'] = None
 
 			# Generate the initial guess of this population's
 			# thermal speed(s).
 
-			if ( self.nln_pyon.arr_pop[i]['aniso'] ) :
-				try :
-					self.nln_pyon.arr_pop[i]['w_per'] = \
-					   round_sig( self.nln_set_gss_w[i]
-					                       * self.mom_w, 4 )
-				except :
-					self.nln_pyon.arr_pop[i]['w_per'] = \
-					      None
-				try :
-					self.nln_pyon.arr_pop[i]['w_par'] = \
-					   round_sig( self.nln_set_gss_w[i]
-					                       * self.mom_w, 4 )
-				except :
-					self.nln_pyon.arr_pop[i]['w_par'] = \
-					      None
+			try :
+				w = round_sig( self.nln_set_gss_w[i] 
+				               * self.mom_res['w_p'], 4 )
+			except :
+				w = None
+
+			if ( self.nln_plas.arr_pop[i].aniso ) :
+				self.nln_plas.arr_pop[i]['w_per'] = w
+				self.nln_plas.arr_pop[i]['w_par'] = w
 			else :
-				try :
-					self.nln_pyon.arr_pop[i]['w'] = \
-					   round_sig( self.nln_set_gss_w[i]
-					                       * self.mom_w, 4 )
-				except :
-					self.nln_pyon.arr_pop[i]['w'] = \
-					      None
+				self.nln_plas.arr_pop[i]['w'] = w
 
 		# Run the "make_nln_gss" function to update the "self.nln_gss_"
 		# arrays, widgets, etc.
@@ -2442,58 +1661,58 @@ class core( QObject ) :
 		if   ( param == 'v_x' ) :
 
 			try :
-				self.nln_pyon['v0_x'] = val
+				self.nln_plas['v0_x'] = val
 			except :
-				self.nln_pyon['v0_x'] = None
+				self.nln_plas['v0_x'] = None
 
 		elif ( param == 'v_y' ) :
 
 			try :
-				self.nln_pyon['v0_y'] = val
+				self.nln_plas['v0_y'] = val
 			except :
-				self.nln_pyon['v0_y'] = None
+				self.nln_plas['v0_y'] = None
 
 		elif ( param == 'v_z' ) :
 
 			try :
-				self.nln_pyon['v0_z'] = val
+				self.nln_plas['v0_z'] = val
 			except :
-				self.nln_pyon['v0_z'] = None
+				self.nln_plas['v0_z'] = None
 
 		elif ( param == 'n' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['n'] = val
+				self.nln_plas.arr_pop[i]['n'] = val
 			except :
-				self.nln_pyon.arr_pop[i]['n'] = None
+				self.nln_plas.arr_pop[i]['n'] = None
 
 		elif ( param == 'dv' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['dv'] = val
+				self.nln_plas.arr_pop[i]['dv'] = val
 			except :
-				self.nln_pyon.arr_pop[i]['dv'] = None
+				self.nln_plas.arr_pop[i]['dv'] = None
 
 		elif ( param == 'w' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['w'] = val
+				self.nln_plas.arr_pop[i]['w'] = val
 			except :
-				self.nln_pyon.arr_pop[i]['w'] = None
+				self.nln_plas.arr_pop[i]['w'] = None
 
 		elif ( param == 'w_per' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['w_per'] = val
+				self.nln_plas.arr_pop[i]['w_per'] = val
 			except :
-				self.nln_pyon.arr_pop[i]['w_per'] = None
+				self.nln_plas.arr_pop[i]['w_per'] = None
 
 		elif ( param == 'w_par' ) :
 
 			try :
-				self.nln_pyon.arr_pop[i]['w_par'] = val
+				self.nln_plas.arr_pop[i]['w_par'] = val
 			except :
-				self.nln_pyon.arr_pop[i]['w_par'] = None
+				self.nln_plas.arr_pop[i]['w_par'] = None
 
 		# Run the "make_nln_gss" function to update the "self.nln_gss_"
 		# arrays, widgets, etc.
@@ -2509,29 +1728,31 @@ class core( QObject ) :
 		# Establish which of the ion populations are in use, are valid,
 		# and have initial guesses.
 
-		for i in range ( self.nln_n_pop ) :
+		for p in range ( self.nln_n_pop ) :
 
-			if ( ( self.nln_pop_use[i]               ) and
-			     ( self.nln_pop_vld[i]               ) and
-			     ( self.nln_pyon.arr_pop[i].valid(
+			if ( ( self.nln_pop_use[p]               ) and
+			     ( self.nln_pop_vld[p]               ) and
+			     ( self.nln_plas.arr_pop[p].valid(
 			                      require_val=True ) )     ) :
 
-				self.nln_gss_vld[i] = True
+				self.nln_gss_vld[p] = True
 
 			else :
 
-				self.nln_gss_vld[i] = False
+				self.nln_gss_vld[p] = False
 
-		self.nln_gss_pop = where( self.nln_gss_vld )[0]
+		self.nln_gss_pop = list( where( self.nln_gss_vld )[0] )
+
+		self.nln_gss_n_pop = len( self.nln_gss_pop )
 
 		# Reset the "prm" and "cur_???" arrays.
 
-		self.nln_gss_prm = array( [] )
+		self.nln_gss_prm = [ ]
 
-		self.nln_gss_cur_ion = None
-		self.nln_gss_cur_tot = None
+		self.nln_gss_curr_ion = None
+		self.nln_gss_curr_tot = None
 
-		# Abort if any of the following cases are arise:
+		# Abort if any of the following cases arise:
 		#   -- No populations have been found to be valid.
 		#   -- The primary population is not valid.
 		#   -- The init. guess of any reference vel. comp. is invalid.
@@ -2540,65 +1761,99 @@ class core( QObject ) :
 		#   -- Emit the signal that the NLN guess has been updated.
 		#   -- Return.
 
-		if ( ( len( self.nln_gss_pop ) == 0    ) or
+		if ( ( self.nln_gss_n_pop == 0         ) or
 		     ( 0 not in self.nln_gss_pop       ) or
-		     ( None in self.nln_pyon['vec_v0'] ) or
+		     ( None in self.nln_plas['v0_vec'] ) or
 		     ( self.n_mfi == 0                 )    ) :
 
 			self.emit( SIGNAL('janus_chng_nln_gss') )
 
 			return
 
-		# Generate the intial guess array in the format expected.
+		# Generate the intial guess array (beginning with the reference
+		# velocity) and compute the expected  currents from each
+		# population.
 
-		prm = list( self.nln_pyon['vec_v0'] )
+		pop_v0_vec = self.nln_plas['v0_vec']
 
-		for i in self.nln_gss_pop :
+		self.nln_gss_prm = list( pop_v0_vec )
 
-			prm.append( self.nln_pyon.arr_pop[i]['n'] )
+		self.nln_gss_curr_ion = [ ]
 
-			if ( self.nln_pyon.arr_pop[i]['drift'] ) :
-				prm.append( self.nln_pyon.arr_pop[i]['dv'] )
+		for p in self.nln_gss_pop :
 
-			if ( self.nln_pyon.arr_pop[i]['aniso'] ) :
-				prm.append( self.nln_pyon.arr_pop[i]['w_per'] )
-				prm.append( self.nln_pyon.arr_pop[i]['w_par'] )
+			# Extract the drift and anisotropy states of the
+			# population
+
+			pop_drift = self.nln_plas.arr_pop[p]['drift']
+			pop_aniso = self.nln_plas.arr_pop[p]['aniso']
+
+			# Extract the population's density and add it to the
+			# parameter array.
+
+			pop_n = self.nln_plas.arr_pop[p]['n']
+
+			self.nln_gss_prm.append( pop_n )
+
+			# If the population is drifting, extract its drift and
+			# add it to the parameter array.  Otherwise, set the
+			# drift as zero.
+
+			if ( pop_drift ) :
+
+				pop_dv = self.nln_plas.arr_pop[p]['dv']
+
+				self.nln_gss_prm.append( pop_dv )
+
 			else :
-				prm.append( self.nln_pyon.arr_pop[i]['w'] )
 
-		self.nln_gss_prm = array( prm )
+				pop_dv = 0.
 
-		# Calculate the expected currents based on the initial geuss.
+			# If the population is anisotropic, extract its
+			# perpendicular and parallel thermal-speeds and add them
+			# to the parameter array.  Otherwise, extract its scalar
+			# thermal speed and add it to the parameter array.
 
-		# FIXME: This code (and that in "self.calc_nln_cur") may not be
-		#        especially efficient.
+			if ( pop_aniso ) :
 
-		( tk_t, tk_p, tk_v ) = indices( ( self.n_alt, self.n_azm,
-		                                  self.n_vel              ) )
+				pop_w     = ( self.nln_plas.arr_pop[p]['w_per'],
+				              self.nln_plas.arr_pop[p]['w_par'])
 
-		tk_t = tk_t.flatten( )
-		tk_p = tk_p.flatten( )
-		tk_v = tk_v.flatten( )
+				self.nln_gss_prm.append( pop_w[0] )
+				self.nln_gss_prm.append( pop_w[1] )
 
-		x_vel_cen = self.vel_cen[ tk_v ]
-		x_vel_wid = self.vel_wid[ tk_v ]
-		x_alt     = self.alt[ tk_t ]
-		x_azm     = self.azm[ tk_t, tk_p ]
-		x_mag_x   = self.mag_x[ tk_v ]
-		x_mag_y   = self.mag_y[ tk_v ]
-		x_mag_z   = self.mag_z[ tk_v ]
+			else :
 
-		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_azm,
-		             x_mag_x, x_mag_y, x_mag_z           ] )
+				pop_w     = self.nln_plas.arr_pop[p]['w']
 
-		self.nln_gss_cur_ion = reshape(
-		      self.calc_nln_cur( self.nln_gss_pop, x,
-		                         self.nln_gss_prm,
-		                         ret_comp=True        ),
-		      ( self.n_alt, self.n_azm, self.n_vel,
-		        len( self.nln_gss_pop )             )    )
+				self.nln_gss_prm.append( pop_w )
 
-		self.nln_gss_cur_tot = sum( self.nln_gss_cur_ion, axis=3 )
+			# For each datum in the spectrum, compute the expected
+			# current from each population.
+
+			self.nln_gss_curr_ion.append(
+			     self.fc_spec.calc_curr(
+			                    self.nln_plas.arr_pop[p]['m'],
+			                    self.nln_plas.arr_pop[p]['q'],
+			                    pop_v0_vec, pop_n, pop_dv, pop_w ) )
+
+		# Alter the axis order of the array of currents.
+
+		self.nln_gss_curr_ion = [ [ [ [ 
+		                     self.nln_gss_curr_ion[p][c][d][b]
+		                     for p in range( self.nln_gss_n_pop      ) ]
+		                     for b in range( self.fc_spec['n_bin']   ) ]
+		                     for d in range( self.fc_spec['n_dir']   ) ]
+		                     for c in range( self.fc_spec['n_cup']   ) ]
+
+		# For each datum in the spectrum, compute the total expected
+		# current (from all populations).
+
+		self.nln_gss_curr_tot = [ [ [ 
+		                     sum( self.nln_gss_curr_ion[c][d][b]     )
+		                     for b in range( self.fc_spec['n_bin']   ) ]
+		                     for d in range( self.fc_spec['n_dir']   ) ]
+		                     for c in range( self.fc_spec['n_cup']   ) ]
 
 		# Propagate the new initial-guess for the non-linear analysis.
 
@@ -2645,8 +1900,9 @@ class core( QObject ) :
 
 		# Intially deselect all data.
 
-		self.nln_sel = tile( False, [ self.n_alt, self.n_azm,
-		                              self.n_vel              ] )
+		self.nln_sel = tile( False, [ self.fc_spec['n_cup'],
+                                              self.fc_spec['n_dir'],
+		                              self.fc_spec['n_bin']   ] )
 
 		# Determine which ion species have been selected for analysis
 		# and have been given valid parameters, initial geusses, and
@@ -2670,22 +1926,25 @@ class core( QObject ) :
 		# Select data based on the selection windows from each of the
 		# look directions selected for the moments analysis.
 
-		( tk_t, tk_p ) = where( self.mom_sel_azm )
+		( tk_c, tk_d ) = where( self.mom_sel_dir )
 
-		n_tk = len( tk_t )
+		n_tk = len( tk_c )
+
+		arr_curr_valid = self.fc_spec['curr_valid']
+		arr_vel_cen    = self.fc_spec['vel_cen']
 
 		for j in range( n_tk ) :
 
 			# Extract the current look direction and convert it
 			# from altitude-azimuth to rectangular coordiantes.
 
-			t = tk_t[j]
-			p = tk_p[j]
+			c   = tk_c[j]
+			d   = tk_d[j]
 
-			alt = self.alt[t]
-			azm = self.azm[t,p]
+#			cup = self.cup[c]
+#			dir = self.dir[c,d]
 
-			dlk = self.calc_dir_look( alt, azm )
+			dlk = self.fc_spec.arr[c][d][0]['dir']
 
 			# Select data for each species.
 
@@ -2695,11 +1954,11 @@ class core( QObject ) :
 				# magnitude thereof) of this ion species (based
 				# on the initial guess).
 
-				vel = array( self.nln_pyon['vec_v0'] )
+				vel = array( self.nln_plas['vec_v0'] )
 
-				if ( self.nln_pyon.arr_pop[i]['drift'] ) :
+				if ( self.nln_plas.arr_pop[i]['drift'] ) :
 					vel += self.mfi_avg_nrm * \
-					          self.nln_pyon.arr_pop[i]['dv']
+					          self.nln_plas.arr_pop[i]['dv']
 
 				v = sqrt( vel[0]**2 + vel[1]**2 + vel[2]**2 )
 
@@ -2712,15 +1971,15 @@ class core( QObject ) :
 				# specified by this ion species' charge-to-mass
 				# ratio, initial geusses, and selection window.
 
-				if ( self.nln_pyon.arr_pop[i]['aniso'] ) :
+				if ( self.nln_plas.arr_pop[i]['aniso'] ) :
 					ang = abs( dot( dlk, self.mfi_avg_nrm ))
 					w = sqrt(
-					   ( self.nln_pyon.arr_pop[i]['w_per']
+					   ( self.nln_plas.arr_pop[i]['w_per']
 					                     * sin(ang) )**2 +
-					   ( self.nln_pyon.arr_pop[i]['w_par']
+					   ( self.nln_plas.arr_pop[i]['w_par']
 					                     * cos(ang) )**2   )
 				else :
-					w = self.nln_pyon.arr_pop[i]['w']
+					w = self.nln_plas.arr_pop[i]['w']
 
 				v_min = v_proj + ( self.nln_set_sel_a[i] *
 				                   w * v_proj / v          )
@@ -2728,22 +1987,24 @@ class core( QObject ) :
 				                   w * v_proj / v          )
 
 				v_min = v_min * sqrt(
-				               self.nln_pyon.arr_pop[i]['m'] /
-				               self.nln_pyon.arr_pop[i]['q']   )
+				               self.nln_plas.arr_pop[i]['m'] /
+				               self.nln_plas.arr_pop[i]['q']   )
 				v_max = v_max * sqrt(
-				               self.nln_pyon.arr_pop[i]['m'] /
-				               self.nln_pyon.arr_pop[i]['q']   )
+				               self.nln_plas.arr_pop[i]['m'] /
+				               self.nln_plas.arr_pop[i]['q']   )
 
 				# Select all seemingly valid measurements from
 				# this look direction that fall into this range
 				# range of inflow speeds.
 
-				tk = where( ( self.cur_vld[t,p,:]   ) &
-				            ( self.vel_cen >= v_min ) &
-				            ( self.vel_cen <= v_max )   )[0]
+				tk = where( 
+				     ( array( arr_curr_valid[c][d] )
+				            >= self.fc_spec['curr_min'] ) &
+				     ( array( arr_vel_cen[c] ) >= v_min ) &
+				     ( array( arr_vel_cen[c] ) <= v_max )   )[0]
 
-				if ( len( tk ) > 0 ) :
-					self.nln_sel[t,p,tk] = True
+				for b in tk :
+					self.nln_sel[c,d,b] = True
 
 		# Propagate the new data-selection for the non-linear analysis.
 
@@ -2753,7 +2014,7 @@ class core( QObject ) :
 	# DEFINE THE FUNCTION FOR CHANGING THE SELECTION OF A SINGLE POINT.
 	#-----------------------------------------------------------------------
 
-	def chng_nln_sel( self, t, p, v ) :
+	def chng_nln_sel( self, c, d, b ) :
 
 		# As this function was mostly likely called in response to the
 		# user manually adjusting the point selection for the
@@ -2766,16 +2027,17 @@ class core( QObject ) :
 
 		if ( self.nln_sel is None ) :
 			self.nln_sel = tile( False,
-			                     [ self.n_alt, self.n_azm,
-			                       self.n_vel              ] )
+			                     [ self.fc_spec['n_cup'],
+                                               self.fc_spec['n_dir'],
+			                       self.fc_spec['n_bin']     ] )
 
 		# Change the selection of the requested point.
 
-		self.nln_sel[t,p,v] = not self.nln_sel[t,p,v]
+		self.nln_sel[c,d,b] = not self.nln_sel[c,d,b]
 
 		# Propagate the new data-selection for the non-linear analysis.
 
-		self.prop_nln_sel( pnt=[t,p,v] )
+		self.prop_nln_sel( pnt=[c,d,b] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR PROPAGATING THE NLN DATA-SELECTION.
@@ -2793,7 +2055,7 @@ class core( QObject ) :
 		if ( pnt is None ) :
 			self.emit( SIGNAL('janus_chng_nln_sel_all') )
 		else :
-			self.emit( SIGNAL('janus_chng_nln_sel_cur'),
+			self.emit( SIGNAL('janus_chng_nln_sel_bin'),
 			           pnt[0], pnt[1], pnt[2]            )
 
 		# If dynamic updating of the non-linear fitting has been
@@ -2809,126 +2071,69 @@ class core( QObject ) :
 	# DEFINE THE FUNCTION FOR CALCULATING THE NLN MODEL CURRNET.
 	#-----------------------------------------------------------------------
 
-	def calc_nln_cur( self, pop, x, prm, ret_comp=False ) :
+	def calc_nln_curr( self, dat, prm ) :
 
-		# Extract the independent data variables (i.e., the
-		# specifications of the velocity windows and pointing
-		# directions).
+		# Initialize the returned list: the total calculated current for
+		# each datum.
 
-		d_vel_cen = x[0]
-		d_vel_wid = x[1]
-		d_alt     = x[2]
-		d_azm     = x[3]
-		d_mag_x   = x[4]
-		d_mag_y   = x[5]
-		d_mag_z   = x[6]
-
-		# Compute the normalized magnetic field values.
-
-		d_mag = sqrt( d_mag_x**2 + d_mag_y**2 + d_mag_z**2 )
-
-		d_nrm_x = d_mag_x / d_mag
-		d_nrm_y = d_mag_y / d_mag
-		d_nrm_z = d_mag_z / d_mag
+		curr = [ 0. for d in dat ]
 
 		# For each ion species, extract the passed parameters and
 		# calculate it's contribution to the total current.
 
-		if hasattr( x[0], '__iter__' ) :
-			cur = tile( 0., [ len( x[0] ), self.nln_n_pop ] )
-		else :
-			cur = tile( 0., self.nln_n_pop )
+		prm_v0 = ( prm[0], prm[1], prm[2] )
 
-		prm_v0_x = prm[0]
-		prm_v0_y = prm[1]
-		prm_v0_z = prm[2]
+		k = 3
 
-		c = 3
-
-		for p in pop :
+		for p in self.nln_gss_pop :
 
 			# Extract the density of population "p".
 
-			prm_n = prm[c]
+			prm_n = prm[k]
 
-			c += 1
+			k += 1
 
 			# Determine the bulk velocity of population "p",
 			# extracting (if necessary) the population's drift.
 
-			if ( self.nln_pyon.arr_pop[p]['drift'] ) :
+			if ( self.nln_plas.arr_pop[p]['drift'] ) :
 
-				prm_dv = prm[c]
+				prm_dv = prm[k]
 
-				c += 1
-
-				prm_v_x = prm_v0_x + ( prm_dv * d_nrm_x )
-				prm_v_y = prm_v0_y + ( prm_dv * d_nrm_y )
-				prm_v_z = prm_v0_z + ( prm_dv * d_nrm_z )
+				k += 1
 
 			else :
 
-				prm_v_x = prm_v0_x
-				prm_v_y = prm_v0_y
-				prm_v_z = prm_v0_z
+				prm_dv = 0.
 
 			# Extract the thermal speed(s).
 
-			if ( self.nln_pyon.arr_pop[p]['aniso'] ) :
+			if ( self.nln_plas.arr_pop[p]['aniso'] ) :
 
-				prm_w_per = prm[c  ]
-				prm_w_par = prm[c+1]
+				prm_w = ( prm[k], prm[k+1] )
 
-				c += 2
+				k += 2
 
 			else :
 
-				prm_w = prm[c]
+				prm_w = prm[k]
 
-				c += 1
+				k += 1
 
 			# Add the contribution of this ion species to
-			# the total current.
+			# the total currents.
 
-			sqm = sqrt( self.nln_pyon.arr_pop[p]['q'] /
-			            self.nln_pyon.arr_pop[p]['m']   )
+			for d in range( len( dat ) ) :
 
-			if ( self.nln_pyon.arr_pop[p]['aniso'] ) :
-				cur_p = self.nln_pyon.arr_pop[p]['q'] * \
-				        self.calc_cur_bmx(
-					            d_vel_cen * sqm,
-					            d_vel_wid * sqm,
-				                    d_alt, d_azm,
-					            d_nrm_x, d_nrm_y, d_nrm_z,
-				                    prm_n, prm_v_x,
-				                    prm_v_y, prm_v_z,
-				                    prm_w_per, prm_w_par       )
-			else :
-				cur_p = self.nln_pyon.arr_pop[p]['q'] * \
-				        self.calc_cur_max( d_vel_cen * sqm,
-					                   d_vel_wid * sqm,
-				                           d_alt, d_azm,
-				                           prm_n, prm_v_x,
-				                           prm_v_y, prm_v_z,
-				                           prm_w             )
+				curr[d] += dat[d].calc_curr(
+				                self.nln_plas.arr_pop[p]['m'],
+				                self.nln_plas.arr_pop[p]['q'],
+				                prm_v0, prm_n, prm_dv, prm_w   )
 
-			if hasattr( x[0], '__iter__' ) :
-				cur[:,p] = cur_p
-			else :
-				cur[p] = cur_p
+		# Return the list of total currents from all modeled ion
+		# species.
 
-		# Return the total current from all modeled ion species.
-
-		if hasattr( x[0], '__iter__' ) :
-			if ( ret_comp ) :
-				return cur[:,pop]
-			else :
-				return sum( cur, axis=1 )
-		else :
-			if ( ret_comp ) :
-				return cur[pop]
-			else :
-				return sum( cur, axis=0 )
+		return curr
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RUNNING THE NON-LINEAR ANALYSIS.
@@ -2938,13 +2143,11 @@ class core( QObject ) :
 
 		# Re-initialize the output of the non-linear analysis.
 
+		start = time.time()
 		self.rset_var( var_nln_res=True )
 
 		# Load the list of ion populations to be analyzed and the intial
 		# guess of their parameters.
-
-		pop = self.nln_gss_pop
-		gss = self.nln_gss_prm
 
 		# If any of the following conditions are met, emit a signal that
 		# indicates that the results of the non-linear analysis have
@@ -2955,11 +2158,12 @@ class core( QObject ) :
 		#   -- No initial guess has been generated.
 		#   -- Insufficient data have been selected.
 
-		if ( ( self.n_vel == 0                   ) or
+		if ( ( self.fc_spec is None              ) or
+		     ( self.fc_spec['n_bin'] == 0        ) or
 		     ( self.n_mfi == 0                   ) or
-		     ( len( pop ) == 0                   ) or
-		     ( 0 not in pop                      ) or
-		     ( len( gss ) == 0                   ) or
+		     ( len( self.nln_gss_pop ) == 0      ) or
+		     ( 0 not in self.nln_gss_pop         ) or
+		     ( len( self.nln_gss_prm ) == 0      ) or
 		     ( self.nln_n_sel < self.nln_min_sel )    ) :
 
 			self.emit( SIGNAL('janus_mesg'),
@@ -2977,37 +2181,44 @@ class core( QObject ) :
 
 		def model( x, *p ) :
 
-			return self.calc_nln_cur( pop, x, array( p ) )
+			return self.calc_nln_curr( x, p )
 
-		# Save the data selection and then use it to generate data
+                # Save the data selection and then use it to generate data
 		# arrays for the non-linear fit.
 
 		self.nln_res_sel = self.nln_sel.copy( )
 
-		( tk_t, tk_p, tk_v ) = where( self.nln_res_sel )
+		# Extract the data selection.
 
-		x_vel_cen = self.vel_cen[ tk_v ]
-		x_vel_wid = self.vel_wid[ tk_v ]
-		x_alt     = self.alt[ tk_t ]
-		x_azm     = self.azm[ tk_t, tk_p ]
-		x_mag_x   = self.mag_x[ tk_v ]
-		x_mag_y   = self.mag_y[ tk_v ]
-		x_mag_z   = self.mag_z[ tk_v ]
+		x = [ ]
 
-		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_azm,
-		             x_mag_x, x_mag_y, x_mag_z           ] )
+		for c in range( self.fc_spec['n_cup'] ) :
 
-		y = self.cur[ tk_t, tk_p, tk_v ]
+			for d in range( self.fc_spec['n_dir'] ) :
+
+				for b in range( self.fc_spec['n_bin'] ) :
+
+					if ( self.nln_res_sel[c][d][b] ) :
+
+						x.append(
+						     self.fc_spec.arr[c][d][b] )
+
+		y = [ xx['curr'] for xx in x ]
+
+		# Compute the uncertainties.
+
+		sigma = [ sqrt( yy ) for yy in y ]
 
 		# Attempt to perform the non-linear fit.  If this fails, reset
 		# the associated variables and abort.
 
 		try :
 
-			( fit, covar ) = curve_fit( model, x, y, gss,
-			                            sigma=sqrt(y)     )
+			( fit, covar ) = curve_fit( model, x, y, 
+			                            self.nln_gss_prm,
+			                            sigma=sigma       )
 
-			sigma = sqrt( diag( covar ) )
+			sig = sqrt( diag( covar ) )
 
 		except :
 
@@ -3019,67 +2230,46 @@ class core( QObject ) :
 
 			return
 
-		# Calculate the expected currents based on the results of the
-		# non-linear analysis.
-
-		( tk_t, tk_p, tk_v ) = indices( ( self.n_alt, self.n_azm,
-		                                  self.n_vel              ) )
-
-		tk_t = tk_t.flatten( )
-		tk_p = tk_p.flatten( )
-		tk_v = tk_v.flatten( )
-
-		x_vel_cen = self.vel_cen[ tk_v ]
-		x_vel_wid = self.vel_wid[ tk_v ]
-		x_alt     = self.alt[ tk_t ]
-		x_azm     = self.azm[ tk_t, tk_p ]
-		x_mag_x   = self.mag_x[ tk_v ]
-		x_mag_y   = self.mag_y[ tk_v ]
-		x_mag_z   = self.mag_z[ tk_v ]
-
-		x = array( [ x_vel_cen, x_vel_wid, x_alt, x_azm,
-		             x_mag_x, x_mag_y, x_mag_z           ] )
-
-		self.nln_res_cur_ion = \
-		   reshape( self.calc_nln_cur( pop, x, fit, ret_comp=True ),
-		            ( self.n_alt, self.n_azm, self.n_vel, len( pop ) ) )
-
-		self.nln_res_cur_tot = sum( self.nln_res_cur_ion, axis=3 )
-
 		# Save the properties and fit parameters for each ion species
 		# used in this analysis.
 
-		self.nln_res_plas.covar = covar.copy( )
+		self.nln_res_plas = plas( enforce=False )
 
-		self.nln_res_plas['time'] = self.time_epc
+		self.nln_res_plas.covar       = covar.copy( )
 
-		self.nln_res_plas['b0_x'] = self.mfi_avg_vec[0]
-		self.nln_res_plas['b0_y'] = self.mfi_avg_vec[1]
-		self.nln_res_plas['b0_z'] = self.mfi_avg_vec[2]
+		self.nln_res_plas['time']     = self.time_epc
 
-		self.nln_res_plas['v0_x'] = fit[0]
-		self.nln_res_plas['v0_y'] = fit[1]
-		self.nln_res_plas['v0_z'] = fit[2]
-		self.nln_res_plas['sig_v0_x'] = sigma[0]
-		self.nln_res_plas['sig_v0_y'] = sigma[1]
-		self.nln_res_plas['sig_v0_z'] = sigma[2]
+		self.nln_res_plas['b0_x']     = self.mfi_avg_vec[0]
+		self.nln_res_plas['b0_y']     = self.mfi_avg_vec[1]
+		self.nln_res_plas['b0_z']     = self.mfi_avg_vec[2]
+
+		pop_v0_vec                    = [fit[0], fit[1], fit[2]]
+		self.nln_res_plas['v0_x']     = fit[0]
+		self.nln_res_plas['v0_y']     = fit[1]
+		self.nln_res_plas['v0_z']     = fit[2]
+		self.nln_res_plas['sig_v0_x'] = sig[0]
+		self.nln_res_plas['sig_v0_y'] = sig[1]
+		self.nln_res_plas['sig_v0_z'] = sig[2]
+
 		c = 3
 
-		for i in pop :
+		self.nln_res_curr_ion = []
+
+		for p in self.nln_gss_pop :
 
 			# If necessary, add this population's species to the
 			# results.
 
-			spc_name = self.nln_pyon.arr_pop[i].my_spec['name']
+			spc_name = self.nln_plas.arr_pop[p].my_spec['name']
 
 			if ( self.nln_res_plas.get_spec( spc_name ) is None ) :
 
 				spc_sym = \
-				         self.nln_pyon.arr_pop[i].my_spec['sym']
+				         self.nln_plas.arr_pop[p].my_spec['sym']
 				spc_m   = \
-				         self.nln_pyon.arr_pop[i].my_spec['m'  ]
+				         self.nln_plas.arr_pop[p].my_spec['m'  ]
 				spc_q   = \
-				         self.nln_pyon.arr_pop[i].my_spec['q'  ]
+				         self.nln_plas.arr_pop[p].my_spec['q'  ]
 
 				self.nln_res_plas.add_spec(
 				                   name=spc_name, sym=spc_sym,
@@ -3087,51 +2277,75 @@ class core( QObject ) :
 
 			# Add the population itself to the results.
 
-			pop_drift = self.nln_pyon.arr_pop[i]['drift']
-			pop_aniso = self.nln_pyon.arr_pop[i]['aniso']
-			pop_name  = self.nln_pyon.arr_pop[i]['name']
-			pop_sym   = self.nln_pyon.arr_pop[i]['sym']
+			pop_drift = self.nln_plas.arr_pop[p]['drift']
+			pop_aniso = self.nln_plas.arr_pop[p]['aniso']
+			pop_name  = self.nln_plas.arr_pop[p]['name']
+			pop_sym   = self.nln_plas.arr_pop[p]['sym']
 
-			pop_n   = fit[c]
-			pop_sig_n = sigma[c]
+			pop_n     = fit[c]
+			pop_sig_n = sig[c]
 			c += 1
 
 			if ( pop_drift ) :
-				pop_dv = fit[c]
-				pop_sig_dv = sigma[c]
+				pop_dv     = fit[c]
+				pop_sig_dv = sig[c]
 				c += 1
 			else :
-				pop_dv = None
+				pop_dv     = None
 				pop_sig_dv = None
 
 			if ( pop_aniso ) :
-				pop_w     = None
-				pop_w_per = fit[c  ]
-				pop_w_par = fit[c+1]
+				pop_w         = [ fit[c], fit[c+1] ]
 				pop_sig_w     = None
-				pop_sig_w_per = sigma[c  ]
-				pop_sig_w_par = sigma[c+1]
+				pop_sig_w_per = sig[c  ]
+				pop_sig_w_par = sig[c+1]
 				c += 2
 			else :
-				pop_w     = fit[c]
-				pop_w_per = None
-				pop_w_par = None
-				pop_sig_w     = sigma[c]
-				pop_sig_w_per = None
+				pop_w         = fit[c]
+				pop_sig_w     = sig[c]
+				pop_sig_w_per = None 
 				pop_sig_w_par = None
 				c += 1
 
 			self.nln_res_plas.add_pop(
-			       spc=spc_name, drift=pop_drift, aniso=pop_aniso,
-			       name=pop_name, sym=pop_sym, n=pop_n, dv=pop_dv,
-			       w=pop_w, w_per=pop_w_per, w_par=pop_w_par,
-			       sig_n=pop_sig_n, sig_dv=pop_sig_dv, sig_w=pop_sig_w,
-			       sig_w_per=pop_sig_w_per, sig_w_par=pop_sig_w_par        )
+			       spc=spc_name, drift=pop_drift,
+			       aniso=pop_aniso, name=pop_name,
+			       sym=pop_sym, n=pop_n, dv=pop_dv, w=pop_w,
+			       sig_n=pop_sig_n, sig_dv=pop_sig_dv, 
+			       sig_w=pop_sig_w, sig_w_per=pop_sig_w_per,
+			       sig_w_par=pop_sig_w_par                    )
+
+			# For each datum in the spectrum, compute the expected
+			# current from each population.
+
+			self.nln_res_curr_ion.append(
+			     self.fc_spec.calc_curr ( 
+			                  self.nln_plas.arr_pop[p]['m'],
+			                  self.nln_plas.arr_pop[p]['q'],
+			                  pop_v0_vec, pop_n, pop_dv, pop_w ) )
 
 		# Save the results of the this non-linear analysis to the
 		# results log.
 
 		self.series.add_spec( self.nln_res_plas )
+
+		# Calculate the expected currents based on the results of the
+		# non-linear analysis.
+
+		self.nln_res_curr_ion = [ [ [ [
+		                     self.nln_res_curr_ion[p][c][d][b]
+		                     for p in range( len(self.nln_res_plas.arr_pop) ) ]
+		                     for b in range( self.fc_spec['n_bin']   ) ]
+		                     for d in range( self.fc_spec['n_dir']   ) ]
+		                     for c in range( self.fc_spec['n_cup']   ) ]
+
+		self.nln_res_curr_tot =[ [ [ 
+		                           sum( self.nln_res_curr_ion[c][d][b] )
+		                     for b in range( self.fc_spec['n_bin']   ) ]
+		                     for d in range( self.fc_spec['n_dir']   ) ]
+		                     for c in range( self.fc_spec['n_cup']   ) ]
+
+
 
 		# Message the user that the non-linear analysis has finished.
 
@@ -3139,6 +2353,8 @@ class core( QObject ) :
 
 		# Emit a signal that indicates that the results of the
 		# non-linear analysis have changed.
+
+                self.nln_res_runtime = (time.time()-start)
 
 		self.emit( SIGNAL('janus_chng_nln_res') )
 
@@ -3328,8 +2544,8 @@ class core( QObject ) :
 				if ( self.n_mfi == 0 ) :
 					self.stop_auto_run = True
 					break
-				if ( ( self.dyn_mom       ) and
-				     ( self.mom_n is None )     ) :
+				if ( ( self.dyn_mom         ) and
+				     ( self.mom_res is None )     ) :
 					self.stop_auto_run = True
 					break
 				if ( ( self.dyn_nln               ) and
@@ -3464,7 +2680,7 @@ class core( QObject ) :
 		fl.write( '#      that value written immediately below it.\n'  )
 		fl.write( '#      Uncertainty values are absolute (versus\n'   )
 		fl.write( '#      relative) uncertainties and are scaled so\n' )
-                fl.write( '#      that the reduced chi-squared returned by\n'  )
+		fl.write( '#      that the reduced chi-squared returned by\n'  )
 		fl.write( '#      the non-linear fit is unity.\n'              )
 		fl.write( '#   -- The units on numerical quantities are as\n'  )
 		fl.write( '#      follows:\n'                                  )
@@ -3515,6 +2731,22 @@ class core( QObject ) :
 
 				fl.write( '\n' )
 				fl.write( 'Species:    ' )
+			fl.write( txt_num.format( plas['v0_z'] ) )
+			fl.write( '\n' )
+			fl.write( txt_spc )
+			fl.write( txt_num.format( plas['sig_v0_x'] ) )
+			fl.write( txt_num.format( plas['sig_v0_y'] ) )
+			fl.write( txt_num.format( plas['sig_v0_z'] ) )
+
+			# Write the values for each species.
+
+			for spec in plas.arr_spec :
+
+				# Write the values for the general parameters of
+				# the species.
+
+				fl.write( '\n' )
+				fl.write( 'Species:    ' )
 				fl.write( spec['name'] )
 				fl.write( ' (' )
 				fl.write( spec['sym'] )
@@ -3535,7 +2767,7 @@ class core( QObject ) :
 
 					fl.write( '\n' )
 					fl.write( txt_spc )
-					fl.write( ' ' )	
+					fl.write( ' ' )
 					fl.write( 'Population: ' )
 					fl.write( pop['name'] )
 					fl.write( ' (' )

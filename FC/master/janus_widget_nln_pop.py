@@ -70,6 +70,8 @@ class widget_nln_pop( QWidget ) :
 
 		self.connect( self.core, SIGNAL('janus_chng_nln_ion'),
 		                                        self.resp_chng_nln_ion )
+		self.connect( self.core, SIGNAL('janus_chng_nln_pop'),
+		                                        self.resp_chng_nln_pop )
 
 		# Give this widget a grid layout, "self.grd".
 
@@ -180,20 +182,20 @@ class widget_nln_pop( QWidget ) :
 
 			tmp_use = self.core.nln_pop_use[i]
 
-			tmp_ion   = self.core.nln_pyon.arr_pop[i]['spec']
-			tmp_name  = self.core.nln_pyon.arr_pop[i]['name']
-			tmp_sym   = self.core.nln_pyon.arr_pop[i]['sym']
-			tmp_drift = self.core.nln_pyon.arr_pop[i]['drift']
-			tmp_aniso = self.core.nln_pyon.arr_pop[i]['aniso']
+			tmp_ion   = self.core.nln_plas.arr_pop[i]['spec']
+			tmp_name  = self.core.nln_plas.arr_pop[i]['name']
+			tmp_sym   = self.core.nln_plas.arr_pop[i]['sym']
+			tmp_drift = self.core.nln_plas.arr_pop[i]['drift']
+			tmp_aniso = self.core.nln_plas.arr_pop[i]['aniso']
 
 			# Construct the list of ion-species names/symbols.
 
 			lst_ion = [ str( s['name'] )
-			            for s in self.core.nln_pyon.arr_spec ]
+			            for s in self.core.nln_plas.arr_spec ]
 
 			lst_ion = [ '' ]
 
-			for s in self.core.nln_pyon.arr_spec :
+			for s in self.core.nln_plas.arr_spec :
 
 				txt = ''
 
@@ -237,7 +239,7 @@ class widget_nln_pop( QWidget ) :
 				self.arr_ion[i].addItems( lst_ion )
 
 				try :
-					s = self.core.nln_pyon.arr_spec.index(
+					s = self.core.nln_plas.arr_spec.index(
 					                           tmp_ion ) + 1
 				except :
 					s = 0
@@ -326,9 +328,6 @@ class widget_nln_pop( QWidget ) :
 		# Determine which parameter has been changed by the user and
 		# what its new value is.
 
-		pop_name = None
-		pop_sym  = None
-
 		if   ( fnc[0] == 'u' ) :
 
 			param = 'use'
@@ -338,9 +337,6 @@ class widget_nln_pop( QWidget ) :
 
 			param = 'spec'
 			val   = self.arr_ion[i].currentIndex( ) - 1
-
-			pop_name = str( self.arr_name[i].text( ) )
-			pop_sym  = str( self.arr_sym[i].text(  ) )
 
 		elif ( fnc[0] == 'n' ) :
 
@@ -370,8 +366,33 @@ class widget_nln_pop( QWidget ) :
 		# appropriately.
 
 		Thread( target=thread_chng_nln_pop,
-		        args=( self.core, i, param, val,
-		               pop_name, pop_sym         ) ).start( )
+		        args=( self.core, i, param, val ) ).start( )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_nln_pop" SIGNAL.
+	#-----------------------------------------------------------------------
+
+	def resp_chng_nln_pop( self, i ) :
+
+		# If the value of "i" is invalid, abort.
+
+		try :
+			i = int( i )
+		except :
+			return
+
+		if ( ( i < 0 ) or ( i >= self.core.nln_n_pop ) ) :
+			return
+
+		# Clear the stored text for the i-th population's name and
+		# symbol.
+
+		self.arr_name[i].clear( )
+		self.arr_sym[i].clear( )
+
+		# Repopulate the text and checkmarks in this widget.
+
+		self.make_txt( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_nln_ion" SIGNAL.
