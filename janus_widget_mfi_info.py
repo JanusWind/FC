@@ -139,6 +139,7 @@ class widget_mfi_info( format_TextEdit ) :
 		self.prnt_htm( '<i>&Psi;<sub>B<sub><i> = ' )
 		self.prnt_dcm( self.core.mfi_psi_b_avg, 1, '<sup>o</sup>')
 
+
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "rset" SIGNAL.
 	#-----------------------------------------------------------------------

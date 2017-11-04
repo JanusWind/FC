@@ -97,6 +97,7 @@ class widget_mfi_ang_plot( QWidget ) :
 		self.pen_crv_colat = mkPen( color='#8B008B' )
 		self.pen_crv_lon   = mkPen( color='#FFD700' )
 
+
 		self.fnt = self.core.app.font( )
 
 		# Configure the plot: disable automatic adjustments and
@@ -118,6 +119,7 @@ class widget_mfi_ang_plot( QWidget ) :
 		labelStyle = {'color':'k'}
 		self.axs_x.setLabel( 'Time [s]'           , **labelStyle )
 		self.axs_y.setLabel( 'Elev. & Azim. [deg]', **labelStyle )
+
 
 		self.axs_x.label.setFont( self.fnt )
 		self.axs_y.label.setFont( self.fnt )
@@ -180,7 +182,7 @@ class widget_mfi_ang_plot( QWidget ) :
 			d_t = max( 1.5 + d_t_0, 3. )
 
 			t_max = t_min + d_t
-			
+
 		else :
 
 			t_min = 0.001
@@ -193,6 +195,7 @@ class widget_mfi_ang_plot( QWidget ) :
 
 		self.plt.setXRange( t_min, t_max, padding=0.0 )
 		self.plt.setYRange( ang_min, ang_max, padding=0.0 )
+
 
 		# If the core contains no Wind/MFI magnetic field data, return.
 

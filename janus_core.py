@@ -235,6 +235,7 @@ class core( QObject ) :
 	              var_nln_sel = False, var_nln_res = False,
 	              var_dsp     = False, var_dyn     = False          ) :
 
+
 		# If requested, (re-)initialize the variables associated with
 		# the ion spectrum's data.
 
@@ -635,7 +636,7 @@ class core( QObject ) :
 		if ( self.dyn_mom ) :
 			self.auto_mom_sel( )
 
-	#-----------------------------------------------------------------------
+  #-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING THE Wind/MFI MAGNETIC FIELD DATA.
 	#-----------------------------------------------------------------------
 
@@ -687,7 +688,7 @@ class core( QObject ) :
                                      self.mfi_b_y[i]**2 +
                                      self.mfi_b_z[i]**2 )
                                      for i in range( len( self.mfi_b_x ) ) ]
-
+    
 		# Compute the average magetic field.
 
 		self.mfi_avg_vec = array( [ mean( self.mfi_b_x ),
@@ -751,7 +752,7 @@ class core( QObject ) :
 
 		# Try to convert the "val" argument to an integer and store it.
 		# If this fails, store "None".
-
+    
 		if ( val is None ) :
 			self.mom_win_dir = None
 		else :
@@ -832,7 +833,6 @@ class core( QObject ) :
 
 		# Find the maximum current window (of "self.mom_win_bin" bins)
 		# for each direction
-
 		dir_max_ind  = [ [ self.fc_spec.find_max_curr( c, d,
 		                             win=self.mom_win_bin            )
 		                             for d in range(self.fc_spec['n_dir']) ]
@@ -1163,7 +1163,7 @@ class core( QObject ) :
 		# Calculate a net estimators of the number density and thermal
 		# speed.
 
-		# Note.  The total signal for a look direction is roughly 
+		# Note.  The total signal for a look direction is roughly
 		#        proportional to its effective collecting area.  Thus,
 		#        the reciprical of the effective collecting area can be
 		#        thought of a crude indicator of the uncertainty in the
@@ -1289,8 +1289,7 @@ class core( QObject ) :
 	# DEFINE THE FUNCTION FOR CHANGING A NLN POPULATION.
 	#-----------------------------------------------------------------------
 
-	def chng_nln_pop( self, i, param, val,
-	                  pop_name=None, pop_sym=None ) :
+	def chng_nln_pop( self, i, param, val ) :
 
 		# Ensure that "i" is a valid ion-population index.
 
@@ -2145,7 +2144,6 @@ class core( QObject ) :
 		# Re-initialize the output of the non-linear analysis.
 
 		start = time.time()
-
 		self.rset_var( var_nln_res=True )
 
 		# Load the list of ion populations to be analyzed and the intial
@@ -2682,7 +2680,7 @@ class core( QObject ) :
 		fl.write( '#      that value written immediately below it.\n'  )
 		fl.write( '#      Uncertainty values are absolute (versus\n'   )
 		fl.write( '#      relative) uncertainties and are scaled so\n' )
-                fl.write( '#      that the reduced chi-squared returned by\n'  )
+		fl.write( '#      that the reduced chi-squared returned by\n'  )
 		fl.write( '#      the non-linear fit is unity.\n'              )
 		fl.write( '#   -- The units on numerical quantities are as\n'  )
 		fl.write( '#      follows:\n'                                  )
@@ -2769,7 +2767,7 @@ class core( QObject ) :
 
 					fl.write( '\n' )
 					fl.write( txt_spc )
-					fl.write( ' ' )	
+					fl.write( ' ' )
 					fl.write( 'Population: ' )
 					fl.write( pop['name'] )
 					fl.write( ' (' )

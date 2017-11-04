@@ -38,7 +38,6 @@ from pyqtgraph import mkPen, PlotDataItem, PlotWidget, setConfigOption
 
 from numpy import amax, amin, array
 
-
 ################################################################################
 ## DEFINE THE "widget_mfi_lin_plot" CLASS FOR "QWidget" TO PLOT MFI DATA.
 ################################################################################
@@ -99,7 +98,6 @@ class widget_mfi_lin_plot( QWidget ) :
 		self.pen_crv_x = mkPen( color='r' )
 		self.pen_crv_y = mkPen( color='g' )
 		self.pen_crv_z = mkPen( color='b' )
-
 
 		self.fnt = self.core.app.font( )
 
@@ -258,6 +256,7 @@ class widget_mfi_lin_plot( QWidget ) :
 
 		# if ( self.crv_lon is not None ) :
 		# 	self.plt.removeItem( self.crv_lon )
+
 
 		# Permanently delete this plot's elements by setting each of the
 		# variables that store them to "None".

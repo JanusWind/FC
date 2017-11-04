@@ -42,6 +42,8 @@ from math import log10, floor
 
 from janus_helper import round_sig
 
+from tabulate import tabulate
+
 
 ################################################################################
 ## DEFINE CLASS "widget_nln_res" TO CUSTOMIZE "format_TextEdit" FOR NLN OUTPUT.
