@@ -1,4 +1,6 @@
 *.pyc
+*.swp
+*.swo
 results/export/*.dat
 results/save/*.jns
 data/fc/*.cdf
