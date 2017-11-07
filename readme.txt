@@ -1,7 +1,12 @@
-Changes from the previous version: (Development)
+Changes from the previous version:
 
-1. Added calculation of 2 higer order moments and beta (perp and par) to janus_pyon.py
-2. Fixed some existing bugs.
-3. Tweaked janus_core.py to be compatible with updated pyon.
-4. Added a new tab to plot co-latitude and longitude angles as a function of time under mfi widget.
-5. Added calculation of median magnetic deviation angle to janus_core.py and displayed under mfi widget sumary.
+1. Major changes in 'janus_core.py'. The code is parsed into three different
+   files ('janus_core.py','janus_fc_dat.py' and 'janus_fc_spec.py').
+2. Functions in 'janus_core.py' were re-written to be compatible with the two
+   new files.
+3. MFI widget now has 4 different tabs to show the magnetic field components
+   in x,y and z directions, and then along the co-latitude and longitude, 
+   and the fourth tab lists out the average value of all those parameters
+   including the avarage variation from the mean magnetic field.
+4. The result widget now shows results for 3rd and 4th order moments and
+   the time taken to run the non-linear analysis.
