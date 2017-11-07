@@ -1,4 +1,4 @@
-# Lists all the git commands which are required to push the changes made.
+# Lists all the git commands required to push the changes to online repository.
 
 git add --a
 git commit -a
