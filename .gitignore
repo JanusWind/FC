@@ -5,4 +5,4 @@ results/export/*.dat
 results/save/*.jns
 data/fc/*.cdf
 data/mfi/*.cdf
-upload.py
+upload.*
