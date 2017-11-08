@@ -49,6 +49,7 @@ def n_thread( ) :
 		     ( thr._Thread__target is thread_chng_dsp         ) or
 		     ( thr._Thread__target is thread_chng_dyn         ) or
 		     ( thr._Thread__target is thread_auto_run         ) or
+		     ( thr._Thread__target is thread_opt_men          ) or
 		     ( thr._Thread__target is thread_save_res         ) or
 		     ( thr._Thread__target is thread_xprt_res         ) or
 		     ( thr._Thread__target is thread_chng_mom_sel     ) or
@@ -150,6 +151,22 @@ def thread_auto_run( core, t_strt, t_stop,
         core.auto_run( t_strt, t_stop, get_next, err_halt, pause )
 
         core.emit( SIGNAL('janus_busy_end') )
+
+
+################################################################################
+## DEFINE THE WRAPPER FOR THE FUNCTION "core.opt_men".
+################################################################################
+
+def thread_opt_men( core, temp=None, tvel=None,
+                          skew=None, kurt=None ) :
+
+        core.emit( SIGNAL('janus_busy_end') )
+        core.emit( SIGNAL('janus_busy_beg') )
+
+        core.opt_men( temp, tvel, skew, kurt )
+
+        core.emit( SIGNAL('janus_busy_end') )
+
 
 
 ################################################################################

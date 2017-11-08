@@ -2583,6 +2583,21 @@ class core( QObject ) :
 		self.emit( SIGNAL('janus_done_auto_run') )
 
 	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR DISPLAY OPTIONS.
+	#-----------------------------------------------------------------------
+
+	def opt_men( self, temp=None, tvel=None, skew=None, kurt=None ) :
+
+		# Supply values for any missing keywords.
+
+		temp = False if ( temp is None ) else temp
+		tvel = False if ( tvel is None ) else tvel
+		skew = False if ( skew is None ) else skew
+		kurt = False if ( kurt is None ) else kurt
+
+
+
+	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR SAVING THE RESULTS LOG TO A FILE.
 	#-----------------------------------------------------------------------
 

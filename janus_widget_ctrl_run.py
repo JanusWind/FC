@@ -36,9 +36,10 @@ from janus_event_PushButton import event_PushButton
 
 # Load the customized dialog windows.
 
+from janus_dialog_opt import dialog_opt
+from janus_dialog_missing import dialog_missing
 from janus_dialog_auto_ctrl import dialog_auto_ctrl
 from janus_dialog_auto_prog import dialog_auto_prog
-from janus_dialog_missing import dialog_missing
 
 # Load the modules necessary for time convertion.
 
@@ -48,7 +49,7 @@ from janus_time import calc_time_epc
 
 from threading import Thread
 from janus_thread import n_thread, thread_anls_mom, thread_anls_nln, \
-                         thread_auto_run, thread_save_res
+                         thread_auto_run, thread_opt_men, thread_save_res
 
 
 ################################################################################
@@ -116,6 +117,11 @@ class widget_ctrl_run( QWidget ) :
 		self.req_auto_next = False
 		self.req_auto_halt = True
 
+		self.req_opt_temp = True
+		self.req_opt_tvel = False
+		self.req_opt_skew = True
+		self.req_opt_kurt = True
+
 		# Initialize the variable that will hold the progress-bar dialog
 		# (if an when one is created).
 
@@ -176,6 +182,23 @@ class widget_ctrl_run( QWidget ) :
 			if ( not self.core.debug ) :
 				dialog_missing( ).alert( )
 				return
+
+			disp_opt = dialog_opt( temp= self.req_opt_temp
+			# Assuming that there still aren't any janus threads
+			# running, start a new thread for the options menu.
+
+			if ( n_thread( ) == 0 ) :
+
+				# Start a new thread that automatically loads
+				# and processes each spectrum in the time range
+				# specified by the user.
+
+				Thread( target=thread_opt_men,
+				        args=( self.core,
+				               self.req_opt_temp, 
+				               self.req_opt_tvel,
+				               self.req_opt_skew,
+				               self.req_opt_kurt   ) ).start( )
 
 			# Return.
 
