@@ -183,7 +183,20 @@ class widget_ctrl_run( QWidget ) :
 				dialog_missing( ).alert( )
 				return
 
-			disp_opt = dialog_opt( temp= self.req_opt_temp
+			# Launch a dialog box to request options from the user.
+
+			disp_opt = dialog_opt( 
+			               temp = self.req_opt_temp,
+			               tvel = self.req_opt_tvel,
+			               skew = self.req_opt_skew,
+			               kurt = self.req_opt_kurt
+			                                        ).get_opt_men( )
+
+			self.req_opt_temp = disp_opt[0]
+                        self.req_opt_tvel = disp_opt[1]
+                        self.req_opt_skew = disp_opt[2]
+                        self.req_opt_kurt = disp_opt[3]
+
 			# Assuming that there still aren't any janus threads
 			# running, start a new thread for the options menu.
 
