@@ -56,44 +56,84 @@ class spin_arcv( object ) :
 	# DEFINE THE INITIALIZATION FUNCTION.
 	#-----------------------------------------------------------------------
 
-	def __init__( self, core=None, buf=3600., tol=0., win=None,
+	def __init__( self, core=None, buf=None, tol=None, win=None,
 	                    n_file_max=None, n_date_max=None,
-	                    path=None, verbose=True                 ) :
+	                    path=None, verbose=None                 ) :
 
-		# Save the arguments for later use.
+		# Save the arguments for later use and, if necessary,
+		#provide values
 
-		self.core = core
+		self.core       = core
 
-		self.win = int( win ) if ( win is not None ) else self.win = 5
+		self.buf        = float( buf )      if ( buf is not None )     \
+						    else 3600.
 
-		self.verbose = bool( verbose ) if ( verbose is not None ) else self.verbose = True
+		self.tol        = float( tol )      if ( tol 
+		                                         is not None )         \
+		                                    else 0.
+
+		self.win        = int( win )        if ( win 
+		                                         is not None )         \
+		                                    else 5
+
+		self.n_file_max = int( n_file_max ) if ( n_file_max 
+		                                         is not None )         \
+		                                    else float( 'infinity' )
+
+		self.n_date_max = int( n_date_max ) if ( n_date_max 
+		                                         is not None )         \
+		                                    else 40
+
+		self.path       = str( path )       if ( path 
+		                                         is not None )         \
+		                                    else os.path.join( 
+		                                            os.path.dirname( 
+		                                               __file__ ), 
+		                                               'data', 'spin'  )
+
+		self.verbose    = bool( verbose )   if ( verbose 
+		                                         is not None )         \
+		                                    else True
 
 		#TODO Rest of variables
 
-		self.buf        = buf
-		self.tol        = tol
-		self.path       = path
-		self.n_file_max = n_file_max
-		self.n_date_max = n_date_max
-		self.verbose    = verbose
+#		self.buf        = buf
+#		self.tol        = tol
+#		self.path       = path
+#		self.n_file_max = n_file_max
+#		self.n_date_max = n_date_max
+#		self.verbose    = verbose
 
-		# Validate the values of the parameters and, if necessary,
-		# provide values.
+		# Validate the values of the parameters.
+
+		if ( self.buf < 0 ) :
+			raise ValueError( 'Time buffer cannot be negative.'    )
+
+		if (self.tol < 0 ) :
+			raise ValueError( 'Time tolerance cannot be negative.' )
 
 		if ( self.win <= 0 ) :
-			raise ValueError( 'Median window must be at least 1.' )
+			raise ValueError( 'Median window must be at least 1.'  )
+
+		if ( self.n_file_max < 0 ) :
+			raise ValueError( 'Maximum number of files \
+			                                  cannot be negative.' )
+
+		if ( self.n_date_max < 0 ) :
+			raise ValueError( 'Maximum number of dates \
+			                                  cannot be negative.' )
 
 		#TODO Rest of variables
 
-		if ( ( self.n_file_max is None ) or ( self.n_file_max < 0 ) ) :
-			self.n_file_max = float( 'infinity' )
-
-		if ( ( self.n_date_max is None ) or ( self.n_date_max < 0 ) ) :
-			self.n_date_max = 40
-
-		if ( self.path is None ) :
-			self.path = os.path.join( os.path.dirname( __file__ ),
-			                          'data', 'spin'               )
+#		if ( ( self.n_file_max is None ) or ( self.n_file_max < 0 ) ) :
+#			self.n_file_max = float( 'infinity' )
+#
+#		if ( ( self.n_date_max is None ) or ( self.n_date_max < 0 ) ) :
+#			self.n_date_max = 40
+#
+#		if ( self.path is None ) :
+#			self.path = os.path.join( os.path.dirname( __file__ ),
+#			                          'data', 'spin'               )
 
 		# Initialize the list of dates loaded.
 
@@ -154,9 +194,9 @@ class spin_arcv( object ) :
 
 		# Identify and extract the requested range of Wind/MFI data.
 
-		tk = where( ( self.mfi_t >= ( time_strt_epc -
+		tk = where( ( self.arr_spin_t >= ( time_strt_epc -
 		                              timedelta( 0, self.tol ) ) ) &
-		            ( self.mfi_t <= ( time_stop_epc +
+		            ( self.arr_spin_t <= ( time_stop_epc +
 		                              timedelta( 0, self.tol ) ) )   )
 		tk = tk[0]
 
@@ -166,24 +206,18 @@ class spin_arcv( object ) :
 
 			self.mesg_txt( 'none' )
 
-			ret_t   = array( [ ] )
-			ret_b_x = array( [ ] )
-			ret_b_y = array( [ ] )
-			ret_b_z = array( [ ] )
+			ret_t = array( [ ] )
+			ret_w = array( [ ] )
 
 		else :
 
-			ret_t   = self.mfi_t[tk]
-			ret_b_x = self.mfi_b_x[tk]
-			ret_b_y = self.mfi_b_y[tk]
-			ret_b_z = self.mfi_b_z[tk]
+			ret_t = self.arr_spin_t[tk]
+			ret_w = self.arr_spin_w[tk]
 
 			srt = argsort( ret_t )
 
-			ret_t   = ret_t[srt]
-			ret_b_x = ret_b_x[srt]
-			ret_b_y = ret_b_y[srt]
-			ret_b_z = ret_b_z[srt]
+			ret_t = ret_t[srt]
+			ret_w = ret_w[srt]
 
 		# Request a cleanup of the data loaded into this archive.
 
@@ -191,8 +225,7 @@ class spin_arcv( object ) :
 
 		# Return the requested range of Wind/MFI data.
 
-		return ( list( ret_t ), list( ret_b_x ),
-		                        list( ret_b_y ), list( ret_b_z ) )
+		return ( list( ret_t ), list( ret_w ) )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING ALL DATA FROM DATE-SPECIFIED FILE.
@@ -327,13 +360,11 @@ class spin_arcv( object ) :
 
 		self.n_date -= n_rm
 
-		tk = where( self.mfi_ind >= ind_min )[0]
+		tk = where( self.arr_spin_ind >= ind_min )[0]
 
-		self.mfi_t   = self.mfi_t[tk]
-		self.mfi_b_x = self.mfi_b_x[tk]
-		self.mfi_b_y = self.mfi_b_y[tk]
-		self.mfi_b_z = self.mfi_b_z[tk]
-		self.mfi_ind = self.mfi_ind[tk]
+		self.arr_spin_t   = self.arr_spin_t[tk]
+		self.arr_spin_w   = self.arr_spin_w[tk]
+		self.arr_spin_ind = self.arr_spin_ind[tk]
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CLEANING UP THE DATA DIRECTORY.
@@ -353,7 +384,7 @@ class spin_arcv( object ) :
 
 		if ( self.use_idl ) :
 			file_name = array( glob(
-			              os.path.join( self.path, 'wind_mag*' ) ) )
+			              os.path.join( self.path, 'wind_s*' ) ) )
 		else :
 			if ( self.use_k0 ) :
 				file_name = array( glob(
