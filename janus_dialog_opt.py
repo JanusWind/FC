@@ -190,7 +190,8 @@ class dialog_opt( QDialog ) :
 
 	def vldt_opt( self ) :
 
-		return
+		if ( self.temp is False ) and ( self.tvel is False ):
+			self.temp = True
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
@@ -217,7 +218,6 @@ class dialog_opt( QDialog ) :
 			             self.skew, self.kurt    )
 
 			self.close( )
-
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR PROMPTING THE USER FOR OPTIONS.

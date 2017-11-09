@@ -192,10 +192,18 @@ class widget_ctrl_run( QWidget ) :
 			               kurt = self.req_opt_kurt
 			                                        ).get_opt_men( )
 
+			if (disp_opt is None ) :
+				return
+
 			self.req_opt_temp = disp_opt[0]
                         self.req_opt_tvel = disp_opt[1]
                         self.req_opt_skew = disp_opt[2]
                         self.req_opt_kurt = disp_opt[3]
+
+#			if ( ( self.req_opt_temp is False ) and
+#			     ( self.req_opt_tvel is False )  ) :
+#
+#				self.req_opt_tvel = True
 
 			# Assuming that there still aren't any janus threads
 			# running, start a new thread for the options menu.
@@ -212,7 +220,6 @@ class widget_ctrl_run( QWidget ) :
 				               self.req_opt_tvel,
 				               self.req_opt_skew,
 				               self.req_opt_kurt   ) ).start( )
-
 			# Return.
 
 			return
