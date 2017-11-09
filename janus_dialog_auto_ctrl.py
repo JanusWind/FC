@@ -138,6 +138,7 @@ class dialog_auto_ctrl( QDialog ) :
 		#        "self.time_????" and "self.vld_????" parameters and
 		#        populates the text boxes approriately.
 
+
 		self.aply_time( time_strt=time_strt, time_stop=time_stop,
 		                get_next=get_next, err_halt=err_halt      )
 

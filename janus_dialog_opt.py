@@ -89,15 +89,13 @@ class dialog_opt( QDialog ) :
 
 
 		self.grd.addLayout( self.sg1, 0, 0, 1, 1 )
-		self.grd.addLayout( self.sg2, 3, 1, 1, 1 )
+		self.grd.addLayout( self.sg2, 1, 0, 1, 1 )
 		self.grd.addLayout( self.sg3, 2, 0, 1, 1 )
-		self.grd.addLayout( self.sg4, 3, 0, 1, 1 )
-
 
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
 
-		self.lab_disp = QLabel( 'Display Options'   )
+		self.lab_disp = QLabel( 'Display Options:'   )
 		self.lab_temp = QLabel( 'Temperature:'      )
 		self.lab_tvel = QLabel( 'Thermal Velocity:' )
 		self.lab_skew = QLabel( 'Skewness:'         )
@@ -109,7 +107,7 @@ class dialog_opt( QDialog ) :
 		self.box_kurt = event_CheckBox( self, 'kurt' )
 
 
-		self.btn_auto = event_PushButton( self, 'appl', 'Apply'  )
+		self.btn_appl = event_PushButton( self, 'appl', 'Apply'  )
 		self.btn_cncl = event_PushButton( self, 'cncl', 'Cancel' )
 
 		# Adjust the button defaults.
@@ -127,7 +125,7 @@ class dialog_opt( QDialog ) :
 
 		self.sg2.addWidget( self.lab_temp, 0, 0, 1, 1 )
 		self.sg2.addWidget( self.box_temp, 0, 1, 1, 1 )
-		self.sg2.addWidget( self.txt_tvel, 1, 0, 1, 1 )
+		self.sg2.addWidget( self.lab_tvel, 1, 0, 1, 1 )
 		self.sg2.addWidget( self.box_tvel, 1, 1, 1, 1 )
 		self.sg2.addWidget( self.lab_skew, 2, 0, 1, 1 )
 		self.sg2.addWidget( self.box_skew, 2, 1, 1, 1 )
@@ -136,6 +134,63 @@ class dialog_opt( QDialog ) :
 
 		self.sg3.addWidget( self.btn_appl, 0, 0, 1, 1 )
 		self.sg3.addWidget( self.btn_cncl, 0, 1, 1, 1 )
+
+		self.aply_opt( temp=temp, tvel=tvel, skew=skew, kurt=kurt )
+
+		self.ret = None
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR APPLYING OPTIONS.
+	#-----------------------------------------------------------------------
+
+	def aply_opt( self, temp=None, tvel=None, skew=None, kurt=None ) :
+
+		# If requested, update the state of checkbox(es).
+
+		if ( temp is not None ) :
+			self.box_temp.setChecked( temp )
+
+		if ( tvel is not None ) :
+			self.box_tvel.setChecked( tvel )
+
+
+		if ( skew is not None ) :
+			self.box_skew.setChecked( skew )
+
+
+		if ( kurt is not None ) :
+			self.box_kurt.setChecked( kurt )
+
+		self.rtrv_opt( )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR RETRIEVING THE ROPTIONS.
+	#-----------------------------------------------------------------------
+
+	def rtrv_opt( self ) :
+
+		# Attempt to retrieve each timestamp.
+
+		# Note.  If the function "calc_time_epc" is given input that it
+		#        cannot process, it should return "None".
+
+		self.temp = self.box_temp.isChecked( )
+		self.tvel = self.box_tvel.isChecked( )
+		self.skew = self.box_skew.isChecked( )
+		self.kurt = self.box_kurt.isChecked( )
+
+		# Validate the timestamps and update the text color of the text
+		# boxes appropriately.
+
+		self.vldt_opt( )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR VALIDATING THE OPTIONS.
+	#-----------------------------------------------------------------------
+
+	def vldt_opt( self ) :
+
+		return
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
@@ -152,19 +207,14 @@ class dialog_opt( QDialog ) :
 
 			return
 
-		# Retrieve (and subsequently validate) the timestamp values in
-		# the text boxes.
-
-		self.rtrv_time( )
-
 		# If the event was from the auto-run button and the timestamp
 		# range is valid, generate the return object and close this
 		# dialog window.
 
-		if ( ( fnc == 'auto' ) and ( self.vld_rang ) ) :
+		if ( ( fnc == 'appl' ) ) :
 
-			self.ret = ( self.time_strt, self.time_stop,
-			             self.get_next, self.err_halt    )
+			self.ret = ( self.temp, self.tvel,
+			             self.skew, self.kurt    )
 
 			self.close( )
 
@@ -178,3 +228,7 @@ class dialog_opt( QDialog ) :
 		# Execute this dialog.
 
 		self.exec_( )
+
+		# Return the return objects.
+
+		return self.ret

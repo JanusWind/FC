@@ -64,9 +64,10 @@ class spin_arcv( object ) :
 
 		self.core = core
 
-		self.win = int( win ) if ( win is not None ) else self.win = 5
+		self.win = int( win ) if ( win is not None ) else  5
 
-		self.verbose = bool( verbose ) if ( verbose is not None ) else self.verbose = True
+		self.verbose = bool( verbose ) if ( verbose is not None ) else True
+
 
 		#TODO Rest of variables
 
