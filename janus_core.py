@@ -155,17 +155,11 @@ class core( QObject ) :
 		# Initialize and store the archive of Wind/FC ion spectra.
 
 		self.fc_arcv = fc_arcv( core=self )
-		###self.fc_arcv = fc_arcv( core=self, use_idl=True,
-		###                        buf=-1.                  )
 
 		# Initialize and store the archive of Wind/MFI magnetic field
 		# data.
 
 		self.mfi_arcv = mfi_arcv( core=self )
-		###self.mfi_arcv = mfi_arcv( core=self, use_k0=True,
-		###                          buf=-1., tol=90.         )
-		###self.mfi_arcv = mfi_arcv( core=self, use_idl=True,
-		###                          buf=-1., tol=90.         )
 
 		# Initialize a log of the analysis results.
 
@@ -521,7 +515,6 @@ class core( QObject ) :
 		               var_nln_gss = True, var_nln_sel = True,
 		               var_nln_res = True                         )
 
-
 		# If a special code has been entered, take the specified action.
 
 		if ( str( time_req ).lower( ) == 'iddqd' ) :
@@ -567,7 +560,6 @@ class core( QObject ) :
 
 			self.time_vld = True
 
-
 		# If necessary, adjust "self.dsp" and "self.dyn_???" keywords to
 		# make them a bit more mutually consistent.
 
@@ -584,7 +576,6 @@ class core( QObject ) :
 			self.emit( SIGNAL('janus_chng_dyn') )
 			self.emit( SIGNAL('janus_chng_dsp') )
 
-
 		# If no valid time was requested, alert the user and abort.
 
 		if ( not self.time_vld ) :
@@ -594,13 +585,10 @@ class core( QObject ) :
 
 			return
 
-
 		# Message the user that a new Wind/FC ion spectrum is about to
 		# be loaded.
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'fc' )
-
-
 
 		# Load the Wind/FC ion spectrum with a timestamp closest to that
 		# requested.
@@ -614,7 +602,6 @@ class core( QObject ) :
 		if ( self.fc_spec is None ) :
 			self.emit( SIGNAL('janus_chng_spc') )
 			return
-
 
 		# Message the user that a new Wind/FC ion spectrum is about to
 		# be loaded.
@@ -653,7 +640,7 @@ class core( QObject ) :
 		if ( self.dyn_mom ) :
 			self.auto_mom_sel( )
 
-  #-----------------------------------------------------------------------
+	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING THE Wind/MFI MAGNETIC FIELD DATA.
 	#-----------------------------------------------------------------------
 

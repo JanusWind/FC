@@ -35,6 +35,10 @@ from datetime import datetime, timedelta
 
 from janus_time import calc_time_str, calc_time_val, calc_time_epc
 
+# Load the modules necessary for data handling.
+
+from numpy import median, pi
+
 # Load the modules necessary for file I/O (including FTP).
 
 from spacepy import pycdf
@@ -56,9 +60,9 @@ class spin_arcv( object ) :
 	# DEFINE THE INITIALIZATION FUNCTION.
 	#-----------------------------------------------------------------------
 
-	def __init__( self, core=None, buf=None, tol=None, win=None,
+	def __init__( self, core=None, buf=None, win=None,
 	                    n_file_max=None, n_date_max=None,
-	                    path=None, verbose=None                 ) :
+	                    path=None, verbose=None           ) :
 
 		# Save the arguments for later use and, if necessary,
 		#provide values
@@ -68,10 +72,6 @@ class spin_arcv( object ) :
 		self.buf        = float( buf )      if ( buf 
 		                                         is not None )         \
 		                                    else 3600.
-
-		self.tol        = float( tol )      if ( tol 
-		                                         is not None )         \
-		                                    else 0.
 
 		self.win        = int( win )        if ( win 
 		                                         is not None )         \
@@ -96,22 +96,10 @@ class spin_arcv( object ) :
 		                                         is not None )         \
 		                                    else True
 
-		#TODO Rest of variables
-
-#		self.buf        = buf
-#		self.tol        = tol
-#		self.path       = path
-#		self.n_file_max = n_file_max
-#		self.n_date_max = n_date_max
-#		self.verbose    = verbose
-
 		# Validate the values of the parameters.
 
 		if ( self.buf < 0 ) :
 			raise ValueError( 'Time buffer cannot be negative.'    )
-
-		if (self.tol < 0 ) :
-			raise ValueError( 'Time tolerance cannot be negative.' )
 
 		if ( self.win <= 0 ) :
 			raise ValueError( 'Median window must be at least 1.'  )
@@ -123,18 +111,6 @@ class spin_arcv( object ) :
 		if ( self.n_date_max < 0 ) :
 			raise ValueError( 'Maximum number of dates \
 			                                  cannot be negative.' )
-
-		#TODO Rest of variables
-
-#		if ( ( self.n_file_max is None ) or ( self.n_file_max < 0 ) ) :
-#			self.n_file_max = float( 'infinity' )
-#
-#		if ( ( self.n_date_max is None ) or ( self.n_date_max < 0 ) ) :
-#			self.n_date_max = 40
-#
-#		if ( self.path is None ) :
-#			self.path = os.path.join( os.path.dirname( __file__ ),
-#			                          'data', 'spin'               )
 
 		# Initialize the list of dates loaded.
 
@@ -162,8 +138,8 @@ class spin_arcv( object ) :
 
 		req_date = [ ]
 
-		tm_strt = time_epc - timedelta( seconds = buf )
-		tm_stop = time_epc + timedelta( seconds = buf )
+		tm_strt = time_epc - timedelta( seconds=self.buf )
+		tm_stop = time_epc + timedelta( seconds=self.buf )
 
 		dt_strt = datetime( tm_strt.year, tm_strt.month, tm_strt.day )
 		dt_stop = datetime( tm_stop.year, tm_stop.month, tm_stop.day )
@@ -180,53 +156,36 @@ class spin_arcv( object ) :
 		for date in req_date :
 			self.load_date( date )
 
+		# Compute the absolute time difference between the requested
+		# time and the timestamp of each loaded datum.
 
+		adt = [ abs( ( t - time_epc ).total_seconds( ) )
+		                                      for t in self.arr_spin_t ]
 
+		# Determine the ordering of the absolute time differeneces.
 
+		arg = sorted( range( len( adt ) ), key=adt.__getitem__ )
+		# If the smallest time difference is greater than the tolerance,
+		# return 'None'.
 
+		if ( adt[arg[0]] > self.buf ) :
+			return None
 
-		#TODO
-		#FIXME
+		# Compute and the median spin rate for the data with the
+		# smallest time difference.
 
-
-
-
-
-
-		# Identify and extract the requested range of Wind/MFI data.
-
-		tk = where( ( self.arr_spin_t >= ( time_strt_epc -
-		                              timedelta( 0, self.tol ) ) ) &
-		            ( self.arr_spin_t <= ( time_stop_epc +
-		                              timedelta( 0, self.tol ) ) )   )
-		tk = tk[0]
-
-		n_tk = len( tk )
-
-		if ( n_tk <= 0 ) :
-
-			self.mesg_txt( 'none' )
-
-			ret_t = array( [ ] )
-			ret_w = array( [ ] )
-
-		else :
-
-			ret_t = self.arr_spin_t[tk]
-			ret_w = self.arr_spin_w[tk]
-
-			srt = argsort( ret_t )
-
-			ret_t = ret_t[srt]
-			ret_w = ret_w[srt]
+		w = median( [ self.arr_spin_w[arg[i]]
+		              for i in range( self.win ) ] )
 
 		# Request a cleanup of the data loaded into this archive.
 
-		self.cleanup_date( )
+		#TODO
 
-		# Return the requested range of Wind/MFI data.
+		###self.cleanup_date( )
 
-		return ( list( ret_t ), list( ret_w ) )
+		# Return the spin period.
+
+		return ( 2. * pi / w )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING ALL DATA FROM DATE-SPECIFIED FILE.
@@ -328,10 +287,10 @@ class spin_arcv( object ) :
 
 		# Extract the data from the loaded file.
 
-		self.spin_t.append( list( cdf['Epoch'        ][:] ) )
-		self.spin_w.append( list( cdf['AVG_SPIN_RATE'][:] ) )
+		self.arr_spin_t += list( cdf['Epoch'        ][:] )
+		self.arr_spin_w += list( cdf['AVG_SPIN_RATE'][:] )
 
-		self.spin_ind.append( [ ind for t in sub_t ] )
+		self.arr_spin_ind.append( [ ind for ep in cdf['Epoch'] ] )
 
 		# Request a clean-up of the files in the data directory.
 

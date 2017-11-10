@@ -111,7 +111,7 @@ class fc_arcv( object ) :
 
 		if ( self.path is None ) :
 
-			self.path = os.path.join( os.path.dirname( __file__ ),		# double underscore ??		
+			self.path = os.path.join( os.path.dirname( __file__ ),
 			                          'data', 'fc'                 )
 
 		# Initialize arrays of date and times loaded.

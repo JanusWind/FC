@@ -66,6 +66,7 @@ class janus( object ) :
 		lst = [ os.path.join( dname, 'data'              ),
 		        os.path.join( dname, 'data'   , 'fc'     ),
 		        os.path.join( dname, 'data'   , 'mfi'    ),
+		        os.path.join( dname, 'data'   , 'spin'   ),
 		        os.path.join( dname, 'results'           ),
 		        os.path.join( dname, 'results', 'save'   ),
 		        os.path.join( dname, 'results', 'export' )  ]
