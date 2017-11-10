@@ -172,20 +172,9 @@ class widget_ctrl_run( QWidget ) :
 
 		if ( fnc == 'opt' ) :
 
-			# WARNING!  THIS FEATURE IS INCOMPLETE.  DURING
-			#           DEVELOPMENT, IT IS ONLY AVAILABLE IN
-			#           DEBUGGING MODE.
-
-			# If debugging mode is not active, alert the user and
-			# abort.
-
-			if ( not self.core.debug ) :
-				dialog_missing( ).alert( )
-				return
-
 			# Launch a dialog box to request options from the user.
 
-			disp_opt = dialog_opt( self.core )
+			dialog_opt( self.core )
 
 			# Return.
 

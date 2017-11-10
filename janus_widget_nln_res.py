@@ -68,6 +68,8 @@ class widget_nln_res( format_TextEdit ) :
 		# Prepare to respond to signals received from the Janus core.
 
 		self.connect( self.core, SIGNAL('janus_rset'), self.resp_rset )
+		self.connect( self.core, SIGNAL('janus_chng_opt'),
+		                                            self.resp_chng_opt )
 		self.connect( self.core, SIGNAL('janus_chng_mfi'),
 		                                            self.resp_chng_mfi )
 		self.connect( self.core, SIGNAL('janus_chng_nln_res'),
@@ -293,8 +295,8 @@ class widget_nln_res( format_TextEdit ) :
 
 			# Print the Skewness and Excess Kurtosis value
 
-			if  ( len( self.core.nln_res_plas.lst_pop( spc)
-			                                       ) > 1 ) :
+			if  ( len( self.core.nln_res_plas.lst_pop( spc )
+			                                               ) > 1 ) :
 				self.prnt_brk( )
 				self.prnt_brk( )
        				self.prnt_tab( 1 )
@@ -331,6 +333,16 @@ class widget_nln_res( format_TextEdit ) :
 		# Reset the text area.
 
 		self.clear( )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_opt" SIGNAL.
+	#-----------------------------------------------------------------------
+
+	def resp_chng_opt( self ) :
+
+		# Regenerate the text in the text area.
+
+		self.make_txt( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_mfi" SIGNAL.

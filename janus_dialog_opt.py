@@ -28,7 +28,7 @@
 # Load the modules necessary for the graphical interface.
 
 from PyQt4.QtGui import QDialog, QGridLayout, QLabel
-from PyQt4.QtCore import SIGNAL 
+from PyQt4.QtCore import SIGNAL
 
 # Load the customized push button and one-line text editor.
 
@@ -144,6 +144,10 @@ class dialog_opt( QDialog ) :
 		# Populate the menu with the options settings from core.
 
 		self.make_opt( )
+
+		# Execute this dialog.
+
+		self.exec_( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR POPULATING MENU.
