@@ -32,12 +32,12 @@ from PyQt4.QtGui import QDialog, QGridLayout, QLabel
 # Load the customized push button and one-line text editor.
 
 from janus_event_CheckBox import event_CheckBox
-from janus_event_LineEdit import event_LineEdit
 from janus_event_PushButton import event_PushButton
 
-# Load the modules necessary for time convertion.
+# Load the necessary threading modules.
 
-from janus_time import calc_time_epc, calc_time_sec, calc_time_str
+from threading import Thread
+from janus_thread import n_thread, thread_chng_opt
 
 
 ################################################################################
@@ -50,12 +50,20 @@ class dialog_opt( QDialog ) :
 	# DEFINE THE INITIALIZATION FUNCTION.
 	#-----------------------------------------------------------------------
 
-	def __init__( self, temp=True, tvel=True,
-	                    skew=True, kurt=True  ) :
+	def __init__( self, core ) :
 
 		# Inherit all attributes of an instance of "QDialog".
 
 		super( dialog_opt, self ).__init__( )
+
+		# Store the Janus core.
+
+		self.core = core
+
+		# Prepare to respond to signals received from the Janus core.
+
+		self.connect( self.core, SIGNAL('janus_chng_opt'),
+		                                            self.resp_chng_opt )
 
 		# Make this a modal dialog (i.e., block user-interaction with
 		# the main application window while this dialog exists).
@@ -79,14 +87,10 @@ class dialog_opt( QDialog ) :
 		self.sg1 = QGridLayout( )
 		self.sg2 = QGridLayout( )
 		self.sg3 = QGridLayout( )
-		self.sg4 = QGridLayout( )
-
 
 		self.sg1.setContentsMargins( 0, 0, 0, 0 )
 		self.sg2.setContentsMargins( 0, 0, 0, 0 )
 		self.sg3.setContentsMargins( 0, 0, 0, 0 )
-		self.sg4.setContentsMargins( 0, 0, 0, 0 )
-
 
 		self.grd.addLayout( self.sg1, 0, 0, 1, 1 )
 		self.grd.addLayout( self.sg2, 1, 0, 1, 1 )
@@ -101,11 +105,18 @@ class dialog_opt( QDialog ) :
 		self.lab_skew = QLabel( 'Skewness:'         )
 		self.lab_kurt = QLabel( 'Kurtosis:'         )
 
-		self.box_temp = event_CheckBox( self, 'temp' )
-		self.box_tvel = event_CheckBox( self, 'tvel' )
+		# TODO: change labels to match keys in "self.core.opt"
+
+		self.box = { 'thrm_t':event_CheckBox( self, 'thrm_t' }
+
+		"""
+		self.box_temp = event_CheckBox( self, 'thrm_t' )
+		self.box_tvel = event_CheckBox( self, 'thrm_w' )
 		self.box_skew = event_CheckBox( self, 'skew' )
 		self.box_kurt = event_CheckBox( self, 'kurt' )
+		"""
 
+		# TODO: remove buttons (at least for now).
 
 		self.btn_appl = event_PushButton( self, 'appl', 'Apply'  )
 		self.btn_cncl = event_PushButton( self, 'cncl', 'Cancel' )
@@ -135,62 +146,21 @@ class dialog_opt( QDialog ) :
 		self.sg3.addWidget( self.btn_appl, 0, 0, 1, 1 )
 		self.sg3.addWidget( self.btn_cncl, 0, 1, 1, 1 )
 
-		# Initialize the requested inputs provided.
+		# Populate the menu with the options settings from core.
 
-		self.aply_opt( temp=temp, tvel=tvel, skew=skew, kurt=kurt )
-
-		self.ret = None
+		self.make_opt( )
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR RETRIEVING THE ROPTIONS.
+	# DEFINE THE FUNCTION FOR POPULATING MENU.
 	#-----------------------------------------------------------------------
 
-	def rtrv_opt( self ) :
+	def make_opt( self ) :
 
-		# Attempt to retrieve each timestamp.
+		self.box_temp.setChecked( self.core.opt['thrm_t']
 
-		self.temp = self.box_temp.isChecked( )
-		self.tvel = self.box_tvel.isChecked( )
-		self.skew = self.box_skew.isChecked( )
-		self.kurt = self.box_kurt.isChecked( )
+		#TODO: Rename "box_?" variables to match "self.core.opt."
 
-		# Validate the timestamps and update the text color of the text
-		# boxes appropriately.
-
-		self.vldt_opt( )
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR VALIDATING THE OPTIONS.
-	#-----------------------------------------------------------------------
-
-	def vldt_opt( self ) :
-
-		if ( self.temp is False ) and ( self.tvel is False ):
-			self.temp = True
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR APPLYING OPTIONS.
-	#-----------------------------------------------------------------------
-
-	def aply_opt( self, temp=None, tvel=None, skew=None, kurt=None ) :
-
-		# If requested, update the state of checkbox(es).
-
-		if ( temp is not None ) :
-			self.box_temp.setChecked( temp )
-
-		if ( tvel is not None ) :
-			self.box_tvel.setChecked( tvel )
-
-
-		if ( skew is not None ) :
-			self.box_skew.setChecked( skew )
-
-
-		if ( kurt is not None ) :
-			self.box_kurt.setChecked( kurt )
-
-		self.rtrv_opt( )
+		#TODO: Code to set state of other boxes.
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
@@ -198,36 +168,28 @@ class dialog_opt( QDialog ) :
 
 	def user_event( self, event, fnc ) :
 
-		# If the event was from the cancel button, close this dialog
-		# window.
+		# If no threads are running, make the change to the option with
+		# core.  Otherwise, restore the original options settings.\
 
-		if ( fnc == 'cncl' ) :
+		if ( n_thread( ) == 0 ) :
 
-			self.close( )
+			# Start a new thread that makes the change to the option
+			# with core.
 
-			return
+			Thread( target=thread_chng_opt,
+			        args=( self.core, fnc,
+			               self.box[fnc].isChecked( ) ) ).start( )
 
-		# If the event was from the auto-run button and the timestamp
-		# range is valid, generate the return object and close this
-		# dialog window.
+		else :
 
-		if ( ( fnc == 'appl' ) ) :
-
-			self.ret = ( self.temp, self.tvel,
-			             self.skew, self.kurt    )
-
-			self.close( )
+			self.make_opt( )
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR PROMPTING THE USER FOR OPTIONS.
+	# DEFINE THE FUNCTION FOR RESPONDING TO A CHANGE OF AN OPTION.
 	#-----------------------------------------------------------------------
 
-	def get_opt_men( self ) :
+	def resp_chng_opt( self ) :
 
-		# Execute this dialog.
+		# Regenerate the menu.
 
-		self.exec_( )
-
-		# Return the return objects.
-
-		return self.ret
+		self.make_opt( )

@@ -48,8 +48,8 @@ def n_thread( ) :
 		     ( thr._Thread__target is thread_anls_nln         ) or
 		     ( thr._Thread__target is thread_chng_dsp         ) or
 		     ( thr._Thread__target is thread_chng_dyn         ) or
+		     ( thr._Thread__target is thread_chng_opt         ) or
 		     ( thr._Thread__target is thread_auto_run         ) or
-		     ( thr._Thread__target is thread_opt_men          ) or
 		     ( thr._Thread__target is thread_save_res         ) or
 		     ( thr._Thread__target is thread_xprt_res         ) or
 		     ( thr._Thread__target is thread_chng_mom_sel     ) or
@@ -139,6 +139,20 @@ def thread_chng_dyn( core, anal, value ) :
 
 
 ################################################################################
+## DEFINE THE WRAPPER FOR THE FUNCTION "core.chng_opt".
+################################################################################
+
+def thread_chng_opt( core, key, value ) :
+
+        core.emit( SIGNAL('janus_busy_end') )
+        core.emit( SIGNAL('janus_busy_beg') )
+
+        core.chng_opt( key, value )
+
+        core.emit( SIGNAL('janus_busy_end') )
+
+
+################################################################################
 ## DEFINE THE WRAPPER FOR THE FUNCTION "core.auto_run".
 ################################################################################
 
@@ -151,22 +165,6 @@ def thread_auto_run( core, t_strt, t_stop,
         core.auto_run( t_strt, t_stop, get_next, err_halt, pause )
 
         core.emit( SIGNAL('janus_busy_end') )
-
-
-################################################################################
-## DEFINE THE WRAPPER FOR THE FUNCTION "core.opt_men".
-################################################################################
-
-def thread_opt_men( core, temp=None, tvel=None,
-                          skew=None, kurt=None ) :
-
-        core.emit( SIGNAL('janus_busy_end') )
-        core.emit( SIGNAL('janus_busy_beg') )
-
-        core.opt_men( temp, tvel, skew, kurt )
-
-        core.emit( SIGNAL('janus_busy_end') )
-
 
 
 ################################################################################

@@ -113,8 +113,8 @@ class core( QObject ) :
 	# | chng_nln_res      |                              |
 	# | chng_dsp          |                              |
 	# | chng_dyn          |                              |
+	# | chng_opt          |                              |
 	# | done_auto_run     |                              |
-	# | done_opt_men      |                              |
 	# | exit              |                              |
 	# +-------------------+------------------------------+
 
@@ -209,7 +209,8 @@ class core( QObject ) :
 		               var_mom_res = True, var_nln_ion = True,
 		               var_nln_set = True, var_nln_gss = True,
 		               var_nln_sel = True, var_nln_res = True,
-		               var_dsp     = True, var_dyn     = True          )
+		               var_dsp     = True, var_dyn     = True,
+		               var_opt     = True                      )
 		
 		# Initialize the value of the indicator variable of whether the
 		# automatic analysis should be aborted.
@@ -234,8 +235,8 @@ class core( QObject ) :
 	              var_mom_res = False, var_nln_ion = False,
 	              var_nln_set = False, var_nln_gss = False,
 	              var_nln_sel = False, var_nln_res = False,
-	              var_dsp     = False, var_dyn     = False          ) :
-
+	              var_dsp     = False, var_dyn     = False,
+	              var_opt     = False                       ) :
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion spectrum's data.
@@ -481,6 +482,20 @@ class core( QObject ) :
 			self.dyn_gss = True
 			self.dyn_sel = True
 			self.dyn_nln = False
+
+		# If requested, (re-)initialize the variables which indicate
+		# the various options for the GUI's option menu.
+
+		if ( var_opt ) :
+
+			self.opt = { 'thrm_w':True,
+			             'thrm_t':True,
+			             'spres_n':True,
+			             'spres_v':True,
+			             'spres_w':True,
+			             'spres_r':True,
+			             'spres_s':True,
+			             'spres_k':True }
 
 	#-----------------------------------------------------------------------
 	# LOAD THE REQUESTED WIND/FC SPECTRUM.
@@ -2483,6 +2498,39 @@ class core( QObject ) :
 				self.chng_dsp( 'nln' )
 
 	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION CHANGING THE STATE OF AN OPTION.
+	#-----------------------------------------------------------------------
+
+	def chng_opt( self, key, value ) :
+
+		#if ( key not in sef.opt ) :
+		#	return
+
+		# Apply the change to the options dictionary.
+
+		self.opt[key] = bool( value )
+
+		# Validate the options.
+
+		if ( not ( self.opt['thrm_w'] or self.opt['thrm_t'] ) ) :
+
+			if ( key == 'thrm_w' ) :
+				self.opt['thrm_t'] = True
+			else :
+				self.opt['thrm_w'] = True
+
+		# Emit the signal that an option has changed.
+
+		self.emit( SIGNAL('janus_chng_opt') )
+
+
+
+
+
+
+
+
+	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR AUTOMATICALLY RUNNING A RANGE OF SPECTRA.
 	#-----------------------------------------------------------------------
 
@@ -2582,25 +2630,6 @@ class core( QObject ) :
 		# ended.
 
 		self.emit( SIGNAL('janus_done_auto_run') )
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR DISPLAY OPTIONS.
-	#-----------------------------------------------------------------------
-
-	def opt_men( self, temp=None, tvel=None, skew=None, kurt=None ) :
-
-		# Supply values for any missing keywords.
-
-		temp = False if ( temp is None ) else temp
-		tvel = False if ( tvel is None ) else tvel
-		skew = False if ( skew is None ) else skew
-		kurt = False if ( kurt is None ) else kurt
-
-		# Message the user that the options menu is active now.
-
-		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'opt' )
-
-
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR SAVING THE RESULTS LOG TO A FILE.

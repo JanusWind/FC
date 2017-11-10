@@ -49,7 +49,7 @@ from janus_time import calc_time_epc
 
 from threading import Thread
 from janus_thread import n_thread, thread_anls_mom, thread_anls_nln, \
-                         thread_auto_run, thread_opt_men, thread_save_res
+                         thread_auto_run, thread_save_res
 
 
 ################################################################################
@@ -185,41 +185,8 @@ class widget_ctrl_run( QWidget ) :
 
 			# Launch a dialog box to request options from the user.
 
-			disp_opt = dialog_opt( 
-			               temp = self.req_opt_temp,
-			               tvel = self.req_opt_tvel,
-			               skew = self.req_opt_skew,
-			               kurt = self.req_opt_kurt
-			                                        ).get_opt_men( )
+			disp_opt = dialog_opt( self.core )
 
-			if (disp_opt is None ) :
-				return
-
-			self.req_opt_temp = disp_opt[0]
-                        self.req_opt_tvel = disp_opt[1]
-                        self.req_opt_skew = disp_opt[2]
-                        self.req_opt_kurt = disp_opt[3]
-
-#			if ( ( self.req_opt_temp is False ) and
-#			     ( self.req_opt_tvel is False )  ) :
-#
-#				self.req_opt_tvel = True
-
-			# Assuming that there still aren't any janus threads
-			# running, start a new thread for the options menu.
-
-			if ( n_thread( ) == 0 ) :
-
-				# Start a new thread that automatically loads
-				# and processes each spectrum in the time range
-				# specified by the user.
-
-				Thread( target=thread_opt_men,
-				        args=( self.core,
-				               self.req_opt_temp, 
-				               self.req_opt_tvel,
-				               self.req_opt_skew,
-				               self.req_opt_kurt   ) ).start( )
 			# Return.
 
 			return
