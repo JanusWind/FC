@@ -65,8 +65,9 @@ class spin_arcv( object ) :
 
 		self.core       = core
 
-		self.buf        = float( buf )      if ( buf is not None )     \
-						    else 3600.
+		self.buf        = float( buf )      if ( buf 
+		                                         is not None )         \
+		                                    else 3600.
 
 		self.tol        = float( tol )      if ( tol 
 		                                         is not None )         \
@@ -161,8 +162,8 @@ class spin_arcv( object ) :
 
 		req_date = [ ]
 
-		tm_strt = time_epc - timedelta( seconds=buf )
-		tm_stop = time_epc + timedelta( seconds=buf )
+		tm_strt = time_epc - timedelta( seconds = buf )
+		tm_stop = time_epc + timedelta( seconds = buf )
 
 		dt_strt = datetime( tm_strt.year, tm_strt.month, tm_strt.day )
 		dt_stop = datetime( tm_stop.year, tm_stop.month, tm_stop.day )
@@ -435,4 +436,4 @@ class spin_arcv( object ) :
 		# message parameters.
 
 		self.core.emit( SIGNAL('janus_mesg'),
-		                'mfi', mesg_typ, mesg_obj )
+		                'spin', mesg_typ, mesg_obj )

@@ -42,7 +42,7 @@ from math import log10, floor
 
 from janus_helper import round_sig
 
-from tabulate import tabulate
+#from tabulate import tabulate
 
 
 ################################################################################
