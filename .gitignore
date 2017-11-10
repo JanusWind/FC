@@ -7,3 +7,4 @@ results/save/*.jns
 data/fc/*.cdf
 data/mfi/*.cdf
 .gitignore
+.cdf

@@ -114,6 +114,7 @@ class core( QObject ) :
 	# | chng_dsp          |                              |
 	# | chng_dyn          |                              |
 	# | done_auto_run     |                              |
+	# | done_opt_men      |                              |
 	# | exit              |                              |
 	# +-------------------+------------------------------+
 
@@ -2594,6 +2595,10 @@ class core( QObject ) :
 		tvel = False if ( tvel is None ) else tvel
 		skew = False if ( skew is None ) else skew
 		kurt = False if ( kurt is None ) else kurt
+
+		# Message the user that the options menu is active now.
+
+		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'opt' )
 
 
 

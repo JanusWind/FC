@@ -51,7 +51,7 @@ class dialog_opt( QDialog ) :
 	#-----------------------------------------------------------------------
 
 	def __init__( self, temp=True, tvel=True,
-	                    skew=True, kurt= True ) :
+	                    skew=True, kurt=True  ) :
 
 		# Inherit all attributes of an instance of "QDialog".
 
@@ -95,7 +95,7 @@ class dialog_opt( QDialog ) :
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
 
-		self.lab_disp = QLabel( 'Display Options:'   )
+		self.lab_disp = QLabel( 'Display Options:'  )
 		self.lab_temp = QLabel( 'Temperature:'      )
 		self.lab_tvel = QLabel( 'Thermal Velocity:' )
 		self.lab_skew = QLabel( 'Skewness:'         )
@@ -135,9 +135,38 @@ class dialog_opt( QDialog ) :
 		self.sg3.addWidget( self.btn_appl, 0, 0, 1, 1 )
 		self.sg3.addWidget( self.btn_cncl, 0, 1, 1, 1 )
 
+		# Initialize the requested inputs provided.
+
 		self.aply_opt( temp=temp, tvel=tvel, skew=skew, kurt=kurt )
 
 		self.ret = None
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR RETRIEVING THE ROPTIONS.
+	#-----------------------------------------------------------------------
+
+	def rtrv_opt( self ) :
+
+		# Attempt to retrieve each timestamp.
+
+		self.temp = self.box_temp.isChecked( )
+		self.tvel = self.box_tvel.isChecked( )
+		self.skew = self.box_skew.isChecked( )
+		self.kurt = self.box_kurt.isChecked( )
+
+		# Validate the timestamps and update the text color of the text
+		# boxes appropriately.
+
+		self.vldt_opt( )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR VALIDATING THE OPTIONS.
+	#-----------------------------------------------------------------------
+
+	def vldt_opt( self ) :
+
+		if ( self.temp is False ) and ( self.tvel is False ):
+			self.temp = True
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR APPLYING OPTIONS.
@@ -162,36 +191,6 @@ class dialog_opt( QDialog ) :
 			self.box_kurt.setChecked( kurt )
 
 		self.rtrv_opt( )
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR RETRIEVING THE ROPTIONS.
-	#-----------------------------------------------------------------------
-
-	def rtrv_opt( self ) :
-
-		# Attempt to retrieve each timestamp.
-
-		# Note.  If the function "calc_time_epc" is given input that it
-		#        cannot process, it should return "None".
-
-		self.temp = self.box_temp.isChecked( )
-		self.tvel = self.box_tvel.isChecked( )
-		self.skew = self.box_skew.isChecked( )
-		self.kurt = self.box_kurt.isChecked( )
-
-		# Validate the timestamps and update the text color of the text
-		# boxes appropriately.
-
-		self.vldt_opt( )
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR VALIDATING THE OPTIONS.
-	#-----------------------------------------------------------------------
-
-	def vldt_opt( self ) :
-
-		if ( self.temp is False ) and ( self.tvel is False ):
-			self.temp = True
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
