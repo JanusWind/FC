@@ -28,6 +28,7 @@
 # Load the modules necessary for the graphical interface.
 
 from PyQt4.QtGui import QDialog, QGridLayout, QLabel
+from PyQt4.QtCore import SIGNAL 
 
 # Load the customized push button and one-line text editor.
 
@@ -99,52 +100,46 @@ class dialog_opt( QDialog ) :
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
 
-		self.lab_disp = QLabel( 'Display Options:'  )
-		self.lab_temp = QLabel( 'Temperature:'      )
-		self.lab_tvel = QLabel( 'Thermal Velocity:' )
-		self.lab_skew = QLabel( 'Skewness:'         )
-		self.lab_kurt = QLabel( 'Kurtosis:'         )
+		self.lab_disp    = QLabel( 'Display Options:'  )
+		self.lab_thrm_t  = QLabel( 'Temperature:'      )
+		self.lab_thrm_w  = QLabel( 'Thermal Velocity:' )
+		self.lab_spres_n = QLabel( 'Number density:'         )
+		self.lab_spres_v = QLabel( 'Velocity:'         )
+		self.lab_spres_w = QLabel( 'Thermal Speed' )
+		self.lab_spres_r = QLabel( 'Anisotropy' )
+		self.lab_spres_s = QLabel( 'Skewness' )
+		self.lab_spres_k = QLabel( 'Kurtosis' )
 
-		# TODO: change labels to match keys in "self.core.opt"
-
-		self.box = { 'thrm_t':event_CheckBox( self, 'thrm_t' }
-
-		"""
-		self.box_temp = event_CheckBox( self, 'thrm_t' )
-		self.box_tvel = event_CheckBox( self, 'thrm_w' )
-		self.box_skew = event_CheckBox( self, 'skew' )
-		self.box_kurt = event_CheckBox( self, 'kurt' )
-		"""
-
-		# TODO: remove buttons (at least for now).
-
-		self.btn_appl = event_PushButton( self, 'appl', 'Apply'  )
-		self.btn_cncl = event_PushButton( self, 'cncl', 'Cancel' )
-
-		# Adjust the button defaults.
-
-		self.btn_appl.setDefault( False )
-		self.btn_cncl.setDefault( False )
-
-		self.btn_appl.setAutoDefault( False )
-		self.btn_cncl.setAutoDefault( False )
+		self.box = { 'thrm_t':event_CheckBox( self, 'thrm_t'),
+		             'thrm_w':event_CheckBox( self, 'thrm_w'),
+		             'spres_n':event_CheckBox( self, 'spres_n'),
+		             'spres_v':event_CheckBox( self, 'spres_v'),
+		             'spres_w':event_CheckBox( self, 'spres_w'),
+		             'spres_r':event_CheckBox( self, 'spres_r'),
+		             'spres_s':event_CheckBox( self, 'spres_s'),
+		             'spres_k':event_CheckBox( self, 'spres_k')  }
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
 		self.sg1.addWidget( self.lab_disp, 0, 0, 1, 1 )
 
-		self.sg2.addWidget( self.lab_temp, 0, 0, 1, 1 )
-		self.sg2.addWidget( self.box_temp, 0, 1, 1, 1 )
-		self.sg2.addWidget( self.lab_tvel, 1, 0, 1, 1 )
-		self.sg2.addWidget( self.box_tvel, 1, 1, 1, 1 )
-		self.sg2.addWidget( self.lab_skew, 2, 0, 1, 1 )
-		self.sg2.addWidget( self.box_skew, 2, 1, 1, 1 )
-		self.sg2.addWidget( self.lab_kurt, 3, 0, 1, 1 )
-		self.sg2.addWidget( self.box_kurt, 3, 1, 1, 1 )
-
-		self.sg3.addWidget( self.btn_appl, 0, 0, 1, 1 )
-		self.sg3.addWidget( self.btn_cncl, 0, 1, 1, 1 )
+		self.sg2.addWidget( self.lab_thrm_t,     0, 0, 1, 1 )
+		self.sg2.addWidget( self.box['thrm_t'],  0, 1, 1, 1 )
+		self.sg2.addWidget( self.lab_thrm_w,     1, 0, 1, 1 )
+		self.sg2.addWidget( self.box['thrm_w'],  1, 1, 1, 1 )
+		self.sg2.addWidget( self.lab_spres_n,    2, 0, 1, 1 )
+		self.sg2.addWidget( self.box['spres_n'], 2, 1, 1, 1 )
+		self.sg2.addWidget( self.lab_spres_v,    3, 0, 1, 1 )
+		self.sg2.addWidget( self.box['spres_v'], 3, 1, 1, 1 )
+		self.sg2.addWidget( self.lab_spres_w,    4, 0, 1, 1 )
+		self.sg2.addWidget( self.box['spres_w'], 4, 1, 1, 1 )
+		self.sg2.addWidget( self.lab_spres_r,    5, 0, 1, 1 )
+		self.sg2.addWidget( self.box['spres_r'], 5, 1, 1, 1 )
+		self.sg2.addWidget( self.lab_spres_s,    6, 0, 1, 1 )
+		self.sg2.addWidget( self.box['spres_s'], 6, 1, 1, 1 )
+		self.sg2.addWidget( self.lab_spres_k,    7, 0, 1, 1 )
+		self.sg2.addWidget( self.box['spres_k'], 7, 1, 1, 1 )
 
 		# Populate the menu with the options settings from core.
 
@@ -156,7 +151,14 @@ class dialog_opt( QDialog ) :
 
 	def make_opt( self ) :
 
-		self.box_temp.setChecked( self.core.opt['thrm_t']
+		self.box['thrm_t'].setChecked(  self.core.opt['thrm_t' ] )
+		self.box['thrm_w'].setChecked(  self.core.opt['thrm_w' ] )
+		self.box['spres_n'].setChecked( self.core.opt['spres_n'] )
+		self.box['spres_v'].setChecked( self.core.opt['spres_v'] )
+		self.box['spres_w'].setChecked( self.core.opt['spres_w'] )
+		self.box['spres_r'].setChecked( self.core.opt['spres_r'] )
+		self.box['spres_s'].setChecked( self.core.opt['spres_s'] )
+		self.box['spres_k'].setChecked( self.core.opt['spres_k'] )
 
 		#TODO: Rename "box_?" variables to match "self.core.opt."
 

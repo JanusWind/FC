@@ -2523,13 +2523,6 @@ class core( QObject ) :
 
 		self.emit( SIGNAL('janus_chng_opt') )
 
-
-
-
-
-
-
-
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR AUTOMATICALLY RUNNING A RANGE OF SPECTRA.
 	#-----------------------------------------------------------------------
