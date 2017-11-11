@@ -305,22 +305,24 @@ class spin_arcv( object ) :
 		# If the number of dates is less than or equal to the maximum,
 		# abort (as nothing needs to be done).
 
-		if ( self.n_date <= self.n_date_max ) :
+		if ( len( self.arr_date ) <= self.n_date_max ) :
 			return
 
 		# Delete dates (and all associated data) from this archive so
 		# that the number of loaded dates equals the maximum allowed.
 
-		n_rm = self.n_date - self.n_date_max
+		n_rmv = len( self.arr_date ) - self.n_date_max
 
-		ind_min = self.t_date - self.n_date_max
+#		ind_min = self.t_date - self.n_date_max
 
-		self.date_str = self.date_str[n_rm:]
-		self.date_ind = self.date_ind[n_rm:]
+		self.date_str = self.date_str[n_rmv:]
+		self.date_ind = self.date_ind[n_rmv:]
 
-		self.n_date -= n_rm
+#		self.n_date -= n_rmv
 
-		tk = where( self.arr_spin_ind >= ind_min )[0]
+#		tk = where( self.arr_spin_ind >= n_rmv )[0]
+
+		tk = [i for i, x in enumerate( self.arr_spin_ind ) if x >= n_rmv ]
 
 		self.arr_spin_t   = self.arr_spin_t[tk]
 		self.arr_spin_w   = self.arr_spin_w[tk]

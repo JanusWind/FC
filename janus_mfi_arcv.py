@@ -356,14 +356,14 @@ class mfi_arcv( object ) :
 		# Delete dates (and all associated data) from this archive so
 		# that the number of loaded dates equals the maximum allowed.
 
-		n_rm = self.n_date - self.n_date_max
+		n_rmv = self.n_date - self.n_date_max
 
 		ind_min = self.t_date - self.n_date_max
 
-		self.date_str = self.date_str[n_rm:]
-		self.date_ind = self.date_ind[n_rm:]
+		self.date_str = self.date_str[n_rmv:]
+		self.date_ind = self.date_ind[n_rmv:]
 
-		self.n_date -= n_rm
+		self.n_date -= n_rmv
 
 		tk = where( self.mfi_ind >= ind_min )[0]
 
