@@ -1,4 +1,4 @@
-Changes from the previous version: (development)
+Changes from the previous version: (Development)
 
 1. Major changes in 'janus_core.py'. The code is parsed into three different
    files ('janus_core.py','janus_fc_dat.py' and 'janus_fc_spec.py').
