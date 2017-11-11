@@ -109,6 +109,13 @@ class widget_nln_res( format_TextEdit ) :
                 self.prnt_brk( )
                 self.prnt_brk( )
 
+		# If none of the display menus is selected, do not print
+		# anything in the non-linear display widget.
+
+		if (self.core.opt['spres'] == False ) :
+
+			return
+
 		# Print the results for each population that was considered in
 		# the non-linear analysis, grouping the populations by their
 		# species.
@@ -130,7 +137,6 @@ class widget_nln_res( format_TextEdit ) :
 			self.prnt_htm( '<b><u>' + spc['name']
 			                + ' (<i>' + spc['sym']
 			                + '</i>):</b></u>'     )
-
 
 			# Print the results for each population of this species.
 
@@ -181,15 +187,16 @@ class widget_nln_res( format_TextEdit ) :
 
 				dcm = max( [ 1, 2 - int( floor( log10(
 				                       abs( pop['n'] ) ) ) ) ] )
+				if ( self.core.opt['spres_n'] == True ) :
 
-				self.prnt_brk( )
-				self.prnt_tab( 2 )
-				self.prnt_htm( lab_n + ' = ' )
-				self.prnt_dcm( pop['n'], dcm )
-				self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-				self.prnt_dcm( pop['sig_n'], dcm,
-				               'cm<sup>-3</sup>' )
-
+					self.prnt_brk( )
+					self.prnt_tab( 2 )
+					self.prnt_htm( lab_n + ' = ' )
+					self.prnt_dcm( pop['n'], dcm )
+					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
+					self.prnt_dcm( pop['sig_n'], dcm,
+					               'cm<sup>-3</sup>' )
+	
 				# If this is the first population of the first
 				# species, print the bulk velocity.  Otherwise,
 				# if the population has drift, print its drift
@@ -197,39 +204,48 @@ class widget_nln_res( format_TextEdit ) :
 
 				if ( ( first_spc ) and ( first_pop ) ) :
 
-					self.prnt_brk( )
-					self.prnt_tab( 2 )
-					self.prnt_htm( lab_v + ' = ' )
-					self.prnt_dcm(
-					       self.core.nln_res_plas['v0'],
-					       0, 'km/s'                     )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_v_x + ' = ' )
-					self.prnt_dcm(
-					     self.core.nln_res_plas['v0_x'], 0 )
-					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm(
-					     self.core.nln_res_plas['sig_v0_x'],
-					     0, 'km/s'                         )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_v_y + ' = ' )
-					self.prnt_dcm(
-					     self.core.nln_res_plas['v0_y'], 0 )
-					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm(
-					     self.core.nln_res_plas['sig_v0_y'],
-					     0, 'km/s'                         )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_v_z + ' = ' )
-					self.prnt_dcm(
-					     self.core.nln_res_plas['v0_z'], 0 )
-					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm(
-					     self.core.nln_res_plas['sig_v0_z'],
-					     0, 'km/s'                         )
+					if ( self.core.opt['spres_v'] == True ) :
+
+
+						self.prnt_brk( )
+						self.prnt_tab( 2 )
+						self.prnt_htm( lab_v + ' = ' )
+						self.prnt_dcm(
+						   self.core.nln_res_plas[
+						        'v0'], 0, 'km/s'       )
+						self.prnt_brk( )
+						self.prnt_tab( 3 )
+						self.prnt_htm( lab_v_x + ' = ' )
+						self.prnt_dcm(
+						   self.core.nln_res_plas[
+						                    'v0_x'], 0 )
+						self.prnt_htm( 
+						        '&nbsp;&plusmn;&nbsp;' )
+						self.prnt_dcm(
+						   self.core.nln_res_plas[
+						        'sig_v0_x'], 0, 'km/s' )
+						self.prnt_brk( )
+						self.prnt_tab( 3 )
+						self.prnt_htm( lab_v_y + ' = ' )
+						self.prnt_dcm(
+						   self.core.nln_res_plas[
+						                    'v0_y'], 0 )
+						self.prnt_htm(
+						        '&nbsp;&plusmn;&nbsp;' )
+						self.prnt_dcm(
+						   self.core.nln_res_plas[
+						        'sig_v0_y'], 0, 'km/s' )
+						self.prnt_brk( )
+						self.prnt_tab( 3 )
+						self.prnt_htm( lab_v_z + ' = ' )
+						self.prnt_dcm(
+						   self.core.nln_res_plas[
+						                    'v0_z'], 0 )
+						self.prnt_htm(
+						        '&nbsp;&plusmn;&nbsp;' )
+						self.prnt_dcm(
+						   self.core.nln_res_plas[
+						        'sig_v0_z'], 0, 'km/s' )
 
 				elif ( pop['drift'] ) :
 
