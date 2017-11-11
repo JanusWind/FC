@@ -103,21 +103,26 @@ class dialog_opt( QDialog ) :
 		self.lab_disp    = QLabel( 'Display Options:'  )
 		self.lab_thrm_t  = QLabel( 'Temperature:'      )
 		self.lab_thrm_w  = QLabel( 'Thermal Velocity:' )
-		self.lab_spres_n = QLabel( 'Number density:'         )
+		self.lab_spres_n = QLabel( 'Number density:'   )
 		self.lab_spres_v = QLabel( 'Velocity:'         )
-		self.lab_spres_w = QLabel( 'Thermal Speed' )
-		self.lab_spres_r = QLabel( 'Anisotropy' )
-		self.lab_spres_s = QLabel( 'Skewness' )
-		self.lab_spres_k = QLabel( 'Kurtosis' )
+		self.lab_spres_w = QLabel( 'Thermal Speed'     )
+		self.lab_spres_r = QLabel( 'Anisotropy'        )
+		self.lab_spres_s = QLabel( 'Skewness'          )
+		self.lab_spres_k = QLabel( 'Kurtosis'          )
+		self.lab_done    = QLabel( 'Done'              )
 
-		self.box = { 'thrm_t':event_CheckBox( self, 'thrm_t'),
-		             'thrm_w':event_CheckBox( self, 'thrm_w'),
+		self.box = { 'thrm_t' :event_CheckBox( self, 'thrm_t' ),
+		             'thrm_w' :event_CheckBox( self, 'thrm_w' ),
 		             'spres_n':event_CheckBox( self, 'spres_n'),
 		             'spres_v':event_CheckBox( self, 'spres_v'),
 		             'spres_w':event_CheckBox( self, 'spres_w'),
 		             'spres_r':event_CheckBox( self, 'spres_r'),
 		             'spres_s':event_CheckBox( self, 'spres_s'),
 		             'spres_k':event_CheckBox( self, 'spres_k')  }
+
+		self.btn_done = event_PushButton( self, 'done', 'Done' )
+
+		self.btn_done.setAutoDefault( False )
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
@@ -141,6 +146,8 @@ class dialog_opt( QDialog ) :
 		self.sg2.addWidget( self.lab_spres_k,    7, 0, 1, 1 )
 		self.sg2.addWidget( self.box['spres_k'], 7, 1, 1, 1 )
 
+		self.sg3.addWidget( self.btn_done, 0, 0, 1, 1 )
+
 		# Populate the menu with the options settings from core.
 
 		self.make_opt( )
@@ -155,18 +162,14 @@ class dialog_opt( QDialog ) :
 
 	def make_opt( self ) :
 
-		self.box['thrm_t'].setChecked(  self.core.opt['thrm_t' ] )
-		self.box['thrm_w'].setChecked(  self.core.opt['thrm_w' ] )
+		self.box['thrm_t' ].setChecked( self.core.opt['thrm_t' ] )
+		self.box['thrm_w' ].setChecked( self.core.opt['thrm_w' ] )
 		self.box['spres_n'].setChecked( self.core.opt['spres_n'] )
 		self.box['spres_v'].setChecked( self.core.opt['spres_v'] )
 		self.box['spres_w'].setChecked( self.core.opt['spres_w'] )
 		self.box['spres_r'].setChecked( self.core.opt['spres_r'] )
 		self.box['spres_s'].setChecked( self.core.opt['spres_s'] )
 		self.box['spres_k'].setChecked( self.core.opt['spres_k'] )
-
-		#TODO: Rename "box_?" variables to match "self.core.opt."
-
-		#TODO: Code to set state of other boxes.
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
@@ -175,7 +178,7 @@ class dialog_opt( QDialog ) :
 	def user_event( self, event, fnc ) :
 
 		# If no threads are running, make the change to the option with
-		# core.  Otherwise, restore the original options settings.\
+		# core.  Otherwise, restore the original options settings.
 
 		if ( n_thread( ) == 0 ) :
 
@@ -186,9 +189,18 @@ class dialog_opt( QDialog ) :
 			        args=( self.core, fnc,
 			               self.box[fnc].isChecked( ) ) ).start( )
 
+#			if ( fnc == 'done' ) :
+#
+#				self.close( )
+#
+#				return
 		else :
 
 			self.make_opt( )
+
+#		if (fnc == 'done' ) :
+#
+#			self.close( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A CHANGE OF AN OPTION.
