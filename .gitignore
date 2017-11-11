@@ -2,7 +2,6 @@
 *.swp
 *.swo
 *.sh
-*.vim
 results/export/*.dat
 results/save/*.jns
 data/fc/*.cdf
