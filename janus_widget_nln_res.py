@@ -249,6 +249,7 @@ class widget_nln_res( format_TextEdit ) :
 
 				elif ( pop['drift'] ) :
 
+                                        print 
 					self.prnt_brk( )
 					self.prnt_tab( 2 )
 					self.prnt_htm( lab_dv + ' = ' )
