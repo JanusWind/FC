@@ -119,7 +119,7 @@ class dialog_opt( QDialog ) :
 		             'spres_s':event_CheckBox( self, 'spres_s'),
 		             'spres_k':event_CheckBox( self, 'spres_k')  }
 
-		self.btn_done = events_PushButton( self, 'done', 'Done' )
+		self.btn_done = event_PushButton( self, 'done', 'Done' )
 
 		self.btn_done.setAutoDefault( False )
 
@@ -201,20 +201,3 @@ class dialog_opt( QDialog ) :
 		# Regenerate the menu.
 
 		self.make_opt( )
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
-	#-----------------------------------------------------------------------
-
-	def user_events( self, event, fnc ) :
-
-		# If no threads are running, make the change to the option with
-		# core.  Otherwise, restore the original options settings.
-
-		if ( fnc == 'done' ) :
-
-			self.close( )
-
-			return
-
-
