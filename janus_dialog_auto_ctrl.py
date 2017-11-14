@@ -112,9 +112,6 @@ class dialog_auto_ctrl( QDialog ) :
 		self.btn_auto.setDefault( False )
 		self.btn_cncl.setDefault( False )
 
-		self.btn_auto.setAutoDefault( False )
-		self.btn_cncl.setAutoDefault( False )
-
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
