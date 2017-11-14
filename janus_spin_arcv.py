@@ -180,9 +180,7 @@ class spin_arcv( object ) :
 
 		# Request a cleanup of the data loaded into this archive.
 
-		#TODO
-
-		###self.cleanup_date( )
+		self.cleanup_date( )
 
 		# Return the spin period.
 
@@ -284,14 +282,14 @@ class spin_arcv( object ) :
 
 		ind = len( self.arr_date )
 
-		self.arr_date.append( [ date_str ] )
+		self.arr_date.append( date_str )
 
 		# Extract the data from the loaded file.
 
 		self.arr_spin_t += list( cdf['Epoch'        ][:] )
 		self.arr_spin_w += list( cdf['AVG_SPIN_RATE'][:] )
 
-		self.arr_spin_ind.append( [ ind for ep in cdf['Epoch'] ] )
+		self.arr_spin_ind += [ ind for ep in cdf['Epoch'] ]
 
 		# Request a clean-up of the files in the data directory.
 
@@ -303,31 +301,35 @@ class spin_arcv( object ) :
 
 	def cleanup_date( self ) :
 
-		# If the number of dates is less than or equal to the maximum,
-		# abort (as nothing needs to be done).
+		# For each date over the maximum number, remove that date and
+		# all loaded data.
 
-		if ( len( self.arr_date ) <= self.n_date_max ) :
-			return
+		while ( len( self.arr_date ) > self.n_date_max ) :
 
-		# Delete dates (and all associated data) from this archive so
-		# that the number of loaded dates equals the maximum allowed.
+			# Remove the least recently loaded date from the list
+			# of loaded dates.
 
-		n_rmv = len( self.arr_date ) - self.n_date_max
+			self.arr_date = self.arr_date[1:]
 
-#		ind_min = self.t_date - self.n_date_max
+			# Remove the timestamps and spin rates from the removed
+			# date.
 
-		self.date_str = self.date_str[n_rmv:]
-		self.date_ind = self.date_ind[n_rmv:]
+			rng = range( len( self.arr_spin_ind ) )
 
-#		self.n_date -= n_rmv
+			self.arr_spin_t = [ self.arr_spin_t[i]
+			                    for i in rng
+			                    if  self.arr_spin_ind[i] != 0 ]
 
-#		tk = where( self.arr_spin_ind >= n_rmv )[0]
+			self.arr_spin_w = [ self.arr_spin_w[i]
+			                    for i in rng
+			                    if  self.arr_spin_ind[i] != 0 ]
 
-		tk = [i for i, x in enumerate( self.arr_spin_ind ) if x >= n_rmv ]
+			# Remove the indices for the removed data and decrement
+			# the remaining indices.
 
-		self.arr_spin_t   = self.arr_spin_t[tk]
-		self.arr_spin_w   = self.arr_spin_w[tk]
-		self.arr_spin_ind = self.arr_spin_ind[tk]
+			self.arr_spin_ind = [ ind - 1
+			                      for ind in self.arr_spin_ind
+			                      if  ind != 0                 ]
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CLEANING UP THE DATA DIRECTORY.
@@ -341,44 +343,32 @@ class spin_arcv( object ) :
 		if ( self.n_file_max >= float( 'infinity' ) ) :
 			return
 
-		# Generate a list of the names of all files of the requested
-		# type (as specified by the "use_*" keywords) in the data
-		# directory.
+		# Generate a list of the names of all spin data files.
 
-		if ( self.use_idl ) :
-			file_name = array( glob(
-			              os.path.join( self.path, 'wind_s*' ) ) )
-		else :
-			if ( self.use_k0 ) :
-				file_name = array( glob(
-				         os.path.join( self.path, 'wi_k0*' ) ) )
-			else :
-				file_name = array( glob(
-				         os.path.join( self.path, 'wi_h0*' ) ) )
-
-		n_file = len( file_name )
+		file_name = list( glob(
+				  os.path.join( self.path, 'wi_k0_spha_*' ) ) )
 
 		# If the number of files is less than or equal to the maximum,
 		# abort (as nothing needs to be done).
 
-		if ( n_file <= self.n_file_max ) :
+		if ( len( file_name ) <= self.n_file_max ) :
 			return
 
 		# Determine the access time of each of the files, and then sort
 		# the files in ascending value.
 
-		file_time = array( [ os.path.getatime( fl )
-		                     for fl in file_name    ] )
+		file_time = [ os.path.getatime( fl ) for fl in file_name ]
 
-		srt = argsort( file_time )
+		srt = sorted( range( len( file_time ) ),
+		              key=file_time.__getitem__  )
 
-		file_name = file_name[srt]
-		file_time = file_time[srt]
+		file_name = [ file_name[i] for i in srt ]
+		file_time = [ file_time[i] for i in srt ]
 
 		# Delete files so that the number of files equals the maximum
 		# allowed.
 
-		for f in range( n_file - self.n_file_max ) :
+		for f in range( len( file_name ) - self.n_file_max ) :
 			os.remove( file_name[f] )
 
 	#-----------------------------------------------------------------------
@@ -399,3 +389,9 @@ class spin_arcv( object ) :
 
 		self.core.emit( SIGNAL('janus_mesg'),
 		                'spin', mesg_typ, mesg_obj )
+
+	# TODO
+
+	###def chng_n_file_max( val ) :
+	###	self.n_file_max = 
+	###	self.cleanup_file( )

@@ -119,7 +119,7 @@ class dialog_opt( QDialog ) :
 		             'spres_s':event_CheckBox( self, 'spres_s'),
 		             'spres_k':event_CheckBox( self, 'spres_k')  }
 
-		self.btn_done = events_PushButton( self, 'done', 'Done' )
+		self.btn_done = event_PushButton( self, 'done', 'Done' )
 
 		self.btn_done.setAutoDefault( False )
 
@@ -175,6 +175,15 @@ class dialog_opt( QDialog ) :
 	#-----------------------------------------------------------------------
 
 	def user_event( self, event, fnc ) :
+
+		# If the 'Done' button has been pressed, close the window and
+		# return.
+
+		if ( fnc == 'done' ) :
+
+			self.close( )
+
+			return
 
 		# If no threads are running, make the change to the option with
 		# core.  Otherwise, restore the original options settings.
