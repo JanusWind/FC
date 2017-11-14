@@ -106,7 +106,6 @@ class dialog_opt( QDialog ) :
 		self.lab_spres_n = QLabel( 'Number density'   )
 		self.lab_spres_v = QLabel( 'Velocity'         )
 		self.lab_spres_d = QLabel( 'Drift'            )
-		self.lab_spres_w = QLabel( 'Thermal Speed'    )
 		self.lab_spres_r = QLabel( 'Anisotropy'       )
 		self.lab_spres_s = QLabel( 'Skewness'         )
 		self.lab_spres_k = QLabel( 'Kurtosis'         )
@@ -117,7 +116,6 @@ class dialog_opt( QDialog ) :
 		             'spres_n':event_CheckBox( self, 'spres_n'),
 		             'spres_v':event_CheckBox( self, 'spres_v'),
 		             'spres_d':event_CheckBox( self, 'spres_d'),
-		             'spres_w':event_CheckBox( self, 'spres_w'),
 		             'spres_r':event_CheckBox( self, 'spres_r'),
 		             'spres_s':event_CheckBox( self, 'spres_s'),
 		             'spres_k':event_CheckBox( self, 'spres_k')  }
@@ -141,14 +139,12 @@ class dialog_opt( QDialog ) :
 		self.sg2.addWidget( self.box['spres_v'], 3, 1, 1, 1 )
 		self.sg2.addWidget( self.lab_spres_d,    4, 0, 1, 1 )
 		self.sg2.addWidget( self.box['spres_d'], 4, 1, 1, 1 )
-		self.sg2.addWidget( self.lab_spres_w,    5, 0, 1, 1 )
-		self.sg2.addWidget( self.box['spres_w'], 5, 1, 1, 1 )
-		self.sg2.addWidget( self.lab_spres_r,    6, 0, 1, 1 )
-		self.sg2.addWidget( self.box['spres_r'], 6, 1, 1, 1 )
-		self.sg2.addWidget( self.lab_spres_s,    7, 0, 1, 1 )
-		self.sg2.addWidget( self.box['spres_s'], 7, 1, 1, 1 )
-		self.sg2.addWidget( self.lab_spres_k,    8, 0, 1, 1 )
-		self.sg2.addWidget( self.box['spres_k'], 8, 1, 1, 1 )
+		self.sg2.addWidget( self.lab_spres_r,    5, 0, 1, 1 )
+		self.sg2.addWidget( self.box['spres_r'], 5, 1, 1, 1 )
+		self.sg2.addWidget( self.lab_spres_s,    6, 0, 1, 1 )
+		self.sg2.addWidget( self.box['spres_s'], 6, 1, 1, 1 )
+		self.sg2.addWidget( self.lab_spres_k,    7, 0, 1, 1 )
+		self.sg2.addWidget( self.box['spres_k'], 7, 1, 1, 1 )
 
 		self.sg3.addWidget( self.btn_done, 0, 0, 1, 1 )
 
@@ -171,7 +167,6 @@ class dialog_opt( QDialog ) :
 		self.box['spres_n'].setChecked( self.core.opt['spres_n'] )
 		self.box['spres_v'].setChecked( self.core.opt['spres_v'] )
 		self.box['spres_d'].setChecked( self.core.opt['spres_d'] )
-		self.box['spres_w'].setChecked( self.core.opt['spres_w'] )
 		self.box['spres_r'].setChecked( self.core.opt['spres_r'] )
 		self.box['spres_s'].setChecked( self.core.opt['spres_s'] )
 		self.box['spres_k'].setChecked( self.core.opt['spres_k'] )

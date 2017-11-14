@@ -299,7 +299,8 @@ class widget_nln_res( format_TextEdit ) :
 							       pop['sig_w_par'],
 							             1, 'km/s' )
 
-						if ( self.core.opt['spres_r'] ): 
+						if ( ( self.core.opt['spres_r'] ) and 
+						     ( self.core.opt['thrm_w'] ) ) :
 
 							self.prnt_brk( )
 							self.prnt_tab( 3 )
@@ -325,7 +326,7 @@ class widget_nln_res( format_TextEdit ) :
 		
 				# Print the population's temperature(s).
 
-				if ( self.core.opt['thrm_t'] == True ) :
+				if ( self.core.opt['thrm_t'] ) :
 
 					self.prnt_brk( )
 					self.prnt_tab( 2 )
@@ -346,6 +347,15 @@ class widget_nln_res( format_TextEdit ) :
 						             lab_t_par + ' = ' )
 					 	self.prnt_dcm(
 						         pop['t_par'], 1, 'kK' )
+
+						if ( ( self.core.opt['spres_r'] ) and
+						     ( self.core.opt['thrm_w'] == False ) ) :
+							self.prnt_brk( )
+							self.prnt_tab( 3 )
+							self.prnt_htm(
+							         lab_r + ' = ' )
+							self.prnt_dcm(
+							           pop['r'], 2 )
 
 				# Clear the first population indicator.
 
