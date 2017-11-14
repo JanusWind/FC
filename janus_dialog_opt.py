@@ -121,7 +121,7 @@ class dialog_opt( QDialog ) :
 
 		self.btn_done = event_PushButton( self, 'done', 'Done' )
 
-		self.btn_done.setAutoDefault( False )
+		self.btn_done.setAutoDefault( True )
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
