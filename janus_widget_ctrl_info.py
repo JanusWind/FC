@@ -141,8 +141,9 @@ class widget_ctrl_info( format_TextEdit ) :
 
 			if ( mesg_typ == 'begin' ) :
 
-				if ( ( mesg_obj == 'fc'  ) or
-				     ( mesg_obj == 'mfi' )    ) :
+				if ( ( mesg_obj == 'fc'   ) or
+				     ( mesg_obj == 'mfi'  ) or
+				     ( mesg_obj == 'spin' )    ) :
 					self.prnt_htm( 'Retrieving '    + 
 					               mesg_obj.upper() +
 					               ' data.'           )
@@ -271,7 +272,9 @@ class widget_ctrl_info( format_TextEdit ) :
 		# a statement to the text area that is appropriate to the
 		# message's source, type, and (if applicable) object.
 
-		if ( ( mesg_src == 'fc'  ) or ( mesg_src == 'mfi' ) ) :
+		if ( ( mesg_src == 'fc'   ) or
+		     ( mesg_src == 'mfi'  ) or 
+		     ( mesg_src == 'spin' )    ) :
 
 			if ( mesg_typ == 'load' ) :
 				self.prnt_tab( 1 )
@@ -290,7 +293,8 @@ class widget_ctrl_info( format_TextEdit ) :
 
 			if ( mesg_typ == 'none' ) :
 				self.prnt_tab( 1 )
-				self.prnt_htm( 'ERROR!  No data found.' , speak=True)
+				self.prnt_htm( 'ERROR!  No data found.',
+				               speak=True                )
 
 		# Scroll to the bottom of the text area.
 

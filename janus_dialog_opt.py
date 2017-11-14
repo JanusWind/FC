@@ -176,6 +176,15 @@ class dialog_opt( QDialog ) :
 
 	def user_event( self, event, fnc ) :
 
+		# If the 'Done' button has been pressed, close the window and
+		# return.
+
+		if ( fnc == 'done' ) :
+
+			self.close( )
+
+			return
+
 		# If no threads are running, make the change to the option with
 		# core.  Otherwise, restore the original options settings.
 
