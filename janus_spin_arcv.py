@@ -165,6 +165,7 @@ class spin_arcv( object ) :
 		# Determine the ordering of the absolute time differeneces.
 
 		arg = sorted( range( len( adt ) ), key=adt.__getitem__ )
+
 		# If the smallest time difference is greater than the tolerance,
 		# return 'None'.
 
