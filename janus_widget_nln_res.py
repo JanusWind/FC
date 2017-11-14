@@ -187,7 +187,8 @@ class widget_nln_res( format_TextEdit ) :
 
 				dcm = max( [ 1, 2 - int( floor( log10(
 				                       abs( pop['n'] ) ) ) ) ] )
-				if ( self.core.opt['spres_n'] == True ) :
+
+				if ( self.core.opt['spres_n'] ) :
 
 					self.prnt_brk( )
 					self.prnt_tab( 2 )
@@ -204,7 +205,7 @@ class widget_nln_res( format_TextEdit ) :
 
 				if ( ( first_spc ) and ( first_pop ) ) :
 
-					if ( self.core.opt['spres_v'] == True ) :
+					if ( self.core.opt['spres_v'] ) :
 
 
 						self.prnt_brk( )
@@ -249,89 +250,133 @@ class widget_nln_res( format_TextEdit ) :
 
 				elif ( pop['drift'] ) :
 
-                                        print 
-					self.prnt_brk( )
-					self.prnt_tab( 2 )
-					self.prnt_htm( lab_dv + ' = ' )
-					self.prnt_dcm( pop['dv'], 1 )
-					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm( pop['sig_dv'], 1, 'km/s')
+					if ( self.core.opt['spres_d'] ):
+						self.prnt_brk( )
+						self.prnt_tab( 2 )
+						self.prnt_htm( lab_dv + ' = ' )
+						self.prnt_dcm( pop['dv'], 1 )
+						self.prnt_htm(
+						        '&nbsp;&plusmn;&nbsp;' )
+						self.prnt_dcm(
+						       pop['sig_dv'], 1, 'km/s')
 
 				# Print the population's thermal speed(s).
 
-				if ( pop['aniso'] ) :
+				if ( ( self.core.opt['thrm_w'] == True ) or
+				     ( self.core.opt['thrm_t'] == True ) or
+				     ( self.core.opt['thrm_w'] == True ) ) :
 
-					self.prnt_brk( )
-					self.prnt_tab( 2 )
-					self.prnt_htm( lab_w + ' = ' )
-					self.prnt_dcm( pop['w'], 1, 'km/s' )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_w_per + ' = ' )
-					self.prnt_dcm( pop['w_per'], 1 )
-					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm( pop['sig_w_per'],
-					               1, 'km/s'       )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_w_par + ' = ' )
-					self.prnt_dcm( pop['w_par'], 1 )
-					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm( pop['sig_w_par'],
-					               1, 'km/s'       )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_r + ' = ' )
-					self.prnt_dcm( pop['r'], 2 )
-				else :
+					if ( pop['aniso'] ) :
 
-					self.prnt_brk( )
-					self.prnt_tab( 2 )
-					self.prnt_htm( lab_w + ' = ' )
-					self.prnt_dcm( pop['w'], 1 )
-					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm( pop['sig_w'], 1, 'km/s' )
+						if ( self.core.opt['thrm_w'] ) :
 
+							self.prnt_brk( )
+							self.prnt_tab( 2 )
+							self.prnt_htm(
+							         lab_w + ' = ' )
+							self.prnt_dcm(
+							   pop['w'], 1, 'km/s' )
+							self.prnt_brk( )
+							self.prnt_tab( 3 )
+							self.prnt_htm(
+							     lab_w_per + ' = ' )
+							self.prnt_dcm(
+							       pop['w_per'], 1 )
+							self.prnt_htm(
+							'&nbsp;&plusmn;&nbsp;' )
+							self.prnt_dcm(
+							       pop['sig_w_per'],
+							             1, 'km/s' )
+							self.prnt_brk( )
+							self.prnt_tab( 3 )
+							self.prnt_htm(
+							     lab_w_par + ' = ' )
+							self.prnt_dcm(
+							       pop['w_par'], 1 )
+							self.prnt_htm(
+							'&nbsp;&plusmn;&nbsp;' )
+							self.prnt_dcm(
+							       pop['sig_w_par'],
+							             1, 'km/s' )
+
+						if ( self.core.opt['spres_r'] ): 
+
+							self.prnt_brk( )
+							self.prnt_tab( 3 )
+							self.prnt_htm(
+							         lab_r + ' = ' )
+							self.prnt_dcm(
+							           pop['r'], 2 )
+					else :
+	
+						if ( self.core.opt['thrm_w'] ) :
+
+							self.prnt_brk( )
+							self.prnt_tab( 2 )
+							self.prnt_htm(
+							         lab_w + ' = ' )
+							self.prnt_dcm(
+							           pop['w'], 1 )
+							self.prnt_htm(
+							'&nbsp;&plusmn;&nbsp;' )
+							self.prnt_dcm(
+							           pop['sig_w'],
+							             1, 'km/s' )
+		
 				# Print the population's temperature(s).
 
-				self.prnt_brk( )
-				self.prnt_tab( 2 )
-				self.prnt_htm( lab_t + ' = ' )
-				self.prnt_dcm( pop['t'], 1, 'kK' )
-
-				if ( pop['aniso'] ) :
+				if ( self.core.opt['thrm_t'] == True ) :
 
 					self.prnt_brk( )
-				 	self.prnt_tab( 3 )
-				 	self.prnt_htm( lab_t_per + ' = ' )
-				 	self.prnt_dcm( pop['t_per'], 1, 'kK' )
-				 	self.prnt_brk( )
-				 	self.prnt_tab( 3 )
-				 	self.prnt_htm( lab_t_par + ' = ' )
-				 	self.prnt_dcm( pop['t_par'], 1, 'kK' )
+					self.prnt_tab( 2 )
+					self.prnt_htm( lab_t + ' = ' )
+					self.prnt_dcm( pop['t'], 1, 'kK' )
+
+					if ( pop['aniso'] ) :
+	
+						self.prnt_brk( )
+					 	self.prnt_tab( 3 )
+					 	self.prnt_htm(
+						             lab_t_per + ' = ' )
+					 	self.prnt_dcm(
+						         pop['t_per'], 1, 'kK' )
+					 	self.prnt_brk( )
+					 	self.prnt_tab( 3 )
+					 	self.prnt_htm(
+						             lab_t_par + ' = ' )
+					 	self.prnt_dcm(
+						         pop['t_par'], 1, 'kK' )
+
+				# Clear the first population indicator.
+
+				first_pop = False
 
 			# Print the Skewness and Excess Kurtosis value
 
 			if  ( len( self.core.nln_res_plas.lst_pop( spc )
 			                                               ) > 1 ) :
-				self.prnt_brk( )
-				self.prnt_brk( )
-       				self.prnt_tab( 1 )
-  				self.prnt_htm( '<u>Higher-Order Moments:</u>' )
+				if ( ( self.core.opt['spres_s'] == True ) or
+				     ( self.core.opt['spres_s'] == True )  )  :
 
-       				self.prnt_brk( )
-       				self.prnt_tab( 2 )
-       				self.prnt_htm( lab_s + ' = ' )
-       				self.prnt_dcm( spc['s'], 3 )
+					self.prnt_brk( )
+					self.prnt_brk( )
+	       				self.prnt_tab( 1 )
+	  				self.prnt_htm(
+					        '<u>Higher-Order Moments:</u>' )
 
-       				self.prnt_brk( )
-       				self.prnt_tab( 2 )
-       				self.prnt_htm( lab_k + ' = ' )
-       				self.prnt_dcm( spc['k'] - 3, 3 )
+				if ( self.core.opt['spres_s'] == True ) :
+	
+	       				self.prnt_brk( )
+	       				self.prnt_tab( 2 )
+	       				self.prnt_htm( lab_s + ' = ' )
+	       				self.prnt_dcm( spc['s'], 3 )
 
-				# Clear the first population indicator.
+				if ( self.core.opt['spres_k'] == True ) :
 
-				first_pop = False
+					self.prnt_brk( )
+       					self.prnt_tab( 2 )
+       					self.prnt_htm( lab_k + ' = ' )
+       					self.prnt_dcm( spc['k'] - 3, 3 )
 
 			# Clear the first-species indicator.
 

@@ -487,6 +487,7 @@ class core( QObject ) :
 			               'spres':True,
 			             'spres_n':True,
 			             'spres_v':True,
+			             'spres_d':True,
 			             'spres_w':True,
 			             'spres_r':True,
 			             'spres_s':True,
@@ -2508,8 +2509,10 @@ class core( QObject ) :
 				self.opt['thrm_w'] = True
 
 		if ( self.opt['spres_n'] or self.opt['spres_v'] or
-		     self.opt['spres_w'] or self.opt['spres_r'] or
-		     self.opt['spres_s'] or self.opt['spres_k']    ) :
+		     self.opt['spres_d'] or self.opt['spres_r'] or
+		     self.opt['spres_s'] or self.opt['spres_k'] or
+		     self.opt['spres_w']                            ) :
+
 			self.opt['spres'] = True
 		else :
 			self.opt['spres'] = False
