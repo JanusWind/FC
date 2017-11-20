@@ -482,12 +482,14 @@ class core( QObject ) :
 
 		if ( var_opt ) :
 
-			self.opt = {  'thrm_w':True,
-			              'thrm_t':True,
+			self.opt = { 'thrm_dw':True,
+			             'thrm_dt':True,
 			               'spres':True,
 			             'spres_n':True,
 			             'spres_v':True,
 			             'spres_d':True,
+			             'spres_t':True,
+			             'spres_w':True,
 			             'spres_r':True,
 			             'spres_s':True,
 			             'spres_k':True  }
@@ -2500,16 +2502,17 @@ class core( QObject ) :
 
 		# Validate the options.
 
-		if ( not ( self.opt['thrm_w'] or self.opt['thrm_t'] ) ) :
+		if ( not ( self.opt['thrm_dw'] or self.opt['thrm_dt'] ) ) :
 
-			if ( key == 'thrm_w' ) :
-				self.opt['thrm_t'] = True
+			if ( key == 'thrm_dw' ) :
+				self.opt['thrm_dt'] = True
 			else :
-				self.opt['thrm_w'] = True
+				self.opt['thrm_dw'] = True
 
 		if ( self.opt['spres_n'] or self.opt['spres_v'] or
-		     self.opt['spres_d'] or self.opt['spres_r'] or
-		     self.opt['spres_s'] or self.opt['spres_k']  ) :
+		     self.opt['spres_d'] or self.opt['spres_t'] or
+		     self.opt['spres_w'] or self.opt['spres_r'] or
+		     self.opt['spres_s'] or self.opt['spres_k']     ) :
 
 			self.opt['spres'] = True
 		else :
