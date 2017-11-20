@@ -106,10 +106,7 @@ class dialog_opt( QDialog ) :
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
 
-		#TODO Make font od 'lab_disp1' and 'lab_disp2' bold.
-		# Not that setFont(QtGui.QFont().setBold(True)) doesn't work.
-
-		self.lab_disp1   = QLabel( 'Display Options'      )
+		self.lab_disp1   = QLabel( 'DisplayOptions', QFont().setBold(True) )
 		self.lab_thrm_dt = QLabel( 'Temperature'          )
 		self.lab_thrm_dw = QLabel( 'Thermal Velocity'     )
 		self.lab_disp2   = QLabel( 'Parameters'           )

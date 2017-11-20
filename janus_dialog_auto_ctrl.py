@@ -35,7 +35,7 @@ from janus_event_CheckBox import event_CheckBox
 from janus_event_LineEdit import event_LineEdit
 from janus_event_PushButton import event_PushButton
 
-# Load the modules necessary for time convertion.
+# Load the modules necessary for time conversion.
 
 from janus_time import calc_time_epc, calc_time_sec, calc_time_str
 
