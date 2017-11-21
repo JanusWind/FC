@@ -484,7 +484,7 @@ class core( QObject ) :
 
 			self.opt = { 'thrm_dw':True,
 			             'thrm_dt':True,
-			               'spres':True,
+			             'spres'  :True,
 			             'spres_n':True,
 			             'spres_v':True,
 			             'spres_d':True,
@@ -2493,8 +2493,8 @@ class core( QObject ) :
 
 	def chng_opt( self, key, value ) :
 
-		#if ( key not in sef.opt ) :
-		#	return
+		if ( key not in sef.opt ) :
+			return
 
 		# Apply the change to the options dictionary.
 

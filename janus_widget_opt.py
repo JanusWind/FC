@@ -27,25 +27,16 @@
 
 # Load the modules necessary for the graphical interface.
 
-from PyQt4.QtGui import QDialog, QGridLayout, QLabel, QFont
-from PyQt4.QtCore import SIGNAL
+from PyQt4.QtGui import QTabWidget
 
-# Load the customized push button and one-line text editor.
-
-from janus_event_CheckBox import event_CheckBox, event_RadioBox
-from janus_event_PushButton import event_PushButton
-
-# Load the necessary threading modules.
-
-from threading import Thread
-from janus_thread import n_thread, thread_chng_opt
-from janus_widget_opt import widget_opt
+from janus_widget_opt_par import widget_opt_par
+#from janus_widget_nln_fls import widget_opt_fls
 
 ################################################################################
-## DEFINE CLASS "dialog_opt" TO CUSTOMIZE "QDialog" FOR OPTION CONTROL.
+## DEFINE THE "widget_opt" CLASS TO CUSTOMIZE "QTabWidget" FOR OPTIONS MENU.
 ################################################################################
 
-class dialog_opt( QDialog ) :
+class widget_opt( QTabWidget ) :
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE INITIALIZATION FUNCTION.
@@ -53,16 +44,18 @@ class dialog_opt( QDialog ) :
 
 	def __init__( self, core ) :
 
-		# Inherit all attributes of an instance of "QDialog".
+		# Inherit all attributes of an instance of "QTabWidget".
 
-		super( dialog_opt, self ).__init__( )
+		super( widget_opt, self ).__init__( )
 
 		# Store the Janus core.
 
 		self.core = core
 
-		# Make this a modal dialog (i.e., block user-interaction with
-		# the main application window while this dialog exists).
+		# Intialize this widget's sub-widgets and add them as tabs.
 
-		self.setModal( True )
-		self.wdg_opt = widget_opt(self) 
+		self.wdg_par = widget_opt_par( self.core )
+#		self.wdg_fls = widget_opt_fls( self.core )
+
+		self.addTab( self.wdg_par, 'Display Options' )
+#		self.addTab( self.wdg_fls, 'Files Options'   )
