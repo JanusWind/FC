@@ -2493,7 +2493,7 @@ class core( QObject ) :
 
 	def chng_opt( self, key, value ) :
 
-		if ( key not in sef.opt ) :
+		if ( key not in self.opt ) :
 			return
 
 		# Apply the change to the options dictionary.

@@ -29,7 +29,7 @@
 
 from PyQt4.QtGui import QTabWidget
 
-from janus_widget_opt_par import widget_opt_par
+from janus_dialog_opt import dialog_opt
 #from janus_widget_nln_fls import widget_opt_fls
 
 ################################################################################
@@ -46,7 +46,7 @@ class widget_opt( QTabWidget ) :
 
 		# Inherit all attributes of an instance of "QTabWidget".
 
-		super( widget_opt, self ).__init__( )
+		super( widget_nln, self ).__init__( )
 
 		# Store the Janus core.
 
@@ -54,7 +54,7 @@ class widget_opt( QTabWidget ) :
 
 		# Intialize this widget's sub-widgets and add them as tabs.
 
-		self.wdg_par = widget_opt_par( self.core )
+		self.wdg_par = dialog_opt( self.core )
 #		self.wdg_fls = widget_opt_fls( self.core )
 
 		self.addTab( self.wdg_par, 'Display Options' )
