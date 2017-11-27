@@ -162,7 +162,7 @@ class spin_arcv( object ) :
 		adt = [ abs( ( t - time_epc ).total_seconds( ) )
 		                                      for t in self.arr_spin_t ]
 
-		# Determine the ordering of the absolute time differeneces.
+		# Determine the ordering of the absolute time differences.
 
 		arg = sorted( range( len( adt ) ), key=adt.__getitem__ )
 
@@ -392,6 +392,35 @@ class spin_arcv( object ) :
 
 	# TODO
 
-	###def chng_n_file_max( val ) :
-	###	self.n_file_max = 
-	###	self.cleanup_file( )
+	def chng_n_file_max( val ) :
+
+		# Check the maximum file number input to ensure it is a postive
+		# integer. Change the maximum file number if it is. Otherwise,
+		# raise an error.
+
+		if type(val) is not int:
+			raise ValueError( 'Max file number must be\
+			                                          an integer.' )
+		elif val < 0:
+			raise ValueError('Max file number must be\
+			                                    greater than zero.')
+		else:
+			self.n_file_max = val
+			self.cleanup_file( )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
