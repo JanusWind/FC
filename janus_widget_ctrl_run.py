@@ -36,6 +36,8 @@ from janus_event_PushButton import event_PushButton
 
 # Load the customized dialog windows.
 
+from janus_dialog_opt_super import dialog_opt_super
+
 from janus_dialog_opt import dialog_opt
 from janus_dialog_missing import dialog_missing
 from janus_dialog_auto_ctrl import dialog_auto_ctrl
@@ -174,7 +176,7 @@ class widget_ctrl_run( QWidget ) :
 
 			# Launch a dialog box to request options from the user.
 
-			dialog_opt( self.core )
+			dialog_opt_super( self.core )
 
 			# Return.
 
