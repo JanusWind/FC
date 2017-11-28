@@ -402,8 +402,8 @@ class spin_arcv( object ) :
 			raise ValueError( 'Max file number must be\
 			                                          an integer.' )
 		elif val < 0:
-			raise ValueError('Max file number must be\
-			                                    greater than zero.')
+			raise ValueError( 'Max file number must be\
+			                                   greater than zero.' )
 		else:
 			self.n_file_max = val
 			self.cleanup_file( )
