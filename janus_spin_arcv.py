@@ -413,18 +413,3 @@ class spin_arcv( object ) :
 			self.cleanup_file( )
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
