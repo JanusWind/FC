@@ -442,3 +442,23 @@ class fc_arcv( object ) :
 
 		self.core.emit( SIGNAL('janus_mesg'),
 		                'fc', mesg_typ, mesg_obj )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR CHANGING THE MAXIMUM NUMBER OF FILES.
+	#-----------------------------------------------------------------------
+
+	def chng_n_file_max( self, val ) :
+
+		# Check the maximum file number input to ensure it is a postive
+		# integer. Change the maximum file number if it is. Otherwise,
+		# raise an error.
+
+		if type(val) is not int:
+			raise ValueError( 'Max file number must be\
+			                                          an integer.' )
+		elif val < 0:
+			raise ValueError( 'Max file number cannot be\
+			                                            negative.' )
+		else:
+			self.n_file_max = val
+			self.cleanup_file( )
