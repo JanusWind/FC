@@ -27,7 +27,7 @@
 
 # Load the modules necessary for signaling the graphical interface.
 
-from PyQt4.QtCore import QObject, SIGNAL
+from PyQt4.QtCore import QObject, SIGNAL, QThread
 
 # Load the modules necessary for file operations.
 

@@ -73,7 +73,7 @@ class spin_arcv( object ) :
 		                                         is not None )         \
 		                                    else 3600.
 
-		self.win        = int( win )        if ( win 
+		self.win        = int( win )        if ( win
 		                                         is not None )         \
 		                                    else 5
 

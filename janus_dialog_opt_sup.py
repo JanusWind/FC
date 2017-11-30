@@ -29,14 +29,14 @@
 
 from PyQt4.QtGui import QDialog, QGridLayout, QTabWidget
 
-from janus_dialog_opt_para import dialog_opt_para
-from janus_dialog_opt_file import dialog_opt_file
+from janus_dialog_opt_par import dialog_opt_par
+from janus_dialog_opt_fls import dialog_opt_fls
 
 ################################################################################
 ## DEFINE CLASS "dialog_opt" TO CUSTOMIZE "QDialog" FOR OPTION CONTROL.
 ################################################################################
 
-class dialog_opt_super( QDialog ) :
+class dialog_opt_sup( QDialog ) :
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE INITIALIZATION FUNCTION.
@@ -46,7 +46,7 @@ class dialog_opt_super( QDialog ) :
 
 		# Inherit all attributes of an instance of "QDialog".
 
-		super( dialog_opt_super, self ).__init__( )
+		super( dialog_opt_sup, self ).__init__( )
 
 		# Store the Janus core.
 
@@ -76,11 +76,11 @@ class dialog_opt_super( QDialog ) :
 		self.grd.addWidget( self.wdg, 0, 0, 1, 1 )
 
 
-		self.wdg_opt_para   = dialog_opt_para( self.core   )
-		self.wdg_opt_file   = dialog_opt_file( self.core   )
+		self.wdg_opt_par   = dialog_opt_par( self.core   )
+		self.wdg_opt_fls   = dialog_opt_fls( self.core   )
 
-		self.wdg.addTab( self.wdg_opt_para, 'Parameters'   )
-		self.wdg.addTab( self.wdg_opt_file, 'File Options' )
+		self.wdg.addTab( self.wdg_opt_par, 'Parameters'   )
+		self.wdg.addTab( self.wdg_opt_fls, 'File Options' )
 
 		# Execute this dialog.
 
