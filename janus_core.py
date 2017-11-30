@@ -495,7 +495,7 @@ class core( QObject ) :
 			             'spres_s':True,
 			             'spres_k':True,
 			             'ret'    :True,
-			             'lim'    :False  }
+			             'lim'    :False }
 
 	#-----------------------------------------------------------------------
 	# LOAD THE REQUESTED WIND/FC SPECTRUM.

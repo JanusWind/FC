@@ -79,8 +79,8 @@ class dialog_opt_super( QDialog ) :
 		self.wdg_opt_para   = dialog_opt_para( self.core   )
 		self.wdg_opt_file   = dialog_opt_file( self.core   )
 
-		self.wdg.addTab( self.wdg_opt_para,  'Parameters' )
-		self.wdg.addTab( self.wdg_opt_file,   'File Options' )
+		self.wdg.addTab( self.wdg_opt_para, 'Parameters'   )
+		self.wdg.addTab( self.wdg_opt_file, 'File Options' )
 
 		# Execute this dialog.
 
