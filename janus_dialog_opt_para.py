@@ -27,7 +27,7 @@
 
 # Load the modules necessary for the graphical interface.
 
-from PyQt4.QtGui import QDialog, QGridLayout, QLabel, QFont
+from PyQt4.QtGui import QWidget, QGridLayout, QLabel, QFont
 from PyQt4.QtCore import SIGNAL
 
 # Load the customized push button and one-line text editor.
@@ -42,7 +42,7 @@ from janus_thread import n_thread, thread_chng_opt
 
 
 ################################################################################
-## DEFINE CLASS "dialog_opt_para" TO CUSTOMIZE "QDialog" FOR PARAMETER OPTIONS.
+## DEFINE CLASS "dialog_opt" TO CUSTOMIZE "QDialog" FOR OPTION CONTROL.
 ################################################################################
 
 class dialog_opt_para( QWidget ) :
@@ -65,15 +65,6 @@ class dialog_opt_para( QWidget ) :
 
 		self.connect( self.core, SIGNAL('janus_chng_opt'),
 		                                            self.resp_chng_opt )
-
-		# Make this a modal dialog (i.e., block user-interaction with
-		# the main application window while this dialog exists).
-
-		self.setModal( True )
-
-		# Set the title of this dialog window.
-
-		self.setWindowTitle( 'Options Menu' )
 
 		# Give this widget a grid layout, "self.grd".
 
@@ -121,6 +112,7 @@ class dialog_opt_para( QWidget ) :
 		self.lab_spres_r = QLabel( 'Anisotropy (R)'       )
 		self.lab_spres_s = QLabel( 'Skewness (S)'         )
 		self.lab_spres_k = QLabel( 'Kurtosis (K)'         )
+		self.lab_spres_u = QLabel( 'Uncertainties'        )
 
 		self.box = { 'thrm_dt':event_CheckBox( self, 'thrm_dt' ),
 		             'thrm_dw':event_CheckBox( self, 'thrm_dw' ),
@@ -131,7 +123,8 @@ class dialog_opt_para( QWidget ) :
 		             'spres_w':event_CheckBox( self, 'spres_w' ),
 		             'spres_r':event_CheckBox( self, 'spres_r' ),
 		             'spres_s':event_CheckBox( self, 'spres_s' ),
-		             'spres_k':event_CheckBox( self, 'spres_k' )  }
+		             'spres_k':event_CheckBox( self, 'spres_k' ),
+		             'spres_u':event_CheckBox( self, 'spres_u' )  }
 
 		self.btn_done = event_PushButton( self, 'done', 'Done' )
 
@@ -165,16 +158,14 @@ class dialog_opt_para( QWidget ) :
 		self.sg4.addWidget( self.box['spres_s'], 6, 1, 1, 1 )
 		self.sg4.addWidget( self.lab_spres_k,    7, 0, 1, 1 )
 		self.sg4.addWidget( self.box['spres_k'], 7, 1, 1, 1 )
+		self.sg4.addWidget( self.lab_spres_u,    8, 0, 1, 1 )
+		self.sg4.addWidget( self.box['spres_u'], 8, 1, 1, 1 )
 
 		self.sg5.addWidget( self.btn_done, 0, 0, 1, 1 )
 
 		# Populate the menu with the options settings from core.
 
 		self.make_opt( )
-
-		# Execute this dialog.
-
-		self.exec_( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR POPULATING MENU.
@@ -192,6 +183,7 @@ class dialog_opt_para( QWidget ) :
 		self.box['spres_r'].setChecked( self.core.opt['spres_r'] )
 		self.box['spres_s'].setChecked( self.core.opt['spres_s'] )
 		self.box['spres_k'].setChecked( self.core.opt['spres_k'] )
+		self.box['spres_u'].setChecked( self.core.opt['spres_u'] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.

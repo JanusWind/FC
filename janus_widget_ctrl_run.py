@@ -38,7 +38,7 @@ from janus_event_PushButton import event_PushButton
 
 from janus_dialog_opt_super import dialog_opt_super
 
-from janus_dialog_opt import dialog_opt
+#from janus_dialog_opt import dialog_opt
 from janus_dialog_missing import dialog_missing
 from janus_dialog_auto_ctrl import dialog_auto_ctrl
 from janus_dialog_auto_prog import dialog_auto_prog

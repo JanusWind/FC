@@ -194,9 +194,11 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_tab( 2 )
 					self.prnt_htm( lab_n + ' = ' )
 					self.prnt_dcm( pop['n'], dcm )
-					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm( pop['sig_n'], dcm,
-					               'cm<sup>-3</sup>' )
+					if ( self.core.opt['spres_u'] ) :
+						self.prnt_htm(
+						        '&nbsp;&plusmn;&nbsp;' )
+						self.prnt_dcm( pop['sig_n'],dcm,
+					                     'cm<sup>-3</sup>' )
 	
 				# If this is the first population of the first
 				# species, print the bulk velocity.  Otherwise,
@@ -219,10 +221,13 @@ class widget_nln_res( format_TextEdit ) :
 						self.prnt_dcm(
 						   self.core.nln_res_plas[
 						                    'v0_x'], 0 )
-						self.prnt_htm( 
+
+						if ( self.core.opt['spres_u'] ):
+
+							self.prnt_htm( 
 						        '&nbsp;&plusmn;&nbsp;' )
-						self.prnt_dcm(
-						   self.core.nln_res_plas[
+							self.prnt_dcm(
+						        self.core.nln_res_plas[
 						        'sig_v0_x'], 0, 'km/s' )
 						self.prnt_brk( )
 						self.prnt_tab( 3 )
@@ -230,10 +235,13 @@ class widget_nln_res( format_TextEdit ) :
 						self.prnt_dcm(
 						   self.core.nln_res_plas[
 						                    'v0_y'], 0 )
-						self.prnt_htm(
+
+						if ( self.core.opt['spres_u'] ):
+
+							self.prnt_htm(
 						        '&nbsp;&plusmn;&nbsp;' )
-						self.prnt_dcm(
-						   self.core.nln_res_plas[
+							self.prnt_dcm(
+						         self.core.nln_res_plas[
 						        'sig_v0_y'], 0, 'km/s' )
 						self.prnt_brk( )
 						self.prnt_tab( 3 )
@@ -241,10 +249,12 @@ class widget_nln_res( format_TextEdit ) :
 						self.prnt_dcm(
 						   self.core.nln_res_plas[
 						                    'v0_z'], 0 )
-						self.prnt_htm(
+
+						if ( self.core.opt['spres_u'] ):
+							self.prnt_htm(
 						        '&nbsp;&plusmn;&nbsp;' )
-						self.prnt_dcm(
-						   self.core.nln_res_plas[
+							self.prnt_dcm(
+						         self.core.nln_res_plas[
 						        'sig_v0_z'], 0, 'km/s' )
 
 				elif ( pop['drift'] ) :
@@ -358,7 +368,23 @@ class widget_nln_res( format_TextEdit ) :
 							self.prnt_dcm(
 							           pop['r'], 2 )
 
-				# Clear the first population indicator.
+				# If both temperature and thermal speed is
+				# unselected for display but anisotropy is
+				# selected, just print the population's
+				# anisotropy.
+
+				if ( ( self.core.opt['spres_w']==False ) and
+				     ( self.core.opt['spres_t']==False ) and
+				     ( self.core.opt['spres_r']        )     ) :
+
+					if ( pop['aniso'] ) :
+
+						self.prnt_brk( )
+						self.prnt_tab( 2 )
+						self.prnt_htm( lab_r + ' = '   )
+						self.prnt_dcm( pop['r'], 2     )
+
+					# Clear the first population indicator.
 
 				first_pop = False
 

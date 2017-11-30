@@ -29,10 +29,8 @@
 
 from PyQt4.QtGui import QDialog, QGridLayout, QTabWidget
 
-from janus_widget_mfi_lin_plot   import widget_mfi_lin_plot
-from janus_widget_mfi_lon_plot   import widget_mfi_lon_plot
-from janus_widget_mfi_colat_plot import widget_mfi_colat_plot
-from janus_widget_mfi_info       import widget_mfi_info
+from janus_dialog_opt_para import dialog_opt_para
+from janus_dialog_opt_file import dialog_opt_file
 
 ################################################################################
 ## DEFINE CLASS "dialog_opt" TO CUSTOMIZE "QDialog" FOR OPTION CONTROL.
@@ -78,76 +76,12 @@ class dialog_opt_super( QDialog ) :
 		self.grd.addWidget( self.wdg, 0, 0, 1, 1 )
 
 
-		self.wdg_lin_plot   = widget_mfi_lin_plot( self.core   )
-		self.wdg_lon_plot   = widget_mfi_lon_plot( self.core   )
-		self.wdg_colat_plot = widget_mfi_colat_plot( self.core )
-		self.wdg_info       = widget_mfi_info( self.core       )
+		self.wdg_opt_para   = dialog_opt_para( self.core   )
+		self.wdg_opt_file   = dialog_opt_file( self.core   )
 
-		self.wdg.addTab( self.wdg_lin_plot,  'MFI' )
-		self.wdg.addTab( self.wdg_lon_plot,   'theta' )
-		self.wdg.addTab( self.wdg_colat_plot, 'lambda' )
-		self.wdg.addTab( self.wdg_info,      '<B>' )
+		self.wdg.addTab( self.wdg_opt_para,  'Parameters' )
+		self.wdg.addTab( self.wdg_opt_file,   'File Options' )
 
 		# Execute this dialog.
 
 		self.exec_( )
-
-	"""
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR POPULATING MENU.
-	#-----------------------------------------------------------------------
-
-	def make_opt( self ) :
-
-		self.box['thrm_dt'].setChecked( self.core.opt['thrm_dt'] )
-		self.box['thrm_dw'].setChecked( self.core.opt['thrm_dw'] )
-		self.box['spres_n'].setChecked( self.core.opt['spres_n'] )
-		self.box['spres_v'].setChecked( self.core.opt['spres_v'] )
-		self.box['spres_d'].setChecked( self.core.opt['spres_d'] )
-		self.box['spres_t'].setChecked( self.core.opt['spres_t'] )
-		self.box['spres_w'].setChecked( self.core.opt['spres_w'] )
-		self.box['spres_r'].setChecked( self.core.opt['spres_r'] )
-		self.box['spres_s'].setChecked( self.core.opt['spres_s'] )
-		self.box['spres_k'].setChecked( self.core.opt['spres_k'] )
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
-	#-----------------------------------------------------------------------
-
-	def user_event( self, event, fnc ) :
-
-		# If the 'Done' button has been pressed, close the window and
-		# return.
-
-		if ( fnc == 'done' ) :
-
-			self.close( )
-
-			return
-
-		# If no threads are running, make the change to the option with
-		# core.  Otherwise, restore the original options settings.
-
-		if ( n_thread( ) == 0 ) :
-
-			# Start a new thread that makes the change to the option
-			# with core.
-
-			Thread( target=thread_chng_opt,
-			        args=( self.core, fnc,
-			               self.box[fnc].isChecked( ) ) ).start( )
-
-		else :
-
-			self.make_opt( )
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR RESPONDING TO A CHANGE OF AN OPTION.
-	#-----------------------------------------------------------------------
-
-	def resp_chng_opt( self ) :
-
-		# Regenerate the menu.
-
-		self.make_opt( )
-	"""

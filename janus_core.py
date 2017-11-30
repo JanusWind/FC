@@ -485,6 +485,7 @@ class core( QObject ) :
 			self.opt = { 'thrm_dw':True,
 			             'thrm_dt':True,
 			             'spres'  :True,
+			             'spres_u':True,
 			             'spres_n':True,
 			             'spres_v':True,
 			             'spres_d':True,
@@ -492,7 +493,9 @@ class core( QObject ) :
 			             'spres_w':True,
 			             'spres_r':True,
 			             'spres_s':True,
-			             'spres_k':True  }
+			             'spres_k':True,
+			             'ret'    :True,
+			             'lim'    :False  }
 
 	#-----------------------------------------------------------------------
 	# LOAD THE REQUESTED WIND/FC SPECTRUM.
