@@ -2521,6 +2521,13 @@ class core( QObject ) :
 		else :
 			self.opt['spres'] = False
 
+		if ( key == 'nfile_fc' ) :
+
+			try :
+				self.fc_arcv.chng_n_file_max( value )
+			else :
+				pass
+
 		# Emit the signal that an option has changed.
 
 		self.emit( SIGNAL('janus_chng_opt') )
