@@ -390,8 +390,6 @@ class spin_arcv( object ) :
 		self.core.emit( SIGNAL('janus_mesg'),
 		                'spin', mesg_typ, mesg_obj )
 
-	# TODO
-
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CHANGING THE MAXIMUM NUMBER OF FILES.
 	#-----------------------------------------------------------------------

@@ -450,12 +450,21 @@ class fc_arcv( object ) :
 		# integer. Change the maximum file number if it is. Otherwise,
 		# raise an error.
 
-		if type(val) is not int:
+		if ( ( val != float( 'infinity' ) ) and
+		     ( type( val ) is not int     )     ) :
+
 			raise ValueError( 'Max file number must be\
-			                                          an integer.' )
-		elif val < 0:
+			                      infinity or a positive integer.' )
+
+			return
+
+		if ( val < 0 ) :
+
 			raise ValueError( 'Max file number cannot be\
 			                                            negative.' )
-		else:
-			self.n_file_max = val
-			self.cleanup_file( )
+
+			return
+
+		self.n_file_max = val
+
+		self.cleanup_file( )

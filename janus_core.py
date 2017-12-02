@@ -2523,10 +2523,24 @@ class core( QObject ) :
 
 		if ( key == 'nfile_fc' ) :
 
-			try :
-				self.fc_arcv.chng_n_file_max( value )
-			else :
-				pass
+#			try :
+			self.fc_arcv.chng_n_file_max( value )
+		else :
+			pass
+
+		if ( key == 'nfile_mfi' ) :
+
+#			try :
+			self.mfi_arcv.chng_n_file_max( value )
+		else :
+			pass
+
+		if ( key == 'nfile_spin' ) :
+
+#			try :
+			self.spin_arcv.chng_n_file_max( value )
+		else :
+			pass
 
 		# Emit the signal that an option has changed.
 

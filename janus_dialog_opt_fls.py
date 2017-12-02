@@ -89,28 +89,35 @@ class dialog_opt_fls( QWidget ) :
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
 
-		self.lab_ret   = QLabel( 'Retain all downloaded files'   )
-		self.lab_lim   = QLabel( 'Limit maximum file number to:' )
+		self.lab_hdr1 = QLabel( 'Maximum # of saved downloaded files'  )
+		self.lab_hdr2 = QLabel( '( Use inf for no limit)'              )
+		self.lab_fc   = QLabel( 'FC Files'                             )
+		self.lab_mfi  = QLabel( 'MFI Files'                            )
+		self.lab_spin = QLabel( 'Spin Files'                           )
 
-		self.txt_lim   = event_LineEdit( self, 'lim' )
+		self.txt_fc    = event_LineEdit( self, 'nfile_fc'   )
+		self.txt_mfi   = event_LineEdit( self, 'nfile_mfi'  )
+		self.txt_spin  = event_LineEdit( self, 'nfile_spin' )
 
-		self.box = { 'ret':event_RadioBox( self, 'ret' ),
-		             'lim':event_RadioBox( self, 'lim' ) }
+		self.box = { 'nfile_fc'  :event_CheckBox( self, 'nfile_fc'   ),
+		             'nfile_mfi' :event_CheckBox( self, 'nfile_mfi'  ),
+		             'nfile_spin':event_CheckBox( self, 'nfile_spin' )   }
 
-		self.btn_done = event_PushButton( self, 'done', 'Done' )
-
-		self.btn_done.setAutoDefault( False )
+#		self.btn_done.setAutoDefault( False )
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
-		self.sg1.addWidget( self.box['ret'], 0, 0, 1, 1 )
-		self.sg1.addWidget( self.box['lim'], 1, 0, 1, 1 )
-		self.sg1.addWidget( self.lab_ret, 0, 1, 1, 1 )
-		self.sg1.addWidget( self.lab_lim, 1, 1, 1, 1 )
-		self.sg1.addWidget( self.txt_lim, 1, 2, 1, 1 )
+		self.sg1.addWidget( self.lab_hdr1, 0, 0, 1, 1 )
+		self.sg1.addWidget( self.lab_hdr2, 1, 0, 1, 1 )
+		self.sg1.addWidget( self.lab_fc,   2, 0, 1, 1 )
+		self.sg1.addWidget( self.txt_fc,   2, 1, 1, 1 )
+		self.sg1.addWidget( self.lab_mfi,  3, 0, 1, 1 )
+		self.sg1.addWidget( self.txt_mfi,  3, 1, 1, 1 )
+		self.sg1.addWidget( self.lab_spin, 4, 0, 1, 1 )
+		self.sg1.addWidget( self.txt_spin, 4, 1, 1, 1 )
 
-		self.sg2.addWidget( self.btn_done, 0, 0, 1, 1 )
+#		self.sg2.addWidget( self.btn_done, 0, 0, 1, 1 )
 		# Populate the menu with the options settings from core.
 
 		self.make_opt( )
@@ -121,8 +128,9 @@ class dialog_opt_fls( QWidget ) :
 
 	def make_opt( self ) :
 
-		self.box['ret'].setChecked( self.core.opt['ret'] )
-		self.box['lim'].setChecked( self.core.opt['lim'] )
+		self.box['nfile_fc'].setChecked(   self.core.opt['nfile_fc']     )
+		self.box['nfile_mfi'].setChecked(  self.core.opt['nfile_mfi']    )
+		self.box['nfile_spin'].setChecked( self.core.opt['nfile_spin']   )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
@@ -133,11 +141,11 @@ class dialog_opt_fls( QWidget ) :
 		# If the 'Done' button has been pressed, close the window and
 		# return.
 
-		if ( fnc == 'done' ) :
-
-			self.close( )
-
-			return
+#		if ( fnc == 'done' ) :
+#
+#			self.close( )
+#
+#			return
 
 		# If no threads are running, make the change to the option with
 		# core.  Otherwise, restore the original options settings.

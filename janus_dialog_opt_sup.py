@@ -72,9 +72,10 @@ class dialog_opt_sup( QDialog ) :
 		# Add a QTabWidget.
 
 		self.wdg = QTabWidget( )
+		self.sg  = QGridLayout( )
 
 		self.grd.addWidget( self.wdg, 0, 0, 1, 1 )
-
+		self.grd.addWidget( self.sg,  0, 0, 1, 1 )
 
 		self.wdg_opt_par   = dialog_opt_par( self.core   )
 		self.wdg_opt_fls   = dialog_opt_fls( self.core   )
@@ -82,6 +83,27 @@ class dialog_opt_sup( QDialog ) :
 		self.wdg.addTab( self.wdg_opt_par, 'Results'   )
 		self.wdg.addTab( self.wdg_opt_fls, 'File Options' )
 
+		self.btn_done = event_PushButton( self, 'done', 'Done' )
+
+		self.btn_done.setAutoDefault( False )
+
+		self.sg.addWidget( self.btn_done, 0, 0, 1, 1 )
+
 		# Execute this dialog.
 
 		self.exec_( )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
+	#-----------------------------------------------------------------------
+
+	def user_event( self, event, fnc ) :
+
+		# If the 'Done' button has been pressed, close the window and
+		# return.
+
+		if ( fnc == 'done' ) :
+
+			self.close( )
+
+			return
