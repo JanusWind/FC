@@ -113,19 +113,51 @@ class dialog_opt_fls( QWidget ) :
 		self.sg.addWidget( self.txt_spin, 4, 1, 1, 1 )
 
 		# Populate the menu with the options settings from core.
-
+#
 		self.make_opt( )
+#
+#	#-----------------------------------------------------------------------
+#	# DEFINE THE FUNCTION FOR VALIDATING TEXT FROM INPUT.
+#	#-----------------------------------------------------------------------
+#
+	def vldt_txt( self ) :
 
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR POPULATING MENU.
-	#-----------------------------------------------------------------------
+		txt = self.txt_fc.txt( )
 
+		if( txt is ' ' ) :
+
+			val = None
+
+		else :
+
+			try:
+
+				val = str_to_nni ( txt )
+
+			except :
+
+				val = None
+
+		if( ( ( val is None ) and ( txt == ' ' ) ) or
+		      ( val == self.core.opt_fls['nfile_fc'] ) ) :
+
+			self.txt_fc.setStyleSheet( 'color: black;' )
+			self.txt_fc.setStyleSheet( 'color: black;' )
+		else :
+			self.txt_fc.setStyleSheet( 'color: red;' )
+			self.txt_fc.setStyleSheet( 'color: red;' )
+			
+
+#	#-----------------------------------------------------------------------
+#	# DEFINE THE FUNCTION FOR POPULATING MENU.
+#	#-----------------------------------------------------------------------
+#
 	def make_opt( self ) :
-
-		self.box['nfile_fc'].setChecked(   self.core.opt['nfile_fc']     )
-		self.box['nfile_mfi'].setChecked(  self.core.opt['nfile_mfi']    )
-		self.box['nfile_spin'].setChecked( self.core.opt['nfile_spin']   )
-
+#
+#		self.box['nfile_fc'].setChecked(   self.core.opt_fls['nfile_fc']     )
+#		self.box['nfile_mfi'].setChecked(  self.core.opt_fls['nfile_mfi']    )
+#		self.box['nfile_spin'].setChecked( self.core.opt_fls['nfile_spin']   )
+#
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
 	#-----------------------------------------------------------------------

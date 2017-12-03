@@ -197,8 +197,8 @@ class widget_nln_res( format_TextEdit ) :
 					if ( self.core.opt['spres_u'] ) :
 						self.prnt_htm(
 						        '&nbsp;&plusmn;&nbsp;' )
-						self.prnt_dcm( pop['sig_n'],dcm,
-					                     'cm<sup>-3</sup>' )
+						self.prnt_dcm( pop['sig_n'],dcm)
+					self.prnt_htm( 'cm<sup>-3</sup>' )
 	
 				# If this is the first population of the first
 				# species, print the bulk velocity.  Otherwise,
@@ -228,7 +228,9 @@ class widget_nln_res( format_TextEdit ) :
 						        '&nbsp;&plusmn;&nbsp;' )
 							self.prnt_dcm(
 						        self.core.nln_res_plas[
-						        'sig_v0_x'], 0, 'km/s' )
+						               'sig_v0_x'], 0  )
+						self.prnt_htm( 'km/s'          )
+
 						self.prnt_brk( )
 						self.prnt_tab( 3 )
 						self.prnt_htm( lab_v_y + ' = ' )
@@ -242,7 +244,9 @@ class widget_nln_res( format_TextEdit ) :
 						        '&nbsp;&plusmn;&nbsp;' )
 							self.prnt_dcm(
 						         self.core.nln_res_plas[
-						        'sig_v0_y'], 0, 'km/s' )
+						               'sig_v0_y'], 0  )
+						self.prnt_htm( 'km/s'          )
+
 						self.prnt_brk( )
 						self.prnt_tab( 3 )
 						self.prnt_htm( lab_v_z + ' = ' )
@@ -255,7 +259,8 @@ class widget_nln_res( format_TextEdit ) :
 						        '&nbsp;&plusmn;&nbsp;' )
 							self.prnt_dcm(
 						         self.core.nln_res_plas[
-						        'sig_v0_z'], 0, 'km/s' )
+						               'sig_v0_z'], 0  )
+						self.prnt_htm( 'km/s'          )
 
 				elif ( pop['drift'] ) :
 
@@ -264,10 +269,12 @@ class widget_nln_res( format_TextEdit ) :
 						self.prnt_tab( 2 )
 						self.prnt_htm( lab_dv + ' = ' )
 						self.prnt_dcm( pop['dv'], 1 )
-						self.prnt_htm(
-						        '&nbsp;&plusmn;&nbsp;' )
-						self.prnt_dcm(
-						       pop['sig_dv'], 1, 'km/s')
+						if( self.core.opt['spres_u'] ) :
+							self.prnt_htm(
+							'&nbsp;&plusmn;&nbsp;' )
+							self.prnt_dcm(
+							pop['sig_dv'], 1       )
+						self.prnt_htm( 'km/s')
 
 				# Print the population's thermal speed(s).
 
@@ -289,26 +296,39 @@ class widget_nln_res( format_TextEdit ) :
 							     lab_w_per + ' = ' )
 							self.prnt_dcm(
 							       pop['w_per'], 1 )
-							self.prnt_htm(
-							'&nbsp;&plusmn;&nbsp;' )
-							self.prnt_dcm(
-							       pop['sig_w_per'],
-							             1, 'km/s' )
+							if (
+							self.core.opt['spres_u']
+							                     ) :
+								self.prnt_htm(
+								'&nbsp;&plusmn;\
+							         &nbsp;'       )
+								self.prnt_dcm(
+								pop[
+								'sig_w_per'] ,1)
+							self.prnt_htm( 'km/s' )
+
 							self.prnt_brk( )
 							self.prnt_tab( 3 )
 							self.prnt_htm(
 							     lab_w_par + ' = ' )
 							self.prnt_dcm(
 							       pop['w_par'], 1 )
-							self.prnt_htm(
-							'&nbsp;&plusmn;&nbsp;' )
-							self.prnt_dcm(
-							       pop['sig_w_par'],
-							             1, 'km/s' )
+							if (
+							self.core.opt['spres_u']
+							                     ) :
+								self.prnt_htm(
+								'&nbsp;&plusmn;\
+							         &nbsp;'       )
+								self.prnt_dcm(
+								pop[
+								'sig_w_par'] ,1)
+							self.prnt_htm( 'km/s' )
 
-						if ( ( self.core.opt['spres_r'] ) and 
-						     ( self.core.opt['spres_w'] ) ) :
-
+						if (
+						   ( self.core.opt['spres_r'] )
+						   and ( 
+						     self.core.opt['spres_w'] )
+						                            ) :
 							self.prnt_brk( )
 							self.prnt_tab( 3 )
 							self.prnt_htm(
@@ -325,16 +345,21 @@ class widget_nln_res( format_TextEdit ) :
 							         lab_w + ' = ' )
 							self.prnt_dcm(
 							           pop['w'], 1 )
-							self.prnt_htm(
-							'&nbsp;&plusmn;&nbsp;' )
-							self.prnt_dcm(
-							           pop['sig_w'],
-							             1, 'km/s' )
+							if (
+							self.core.opt['spres_u']
+							                     ) :
+								self.prnt_htm(
+								'&nbsp;&plusmn;\
+								 &nbsp;'       )
+								self.prnt_dcm(
+								pop[
+							        'sig_w'],1     )
+							self.prnt_htm( 'km/s'  )
 		
 				# Print the population's temperature(s).
 
 				if ( ( self.core.opt['thrm_dt'] ) and
-				     ( self.core.opt['spres_t'] )     ) :
+				     ( self.core.opt['spres_w'] )     ) :
 
 					self.prnt_brk( )
 					self.prnt_tab( 2 )
@@ -374,7 +399,6 @@ class widget_nln_res( format_TextEdit ) :
 				# anisotropy.
 
 				if ( ( self.core.opt['spres_w']==False ) and
-				     ( self.core.opt['spres_t']==False ) and
 				     ( self.core.opt['spres_r']        )     ) :
 
 					if ( pop['aniso'] ) :

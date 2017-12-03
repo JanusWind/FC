@@ -470,6 +470,6 @@ class mfi_arcv( object ) :
 			return
 
 		self.n_file_max = val
-
+		print val
 		self.cleanup_file( )
 

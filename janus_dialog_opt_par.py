@@ -170,16 +170,16 @@ class dialog_opt_par( QWidget ) :
 
 	def make_opt( self ) :
 
-		self.box['thrm_dt'].setChecked( self.core.opt['thrm_dt'] )
-		self.box['thrm_dw'].setChecked( self.core.opt['thrm_dw'] )
-		self.box['spres_n'].setChecked( self.core.opt['spres_n'] )
-		self.box['spres_v'].setChecked( self.core.opt['spres_v'] )
-		self.box['spres_d'].setChecked( self.core.opt['spres_d'] )
-		self.box['spres_w'].setChecked( self.core.opt['spres_w'] )
-		self.box['spres_r'].setChecked( self.core.opt['spres_r'] )
-		self.box['spres_s'].setChecked( self.core.opt['spres_s'] )
-		self.box['spres_k'].setChecked( self.core.opt['spres_k'] )
-		self.box['spres_u'].setChecked( self.core.opt['spres_u'] )
+		self.box['thrm_dt'].setChecked( self.core.opt_par['thrm_dt'] )
+		self.box['thrm_dw'].setChecked( self.core.opt_par['thrm_dw'] )
+		self.box['spres_n'].setChecked( self.core.opt_par['spres_n'] )
+		self.box['spres_v'].setChecked( self.core.opt_par['spres_v'] )
+		self.box['spres_d'].setChecked( self.core.opt_par['spres_d'] )
+		self.box['spres_w'].setChecked( self.core.opt_par['spres_w'] )
+		self.box['spres_r'].setChecked( self.core.opt_par['spres_r'] )
+		self.box['spres_s'].setChecked( self.core.opt_par['spres_s'] )
+		self.box['spres_k'].setChecked( self.core.opt_par['spres_k'] )
+		self.box['spres_u'].setChecked( self.core.opt_par['spres_u'] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.

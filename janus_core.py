@@ -204,7 +204,7 @@ class core( QObject ) :
 		               var_nln_set = True, var_nln_gss = True,
 		               var_nln_sel = True, var_nln_res = True,
 		               var_dsp     = True, var_dyn     = True,
-		               var_opt     = True                      )
+		               var_opt_par = True, var_opt_fls = 'inf' )
 		
 		# Initialize the value of the indicator variable of whether the
 		# automatic analysis should be aborted.
@@ -230,7 +230,7 @@ class core( QObject ) :
 	              var_nln_set = False, var_nln_gss = False,
 	              var_nln_sel = False, var_nln_res = False,
 	              var_dsp     = False, var_dyn     = False,
-	              var_opt     = False                       ) :
+	              var_opt_par = False, var_opt_fls = 'inf'  ) :
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion spectrum's data.
@@ -480,22 +480,24 @@ class core( QObject ) :
 		# If requested, (re-)initialize the variables which indicate
 		# the various options for the GUI's option menu.
 
-		if ( var_opt ) :
+		if ( var_opt_par ) :
 
-			self.opt = { 'thrm_dw'    :True,
-			             'thrm_dt'    :True,
-			             'spres'      :True,
-			             'spres_u'    :True,
-			             'spres_n'    :True,
-			             'spres_v'    :True,
-			             'spres_d'    :True,
-			             'spres_w'    :True,
-			             'spres_r'    :True,
-			             'spres_s'    :True,
-			             'spres_k'    :True,
-			             'nfile_fc'   :True,
-			             'nfile_mfi'  :True,
-                                     'nfile_spin' :True     }
+			self.opt_par = { 'thrm_dw'    :True,
+			                 'thrm_dt'    :True,
+			                 'spres'      :True,
+			                 'spres_u'    :True,
+			                 'spres_n'    :True,
+			                 'spres_v'    :True,
+			                 'spres_d'    :True,
+			                 'spres_w'    :True,
+			                 'spres_r'    :True,
+			                 'spres_s'    :True,
+			                 'spres_k'    :True     }
+		if ( var_opt_fls ) :
+
+			self.opt_fls = { 'nfile_fc'   :'inf',
+			                 'nfile_mfi'  :'inf',
+                                         'nfile_spin' :'inf'    }
 
 	#-----------------------------------------------------------------------
 	# LOAD THE REQUESTED WIND/FC SPECTRUM.
@@ -2496,7 +2498,8 @@ class core( QObject ) :
 
 	def chng_opt( self, key, value ) :
 
-		if ( key not in self.opt ) :
+		if ( ( key not in self.opt_par ) or
+		     ( key not in self.opt_fls ) ) :
 			return
 
 		# Apply the change to the options dictionary.
@@ -2505,21 +2508,22 @@ class core( QObject ) :
 
 		# Validate the options.
 
-		if ( not ( self.opt['thrm_dw'] or self.opt['thrm_dt'] ) ) :
+		if ( not ( self.opt_par['thrm_dw'] or 
+		           self.opt_par['thrm_dt'] ) ) :
 
 			if ( key == 'thrm_dw' ) :
-				self.opt['thrm_dt'] = True
+				self.opt_par['thrm_dt'] = True
 			else :
-				self.opt['thrm_dw'] = True
+				self.opt_par['thrm_dw'] = True
 
-		if ( self.opt['spres_n'] or self.opt['spres_v'] or
-		     self.opt['spres_d'] or self.opt['spres_w'] or
-                     self.opt['spres_r'] or self.opt['spres_s'] or
-                     self.opt['spres_k']                                ) :
+		if ( self.opt_par['spres_n'] or self.opt_par['spres_v'] or
+		     self.opt_par['spres_d'] or self.opt_par['spres_w'] or
+                     self.opt_par['spres_r'] or self.opt_par['spres_s'] or
+                     self.opt_par['spres_k']                                ) :
 
-			self.opt['spres'] = True
+			self.opt_par['spres'] = True
 		else :
-			self.opt['spres'] = False
+			self.opt_par['spres'] = False
 
 		if ( key == 'nfile_fc' ) :
 
