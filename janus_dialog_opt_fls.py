@@ -114,28 +114,32 @@ class dialog_opt_fls( QWidget ) :
 
 		# Populate the menu with the options settings from core.
 #
-		self.make_opt( )
+		self.vldt_txt( )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR RETRIEVING THE TEXT FROM INPUT BOXES.
+	#-----------------------------------------------------------------------
+
+#	def rtrv_txt( self ) :
 #
+#                # Attempt to retrieve each input text.
+#
+#                self.nfile_fc = self.txt
+
 #	#-----------------------------------------------------------------------
 #	# DEFINE THE FUNCTION FOR VALIDATING TEXT FROM INPUT.
 #	#-----------------------------------------------------------------------
 #
 	def vldt_txt( self ) :
 
-		txt = self.txt_fc.txt( )
+		txt = self.txt_fc.text( )
 
 		if( txt is ' ' ) :
-
 			val = None
-
 		else :
-
 			try:
-
 				val = str_to_nni ( txt )
-
 			except :
-
 				val = None
 
 		if( ( ( val is None ) and ( txt == ' ' ) ) or
@@ -152,7 +156,7 @@ class dialog_opt_fls( QWidget ) :
 #	# DEFINE THE FUNCTION FOR POPULATING MENU.
 #	#-----------------------------------------------------------------------
 #
-	def make_opt( self ) :
+#	def make_opt( self ) :
 #
 #		self.box['nfile_fc'].setChecked(   self.core.opt_fls['nfile_fc']     )
 #		self.box['nfile_mfi'].setChecked(  self.core.opt_fls['nfile_mfi']    )
@@ -167,18 +171,8 @@ class dialog_opt_fls( QWidget ) :
 		# If no threads are running, make the change to the option with
 		# core.  Otherwise, restore the original options settings.
 
-		if ( n_thread( ) == 0 ) :
+		if ( self.vldt_txt ) :
 
-			# Start a new thread that makes the change to the option
-			# with core.
-
-			Thread( target=thread_chng_opt,
-			        args=( self.core, fnc,
-			               self.box[fnc].isChecked( ) ) ).start( )
-
-		else :
-
-			self.make_opt( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A CHANGE OF AN OPTION.
