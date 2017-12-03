@@ -472,3 +472,4 @@ class mfi_arcv( object ) :
 		self.n_file_max = val
 
 		self.cleanup_file( )
+

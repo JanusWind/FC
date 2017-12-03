@@ -82,7 +82,6 @@ class dialog_opt_par( QWidget ) :
 		self.sg4 = QGridLayout( )
 		self.sg5 = QGridLayout( )
 		self.sg6 = QGridLayout( )
-#		self.sg7 = QGridLayout( )
 
 		self.sg1.setContentsMargins( 0, 0, 0, 0 )
 		self.sg2.setContentsMargins( 0, 0, 0, 0 )
@@ -90,15 +89,13 @@ class dialog_opt_par( QWidget ) :
 		self.sg4.setContentsMargins( 0, 0, 0, 0 )
 		self.sg5.setContentsMargins( 0, 0, 0, 0 )
 		self.sg6.setContentsMargins( 0, 0, 0, 0 )
-#		self.sg7.setContentsMargins( 0, 0, 0, 0 )
 
 		self.grd.addLayout( self.sg1, 0, 0, 1, 3 )
-		self.grd.addLayout( self.sg2, 1, 0, 1, 1 )
+		self.grd.addLayout( self.sg2, 1, 0, 1, 3 )
 		self.grd.addLayout( self.sg3, 2, 0, 1, 3 )
 		self.grd.addLayout( self.sg4, 3, 0, 1, 1 )
 		self.grd.addLayout( self.sg5, 4, 0, 1, 3 )
 		self.grd.addLayout( self.sg6, 5, 0, 1, 1 )
-#		self.grd.addLayout( self.sg7, 6, 0, 1, 1 )
 
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
@@ -131,10 +128,6 @@ class dialog_opt_par( QWidget ) :
 		             'spres_k':event_CheckBox( self, 'spres_k' ),
 		             'spres_u':event_CheckBox( self, 'spres_u' )  }
 
-#		self.btn_done = event_PushButton( self, 'done', 'Done' )
-
-#		self.btn_done.setAutoDefault( False )
-
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
@@ -147,27 +140,25 @@ class dialog_opt_par( QWidget ) :
 
 		self.sg3.addWidget( self.lab_disp2, 0, 0, 1, 3 )
 
-		self.sg4.addWidget( self.box['spres_n'], 0, 0, 1, 1 )
-		self.sg4.addWidget( self.lab_spres_n,    0, 1, 1, 1 )
-		self.sg4.addWidget( self.box['spres_v'], 1, 0, 1, 1 )
-		self.sg4.addWidget( self.lab_spres_v,    1, 1, 1, 1 )
-		self.sg4.addWidget( self.box['spres_d'], 2, 0, 1, 1 )
-		self.sg4.addWidget( self.lab_spres_d,    2, 1, 1, 1 )
-		self.sg4.addWidget( self.box['spres_w'], 3, 0, 1, 1 )
-		self.sg4.addWidget( self.lab_spres_w,    3, 1, 1, 1 )
-		self.sg4.addWidget( self.box['spres_r'], 4, 0, 1, 1 )
-		self.sg4.addWidget( self.lab_spres_r,    4, 1, 1, 1 )
-		self.sg4.addWidget( self.box['spres_s'], 5, 0, 1, 1 )
-		self.sg4.addWidget( self.lab_spres_s,    5, 1, 1, 1 )
-		self.sg4.addWidget( self.box['spres_k'], 6, 0, 1, 1 )
-		self.sg4.addWidget( self.lab_spres_k,    6, 1, 1, 1 )
+		self.sg4.addWidget( self.box['spres_n'], 0, 1, 1, 1 )
+		self.sg4.addWidget( self.lab_spres_n,    0, 2, 1, 1 )
+		self.sg4.addWidget( self.box['spres_v'], 1, 1, 1, 1 )
+		self.sg4.addWidget( self.lab_spres_v,    1, 2, 1, 1 )
+		self.sg4.addWidget( self.box['spres_d'], 2, 1, 1, 1 )
+		self.sg4.addWidget( self.lab_spres_d,    2, 2, 1, 1 )
+		self.sg4.addWidget( self.box['spres_w'], 3, 1, 1, 1 )
+		self.sg4.addWidget( self.lab_spres_w,    3, 2, 1, 1 )
+		self.sg4.addWidget( self.box['spres_r'], 4, 1, 1, 1 )
+		self.sg4.addWidget( self.lab_spres_r,    4, 2, 1, 1 )
+		self.sg4.addWidget( self.box['spres_s'], 5, 1, 1, 1 )
+		self.sg4.addWidget( self.lab_spres_s,    5, 2, 1, 1 )
+		self.sg4.addWidget( self.box['spres_k'], 6, 1, 1, 1 )
+		self.sg4.addWidget( self.lab_spres_k,    6, 2, 1, 1 )
 
 		self.sg5.addWidget( self.lab_disp3, 0, 0, 1, 3 )
 
-		self.sg6.addWidget( self.box['spres_u'], 0, 0, 1, 1 )
-		self.sg6.addWidget( self.lab_spres_u,    0, 1, 1, 1 )
-
-#		self.sg7.addWidget( self.btn_done, 0, 0, 1, 1 )
+		self.sg6.addWidget( self.box['spres_u'], 0, 1, 1, 1 )
+		self.sg6.addWidget( self.lab_spres_u,    0, 2, 1, 1 )
 
 		# Populate the menu with the options settings from core.
 
@@ -195,15 +186,6 @@ class dialog_opt_par( QWidget ) :
 	#-----------------------------------------------------------------------
 
 	def user_event( self, event, fnc ) :
-
-		# If the 'Done' button has been pressed, close the window and
-		# return.
-
-#		if ( fnc == 'done' ) :
-#
-#			self.close( )
-#
-#			return
 
 		# If no threads are running, make the change to the option with
 		# core.  Otherwise, restore the original options settings.

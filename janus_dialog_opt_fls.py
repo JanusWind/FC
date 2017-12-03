@@ -77,20 +77,17 @@ class dialog_opt_fls( QWidget ) :
 
 		# Create the sub-grids and add them to the widget's main grid.
 
-		self.sg1 = QGridLayout( )
-		self.sg2 = QGridLayout( )
+		self.sg = QGridLayout( )
 
-		self.sg1.setContentsMargins( 0, 0, 0, 0 )
-		self.sg2.setContentsMargins( 0, 0, 0, 0 )
+		self.sg.setContentsMargins( 0, 0, 0, 0 )
 
-		self.grd.addLayout( self.sg1, 0, 0, 1, 1 )
-		self.grd.addLayout( self.sg2, 1, 0, 1, 1 )
+		self.grd.addLayout( self.sg, 0, 0, 14, 3 )
 
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
 
 		self.lab_hdr1 = QLabel( 'Maximum # of saved downloaded files'  )
-		self.lab_hdr2 = QLabel( '( Use inf for no limit)'              )
+		self.lab_hdr2 = QLabel( '( Use "inf" for no limit)'            )
 		self.lab_fc   = QLabel( 'FC Files'                             )
 		self.lab_mfi  = QLabel( 'MFI Files'                            )
 		self.lab_spin = QLabel( 'Spin Files'                           )
@@ -103,21 +100,18 @@ class dialog_opt_fls( QWidget ) :
 		             'nfile_mfi' :event_CheckBox( self, 'nfile_mfi'  ),
 		             'nfile_spin':event_CheckBox( self, 'nfile_spin' )   }
 
-#		self.btn_done.setAutoDefault( False )
-
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
-		self.sg1.addWidget( self.lab_hdr1, 0, 0, 1, 1 )
-		self.sg1.addWidget( self.lab_hdr2, 1, 0, 1, 1 )
-		self.sg1.addWidget( self.lab_fc,   2, 0, 1, 1 )
-		self.sg1.addWidget( self.txt_fc,   2, 1, 1, 1 )
-		self.sg1.addWidget( self.lab_mfi,  3, 0, 1, 1 )
-		self.sg1.addWidget( self.txt_mfi,  3, 1, 1, 1 )
-		self.sg1.addWidget( self.lab_spin, 4, 0, 1, 1 )
-		self.sg1.addWidget( self.txt_spin, 4, 1, 1, 1 )
+		self.sg.addWidget( self.lab_hdr1, 0, 0, 1, 1 )
+		self.sg.addWidget( self.lab_hdr2, 1, 0, 1, 1 )
+		self.sg.addWidget( self.lab_fc,   2, 0, 1, 1 )
+		self.sg.addWidget( self.txt_fc,   2, 1, 1, 1 )
+		self.sg.addWidget( self.lab_mfi,  3, 0, 1, 1 )
+		self.sg.addWidget( self.txt_mfi,  3, 1, 1, 1 )
+		self.sg.addWidget( self.lab_spin, 4, 0, 1, 1 )
+		self.sg.addWidget( self.txt_spin, 4, 1, 1, 1 )
 
-#		self.sg2.addWidget( self.btn_done, 0, 0, 1, 1 )
 		# Populate the menu with the options settings from core.
 
 		self.make_opt( )
@@ -137,15 +131,6 @@ class dialog_opt_fls( QWidget ) :
 	#-----------------------------------------------------------------------
 
 	def user_event( self, event, fnc ) :
-
-		# If the 'Done' button has been pressed, close the window and
-		# return.
-
-#		if ( fnc == 'done' ) :
-#
-#			self.close( )
-#
-#			return
 
 		# If no threads are running, make the change to the option with
 		# core.  Otherwise, restore the original options settings.
