@@ -114,7 +114,7 @@ class dialog_opt_fls( QWidget ) :
 
 		# Populate the menu with the options settings from core.
 #
-		self.vldt_txt( )
+		self.make_opt( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RETRIEVING THE TEXT FROM INPUT BOXES.
@@ -133,35 +133,38 @@ class dialog_opt_fls( QWidget ) :
 	def vldt_txt( self ) :
 
 		txt = self.txt_fc.text( )
-
+		print txt, '1'
 		if( txt is ' ' ) :
 			val = None
+			print val,'2'
 		else :
 			try:
 				val = str_to_nni ( txt )
+				print val,'3'
 			except :
 				val = None
-
+				print val,'4'
 		if( ( ( val is None ) and ( txt == ' ' ) ) or
 		      ( val == self.core.opt_fls['nfile_fc'] ) ) :
 
 			self.txt_fc.setStyleSheet( 'color: black;' )
 			self.txt_fc.setStyleSheet( 'color: black;' )
+			print '5'
 		else :
 			self.txt_fc.setStyleSheet( 'color: red;' )
 			self.txt_fc.setStyleSheet( 'color: red;' )
-			
+			print '6'
 
 #	#-----------------------------------------------------------------------
 #	# DEFINE THE FUNCTION FOR POPULATING MENU.
 #	#-----------------------------------------------------------------------
 #
-#	def make_opt( self ) :
+	def make_opt( self ) :
 #
-#		self.box['nfile_fc'].setChecked(   self.core.opt_fls['nfile_fc']     )
-#		self.box['nfile_mfi'].setChecked(  self.core.opt_fls['nfile_mfi']    )
-#		self.box['nfile_spin'].setChecked( self.core.opt_fls['nfile_spin']   )
-#
+		val = self.core.opt_fls['nfile_fc']
+		print val,'7'
+
+		self.vldt_txt( )
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
 	#-----------------------------------------------------------------------
@@ -173,6 +176,7 @@ class dialog_opt_fls( QWidget ) :
 
 		if ( self.vldt_txt ) :
 
+			self.resp_chng_opt
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A CHANGE OF AN OPTION.
