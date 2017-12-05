@@ -112,7 +112,7 @@ class widget_nln_res( format_TextEdit ) :
 		# If none of the display menus is selected, do not print
 		# anything in the non-linear display widget.
 
-		if (self.core.opt['spres'] == False ) :
+		if (self.core.opt_par['spres'] == False ) :
 
 			return
 
@@ -188,13 +188,13 @@ class widget_nln_res( format_TextEdit ) :
 				dcm = max( [ 1, 2 - int( floor( log10(
 				                       abs( pop['n'] ) ) ) ) ] )
 
-				if ( self.core.opt['spres_n'] ) :
+				if ( self.core.opt_par['spres_n'] ) :
 
 					self.prnt_brk( )
 					self.prnt_tab( 2 )
 					self.prnt_htm( lab_n + ' = ' )
 					self.prnt_dcm( pop['n'], dcm )
-					if ( self.core.opt['spres_u'] ) :
+					if ( self.core.opt_par['spres_u'] ) :
 						self.prnt_htm(
 						        '&nbsp;&plusmn;&nbsp;' )
 						self.prnt_dcm( pop['sig_n'],dcm)
@@ -207,7 +207,7 @@ class widget_nln_res( format_TextEdit ) :
 
 				if ( ( first_spc ) and ( first_pop ) ) :
 
-					if ( self.core.opt['spres_v'] ) :
+					if ( self.core.opt_par['spres_v'] ) :
 
 						self.prnt_brk( )
 						self.prnt_tab( 2 )
@@ -222,7 +222,7 @@ class widget_nln_res( format_TextEdit ) :
 						   self.core.nln_res_plas[
 						                    'v0_x'], 0 )
 
-						if ( self.core.opt['spres_u'] ):
+						if ( self.core.opt_par['spres_u'] ):
 
 							self.prnt_htm( 
 						        '&nbsp;&plusmn;&nbsp;' )
@@ -238,7 +238,7 @@ class widget_nln_res( format_TextEdit ) :
 						   self.core.nln_res_plas[
 						                    'v0_y'], 0 )
 
-						if ( self.core.opt['spres_u'] ):
+						if ( self.core.opt_par['spres_u'] ):
 
 							self.prnt_htm(
 						        '&nbsp;&plusmn;&nbsp;' )
@@ -254,7 +254,7 @@ class widget_nln_res( format_TextEdit ) :
 						   self.core.nln_res_plas[
 						                    'v0_z'], 0 )
 
-						if ( self.core.opt['spres_u'] ):
+						if ( self.core.opt_par['spres_u'] ):
 							self.prnt_htm(
 						        '&nbsp;&plusmn;&nbsp;' )
 							self.prnt_dcm(
@@ -264,12 +264,12 @@ class widget_nln_res( format_TextEdit ) :
 
 				elif ( pop['drift'] ) :
 
-					if ( self.core.opt['spres_d'] ):
+					if ( self.core.opt_par['spres_d'] ):
 						self.prnt_brk( )
 						self.prnt_tab( 2 )
 						self.prnt_htm( lab_dv + ' = ' )
 						self.prnt_dcm( pop['dv'], 1 )
-						if( self.core.opt['spres_u'] ) :
+						if( self.core.opt_par['spres_u'] ) :
 							self.prnt_htm(
 							'&nbsp;&plusmn;&nbsp;' )
 							self.prnt_dcm(
@@ -278,11 +278,11 @@ class widget_nln_res( format_TextEdit ) :
 
 				# Print the population's thermal speed(s).
 
-				if ( self.core.opt['thrm_dw'] ) :
+				if ( self.core.opt_par['thrm_dw'] ) :
 
 					if ( pop['aniso'] ) :
 
-						if ( self.core.opt['spres_w'] ) :
+						if ( self.core.opt_par['spres_w'] ) :
 
 							self.prnt_brk( )
 							self.prnt_tab( 2 )
@@ -297,7 +297,7 @@ class widget_nln_res( format_TextEdit ) :
 							self.prnt_dcm(
 							       pop['w_per'], 1 )
 							if (
-							self.core.opt['spres_u']
+							self.core.opt_par['spres_u']
 							                     ) :
 								self.prnt_htm(
 								'&nbsp;&plusmn;\
@@ -314,7 +314,7 @@ class widget_nln_res( format_TextEdit ) :
 							self.prnt_dcm(
 							       pop['w_par'], 1 )
 							if (
-							self.core.opt['spres_u']
+							self.core.opt_par['spres_u']
 							                     ) :
 								self.prnt_htm(
 								'&nbsp;&plusmn;\
@@ -325,9 +325,9 @@ class widget_nln_res( format_TextEdit ) :
 							self.prnt_htm( 'km/s' )
 
 						if (
-						   ( self.core.opt['spres_r'] )
+						   ( self.core.opt_par['spres_r'] )
 						   and ( 
-						     self.core.opt['spres_w'] )
+						     self.core.opt_par['spres_w'] )
 						                            ) :
 							self.prnt_brk( )
 							self.prnt_tab( 3 )
@@ -337,7 +337,7 @@ class widget_nln_res( format_TextEdit ) :
 							           pop['r'], 2 )
 					else :
 	
-						if ( self.core.opt['spres_w'] ) :
+						if ( self.core.opt_par['spres_w'] ) :
 
 							self.prnt_brk( )
 							self.prnt_tab( 2 )
@@ -346,7 +346,7 @@ class widget_nln_res( format_TextEdit ) :
 							self.prnt_dcm(
 							           pop['w'], 1 )
 							if (
-							self.core.opt['spres_u']
+							self.core.opt_par['spres_u']
 							                     ) :
 								self.prnt_htm(
 								'&nbsp;&plusmn;\
@@ -358,8 +358,8 @@ class widget_nln_res( format_TextEdit ) :
 		
 				# Print the population's temperature(s).
 
-				if ( ( self.core.opt['thrm_dt'] ) and
-				     ( self.core.opt['spres_w'] )     ) :
+				if ( ( self.core.opt_par['thrm_dt'] ) and
+				     ( self.core.opt_par['spres_w'] )     ) :
 
 					self.prnt_brk( )
 					self.prnt_tab( 2 )
@@ -381,9 +381,9 @@ class widget_nln_res( format_TextEdit ) :
 					 	self.prnt_dcm(
 						         pop['t_par'], 1, 'kK' )
 
-						if ( ( self.core.opt['spres_r']
+						if ( ( self.core.opt_par['spres_r']
 						                           ) and
-						(self.core.opt['thrm_dw']==False
+						(self.core.opt_par['thrm_dw']==False
 						                           ) ) :
 
 							self.prnt_brk( )
@@ -398,8 +398,8 @@ class widget_nln_res( format_TextEdit ) :
 				# selected, just print the population's
 				# anisotropy.
 
-				if ( ( self.core.opt['spres_w']==False ) and
-				     ( self.core.opt['spres_r']        )     ) :
+				if ( ( self.core.opt_par['spres_w']==False ) and
+				     ( self.core.opt_par['spres_r']        )     ) :
 
 					if ( pop['aniso'] ) :
 
@@ -416,8 +416,8 @@ class widget_nln_res( format_TextEdit ) :
 
 			if  ( len( self.core.nln_res_plas.lst_pop( spc )
 			                                               ) > 1 ) :
-				if ( ( self.core.opt['spres_s'] == True ) or
-				     ( self.core.opt['spres_k'] == True )  )  :
+				if ( ( self.core.opt_par['spres_s'] == True ) or
+				     ( self.core.opt_par['spres_k'] == True )  )  :
 
 					self.prnt_brk( )
 					self.prnt_brk( )
@@ -425,14 +425,14 @@ class widget_nln_res( format_TextEdit ) :
 	  				self.prnt_htm(
 					        '<u>Higher-Order Moments:</u>' )
 
-				if ( self.core.opt['spres_s'] == True ) :
+				if ( self.core.opt_par['spres_s'] == True ) :
 	
 	       				self.prnt_brk( )
 	       				self.prnt_tab( 2 )
 	       				self.prnt_htm( lab_s + ' = ' )
 	       				self.prnt_dcm( spc['s'], 3 )
 
-				if ( self.core.opt['spres_k'] == True ) :
+				if ( self.core.opt_par['spres_k'] == True ) :
 
 					self.prnt_brk( )
        					self.prnt_tab( 2 )

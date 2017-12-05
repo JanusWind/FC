@@ -113,7 +113,7 @@ class dialog_opt_fls( QWidget ) :
 		self.sg.addWidget( self.txt_spin, 4, 1, 1, 1 )
 
 		# Populate the menu with the options settings from core.
-#
+
 		self.make_opt( )
 
 	#-----------------------------------------------------------------------
@@ -126,10 +126,10 @@ class dialog_opt_fls( QWidget ) :
 #
 #                self.nfile_fc = self.txt
 
-#	#-----------------------------------------------------------------------
-#	# DEFINE THE FUNCTION FOR VALIDATING TEXT FROM INPUT.
-#	#-----------------------------------------------------------------------
-#
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR VALIDATING TEXT FROM INPUT.
+	#-----------------------------------------------------------------------
+
 	def vldt_txt( self ) :
 
 		txt = self.txt_fc.text( )
@@ -155,12 +155,12 @@ class dialog_opt_fls( QWidget ) :
 			self.txt_fc.setStyleSheet( 'color: red;' )
 			print '6'
 
-#	#-----------------------------------------------------------------------
-#	# DEFINE THE FUNCTION FOR POPULATING MENU.
-#	#-----------------------------------------------------------------------
-#
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR POPULATING MENU.
+	#-----------------------------------------------------------------------
+
 	def make_opt( self ) :
-#
+
 		val = self.core.opt_fls['nfile_fc']
 		print val,'7'
 
