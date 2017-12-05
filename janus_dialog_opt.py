@@ -37,7 +37,7 @@ from janus_event_PushButton import event_PushButton
 ## DEFINE CLASS "dialog_opt" TO CUSTOMIZE "QDialog" FOR OPTION CONTROL.
 ################################################################################
 
-class dialog_opt_sup( QDialog ) :
+class dialog_opt( QDialog ) :
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE INITIALIZATION FUNCTION.
@@ -47,7 +47,7 @@ class dialog_opt_sup( QDialog ) :
 
 		# Inherit all attributes of an instance of "QDialog".
 
-		super( dialog_opt_sup, self ).__init__( )
+		super( dialog_opt, self ).__init__( )
 
 		# Store the Janus core.
 
@@ -84,11 +84,11 @@ class dialog_opt_sup( QDialog ) :
 		self.wdg.addTab( self.wdg_opt_par, 'Results'   )
 		self.wdg.addTab( self.wdg_opt_fls, 'File Options' )
 
-		self.btn_done = event_PushButton( self, 'done', 'Done' )
+		self.btn_close = event_PushButton( self, 'close', 'Close' )
 
-		self.btn_done.setAutoDefault( False )
+		self.btn_close.setAutoDefault( False )
 
-		self.sg.addWidget( self.btn_done, 0, 0, 1, 1 )
+		self.sg.addWidget( self.btn_close, 0, 0, 1, 1 )
 
 		# Execute this dialog.
 
@@ -100,10 +100,10 @@ class dialog_opt_sup( QDialog ) :
 
 	def user_event( self, event, fnc ) :
 
-		# If the 'Done' button has been pressed, close the window and
+		# If the 'Close' button has been pressed, close the window and
 		# return.
 
-		if ( fnc == 'done' ) :
+		if ( fnc == 'close' ) :
 
 			self.close( )
 

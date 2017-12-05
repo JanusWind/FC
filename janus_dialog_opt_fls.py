@@ -36,6 +36,8 @@ from janus_event_CheckBox import event_CheckBox, event_RadioBox
 from janus_event_LineEdit import event_LineEdit
 from janus_event_PushButton import event_PushButton
 
+from janus_helper import str_to_nni
+
 # Load the necessary threading modules.
 
 from threading import Thread
@@ -92,13 +94,10 @@ class dialog_opt_fls( QWidget ) :
 		self.lab_mfi  = QLabel( 'MFI Files'                            )
 		self.lab_spin = QLabel( 'Spin Files'                           )
 
-		self.txt_fc    = event_LineEdit( self, 'nfile_fc'   )
-		self.txt_mfi   = event_LineEdit( self, 'nfile_mfi'  )
-		self.txt_spin  = event_LineEdit( self, 'nfile_spin' )
-
-		self.box = { 'nfile_fc'  :event_CheckBox( self, 'nfile_fc'   ),
-		             'nfile_mfi' :event_CheckBox( self, 'nfile_mfi'  ),
-		             'nfile_spin':event_CheckBox( self, 'nfile_spin' )   }
+		self.txt = {
+		           'nfile_fc'  : event_LineEdit( self, 'nfile_fc'   ),
+		           'nfile_mfi' : event_LineEdit( self, 'nfile_ mfi' ),
+		           'nfile_spin': event_LineEdit( self, 'nfile_spin' )  }
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
@@ -106,54 +105,15 @@ class dialog_opt_fls( QWidget ) :
 		self.sg.addWidget( self.lab_hdr1, 0, 0, 1, 1 )
 		self.sg.addWidget( self.lab_hdr2, 1, 0, 1, 1 )
 		self.sg.addWidget( self.lab_fc,   2, 0, 1, 1 )
-		self.sg.addWidget( self.txt_fc,   2, 1, 1, 1 )
+		self.sg.addWidget( self.txt['nfile_fc'],   2, 1, 1, 1 )
 		self.sg.addWidget( self.lab_mfi,  3, 0, 1, 1 )
-		self.sg.addWidget( self.txt_mfi,  3, 1, 1, 1 )
+		self.sg.addWidget( self.txt['nfile_mfi'],  3, 1, 1, 1 )
 		self.sg.addWidget( self.lab_spin, 4, 0, 1, 1 )
-		self.sg.addWidget( self.txt_spin, 4, 1, 1, 1 )
+		self.sg.addWidget( self.txt['nfile_spin'], 4, 1, 1, 1 )
 
 		# Populate the menu with the options settings from core.
 
 		self.make_opt( )
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR RETRIEVING THE TEXT FROM INPUT BOXES.
-	#-----------------------------------------------------------------------
-
-#	def rtrv_txt( self ) :
-#
-#                # Attempt to retrieve each input text.
-#
-#                self.nfile_fc = self.txt
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR VALIDATING TEXT FROM INPUT.
-	#-----------------------------------------------------------------------
-
-	def vldt_txt( self ) :
-
-		txt = self.txt_fc.text( )
-		print txt, '1'
-		if( txt is ' ' ) :
-			val = None
-			print val,'2'
-		else :
-			try:
-				val = str_to_nni ( txt )
-				print val,'3'
-			except :
-				val = None
-				print val,'4'
-		if( ( ( val is None ) and ( txt == ' ' ) ) or
-		      ( val == self.core.opt_fls['nfile_fc'] ) ) :
-
-			self.txt_fc.setStyleSheet( 'color: black;' )
-			self.txt_fc.setStyleSheet( 'color: black;' )
-			print '5'
-		else :
-			self.txt_fc.setStyleSheet( 'color: red;' )
-			self.txt_fc.setStyleSheet( 'color: red;' )
-			print '6'
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR POPULATING MENU.
@@ -162,21 +122,59 @@ class dialog_opt_fls( QWidget ) :
 	def make_opt( self ) :
 
 		val = self.core.opt_fls['nfile_fc']
-		print val,'7'
 
-		self.vldt_txt( )
+		txt = self.txt['nfile_fc'].text( )
+
+		if( txt == '' ) :
+			val = None
+		else :
+			try:
+				val = str_to_nni( txt )
+			except :
+				val = None
+
+		if( ( ( val is None ) and ( txt == '' ) ) or
+		      ( val == self.core.opt_fls['nfile_fc'] ) ) :
+
+			self.txt['nfile_fc'].setStyleSheet( 'color: black;' )
+			self.txt['nfile_fc'].setStyleSheet( 'color: black;' )
+
+			txt = str( self.core.opt_fls['nfile_fc'] )
+
+		else :
+
+			self.txt['nfile_fc'].setStyleSheet( 'color: red;' )
+			self.txt['nfile_fc'].setStyleSheet( 'color: red;' )
+
+		self.txt['nfile_fc'].setTextUpdate( txt )
+
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
 	#-----------------------------------------------------------------------
 
 	def user_event( self, event, fnc ) :
 
+		txt = self.txt[fnc].text( )
+
+		try :
+			val = str_to_nni( txt )
+		except :
+			val = None
+
 		# If no threads are running, make the change to the option with
 		# core.  Otherwise, restore the original options settings.
 
-		if ( self.vldt_txt ) :
+		if ( ( n_thread( ) == 0 ) and ( val is not None ) ) :
 
-			self.resp_chng_opt
+			# Start a new thread that makes the change to the option
+			# with core.
+
+			Thread( target=thread_chng_opt,
+			        args=( self.core, fnc, val ) ).start( )
+
+		else :
+
+			self.make_opt( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A CHANGE OF AN OPTION.

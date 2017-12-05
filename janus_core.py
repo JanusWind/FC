@@ -152,25 +152,27 @@ class core( QObject ) :
 
 		self.debug = False
 
-		# Initialize and store the archive of Wind/FC ion spectra.
-
-		self.fc_arcv = fc_arcv( core=self )
-
-		# Initialize and store the archive of Wind/MFI magnetic field
-		# data.
-
-		self.mfi_arcv = mfi_arcv( core=self )
-
-		# Initialize a log of the analysis results.
-
-		self.series = series( )
-
 		# Initialize the variables that will contain the Wind/FC ion
 		# spectrum's data, the associated Wind/MFI magnetic field data,
 		# the ion spectrum's point selection, and the results of the
 		# moments analysis of the ion spectrum.
 
 		self.init_var( )
+
+		# Initialize and store the archive of Wind/FC ion spectra.
+
+		self.fc_arcv = fc_arcv( core=self,
+		                        n_file_max=self.opt_fls['nfile_fc'] )
+
+		# Initialize and store the archive of Wind/MFI magnetic field
+		# data.
+
+		self.mfi_arcv = mfi_arcv( core=self,
+		                          n_file_max=self.opt_fls['nfile_mfi'] )
+
+		# Initialize a log of the analysis results.
+
+		self.series = series( )
 
 		# Load the requested Wind/FC ion spectrum (if one has been
 		# requested).
@@ -204,7 +206,7 @@ class core( QObject ) :
 		               var_nln_set = True, var_nln_gss = True,
 		               var_nln_sel = True, var_nln_res = True,
 		               var_dsp     = True, var_dyn     = True,
-		               var_opt_par = True, var_opt_fls = 'inf' )
+		               var_opt_par = True, var_opt_fls = True  )
 		
 		# Initialize the value of the indicator variable of whether the
 		# automatic analysis should be aborted.
@@ -230,7 +232,7 @@ class core( QObject ) :
 	              var_nln_set = False, var_nln_gss = False,
 	              var_nln_sel = False, var_nln_res = False,
 	              var_dsp     = False, var_dyn     = False,
-	              var_opt_par = False, var_opt_fls = 'inf'  ) :
+	              var_opt_par = False, var_opt_fls = False  ) :
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion spectrum's data.
@@ -495,9 +497,9 @@ class core( QObject ) :
 			                 'spres_k'    :True     }
 		if ( var_opt_fls ) :
 
-			self.opt_fls = { 'nfile_fc'   :'inf',
-			                 'nfile_mfi'  :'inf',
-                                         'nfile_spin' :'inf'    }
+			self.opt_fls = { 'nfile_fc'   :float('inf'),
+			                 'nfile_mfi'  :float('inf'),
+                                         'nfile_spin' :float('inf')  }
 
 	#-----------------------------------------------------------------------
 	# LOAD THE REQUESTED WIND/FC SPECTRUM.
@@ -2498,13 +2500,10 @@ class core( QObject ) :
 
 	def chng_opt( self, key, value ) :
 
-		if ( ( key not in self.opt_par ) or
-		     ( key not in self.opt_fls ) ) :
-			return
-
 		# Apply the change to the options dictionary.
 
-		self.opt[key] = bool( value )
+		if ( key in self.opt_par ) :
+			self.opt_par[key] = bool( value )
 
 		# Validate the options.
 
@@ -2520,31 +2519,31 @@ class core( QObject ) :
 		     self.opt_par['spres_d'] or self.opt_par['spres_w'] or
                      self.opt_par['spres_r'] or self.opt_par['spres_s'] or
                      self.opt_par['spres_k']                                ) :
-
 			self.opt_par['spres'] = True
 		else :
 			self.opt_par['spres'] = False
 
 		if ( key == 'nfile_fc' ) :
-
-#			try :
-			self.fc_arcv.chng_n_file_max( value )
-		else :
-			pass
+			try :
+				self.fc_arcv.chng_n_file_max( value )
+				self.opt_fls['nfile_fc'] = self.fc_arcv.n_file_max
+			except :
+				pass
 
 		if ( key == 'nfile_mfi' ) :
-
-#			try :
-			self.mfi_arcv.chng_n_file_max( value )
-		else :
-			pass
+			try :
+				self.mfi_arcv.chng_n_file_max( value )
+				self.opt_fls['nfile_mfi'] = self.mfi_arcv.n_file_max
+			except :
+				pass
 
 		if ( key == 'nfile_spin' ) :
 
-#			try :
-			self.spin_arcv.chng_n_file_max( value )
-		else :
-			pass
+			try :
+				self.spin_arcv.chng_n_file_max( value )
+				self.opt_fls['nfile_spin'] = self.spin_arcv.n_file_max
+			except :
+				pass
 
 		# Emit the signal that an option has changed.
 
