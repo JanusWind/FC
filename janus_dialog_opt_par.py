@@ -104,61 +104,61 @@ class dialog_opt_par( QWidget ) :
 		# Not that setFont(QtGui.QFont().setBold(True)) doesn't work.
 
 		self.lab_disp1   = QLabel( 'NLN 2nd Moment Paramters'  )
-		self.lab_thrm_dt = QLabel( 'Temperature'               )
-		self.lab_thrm_dw = QLabel( 'Thermal Speed'             ) 
+		self.lab_res_dt = QLabel( 'Temperature'               )
+		self.lab_res_dw = QLabel( 'Thermal Speed'             ) 
 		self.lab_disp2   = QLabel( 'Species NLN Parameters'    )
-		self.lab_spres_n = QLabel( 'Number density (n)'        )
-		self.lab_spres_v = QLabel( 'Velocity (v)'              )
-		self.lab_spres_d = QLabel( 'Drift (dv)'                )
-		self.lab_spres_w = QLabel( 'Thermal Speed/Temperature' )
-		self.lab_spres_r = QLabel( 'Anisotropy (R)'            )
-		self.lab_spres_s = QLabel( 'Skewness (S)'              )
-		self.lab_spres_k = QLabel( 'Kurtosis (K)'              )
+		self.lab_res_n = QLabel( 'Number density (n)'        )
+		self.lab_res_v = QLabel( 'Velocity (v)'              )
+		self.lab_res_d = QLabel( 'Drift (dv)'                )
+		self.lab_res_w = QLabel( 'Thermal Speed/Temperature' )
+		self.lab_res_r = QLabel( 'Anisotropy (R)'            )
+		self.lab_res_s = QLabel( 'Skewness (S)'              )
+		self.lab_res_k = QLabel( 'Kurtosis (K)'              )
 		self.lab_disp3   = QLabel( 'Uncertainties'             )
-		self.lab_spres_u = QLabel( 'NLN Uncertainties'         )
+		self.lab_res_u = QLabel( 'NLN Uncertainties'         )
 
-		self.box = { 'thrm_dt':event_CheckBox( self, 'thrm_dt' ),
-		             'thrm_dw':event_CheckBox( self, 'thrm_dw' ),
-		             'spres_n':event_CheckBox( self, 'spres_n' ),
-		             'spres_v':event_CheckBox( self, 'spres_v' ),
-		             'spres_d':event_CheckBox( self, 'spres_d' ),
-		             'spres_w':event_CheckBox( self, 'spres_w' ),
-		             'spres_r':event_CheckBox( self, 'spres_r' ),
-		             'spres_s':event_CheckBox( self, 'spres_s' ),
-		             'spres_k':event_CheckBox( self, 'spres_k' ),
-		             'spres_u':event_CheckBox( self, 'spres_u' )  }
+		self.box = { 'res_dt':event_CheckBox( self, 'res_dt' ),
+		             'res_dw':event_CheckBox( self, 'res_dw' ),
+		             'res_n':event_CheckBox( self, 'res_n' ),
+		             'res_v':event_CheckBox( self, 'res_v' ),
+		             'res_d':event_CheckBox( self, 'res_d' ),
+		             'res_w':event_CheckBox( self, 'res_w' ),
+		             'res_r':event_CheckBox( self, 'res_r' ),
+		             'res_s':event_CheckBox( self, 'res_s' ),
+		             'res_k':event_CheckBox( self, 'res_k' ),
+		             'res_u':event_CheckBox( self, 'res_u' )  }
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
 		self.sg1.addWidget( self.lab_disp1, 0, 0, 1, 3 )
 
-		self.sg2.addWidget( self.box['thrm_dt'], 0, 1, 1, 1 )
-		self.sg2.addWidget( self.lab_thrm_dt,    0, 2, 1, 1 )
-		self.sg2.addWidget( self.box['thrm_dw'], 1, 1, 1, 1 )
-		self.sg2.addWidget( self.lab_thrm_dw,    1, 2, 1, 1 )
+		self.sg2.addWidget( self.box['res_dt'], 0, 1, 1, 1 )
+		self.sg2.addWidget( self.lab_res_dt,    0, 2, 1, 1 )
+		self.sg2.addWidget( self.box['res_dw'], 1, 1, 1, 1 )
+		self.sg2.addWidget( self.lab_res_dw,    1, 2, 1, 1 )
 
 		self.sg3.addWidget( self.lab_disp2, 0, 0, 1, 3 )
 
-		self.sg4.addWidget( self.box['spres_n'], 0, 1, 1, 1 )
-		self.sg4.addWidget( self.lab_spres_n,    0, 2, 1, 1 )
-		self.sg4.addWidget( self.box['spres_v'], 1, 1, 1, 1 )
-		self.sg4.addWidget( self.lab_spres_v,    1, 2, 1, 1 )
-		self.sg4.addWidget( self.box['spres_d'], 2, 1, 1, 1 )
-		self.sg4.addWidget( self.lab_spres_d,    2, 2, 1, 1 )
-		self.sg4.addWidget( self.box['spres_w'], 3, 1, 1, 1 )
-		self.sg4.addWidget( self.lab_spres_w,    3, 2, 1, 1 )
-		self.sg4.addWidget( self.box['spres_r'], 4, 1, 1, 1 )
-		self.sg4.addWidget( self.lab_spres_r,    4, 2, 1, 1 )
-		self.sg4.addWidget( self.box['spres_s'], 5, 1, 1, 1 )
-		self.sg4.addWidget( self.lab_spres_s,    5, 2, 1, 1 )
-		self.sg4.addWidget( self.box['spres_k'], 6, 1, 1, 1 )
-		self.sg4.addWidget( self.lab_spres_k,    6, 2, 1, 1 )
+		self.sg4.addWidget( self.box['res_n'], 0, 1, 1, 1 )
+		self.sg4.addWidget( self.lab_res_n,    0, 2, 1, 1 )
+		self.sg4.addWidget( self.box['res_v'], 1, 1, 1, 1 )
+		self.sg4.addWidget( self.lab_res_v,    1, 2, 1, 1 )
+		self.sg4.addWidget( self.box['res_d'], 2, 1, 1, 1 )
+		self.sg4.addWidget( self.lab_res_d,    2, 2, 1, 1 )
+		self.sg4.addWidget( self.box['res_w'], 3, 1, 1, 1 )
+		self.sg4.addWidget( self.lab_res_w,    3, 2, 1, 1 )
+		self.sg4.addWidget( self.box['res_r'], 4, 1, 1, 1 )
+		self.sg4.addWidget( self.lab_res_r,    4, 2, 1, 1 )
+		self.sg4.addWidget( self.box['res_s'], 5, 1, 1, 1 )
+		self.sg4.addWidget( self.lab_res_s,    5, 2, 1, 1 )
+		self.sg4.addWidget( self.box['res_k'], 6, 1, 1, 1 )
+		self.sg4.addWidget( self.lab_res_k,    6, 2, 1, 1 )
 
 		self.sg5.addWidget( self.lab_disp3, 0, 0, 1, 3 )
 
-		self.sg6.addWidget( self.box['spres_u'], 0, 1, 1, 1 )
-		self.sg6.addWidget( self.lab_spres_u,    0, 2, 1, 1 )
+		self.sg6.addWidget( self.box['res_u'], 0, 1, 1, 1 )
+		self.sg6.addWidget( self.lab_res_u,    0, 2, 1, 1 )
 
 		# Populate the menu with the options settings from core.
 
@@ -170,16 +170,16 @@ class dialog_opt_par( QWidget ) :
 
 	def make_opt( self ) :
 
-		self.box['thrm_dt'].setChecked( self.core.opt_par['thrm_dt'] )
-		self.box['thrm_dw'].setChecked( self.core.opt_par['thrm_dw'] )
-		self.box['spres_n'].setChecked( self.core.opt_par['spres_n'] )
-		self.box['spres_v'].setChecked( self.core.opt_par['spres_v'] )
-		self.box['spres_d'].setChecked( self.core.opt_par['spres_d'] )
-		self.box['spres_w'].setChecked( self.core.opt_par['spres_w'] )
-		self.box['spres_r'].setChecked( self.core.opt_par['spres_r'] )
-		self.box['spres_s'].setChecked( self.core.opt_par['spres_s'] )
-		self.box['spres_k'].setChecked( self.core.opt_par['spres_k'] )
-		self.box['spres_u'].setChecked( self.core.opt_par['spres_u'] )
+		self.box['res_dt'].setChecked( self.core.opt['res_dt'] )
+		self.box['res_dw'].setChecked( self.core.opt['res_dw'] )
+		self.box['res_n'].setChecked( self.core.opt['res_n'] )
+		self.box['res_v'].setChecked( self.core.opt['res_v'] )
+		self.box['res_d'].setChecked( self.core.opt['res_d'] )
+		self.box['res_w'].setChecked( self.core.opt['res_w'] )
+		self.box['res_r'].setChecked( self.core.opt['res_r'] )
+		self.box['res_s'].setChecked( self.core.opt['res_s'] )
+		self.box['res_k'].setChecked( self.core.opt['res_k'] )
+		self.box['res_u'].setChecked( self.core.opt['res_u'] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.

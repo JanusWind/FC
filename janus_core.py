@@ -162,13 +162,19 @@ class core( QObject ) :
 		# Initialize and store the archive of Wind/FC ion spectra.
 
 		self.fc_arcv = fc_arcv( core=self,
-		                        n_file_max=self.opt_fls['nfile_fc'] )
+		                        n_file_max=self.opt['fls_n_fc'] )
 
 		# Initialize and store the archive of Wind/MFI magnetic field
 		# data.
 
 		self.mfi_arcv = mfi_arcv( core=self,
-		                          n_file_max=self.opt_fls['nfile_mfi'] )
+		                          n_file_max=self.opt['fls_n_mfi'] )
+
+
+		# Initialize and store the archive of Wind/MFI spin rate data.
+
+#		self.spin_arcv = spin_arcv( core=self,
+#		                          n_file_max=self.opt['fls_n_mfi'] )
 
 		# Initialize a log of the analysis results.
 
@@ -206,7 +212,7 @@ class core( QObject ) :
 		               var_nln_set = True, var_nln_gss = True,
 		               var_nln_sel = True, var_nln_res = True,
 		               var_dsp     = True, var_dyn     = True,
-		               var_opt_par = True, var_opt_fls = True  )
+		               var_opt     = True                      )
 		
 		# Initialize the value of the indicator variable of whether the
 		# automatic analysis should be aborted.
@@ -232,7 +238,7 @@ class core( QObject ) :
 	              var_nln_set = False, var_nln_gss = False,
 	              var_nln_sel = False, var_nln_res = False,
 	              var_dsp     = False, var_dyn     = False,
-	              var_opt_par = False, var_opt_fls = False  ) :
+	              var_opt     = False                        ) :
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion spectrum's data.
@@ -482,24 +488,22 @@ class core( QObject ) :
 		# If requested, (re-)initialize the variables which indicate
 		# the various options for the GUI's option menu.
 
-		if ( var_opt_par ) :
+		if ( var_opt ) :
 
-			self.opt_par = { 'thrm_dw'    :True,
-			                 'thrm_dt'    :True,
-			                 'spres'      :True,
-			                 'spres_u'    :True,
-			                 'spres_n'    :True,
-			                 'spres_v'    :True,
-			                 'spres_d'    :True,
-			                 'spres_w'    :True,
-			                 'spres_r'    :True,
-			                 'spres_s'    :True,
-			                 'spres_k'    :True     }
-		if ( var_opt_fls ) :
-
-			self.opt_fls = { 'nfile_fc'   :float('inf'),
-			                 'nfile_mfi'  :float('inf'),
-                                         'nfile_spin' :float('inf')  }
+			self.opt = { 'res_dw'     :True,
+			             'res_dt'     :True,
+			             'res'        :True,
+			             'res_u'      :True,
+			             'res_n'      :True,
+			             'res_v'      :True,
+			             'res_d'      :True,
+			             'res_w'      :True,
+			             'res_r'      :True,
+			             'res_s'      :True,
+			             'res_k'      :True,
+			             'fls_n_fc'   :float('inf'),
+			             'fls_n_mfi'  :float('inf'),
+			             'fls_n_spin' :float('inf')    }
 
 	#-----------------------------------------------------------------------
 	# LOAD THE REQUESTED WIND/FC SPECTRUM.
@@ -2502,46 +2506,46 @@ class core( QObject ) :
 
 		# Apply the change to the options dictionary.
 
-		if ( key in self.opt_par ) :
-			self.opt_par[key] = bool( value )
+		if ( key in self.opt ) :
+			self.opt[key] = bool( value )
 
 		# Validate the options.
 
-		if ( not ( self.opt_par['thrm_dw'] or 
-		           self.opt_par['thrm_dt'] ) ) :
+		if ( not ( self.opt['res_dw'] or 
+		           self.opt['res_dt'] ) ) :
 
-			if ( key == 'thrm_dw' ) :
-				self.opt_par['thrm_dt'] = True
+			if ( key == 'res_dw' ) :
+				self.opt['res_dt'] = True
 			else :
-				self.opt_par['thrm_dw'] = True
+				self.opt['res_dw'] = True
 
-		if ( self.opt_par['spres_n'] or self.opt_par['spres_v'] or
-		     self.opt_par['spres_d'] or self.opt_par['spres_w'] or
-                     self.opt_par['spres_r'] or self.opt_par['spres_s'] or
-                     self.opt_par['spres_k']                                ) :
-			self.opt_par['spres'] = True
+		if ( self.opt['res_n'] or self.opt['res_v'] or
+		     self.opt['res_d'] or self.opt['res_w'] or
+                     self.opt['res_r'] or self.opt['res_s'] or
+                     self.opt['res_k']                              ) :
+			self.opt['res'] = True
 		else :
-			self.opt_par['spres'] = False
+			self.opt['res'] = False
 
-		if ( key == 'nfile_fc' ) :
+		if ( key == 'fls_n_fc' ) :
 			try :
 				self.fc_arcv.chng_n_file_max( value )
-				self.opt_fls['nfile_fc'] = self.fc_arcv.n_file_max
+				self.opt_fls['fls_n_fc'] = self.fc_arcv.n_file_max
 			except :
 				pass
 
-		if ( key == 'nfile_mfi' ) :
+		if ( key == 'fls_n_mfi' ) :
 			try :
 				self.mfi_arcv.chng_n_file_max( value )
-				self.opt_fls['nfile_mfi'] = self.mfi_arcv.n_file_max
+				self.opt_fls['fls_n_mfi'] = self.mfi_arcv.n_file_max
 			except :
 				pass
 
-		if ( key == 'nfile_spin' ) :
+		if ( key == 'fls_n_spin' ) :
 
 			try :
 				self.spin_arcv.chng_n_file_max( value )
-				self.opt_fls['nfile_spin'] = self.spin_arcv.n_file_max
+				self.opt_fls['fls_n_spin'] = self.spin_arcv.n_file_max
 			except :
 				pass
 

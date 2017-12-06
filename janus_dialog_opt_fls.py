@@ -95,9 +95,9 @@ class dialog_opt_fls( QWidget ) :
 		self.lab_spin = QLabel( 'Spin Files'                           )
 
 		self.txt = {
-		           'nfile_fc'  : event_LineEdit( self, 'nfile_fc'   ),
-		           'nfile_mfi' : event_LineEdit( self, 'nfile_ mfi' ),
-		           'nfile_spin': event_LineEdit( self, 'nfile_spin' )  }
+		           'fls_n_fc'  : event_LineEdit( self, 'fls_n_fc'   ),
+		           'fls_n_mfi' : event_LineEdit( self, 'fls_n_ mfi' ),
+		           'fls_n_spin': event_LineEdit( self, 'fls_n_spin' )  }
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
@@ -105,11 +105,11 @@ class dialog_opt_fls( QWidget ) :
 		self.sg.addWidget( self.lab_hdr1, 0, 0, 1, 1 )
 		self.sg.addWidget( self.lab_hdr2, 1, 0, 1, 1 )
 		self.sg.addWidget( self.lab_fc,   2, 0, 1, 1 )
-		self.sg.addWidget( self.txt['nfile_fc'],   2, 1, 1, 1 )
+		self.sg.addWidget( self.txt['fls_n_fc'],   2, 1, 1, 1 )
 		self.sg.addWidget( self.lab_mfi,  3, 0, 1, 1 )
-		self.sg.addWidget( self.txt['nfile_mfi'],  3, 1, 1, 1 )
+		self.sg.addWidget( self.txt['fls_n_mfi'],  3, 1, 1, 1 )
 		self.sg.addWidget( self.lab_spin, 4, 0, 1, 1 )
-		self.sg.addWidget( self.txt['nfile_spin'], 4, 1, 1, 1 )
+		self.sg.addWidget( self.txt['fls_n_spin'], 4, 1, 1, 1 )
 
 		# Populate the menu with the options settings from core.
 
@@ -121,9 +121,9 @@ class dialog_opt_fls( QWidget ) :
 
 	def make_opt( self ) :
 
-		val = self.core.opt_fls['nfile_fc']
+		val = self.core.opt['fls_n_fc']
 
-		txt = self.txt['nfile_fc'].text( )
+		txt = self.txt['fls_n_fc'].text( )
 
 		if( txt == '' ) :
 			val = None
@@ -134,19 +134,17 @@ class dialog_opt_fls( QWidget ) :
 				val = None
 
 		if( ( ( val is None ) and ( txt == '' ) ) or
-		      ( val == self.core.opt_fls['nfile_fc'] ) ) :
+		      ( val == self.core.opt['fls_n_fc'] ) ) :
 
-			self.txt['nfile_fc'].setStyleSheet( 'color: black;' )
-			self.txt['nfile_fc'].setStyleSheet( 'color: black;' )
+			self.txt['fls_n_fc'].setStyleSheet( 'color: black;' )
 
-			txt = str( self.core.opt_fls['nfile_fc'] )
+			txt = str( self.core.opt['fls_n_fc'] )
 
 		else :
 
-			self.txt['nfile_fc'].setStyleSheet( 'color: red;' )
-			self.txt['nfile_fc'].setStyleSheet( 'color: red;' )
+			self.txt['fls_n_fc'].setStyleSheet( 'color: red;' )
 
-		self.txt['nfile_fc'].setTextUpdate( txt )
+		self.txt['fls_n_fc'].setTextUpdate( txt )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
