@@ -67,41 +67,35 @@ class spin_arcv( object ) :
 		# Save the arguments for later use and, if necessary,
 		#provide values
 
-		self.core       = core
+		self.core = core
 
-		self.buf        = float( buf )      if ( buf 
-		                                         is not None )         \
-		                                    else 3600.
+		self.buf  = float( buf ) if ( buf is not None )\
+		                                  else 3600.
 
-		self.win        = int( win )        if ( win
-		                                         is not None )         \
-		                                    else 5
+		self.win  = int( win   ) if ( win is not None )\
+		                                  else 5
 
-		if (n_file_max == float( 'inf' ) ) :
+		if ( ( n_file_max == float( 'inf' ) ) or
+		     ( n_file_max is None )           ) :
 
-			self.n_file_max = n_file_max
+			self.n_file_max = float( 'inf' )
 
 		elif ( n_file_max is not None ) :
 
 			self.n_file_max = int( n_file_max )
 
-#		self.n_file_max = int( n_file_max ) if ( n_file_max 
-#		                                         is not None )         \
+#		self.n_file_max = int( n_file_max ) if ( n_file_max is not None )\
 #		                                    else float( 'infinity' )
 
 		self.n_date_max = int( n_date_max ) if ( n_date_max 
-		                                         is not None )         \
-		                                    else 40
+		                                    is not None ) else 40
 
-		self.path       = str( path )       if ( path 
-		                                         is not None )         \
+		self.path       = str( path )       if ( path  is not None )\
 		                                    else os.path.join( 
-		                                            os.path.dirname( 
-		                                               __file__ ), 
-		                                               'data', 'spin'  )
+		                                    os.path.dirname( 
+		                                    __file__ ), 'data', 'spin' )
 
-		self.verbose    = bool( verbose )   if ( verbose 
-		                                         is not None )         \
+		self.verbose    = bool( verbose )   if ( verbose is not None )\
 		                                    else True
 
 		# Validate the values of the parameters.

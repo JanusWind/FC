@@ -103,30 +103,30 @@ class dialog_opt_par( QWidget ) :
 		#TODO Make font of 'lab_disp1' and 'lab_disp2' bold.
 		# Not that setFont(QtGui.QFont().setBold(True)) doesn't work.
 
-		self.lab_disp1   = QLabel( 'NLN 2nd Moment Paramters'  )
+		self.lab_disp1  = QLabel( 'NLN 2nd Moment Paramters'  )
 		self.lab_res_dt = QLabel( 'Temperature'               )
-		self.lab_res_dw = QLabel( 'Thermal Speed'             ) 
-		self.lab_disp2   = QLabel( 'Species NLN Parameters'    )
-		self.lab_res_n = QLabel( 'Number density (n)'        )
-		self.lab_res_v = QLabel( 'Velocity (v)'              )
-		self.lab_res_d = QLabel( 'Drift (dv)'                )
-		self.lab_res_w = QLabel( 'Thermal Speed/Temperature' )
-		self.lab_res_r = QLabel( 'Anisotropy (R)'            )
-		self.lab_res_s = QLabel( 'Skewness (S)'              )
-		self.lab_res_k = QLabel( 'Kurtosis (K)'              )
-		self.lab_disp3   = QLabel( 'Uncertainties'             )
-		self.lab_res_u = QLabel( 'NLN Uncertainties'         )
+		self.lab_res_dw = QLabel( 'Thermal Speed'             )
+		self.lab_disp2  = QLabel( 'Species NLN Parameters'    )
+		self.lab_res_n  = QLabel( 'Number density (n)'        )
+		self.lab_res_v  = QLabel( 'Velocity (v)'              )
+		self.lab_res_d  = QLabel( 'Drift (dv)'                )
+		self.lab_res_w  = QLabel( 'Thermal Speed/Temperature' )
+		self.lab_res_r  = QLabel( 'Anisotropy (R)'            )
+		self.lab_res_s  = QLabel( 'Skewness (S)'              )
+		self.lab_res_k  = QLabel( 'Kurtosis (K)'              )
+		self.lab_disp3  = QLabel( 'Uncertainties'             )
+		self.lab_res_u  = QLabel( 'NLN Uncertainties'         )
 
 		self.box = { 'res_dt':event_CheckBox( self, 'res_dt' ),
 		             'res_dw':event_CheckBox( self, 'res_dw' ),
-		             'res_n':event_CheckBox( self, 'res_n' ),
-		             'res_v':event_CheckBox( self, 'res_v' ),
-		             'res_d':event_CheckBox( self, 'res_d' ),
-		             'res_w':event_CheckBox( self, 'res_w' ),
-		             'res_r':event_CheckBox( self, 'res_r' ),
-		             'res_s':event_CheckBox( self, 'res_s' ),
-		             'res_k':event_CheckBox( self, 'res_k' ),
-		             'res_u':event_CheckBox( self, 'res_u' )  }
+		             'res_n' :event_CheckBox( self, 'res_n'  ),
+		             'res_v' :event_CheckBox( self, 'res_v'  ),
+		             'res_d' :event_CheckBox( self, 'res_d'  ),
+		             'res_w' :event_CheckBox( self, 'res_w'  ),
+		             'res_r' :event_CheckBox( self, 'res_r'  ),
+		             'res_s' :event_CheckBox( self, 'res_s'  ),
+		             'res_k' :event_CheckBox( self, 'res_k'  ),
+		             'res_u' :event_CheckBox( self, 'res_u'  )  }
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
