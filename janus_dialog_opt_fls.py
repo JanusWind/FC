@@ -96,7 +96,7 @@ class dialog_opt_fls( QWidget ) :
 
 		self.txt = {
 		           'fls_n_fc'  : event_LineEdit( self, 'fls_n_fc'   ),
-		           'fls_n_mfi' : event_LineEdit( self, 'fls_n_ mfi' ),
+		           'fls_n_mfi' : event_LineEdit( self, 'fls_n_mfi'  ),
 		           'fls_n_spin': event_LineEdit( self, 'fls_n_spin' )  }
 
 		# Row by row, add the text boxes, buttons, and labels to this
@@ -121,30 +121,34 @@ class dialog_opt_fls( QWidget ) :
 
 	def make_opt( self ) :
 
-		val = self.core.opt['fls_n_fc']
+		for i in range( len( self.txt ) ) :
 
-		txt = self.txt['fls_n_fc'].text( )
+			key = self.txt.keys()[i]
 
-		if( txt == '' ) :
-			val = None
-		else :
-			try:
-				val = str_to_nni( txt )
-			except :
+			val = self.core.opt[key]
+
+			txt = self.txt[key].text( )
+
+			if( txt == '' ) :
 				val = None
-
-		if( ( ( val is None ) and ( txt == '' ) ) or
-		      ( val == self.core.opt['fls_n_fc'] ) ) :
-
-			self.txt['fls_n_fc'].setStyleSheet( 'color: black;' )
-
-			txt = str( self.core.opt['fls_n_fc'] )
-
-		else :
-
-			self.txt['fls_n_fc'].setStyleSheet( 'color: red;' )
-
-		self.txt['fls_n_fc'].setTextUpdate( txt )
+			else :
+				try:
+					val = str_to_nni( txt )
+				except :
+					val = None
+	
+			if( ( ( val is None ) and ( txt == '' ) ) or
+			      ( val == self.core.opt[key]     ) )   :
+	
+				self.txt[key].setStyleSheet( 'color: black;' )
+	
+				txt = str( self.core.opt[key] )
+				print txt	
+			else :
+	
+				self.txt[key].setStyleSheet( 'color: red;' )
+	
+			self.txt[key].setTextUpdate( txt )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.

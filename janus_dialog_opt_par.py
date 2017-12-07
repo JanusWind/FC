@@ -172,14 +172,14 @@ class dialog_opt_par( QWidget ) :
 
 		self.box['res_dt'].setChecked( self.core.opt['res_dt'] )
 		self.box['res_dw'].setChecked( self.core.opt['res_dw'] )
-		self.box['res_n'].setChecked( self.core.opt['res_n'] )
-		self.box['res_v'].setChecked( self.core.opt['res_v'] )
-		self.box['res_d'].setChecked( self.core.opt['res_d'] )
-		self.box['res_w'].setChecked( self.core.opt['res_w'] )
-		self.box['res_r'].setChecked( self.core.opt['res_r'] )
-		self.box['res_s'].setChecked( self.core.opt['res_s'] )
-		self.box['res_k'].setChecked( self.core.opt['res_k'] )
-		self.box['res_u'].setChecked( self.core.opt['res_u'] )
+		self.box['res_n' ].setChecked( self.core.opt['res_n' ] )
+		self.box['res_v' ].setChecked( self.core.opt['res_v' ] )
+		self.box['res_d' ].setChecked( self.core.opt['res_d' ] )
+		self.box['res_w' ].setChecked( self.core.opt['res_w' ] )
+		self.box['res_r' ].setChecked( self.core.opt['res_r' ] )
+		self.box['res_s' ].setChecked( self.core.opt['res_s' ] )
+		self.box['res_k' ].setChecked( self.core.opt['res_k' ] )
+		self.box['res_u' ].setChecked( self.core.opt['res_u' ] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.

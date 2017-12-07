@@ -93,7 +93,7 @@ class widget_mom_res( format_TextEdit ) :
 
 		# Print the results of the moments analysis.
 
-		if ( self.core.opt_par['spres_n'] ) :
+		if ( self.core.opt['res_n'] ) :
 
 			self.prnt_htm( '<i>n<sub>p</sub></i> = ' )
 			self.prnt_dcm( self.core.mom_res['n_p_c'],
@@ -102,7 +102,7 @@ class widget_mom_res( format_TextEdit ) :
 
 			self.prnt_brk( )
 
-		if ( self.core.opt_par['spres_v'] ) :
+		if ( self.core.opt['res_v'] ) :
 
 			self.prnt_htm( '<i>v<sub>p</sub></i> = ' )
 			self.prnt_dcm( self.core.mom_res['v_p_c'], 0, 'km/s' )
@@ -127,8 +127,8 @@ class widget_mom_res( format_TextEdit ) :
 	
 			self.prnt_brk( )
 
-		if ( ( self.core.opt_par['thrm_dw'] ) and
-		     ( self.core.opt_par['spres_w'] )    ) :
+		if ( ( self.core.opt['res_dw'] ) and
+		     ( self.core.opt['res_w'] )    ) :
 
 			self.prnt_htm( '<i>w<sub>p</sub></i> = ' )
 			self.prnt_dcm( self.core.mom_res['w_p_c'], 0, 'km/s' )
@@ -136,8 +136,8 @@ class widget_mom_res( format_TextEdit ) :
 
 			self.prnt_brk( )
 
-		if ( ( self.core.opt_par['thrm_dt'] ) and
-		     ( self.core.opt_par['spres_w'] )    ) :
+		if ( ( self.core.opt['res_dt'] ) and
+		     ( self.core.opt['res_w'] )    ) :
 
 			self.prnt_htm( '<i>T<sub>p</sub></i> = ' )
 			self.prnt_dcm( self.core.mom_res['T_p_c'], 1, 'kK' )

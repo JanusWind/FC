@@ -52,6 +52,7 @@ from janus_const import const
 
 from janus_fc_arcv import fc_arcv
 from janus_mfi_arcv import mfi_arcv
+from janus_spin_arcv import spin_arcv
 
 # Load the necessary array modules and mathematical functions.
 
@@ -99,6 +100,7 @@ class core( QObject ) :
 	# | rset              |                              |
 	# | chng_spc          |                              |
 	# | chng_mfi          |                              |
+	# | chng_spin         |                              |
 	# | chng_mom_win      |                              |
 	# | chng_mom_sel_bin  | c, d, b                      |
 	# | chng_mom_sel_dir  | c, d                         |
@@ -171,6 +173,12 @@ class core( QObject ) :
 		                          n_file_max=self.opt['fls_n_mfi'] )
 
 
+		# Initialize and store the archive of Wind/SPIN rate data.
+
+		self.spin_arcv = spin_arcv( core=self,
+		                            n_file_max=self.opt['fls_n_spin'] ) 
+
+
 		# Initialize and store the archive of Wind/MFI spin rate data.
 
 #		self.spin_arcv = spin_arcv( core=self,
@@ -207,12 +215,12 @@ class core( QObject ) :
 		# analyses.
 
 		self.rset_var( var_swe     = True, var_mfi     = True,
-		               var_mom_win = True, var_mom_sel = True,
-		               var_mom_res = True, var_nln_ion = True,
-		               var_nln_set = True, var_nln_gss = True,
-		               var_nln_sel = True, var_nln_res = True,
-		               var_dsp     = True, var_dyn     = True,
-		               var_opt     = True                      )
+		               var_spin    = True, var_mom_win = True,
+		               var_mom_sel = True, var_mom_res = True,
+		               var_nln_ion = True, var_nln_set = True,
+		               var_nln_gss = True, var_nln_sel = True,
+		               var_nln_res = True, var_dsp     = True,
+		               var_dyn     = True, var_opt     = True          )
 		
 		# Initialize the value of the indicator variable of whether the
 		# automatic analysis should be aborted.
@@ -233,12 +241,12 @@ class core( QObject ) :
 
 	def rset_var( self,
 	              var_swe     = False, var_mfi     = False,
-	              var_mom_win = False, var_mom_sel = False,
-	              var_mom_res = False, var_nln_ion = False,
-	              var_nln_set = False, var_nln_gss = False,
-	              var_nln_sel = False, var_nln_res = False,
-	              var_dsp     = False, var_dyn     = False,
-	              var_opt     = False                        ) :
+	              var_spin    = False, var_mom_win = False,
+	              var_mom_sel = False, var_mom_res = False,
+	              var_nln_ion = False, var_nln_set = False,
+	              var_nln_gss = False, var_nln_sel = False,
+	              var_nln_res = False, var_dsp     = False,
+	              var_dyn     = False, var_opt     = False   ) :
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion spectrum's data.
@@ -262,7 +270,6 @@ class core( QObject ) :
 			self.mfi_dur       = 0.
 
 			self.mfi_t         = None
-                        self.n_mfi         = None
 			self.mfi_b         = None
 			self.mfi_b_x       = None
 			self.mfi_b_y       = None
@@ -280,6 +287,16 @@ class core( QObject ) :
 			self.mfi_psi_b_avg = None
 
 			self.mfi_amag_ang  = None
+
+		# If requested, (re-)initialize the varaibles for the Wind/SPIN
+		# data associated with this spectrum.
+
+		if ( var_spin ) :
+
+			self.n_spin   = None
+
+			self.spin_t   = None
+			self.spin_w   = None
 
 		# If requested, (re-)initialize the varaibles for the windows
 		# associated with automatic data selection for the moments
@@ -648,6 +665,11 @@ class core( QObject ) :
 
 		self.load_mfi( )
 
+		# Load the associated Wind/SPIN data associated with this
+		# spectrum.
+
+		self.load_spin( )
+
 		# If requested, run the moments analysis.
 
 		if ( self.dyn_mom ) :
@@ -672,7 +694,6 @@ class core( QObject ) :
 		# loaded.
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'mfi' )
-
 
 		# Load the Wind/MFI magnetic field data associated with this
 		# spectrum.
@@ -760,6 +781,52 @@ class core( QObject ) :
 		# been loaded.
 
 		self.emit( SIGNAL('janus_chng_mfi') )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR LOADING THE Wind/SPIN DATA.
+	#-----------------------------------------------------------------------
+
+	def load_spin( self ) :
+
+		# Reset the contents of the "self.spin_*" arrays.
+
+		self.rset_var( var_spin=True )
+
+		# If no Wind/FC ion spectrum has been loaded, abort.
+
+		if ( self.fc_spec is None ) :
+			return
+
+		# Message the user that new Wind/SPIN data are about to be
+		# loaded.
+
+		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'spin' )
+
+		# Load the Wind/SPIN data associated with this spectrum.
+
+		self.spin_w = self.spin_arcv.load_spin( self.time_val )
+
+		# If no spin data were returned, abort with a signal that the
+		# data have changed.
+
+		if (self.spin_w is None ) :
+
+			self.emit( SIGNAL('janus_chng_spin') )
+
+			return
+
+		# Assign the loaded spin rate to the spectrum rotation value.
+
+		self.fc_spec.set_rot( self.spin_w )
+
+		# Message the user that new Wind/MFI data have been loaded.
+
+		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'spin' )
+
+		# Emit a signal that indicates that a new Wind/MFI data have now
+		# been loaded.
+
+		self.emit( SIGNAL('janus_chng_spin') )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CHANGING THE MOM. SELCTION DIRECTION WINDOW.

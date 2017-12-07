@@ -77,9 +77,17 @@ class spin_arcv( object ) :
 		                                         is not None )         \
 		                                    else 5
 
-		self.n_file_max = int( n_file_max ) if ( n_file_max 
-		                                         is not None )         \
-		                                    else float( 'infinity' )
+		if (n_file_max == float( 'inf' ) ) :
+
+			self.n_file_max = n_file_max
+
+		elif ( n_file_max is not None ) :
+
+			self.n_file_max = int( n_file_max )
+
+#		self.n_file_max = int( n_file_max ) if ( n_file_max 
+#		                                         is not None )         \
+#		                                    else float( 'infinity' )
 
 		self.n_date_max = int( n_date_max ) if ( n_date_max 
 		                                         is not None )         \

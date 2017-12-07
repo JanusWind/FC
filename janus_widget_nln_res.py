@@ -67,7 +67,7 @@ class widget_nln_res( format_TextEdit ) :
 
 		# Prepare to respond to signals received from the Janus core.
 
-		self.connect( self.core, SIGNAL('janus_rset'), self.resp_rset )
+		self.connect( self.core, SIGNAL('janus_rset'), self.resp_rset  )
 		self.connect( self.core, SIGNAL('janus_chng_opt'),
 		                                            self.resp_chng_opt )
 		self.connect( self.core, SIGNAL('janus_chng_mfi'),
@@ -152,16 +152,15 @@ class widget_nln_res( format_TextEdit ) :
 
 				self.prnt_brk( )
 				self.prnt_tab( 1 )
-				self.prnt_htm( '<u>' + pop['name']
-				               + ' (<i>' + pop['sym']
-				               + '</i>):</u>'         )
+				self.prnt_htm( '<u>' + pop['name'] + ' (<i>'
+				                   + pop['sym'] + '</i>):</u>' )
 
 				# Generate the mathematical labels.
 
 				sym = spc['sym'] + pop['sym']
 
-				lab_n     = '<i>n<sub>' + sym + '</sub></i>'
-				lab_v     = '<i>v<sub>' + sym + '</sub></i>'
+				lab_n     = '<i>n<sub>'  + sym + '</sub></i>'
+				lab_v     = '<i>v<sub>'  + sym + '</sub></i>'
 				lab_v_x   = '<i>v<sub>x' + sym + '</sub></i>'
 				lab_v_y   = '<i>v<sub>y' + sym + '</sub></i>'
 				lab_v_z   = '<i>v<sub>z' + sym + '</sub></i>'
@@ -211,7 +210,7 @@ class widget_nln_res( format_TextEdit ) :
 
 						self.prnt_brk( )
 						self.prnt_tab( 2 )
-						self.prnt_htm( lab_v + ' = ' )
+						self.prnt_htm( lab_v + ' = '   )
 						self.prnt_dcm(
 						   self.core.nln_res_plas[
 						        'v0'], 0, 'km/s'       )
@@ -222,7 +221,7 @@ class widget_nln_res( format_TextEdit ) :
 						   self.core.nln_res_plas[
 						                    'v0_x'], 0 )
 
-						if ( self.core.opt['res_u'] ):
+						if ( self.core.opt['res_u'] ) :
 
 							self.prnt_htm( 
 						        '&nbsp;&plusmn;&nbsp;' )
@@ -264,7 +263,7 @@ class widget_nln_res( format_TextEdit ) :
 
 				elif ( pop['drift'] ) :
 
-					if ( self.core.opt['res_d'] ):
+					if ( self.core.opt['res_d'] ) :
 						self.prnt_brk( )
 						self.prnt_tab( 2 )
 						self.prnt_htm( lab_dv + ' = ' )
