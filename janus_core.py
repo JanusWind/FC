@@ -2598,14 +2598,16 @@ class core( QObject ) :
 			if ( key == 'fls_n_fc' ) :
 				try :
 					self.fc_arcv.chng_n_file_max( value )
-					self.opt['fls_n_fc'] = self.fc_arcv.n_file_max
+					self.opt['fls_n_fc'] =
+					                 self.fc_arcv.n_file_max
 				except :
 					pass
 
 			if ( key == 'fls_n_mfi' ) :
 				try :
 					self.mfi_arcv.chng_n_file_max( value )
-					self.opt['fls_n_mfi'] = self.mfi_arcv.n_file_max
+					self.opt['fls_n_mfi'] =\
+					                self.mfi_arcv.n_file_max
 				except :
 					pass
 
@@ -2613,7 +2615,8 @@ class core( QObject ) :
 
 				try :
 					self.spin_arcv.chng_n_file_max( value )
-					self.opt['fls_n_spin'] = self.spin_arcv.n_file_max
+					self.opt['fls_n_spin'] =\
+					               self.spin_arcv.n_file_max
 				except :
 					pass
 
