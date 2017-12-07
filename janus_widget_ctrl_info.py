@@ -296,6 +296,21 @@ class widget_ctrl_info( format_TextEdit ) :
 				self.prnt_htm( 'ERROR!  No data found.',
 				               speak=True                )
 
+		# If the messae is a "val" message from "spin", then print the
+		# spin period.
+
+		if ( ( mesg_obj == 'spin' ) and ( mesg_typ == 'val' ) ) :
+
+			if ( self.core.spin_period is None ) :
+				txt = 'ASSUMED spin rate: '
+			else :
+				txt = 'Spin rate: '
+
+			txt += str( self.core.fc_spec['rot'] ) + ' s'
+
+			self.prnt_tab( 1 )
+			self.prnt_htm( txt )
+
 		# Scroll to the bottom of the text area.
 
 		self.verticalScrollBar( ).setSliderPosition(

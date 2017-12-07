@@ -90,26 +90,27 @@ class dialog_opt_fls( QWidget ) :
 
 		self.lab_hdr1 = QLabel( 'Maximum # of saved downloaded files'  )
 		self.lab_hdr2 = QLabel( '( Use "inf" for no limit)'            )
-		self.lab_fc   = QLabel( 'FC Files'                             )
-		self.lab_mfi  = QLabel( 'MFI Files'                            )
-		self.lab_spin = QLabel( 'Spin Files'                           )
+
+		self.lab = { 'fls_n_fc'  :QLabel( 'FC Files'   ),
+		             'fls_n_mfi' :QLabel( 'MFI Files'  ),
+		             'fls_n_spin':QLabel( 'Spin Files' )  }
 
 		self.txt = {
 		           'fls_n_fc'  : event_LineEdit( self, 'fls_n_fc'   ),
 		           'fls_n_mfi' : event_LineEdit( self, 'fls_n_mfi'  ),
 		           'fls_n_spin': event_LineEdit( self, 'fls_n_spin' )  }
 
+		self.order = [ 'fls_n_fc', 'fls_n_mfi', 'fls_n_spin' ]
+
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
 		self.sg.addWidget( self.lab_hdr1, 0, 0, 1, 1 )
 		self.sg.addWidget( self.lab_hdr2, 1, 0, 1, 1 )
-		self.sg.addWidget( self.lab_fc,   2, 0, 1, 1 )
-		self.sg.addWidget( self.txt['fls_n_fc'],   2, 1, 1, 1 )
-		self.sg.addWidget( self.lab_mfi,  3, 0, 1, 1 )
-		self.sg.addWidget( self.txt['fls_n_mfi'],  3, 1, 1, 1 )
-		self.sg.addWidget( self.lab_spin, 4, 0, 1, 1 )
-		self.sg.addWidget( self.txt['fls_n_spin'], 4, 1, 1, 1 )
+
+		for i, key in enumerate( self.order ) :
+			self.sg.addWidget( self.lab[key], 2+i, 0, 1, 1 )
+			self.sg.addWidget( self.txt[key], 2+i, 1, 1, 1 )
 
 		# Populate the menu with the options settings from core.
 
@@ -121,9 +122,7 @@ class dialog_opt_fls( QWidget ) :
 
 	def make_opt( self ) :
 
-		for i in range( len( self.txt ) ) :
-
-			key = self.txt.keys()[i]
+		for key in self.txt :
 
 			val = self.core.opt[key]
 
@@ -143,7 +142,7 @@ class dialog_opt_fls( QWidget ) :
 				self.txt[key].setStyleSheet( 'color: black;' )
 	
 				txt = str( self.core.opt[key] )
-				print txt	
+
 			else :
 	
 				self.txt[key].setStyleSheet( 'color: red;' )
@@ -158,10 +157,14 @@ class dialog_opt_fls( QWidget ) :
 
 		txt = self.txt[fnc].text( )
 
+		print 'txt', txt
+
 		try :
 			val = str_to_nni( txt )
 		except :
 			val = None
+
+		print 'val', val
 
 		# If no threads are running, make the change to the option with
 		# core.  Otherwise, restore the original options settings.

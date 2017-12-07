@@ -65,7 +65,10 @@ class spin_arcv( object ) :
 	                    path=None, verbose=None           ) :
 
 		# Save the arguments for later use and, if necessary,
-		#provide values
+		# provide values
+
+		# Note.  The value of "n_file_max" is set at the end of this
+		#        function via the "chng_n_file_max" function.
 
 		self.core = core
 
@@ -74,18 +77,6 @@ class spin_arcv( object ) :
 
 		self.win  = int( win   ) if ( win is not None )\
 		                                  else 5
-
-		if ( ( n_file_max == float( 'inf' ) ) or
-		     ( n_file_max is None )           ) :
-
-			self.n_file_max = float( 'inf' )
-
-		elif ( n_file_max is not None ) :
-
-			self.n_file_max = int( n_file_max )
-
-#		self.n_file_max = int( n_file_max ) if ( n_file_max is not None )\
-#		                                    else float( 'infinity' )
 
 		self.n_date_max = int( n_date_max ) if ( n_date_max 
 		                                    is not None ) else 40
@@ -106,10 +97,6 @@ class spin_arcv( object ) :
 		if ( self.win <= 0 ) :
 			raise ValueError( 'Median window must be at least 1.'  )
 
-		if ( self.n_file_max < 0 ) :
-			raise ValueError( 'Maximum number of files \
-			                                  cannot be negative.' )
-
 		if ( self.n_date_max < 0 ) :
 			raise ValueError( 'Maximum number of dates \
 			                                  cannot be negative.' )
@@ -123,6 +110,10 @@ class spin_arcv( object ) :
 		self.arr_spin_t   = [ ]
 		self.arr_spin_w   = [ ]
 		self.arr_spin_ind = [ ]
+
+		# Initialize "n_file_max"
+
+		self.chng_n_file_max( n_file_max )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING (AND RETURNING) A SPIN RATE.
