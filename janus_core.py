@@ -51,8 +51,8 @@ from janus_const import const
 # Load the modules necessary for loading Wind/FC and Wind/MFI data.
 
 from janus_fc_arcv import fc_arcv
-from janus_mfi_arcv import mfi_arcv
 from janus_spin_arcv import spin_arcv
+from janus_mfi_arcv import mfi_arcv
 
 # Load the necessary array modules and mathematical functions.
 
@@ -165,13 +165,13 @@ class core( QObject ) :
 		# and managing data files.
 
 		self.fc_arcv = fc_arcv( core=self,
-		                        n_file_max=self.opt['fls_n_fc'] )
+		                            n_file_max=self.opt['fls_n_fc'  ]  )
 
 		self.spin_arcv = spin_arcv( core=self,
-		                            n_file_max=self.opt['fls_n_spin'] ) 
+		                            n_file_max=self.opt['fls_n_spin']  ) 
 
 		self.mfi_arcv = mfi_arcv( core=self,
-		                          n_file_max=self.opt['fls_n_mfi'] )
+		                            n_file_max=self.opt['fls_n_mfi' ]  )
 
 		# Initialize a log of the analysis results.
 
@@ -505,8 +505,8 @@ class core( QObject ) :
 			             'res_s'      :True,
 			             'res_k'      :True,
 			             'fls_n_fc'   :float('inf'),
-			             'fls_n_mfi'  :float('inf'),
-			             'fls_n_spin' :float('inf')    }
+			             'fls_n_spin' :float('inf'),
+			             'fls_n_mfi'  :float('inf')    }
 
 	#-----------------------------------------------------------------------
 	# LOAD THE REQUESTED WIND/FC SPECTRUM.
@@ -2598,16 +2598,8 @@ class core( QObject ) :
 			if ( key == 'fls_n_fc' ) :
 				try :
 					self.fc_arcv.chng_n_file_max( value )
-					self.opt['fls_n_fc'] =
+					self.opt['fls_n_fc'] =\
 					                 self.fc_arcv.n_file_max
-				except :
-					pass
-
-			if ( key == 'fls_n_mfi' ) :
-				try :
-					self.mfi_arcv.chng_n_file_max( value )
-					self.opt['fls_n_mfi'] =\
-					                self.mfi_arcv.n_file_max
 				except :
 					pass
 
@@ -2617,6 +2609,14 @@ class core( QObject ) :
 					self.spin_arcv.chng_n_file_max( value )
 					self.opt['fls_n_spin'] =\
 					               self.spin_arcv.n_file_max
+				except :
+					pass
+
+			if ( key == 'fls_n_mfi' ) :
+				try :
+					self.mfi_arcv.chng_n_file_max( value )
+					self.opt['fls_n_mfi'] =\
+					                self.mfi_arcv.n_file_max
 				except :
 					pass
 

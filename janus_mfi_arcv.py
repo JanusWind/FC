@@ -74,20 +74,20 @@ class mfi_arcv( object ) :
 		self.tol        = tol
 		self.path       = path
 		self.use_k0     = use_k0
-		self.n_file_max = n_file_max
+#		self.n_file_max = n_file_max
 		self.n_date_max = n_date_max
 		self.verbose    = verbose
 
 		# Validate the values of the "self.max_*" parameters and, if
 		# necessary, provide values for them.
 
-		n_file_max_def = float( 'infinity' )
+		n_file_max_def = float( 'inf' )
 		n_date_max_def = 40
 
-		if ( self.n_file_max is None ) :
-			self.n_file_max = n_file_max_def
-		elif ( self.n_file_max < 0 ) :
-			self.n_file_max = n_file_max_def
+#		if ( self.n_file_max is None ) :
+#			self.n_file_max = n_file_max_def
+#		elif ( self.n_file_max < 0 ) :
+#			self.n_file_max = n_file_max_def
 
 		if ( self.n_date_max is None ) :
 			self.n_date_max = n_date_max_def
@@ -117,6 +117,10 @@ class mfi_arcv( object ) :
 		self.mfi_b_y = array( [ ] )
 		self.mfi_b_z = array( [ ] )
 		self.mfi_ind = array( [ ] )
+
+		# Initialize "n_file_max"
+
+		self.chng_n_file_max( n_file_max )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING (AND RETURNING) A range OF THE DATA.
@@ -382,7 +386,7 @@ class mfi_arcv( object ) :
 		# If there is no limit on the number files in the data
 		# directory, abort (as there's nothing to be done).
 
-		if ( self.n_file_max >= float( 'infinity' ) ) :
+		if ( self.n_file_max >= float( 'inf' ) ) :
 			return
 
 		# Generate a list of the names of all files of the requested
@@ -390,39 +394,43 @@ class mfi_arcv( object ) :
 		# directory.
 
 		if ( self.use_idl ) :
-			file_name = array( glob(
+			file_name = list( glob(
 			              os.path.join( self.path, 'wind_mag*' ) ) )
 		else :
 			if ( self.use_k0 ) :
-				file_name = array( glob(
+				file_name = list( glob(
 				         os.path.join( self.path, 'wi_k0*' ) ) )
 			else :
-				file_name = array( glob(
+				file_name = list( glob(
 				         os.path.join( self.path, 'wi_h0*' ) ) )
-
-		n_file = len( file_name )
 
 		# If the number of files is less than or equal to the maximum,
 		# abort (as nothing needs to be done).
 
-		if ( n_file <= self.n_file_max ) :
+		if ( len( file_name )<= self.n_file_max ) :
 			return
 
 		# Determine the access time of each of the files, and then sort
 		# the files in ascending value.
 
-		file_time = array( [ os.path.getatime( fl )
-		                     for fl in file_name    ] )
+		file_time = [ os.path.getatime( fl )
+		                     for fl in file_name    ]
 
-		srt = argsort( file_time )
+		srt = sorted( range( len( file_time ) ),
+		              key=file_time.__getitem__  )
 
-		file_name = file_name[srt]
-		file_time = file_time[srt]
+		file_name = [ file_name[i] for i in srt ]
+		file_time = [ file_time[i] for i in srt ]
+
+#		srt = argsort( file_time )
+#
+#		file_name = file_name[srt]
+#		file_time = file_time[srt]
 
 		# Delete files so that the number of files equals the maximum
 		# allowed.
 
-		for f in range( n_file - self.n_file_max ) :
+		for f in range( len( file_name ) - self.n_file_max ) :
 			os.remove( file_name[f] )
 
 	#-----------------------------------------------------------------------
@@ -455,7 +463,7 @@ class mfi_arcv( object ) :
 		# raise an error.
 
 		if ( ( val != float( 'infinity' ) ) and
-		     ( type( val ) is not int     )     ) :
+		     ( type( val ) is not int   )       ) :
 
 			raise ValueError( 'Max file number must be\
 			                      infinity or a positive integer.' )
@@ -472,4 +480,3 @@ class mfi_arcv( object ) :
 		self.n_file_max = val
 
 		self.cleanup_file( )
-

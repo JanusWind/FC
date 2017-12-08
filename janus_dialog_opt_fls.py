@@ -92,15 +92,15 @@ class dialog_opt_fls( QWidget ) :
 		self.lab_hdr2 = QLabel( '( Use "inf" for no limit)'            )
 
 		self.lab = { 'fls_n_fc'  :QLabel( 'FC Files'   ),
-		             'fls_n_mfi' :QLabel( 'MFI Files'  ),
-		             'fls_n_spin':QLabel( 'Spin Files' )  }
+		             'fls_n_spin':QLabel( 'Spin Files' ),
+		             'fls_n_mfi' :QLabel( 'MFI Files'  )  }
 
-		self.txt = {
+		self.arr_txt = {
 		           'fls_n_fc'  : event_LineEdit( self, 'fls_n_fc'   ),
-		           'fls_n_mfi' : event_LineEdit( self, 'fls_n_mfi'  ),
-		           'fls_n_spin': event_LineEdit( self, 'fls_n_spin' )  }
+		           'fls_n_spin': event_LineEdit( self, 'fls_n_spin' ),
+		           'fls_n_mfi' : event_LineEdit( self, 'fls_n_mfi'  )  }
 
-		self.order = [ 'fls_n_fc', 'fls_n_mfi', 'fls_n_spin' ]
+		self.order = [ 'fls_n_fc', 'fls_n_spin', 'fls_n_mfi' ]
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
@@ -109,8 +109,8 @@ class dialog_opt_fls( QWidget ) :
 		self.sg.addWidget( self.lab_hdr2, 1, 0, 1, 1 )
 
 		for i, key in enumerate( self.order ) :
-			self.sg.addWidget( self.lab[key], 2+i, 0, 1, 1 )
-			self.sg.addWidget( self.txt[key], 2+i, 1, 1, 1 )
+			self.sg.addWidget( self.lab[key],     2+i, 0, 1, 1 )
+			self.sg.addWidget( self.arr_txt[key], 2+i, 1, 1, 1 )
 
 		# Populate the menu with the options settings from core.
 
@@ -122,11 +122,11 @@ class dialog_opt_fls( QWidget ) :
 
 	def make_opt( self ) :
 
-		for key in self.txt :
+		for key in self.arr_txt :
 
 			val = self.core.opt[key]
 
-			txt = self.txt[key].text( )
+			txt = self.arr_txt[key].text( )
 
 			if( txt == '' ) :
 				val = None
@@ -139,15 +139,16 @@ class dialog_opt_fls( QWidget ) :
 			if( ( ( val is None ) and ( txt == '' ) ) or
 			      ( val == self.core.opt[key]     ) )   :
 	
-				self.txt[key].setStyleSheet( 'color: black;' )
+				self.arr_txt[key].setStyleSheet(
+				                               'color: black;' )
 	
 				txt = str( self.core.opt[key] )
-
+#				print key, type(txt), type(val)
 			else :
 	
-				self.txt[key].setStyleSheet( 'color: red;' )
-	
-			self.txt[key].setTextUpdate( txt )
+				self.arr_txt[key].setStyleSheet( 'color: red;' )
+#				print txt, val, type(txt), type(val)
+			self.arr_txt[key].setTextUpdate( txt )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
@@ -155,16 +156,12 @@ class dialog_opt_fls( QWidget ) :
 
 	def user_event( self, event, fnc ) :
 
-		txt = self.txt[fnc].text( )
-
-		print 'txt', txt
+		txt = self.arr_txt[fnc].text( )
 
 		try :
 			val = str_to_nni( txt )
 		except :
 			val = None
-
-		print 'val', val
 
 		# If no threads are running, make the change to the option with
 		# core.  Otherwise, restore the original options settings.
