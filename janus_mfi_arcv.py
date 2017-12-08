@@ -69,12 +69,14 @@ class mfi_arcv( object ) :
 
 		# Save the arguments for later use.
 
+		# Note.  The "n_file_max" argument is handled at the end of this
+		#        function with a call of "chng_n_file_max".
+
 		self.core       = core
 		self.buf        = buf
 		self.tol        = tol
 		self.path       = path
 		self.use_k0     = use_k0
-#		self.n_file_max = n_file_max
 		self.n_date_max = n_date_max
 		self.verbose    = verbose
 
@@ -83,11 +85,6 @@ class mfi_arcv( object ) :
 
 		n_file_max_def = float( 'inf' )
 		n_date_max_def = 40
-
-#		if ( self.n_file_max is None ) :
-#			self.n_file_max = n_file_max_def
-#		elif ( self.n_file_max < 0 ) :
-#			self.n_file_max = n_file_max_def
 
 		if ( self.n_date_max is None ) :
 			self.n_date_max = n_date_max_def
@@ -118,7 +115,7 @@ class mfi_arcv( object ) :
 		self.mfi_b_z = array( [ ] )
 		self.mfi_ind = array( [ ] )
 
-		# Initialize "n_file_max"
+		# Initialize "n_file_max".
 
 		self.chng_n_file_max( n_file_max )
 
@@ -393,16 +390,12 @@ class mfi_arcv( object ) :
 		# type (as specified by the "use_*" keywords) in the data
 		# directory.
 
-		if ( self.use_idl ) :
+		if ( self.use_k0 ) :
 			file_name = list( glob(
-			              os.path.join( self.path, 'wind_mag*' ) ) )
+			         os.path.join( self.path, 'wi_k0*' ) ) )
 		else :
-			if ( self.use_k0 ) :
-				file_name = list( glob(
-				         os.path.join( self.path, 'wi_k0*' ) ) )
-			else :
-				file_name = list( glob(
-				         os.path.join( self.path, 'wi_h0*' ) ) )
+			file_name = list( glob(
+			         os.path.join( self.path, 'wi_h0*' ) ) )
 
 		# If the number of files is less than or equal to the maximum,
 		# abort (as nothing needs to be done).
