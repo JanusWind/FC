@@ -91,16 +91,14 @@ class fc_arcv( object ) :
 		self.buf        = buf
 		self.tol        = tol
 		self.path       = path
-		self.n_file_max = n_file_max
 		self.n_date_max = n_date_max
 		self.verbose    = verbose
 
-		# Validate the values of the "self.max_*" parameters and, if
-		# necessary, provide values for them.
+		# Validate the values of the "self.n_date_max", and if necessary
+		# provide value for it.
 
-		if ( ( self.n_file_max is None ) or
-		     ( self.n_file_max < 0     )    ) :
-			self.n_file_max = float( 'infinity' )
+		# Note.  The value of "n_file_max" is set at the end of this
+		#        function via the "chng_n_file_max" function.
 
 		if ( ( self.n_date_max is None ) or
 		     ( self.n_date_max <= 0    )    ) :
@@ -120,6 +118,10 @@ class fc_arcv( object ) :
 		self.arr_date = [ ]
 
 		self.arr_tag  = [ ]
+
+		# Initialize "n_file_max"
+
+		self.chng_n_file_max( n_file_max )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING (AND RETURNING) AN ION SPECTRUM.

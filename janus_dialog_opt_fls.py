@@ -83,7 +83,7 @@ class dialog_opt_fls( QWidget ) :
 
 		self.sg.setContentsMargins( 0, 0, 0, 0 )
 
-		self.grd.addLayout( self.sg, 0, 0, 14, 3 )
+		self.grd.addLayout( self.sg, 0, 0, 5, 2)
 
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
@@ -105,8 +105,8 @@ class dialog_opt_fls( QWidget ) :
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
-		self.sg.addWidget( self.lab_hdr1, 0, 0, 1, 1 )
-		self.sg.addWidget( self.lab_hdr2, 1, 0, 1, 1 )
+		self.sg.addWidget( self.lab_hdr1, 0, 0, 1, 2 )
+		self.sg.addWidget( self.lab_hdr2, 1, 0, 1, 2 )
 
 		for i, key in enumerate( self.order ) :
 			self.sg.addWidget( self.lab[key],     2+i, 0, 1, 1 )
@@ -143,11 +143,9 @@ class dialog_opt_fls( QWidget ) :
 				                               'color: black;' )
 	
 				txt = str( self.core.opt[key] )
-#				print key, type(txt), type(val)
 			else :
 	
 				self.arr_txt[key].setStyleSheet( 'color: red;' )
-#				print txt, val, type(txt), type(val)
 			self.arr_txt[key].setTextUpdate( txt )
 
 	#-----------------------------------------------------------------------

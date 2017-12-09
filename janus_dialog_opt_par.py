@@ -29,6 +29,7 @@
 
 from PyQt4.QtGui import QWidget, QGridLayout, QLabel, QFont
 from PyQt4.QtCore import SIGNAL
+from PyQt4 import QtGui
 
 # Load the customized push button and one-line text editor.
 
@@ -76,46 +77,29 @@ class dialog_opt_par( QWidget ) :
 
 		# Create the sub-grids and add them to the widget's main grid.
 
-		self.sg1 = QGridLayout( )
-		self.sg2 = QGridLayout( )
-		self.sg3 = QGridLayout( )
-		self.sg4 = QGridLayout( )
-		self.sg5 = QGridLayout( )
-		self.sg6 = QGridLayout( )
+		self.sg = QGridLayout( )
 
-		self.sg1.setContentsMargins( 0, 0, 0, 0 )
-		self.sg2.setContentsMargins( 0, 0, 0, 0 )
-		self.sg3.setContentsMargins( 0, 0, 0, 0 )
-		self.sg4.setContentsMargins( 0, 0, 0, 0 )
-		self.sg5.setContentsMargins( 0, 0, 0, 0 )
-		self.sg6.setContentsMargins( 0, 0, 0, 0 )
+		self.sg.setContentsMargins( 0, 0, 0, 0 )
 
-		self.grd.addLayout( self.sg1, 0, 0, 1, 3 )
-		self.grd.addLayout( self.sg2, 1, 0, 1, 3 )
-		self.grd.addLayout( self.sg3, 2, 0, 1, 3 )
-		self.grd.addLayout( self.sg4, 3, 0, 1, 1 )
-		self.grd.addLayout( self.sg5, 4, 0, 1, 3 )
-		self.grd.addLayout( self.sg6, 5, 0, 1, 1 )
+		self.grd.addLayout( self.sg, 0, 0, 13, 3 )
 
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
 
-		#TODO Make font of 'lab_disp1' and 'lab_disp2' bold.
-		# Not that setFont(QtGui.QFont().setBold(True)) doesn't work.
-
-		self.lab_disp1  = QLabel( 'NLN 2nd Moment Paramters'  )
-		self.lab_res_dt = QLabel( 'Temperature'               )
-		self.lab_res_dw = QLabel( 'Thermal Speed'             )
-		self.lab_disp2  = QLabel( 'Species NLN Parameters'    )
-		self.lab_res_n  = QLabel( 'Number density (n)'        )
-		self.lab_res_v  = QLabel( 'Velocity (v)'              )
-		self.lab_res_d  = QLabel( 'Drift (dv)'                )
-		self.lab_res_w  = QLabel( 'Thermal Speed/Temperature' )
-		self.lab_res_r  = QLabel( 'Anisotropy (R)'            )
-		self.lab_res_s  = QLabel( 'Skewness (S)'              )
-		self.lab_res_k  = QLabel( 'Kurtosis (K)'              )
-		self.lab_disp3  = QLabel( 'Uncertainties'             )
-		self.lab_res_u  = QLabel( 'NLN Uncertainties'         )
+		self.lab = {
+		       'lab_1'  :QLabel( 'NLN 2nd Moment Paramters'  , self ),
+                       'res_dt' :QLabel( 'Temperature'               , self ),
+                       'res_dw' :QLabel( 'Thermal Speed'             , self ),
+                       'lab_2'  :QLabel( 'Species NLN Parameters'    , self ),
+                       'res_n'  :QLabel( 'Number density (n)'        , self ),
+                       'res_v'  :QLabel( 'Velocity (v)'              , self ),
+                       'res_d'  :QLabel( 'Drift (dv)'                , self ),
+                       'res_w'  :QLabel( 'Thermal Speed/Temperature' , self ),
+                       'res_r'  :QLabel( 'Anisotropy (R)'            , self ),
+                       'res_s'  :QLabel( 'Skewness (S)'              , self ),
+                       'res_k'  :QLabel( 'Kurtosis (K)'              , self ),
+                       'lab_3'  :QLabel( 'Uncertainties'             , self ),
+                       'res_u'  :QLabel( 'NLN Uncertainties'         , self ), }
 
 		self.box = { 'res_dt':event_CheckBox( self, 'res_dt' ),
 		             'res_dw':event_CheckBox( self, 'res_dw' ),
@@ -128,37 +112,27 @@ class dialog_opt_par( QWidget ) :
 		             'res_k' :event_CheckBox( self, 'res_k'  ),
 		             'res_u' :event_CheckBox( self, 'res_u'  )  }
 
+		self.order = [ 'lab_1', 'res_dt', 'res_dw', 'lab_2', 'res_n',
+		               'res_v', 'res_d' , 'res_w' , 'res_r', 'res_s',
+		               'res_k', 'lab_3' , 'res_u'                      ]
+
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
-		self.sg1.addWidget( self.lab_disp1, 0, 0, 1, 3 )
+		for i, key in enumerate( self.order ) :
 
-		self.sg2.addWidget( self.box['res_dt'], 0, 1, 1, 1 )
-		self.sg2.addWidget( self.lab_res_dt,    0, 2, 1, 1 )
-		self.sg2.addWidget( self.box['res_dw'], 1, 1, 1, 1 )
-		self.sg2.addWidget( self.lab_res_dw,    1, 2, 1, 1 )
+			if ( ( key == 'lab_1') or ( key == 'lab_2') or
+			     ( key == 'lab_3' )                       ) :
 
-		self.sg3.addWidget( self.lab_disp2, 0, 0, 1, 3 )
+				self.lab[key].setFont(
+				        QFont( "Times", 12, QFont.Bold ) )
 
-		self.sg4.addWidget( self.box['res_n'], 0, 1, 1, 1 )
-		self.sg4.addWidget( self.lab_res_n,    0, 2, 1, 1 )
-		self.sg4.addWidget( self.box['res_v'], 1, 1, 1, 1 )
-		self.sg4.addWidget( self.lab_res_v,    1, 2, 1, 1 )
-		self.sg4.addWidget( self.box['res_d'], 2, 1, 1, 1 )
-		self.sg4.addWidget( self.lab_res_d,    2, 2, 1, 1 )
-		self.sg4.addWidget( self.box['res_w'], 3, 1, 1, 1 )
-		self.sg4.addWidget( self.lab_res_w,    3, 2, 1, 1 )
-		self.sg4.addWidget( self.box['res_r'], 4, 1, 1, 1 )
-		self.sg4.addWidget( self.lab_res_r,    4, 2, 1, 1 )
-		self.sg4.addWidget( self.box['res_s'], 5, 1, 1, 1 )
-		self.sg4.addWidget( self.lab_res_s,    5, 2, 1, 1 )
-		self.sg4.addWidget( self.box['res_k'], 6, 1, 1, 1 )
-		self.sg4.addWidget( self.lab_res_k,    6, 2, 1, 1 )
-
-		self.sg5.addWidget( self.lab_disp3, 0, 0, 1, 3 )
-
-		self.sg6.addWidget( self.box['res_u'], 0, 1, 1, 1 )
-		self.sg6.addWidget( self.lab_res_u,    0, 2, 1, 1 )
+				self.sg.addWidget( self.lab[key], i, 0, 1, 2 )
+			else :
+				self.box[key].setFont( QFont( "Times", 12 ) )
+				self.lab[key].setFont( QFont( "Times", 12 ) )
+				self.sg.addWidget( self.box[key], i, 0, 1, 1 )
+				self.sg.addWidget( self.lab[key], i, 1, 1, 1 )
 
 		# Populate the menu with the options settings from core.
 
