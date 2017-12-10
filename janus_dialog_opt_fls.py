@@ -83,7 +83,7 @@ class dialog_opt_fls( QWidget ) :
 
 		self.sg.setContentsMargins( 0, 0, 0, 0 )
 
-		self.grd.addLayout( self.sg, 0, 0, 7, 3)
+		self.grd.addLayout( self.sg, 0, 0, 13, 3)
 
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
@@ -91,12 +91,12 @@ class dialog_opt_fls( QWidget ) :
 		self.lab_hdr1 = QLabel( 'Maximum # of saved downloaded files'  )
 		self.lab_hdr2 = QLabel( '( Use "inf" for no limit)'            )
 
-		self.lab_opt = { 'def':QLabel( 'Default ( all value set to\
-		                                infinity )'                  ) ,
-		                 'cst':QLabel( 'Custom Values'               ) }
+		self.lab_opt = {
+                       'def':QLabel( 'Default ( all value set to infinity )' ) ,
+		       'cst':QLabel( 'Custom Values'                        ) }
 
-		self.opt ={ 'def':event_RadioBox( self, 'def' ),
-		            'cst':event_RadioBox( self, 'cst' ) }
+		self.fls_opt = { 'def':event_RadioBox( self, 'def' ) ,
+		                 'cst':event_RadioBox( self, 'cst' ) }
   
 		self.lab = { 'fls_n_fc'  :QLabel( 'FC Files'   ),
 		             'fls_n_spin':QLabel( 'Spin Files' ),
@@ -120,8 +120,8 @@ class dialog_opt_fls( QWidget ) :
 
 		self.sg.addWidget( self.lab_opt['def'], 2, 1, 1, 3 )
 		self.sg.addWidget( self.lab_opt['cst'], 3, 1, 1, 3 )
-		self.sg.addWidget( self.opt['def'], 2, 0, 1, 3 )
-		self.sg.addWidget( self.opt['cst'], 3, 0, 1, 3 )
+		self.sg.addWidget( self.fls_opt['def'], 2, 0, 1, 1 )
+		self.sg.addWidget( self.fls_opt['cst'], 3, 0, 1, 1 )
 
 
 		for i, key in enumerate( self.order ) :
@@ -129,8 +129,9 @@ class dialog_opt_fls( QWidget ) :
 			self.lab[key].setFont( QFont(     "Times", 12 ) )
 			self.arr_txt[key].setFont( QFont( "Times", 12 ) )
 
-			self.sg.addWidget( self.lab[key],     4+i, 0, 1, 1 )
-			self.sg.addWidget( self.arr_txt[key], 4+i, 1, 1, 1 )
+			self.sg.addWidget( self.lab[key],     4+i, 1, 1, 1 )
+			self.sg.addWidget( self.arr_txt[key], 4+i, 2, 1, 1 )
+                        self.arr_txt[key].setMaximumWidth( 60 )
 
 		# Populate the menu with the options settings from core.
 
@@ -174,27 +175,36 @@ class dialog_opt_fls( QWidget ) :
 
 	def user_event( self, event, fnc ) :
 
-		txt = self.arr_txt[fnc].text( )
+                if ( fnc == self.fls_opt['def'] ) :
+        		for key in self.arr_txt :
+        
+        			self.arr_txt[key].text( ) == ''
+ 
+#                        self.make_opt( )
 
-		try :
-			val = str_to_nni( txt )
-		except :
-			val = None
+                elif ( fnc == self.fls_opt['cst'] ) :
 
-		# If no threads are running, make the change to the option with
-		# core.  Otherwise, restore the original options settings.
-
-		if ( ( n_thread( ) == 0 ) and ( val is not None ) ) :
-
-			# Start a new thread that makes the change to the option
-			# with core.
-
-			Thread( target=thread_chng_opt,
-			        args=( self.core, fnc, val ) ).start( )
-
-		else :
-
-			self.make_opt( )
+        		txt = self.arr_txt[fnc].text( )
+        
+        		try :
+        			val = str_to_nni( txt )
+        		except :
+        			val = None
+        
+        		# If no threads are running, make the change to the option with
+        		# core.  Otherwise, restore the original options settings.
+        
+        		if ( ( n_thread( ) == 0 ) and ( val is not None ) ) :
+        
+        			# Start a new thread that makes the change to the option
+        			# with core.
+        
+        			Thread( target=thread_chng_opt,
+        			        args=( self.core, fnc, val ) ).start( )
+        
+        		else :
+        
+        			self.make_opt( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A CHANGE OF AN OPTION.
