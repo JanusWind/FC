@@ -83,7 +83,7 @@ class dialog_opt_fls( QWidget ) :
 
 		self.sg.setContentsMargins( 0, 0, 0, 0 )
 
-		self.grd.addLayout( self.sg, 0, 0, 5, 2)
+		self.grd.addLayout( self.sg, 0, 0, 7, 3)
 
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
@@ -91,6 +91,13 @@ class dialog_opt_fls( QWidget ) :
 		self.lab_hdr1 = QLabel( 'Maximum # of saved downloaded files'  )
 		self.lab_hdr2 = QLabel( '( Use "inf" for no limit)'            )
 
+		self.lab_opt = { 'def':QLabel( 'Default ( all value set to\
+		                                infinity )'                  ) ,
+		                 'cst':QLabel( 'Custom Values'               ) }
+
+		self.opt ={ 'def':event_RadioBox( self, 'def' ),
+		            'cst':event_RadioBox( self, 'cst' ) }
+  
 		self.lab = { 'fls_n_fc'  :QLabel( 'FC Files'   ),
 		             'fls_n_spin':QLabel( 'Spin Files' ),
 		             'fls_n_mfi' :QLabel( 'MFI Files'  )  }
@@ -105,12 +112,25 @@ class dialog_opt_fls( QWidget ) :
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
-		self.sg.addWidget( self.lab_hdr1, 0, 0, 1, 2 )
-		self.sg.addWidget( self.lab_hdr2, 1, 0, 1, 2 )
+		self.lab_hdr1.setFont( QFont( "Times", 12 ) )
+		self.lab_hdr2.setFont( QFont( "Times", 12 ) )
+
+		self.sg.addWidget( self.lab_hdr1, 0, 0, 1, 3 )
+		self.sg.addWidget( self.lab_hdr2, 1, 0, 1, 3 )
+
+		self.sg.addWidget( self.lab_opt['def'], 2, 1, 1, 3 )
+		self.sg.addWidget( self.lab_opt['cst'], 3, 1, 1, 3 )
+		self.sg.addWidget( self.opt['def'], 2, 0, 1, 3 )
+		self.sg.addWidget( self.opt['cst'], 3, 0, 1, 3 )
+
 
 		for i, key in enumerate( self.order ) :
-			self.sg.addWidget( self.lab[key],     2+i, 0, 1, 1 )
-			self.sg.addWidget( self.arr_txt[key], 2+i, 1, 1, 1 )
+
+			self.lab[key].setFont( QFont(     "Times", 12 ) )
+			self.arr_txt[key].setFont( QFont( "Times", 12 ) )
+
+			self.sg.addWidget( self.lab[key],     4+i, 0, 1, 1 )
+			self.sg.addWidget( self.arr_txt[key], 4+i, 1, 1, 1 )
 
 		# Populate the menu with the options settings from core.
 

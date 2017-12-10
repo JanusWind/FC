@@ -29,7 +29,6 @@
 
 from PyQt4.QtGui import QWidget, QGridLayout, QLabel, QFont
 from PyQt4.QtCore import SIGNAL
-from PyQt4 import QtGui
 
 # Load the customized push button and one-line text editor.
 
