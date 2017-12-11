@@ -50,9 +50,9 @@ from janus_const import const
 
 # Load the modules necessary for loading Wind/FC and Wind/MFI data.
 
-from janus_fc_arcv import fc_arcv
+from janus_fc_arcv   import fc_arcv
 from janus_spin_arcv import spin_arcv
-from janus_mfi_arcv import mfi_arcv
+from janus_mfi_arcv  import mfi_arcv
 
 # Load the necessary array modules and mathematical functions.
 
@@ -63,10 +63,10 @@ from numpy import amax, amin, append, arccos, arctan2, arange, argsort, array, \
 
 from numpy.linalg import lstsq
 
+from scipy.special     import erf
 from scipy.interpolate import interp1d
-from scipy.optimize import curve_fit
-from scipy.special import erf
-from scipy.stats import pearsonr, spearmanr
+from scipy.optimize    import curve_fit
+from scipy.stats       import pearsonr, spearmanr
 
 from janus_helper import round_sig
 
@@ -515,7 +515,6 @@ class core( QObject ) :
 	def load_spec( self, time_req=None,
 	               get_prev=False, get_next=False ) :
 
-
 		# Reset the variables that contain the Wind/FC ion spectrum's
 		# data, the associated Wind/MFI magnetic field data, and the
 		# results of all analyses.
@@ -760,7 +759,7 @@ class core( QObject ) :
                                      self.mfi_b_z[i]**2 )
                                      for i in range( len( self.mfi_b_x ) ) ]
     
-		# Compute the average magetic field.
+		# Compute the average magetic field and its norm.
 
 		self.mfi_avg_vec = array( [ mean( self.mfi_b_x ),
 		                            mean( self.mfi_b_y ),
@@ -791,12 +790,12 @@ class core( QObject ) :
 		self.mfi_amag_ang = array( [ mean( self.mfi_b_colat ),
 		                                   mean( self.mfi_b_lon   )  ] )
 
-		# Calculating the average angular deviation of magnetic field
+		# Calculate the average angular deviation of magnetic field
 
 		self.mfi_psi_b = [ arccos( [ sum ( mfi_nrm[i][j] *
 		                               self.mfi_avg_nrm[j]
-		                               for j in range( 3 )      ) ] )
-	                              for i in range( len( mfi_nrm ) ) ]
+		                              for j in range( 3 )          ) ] )
+	                                      for i in range( len( mfi_nrm ) ) ]
 
                 self.mfi_psi_b_avg = rad2deg(sum ( self.mfi_psi_b )/self.n_mfi )
 
@@ -905,15 +904,15 @@ class core( QObject ) :
 		# Find the maximum current window (of "self.mom_win_bin" bins)
 		# for each direction
 		dir_max_ind  = [ [ self.fc_spec.find_max_curr( c, d,
-		                             win=self.mom_win_bin            )
-		                             for d in range(self.fc_spec['n_dir']) ]
-		                             for c in range(self.fc_spec['n_cup']) ]
+		                             win=self.mom_win_bin              )
+		                        for d in range(self.fc_spec['n_dir'] ) ]
+		                        for c in range(self.fc_spec['n_cup'] ) ]
 
 		dir_max_curr = [ [ self.fc_spec.calc_tot_curr( c, d,
 		                             dir_max_ind[c][d],
-		                             win=self.mom_win_bin           )
-		                             for d in range(self.fc_spec['n_dir']) ]
-		                             for c in range(self.fc_spec['n_cup']) ]
+		                             win=self.mom_win_bin              )
+		                        for d in range(self.fc_spec['n_dir'] ) ]
+		                        for c in range(self.fc_spec['n_cup'] ) ]
 
 		# Compute "cup_max_ind" (two element list)
 		# List of indices with maximum current for each cup
@@ -927,7 +926,7 @@ class core( QObject ) :
 			for d in range( self.fc_spec['n_dir'] ) :
 
 				curr_sum = sum( [ dir_max_curr[c][
-				                  (d+i)%self.fc_spec['n_dir']]
+				                  (d+i)%self.fc_spec['n_dir']  ]
 				                  for i in range(
 				                           self.mom_win_dir) ] )
 
@@ -1229,7 +1228,7 @@ class core( QObject ) :
 		# look directions.
 
 		eta_t = ( 1.E-3 / const['k_b'] ) * \
-		        const['m_p'] * ( ( 1.E3 * eta_w )**2 )
+		        const['m_p'] * ( ( 1.E3  * eta_w )**2 )
 
 		# Calculate a net estimators of the number density and thermal
 		# speed.
@@ -1256,7 +1255,7 @@ class core( QObject ) :
 		self.mom_res.add_pop( 'p',
 		                      drift=False, aniso=False,
 		                      name='Core', sym='c',
-		                      n=mom_n, w=mom_w          )
+		                      n=mom_n,     w=mom_w          )
 
 		# Calculate the expected currents based on the results of the
 		# (linear) moments analysis.
@@ -1402,8 +1401,8 @@ class core( QObject ) :
 					self.nln_plas.arr_pop[i]['name'] = None
 					self.nln_plas.arr_pop[i]['sym']  = None
 
-					self.emit( SIGNAL('janus_chng_nln_pop'), i )
-
+					self.emit( SIGNAL(
+					              'janus_chng_nln_pop'), i )
 				try :
 					self.nln_plas.arr_pop[i]['spec'] = \
 					             self.nln_plas.arr_spec[val]
@@ -1546,9 +1545,7 @@ class core( QObject ) :
 			                      >= self.nln_set_sel_b[i] )     ) :
 				self.nln_set_sel_a[i] = None
 				self.nln_set_sel_b[i] = None
-
 		else :
-
 			return
 
 		# Validate the settings for the specified ion population.
@@ -1556,6 +1553,7 @@ class core( QObject ) :
 		if   ( ( self.nln_set_gss_n[i] is None ) or
 		       ( self.nln_set_gss_w[i] is None )    ) :
 			self.nln_set_gss_vld[i] = False
+
 		elif ( ( self.nln_plas.arr_pop[i]['drift'] ) and
 		       ( self.nln_set_gss_d[i] is None     )     ) :
 			self.nln_set_gss_vld[i] = False
@@ -1565,6 +1563,7 @@ class core( QObject ) :
 		if ( ( self.nln_set_sel_a[i] is None ) or
 		     ( self.nln_set_sel_b[i] is None )    ) :
 			self.nln_set_sel_vld[i] = False
+
 		else :
 			self.nln_set_sel_vld[i] = True
 
@@ -1591,6 +1590,7 @@ class core( QObject ) :
 
 		if   ( chng == 'gss' ) :
 			self.auto_nln_gss( )
+
 		elif ( chng == 'sel' ) :
 			self.auto_nln_sel( )
 		else :
@@ -1875,9 +1875,7 @@ class core( QObject ) :
 				pop_dv = self.nln_plas.arr_pop[p]['dv']
 
 				self.nln_gss_prm.append( pop_dv )
-
 			else :
-
 				pop_dv = 0.
 
 			# If the population is anisotropic, extract its
@@ -1892,9 +1890,7 @@ class core( QObject ) :
 
 				self.nln_gss_prm.append( pop_w[0] )
 				self.nln_gss_prm.append( pop_w[1] )
-
 			else :
-
 				pop_w     = self.nln_plas.arr_pop[p]['w']
 
 				self.nln_gss_prm.append( pop_w )
@@ -2011,9 +2007,6 @@ class core( QObject ) :
 
 			c   = tk_c[j]
 			d   = tk_d[j]
-
-#			cup = self.cup[c]
-#			dir = self.dir[c,d]
 
 			dlk = self.fc_spec.arr[c][d][0]['dir']
 
@@ -2315,12 +2308,12 @@ class core( QObject ) :
 		self.nln_res_plas['b0_z']     = self.mfi_avg_vec[2]
 
 		pop_v0_vec                    = [fit[0], fit[1], fit[2]]
-		self.nln_res_plas['v0_x']     = fit[0]
-		self.nln_res_plas['v0_y']     = fit[1]
-		self.nln_res_plas['v0_z']     = fit[2]
-		self.nln_res_plas['sig_v0_x'] = sig[0]
-		self.nln_res_plas['sig_v0_y'] = sig[1]
-		self.nln_res_plas['sig_v0_z'] = sig[2]
+		self.nln_res_plas['v0_x']     =  fit[0]
+		self.nln_res_plas['v0_y']     =  fit[1]
+		self.nln_res_plas['v0_z']     =  fit[2]
+		self.nln_res_plas['sig_v0_x'] =  sig[0]
+		self.nln_res_plas['sig_v0_y'] =  sig[1]
+		self.nln_res_plas['sig_v0_z'] =  sig[2]
 
 		c = 3
 
@@ -2350,8 +2343,8 @@ class core( QObject ) :
 
 			pop_drift = self.nln_plas.arr_pop[p]['drift']
 			pop_aniso = self.nln_plas.arr_pop[p]['aniso']
-			pop_name  = self.nln_plas.arr_pop[p]['name']
-			pop_sym   = self.nln_plas.arr_pop[p]['sym']
+			pop_name  = self.nln_plas.arr_pop[p]['name' ]
+			pop_sym   = self.nln_plas.arr_pop[p]['sym'  ]
 
 			pop_n     = fit[c]
 			pop_sig_n = sig[c]
@@ -2405,7 +2398,8 @@ class core( QObject ) :
 
 		self.nln_res_curr_ion = [ [ [ [
 		                     self.nln_res_curr_ion[p][c][d][b]
-		                     for p in range( len(self.nln_res_plas.arr_pop) ) ]
+		                     for p in range( len(
+		                                 self.nln_res_plas.arr_pop ) ) ]
 		                     for b in range( self.fc_spec['n_bin']   ) ]
 		                     for d in range( self.fc_spec['n_dir']   ) ]
 		                     for c in range( self.fc_spec['n_cup']   ) ]
@@ -2500,7 +2494,6 @@ class core( QObject ) :
 				self.dyn_nln = value
 			else :
 				return
-
 		else :
 
 			return
@@ -2523,6 +2516,7 @@ class core( QObject ) :
 				if ( ( not self.dyn_sel ) and
 				     ( not self.dyn_gss )     ) :
 					self.chng_dsp( 'mom' )
+
 				elif ( self.dyn_nln ) :
 					self.chng_dsp( 'nln' )
 				else :
@@ -2595,6 +2589,8 @@ class core( QObject ) :
 
 		elif ( prefix == 'fls' ) :
 
+			# Assign the provided value to the specified key.
+
 			if ( key == 'fls_n_fc' ) :
 				try :
 					self.fc_arcv.chng_n_file_max( value )
@@ -2604,7 +2600,6 @@ class core( QObject ) :
 					pass
 
 			if ( key == 'fls_n_spin' ) :
-
 				try :
 					self.spin_arcv.chng_n_file_max( value )
 					self.opt['fls_n_spin'] =\
