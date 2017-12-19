@@ -63,13 +63,15 @@ class janus( object ) :
 
 		dname = os.path.dirname( __file__ )
 
-		lst = [ os.path.join( dname, 'data'              ),
-		        os.path.join( dname, 'data'   , 'fc'     ),
-		        os.path.join( dname, 'data'   , 'mfi'    ),
-		        os.path.join( dname, 'data'   , 'spin'   ),
-		        os.path.join( dname, 'results'           ),
-		        os.path.join( dname, 'results', 'save'   ),
-		        os.path.join( dname, 'results', 'export' )  ]
+		lst = [ os.path.join( dname, 'data'                     ),
+		        os.path.join( dname, 'data'   , 'fc'            ),
+		        os.path.join( dname, 'data'   , 'mfi'           ),
+			os.path.join( dname, 'data'   , 'mfi'   ,'hres' ),
+			os.path.join( dname, 'data'   , 'mfi'   ,'lres' ),
+		        os.path.join( dname, 'data'   , 'spin'          ),
+		        os.path.join( dname, 'results'                  ),
+		        os.path.join( dname, 'results', 'save'          ),
+		        os.path.join( dname, 'results', 'export'        )  ]
 
 		for d in lst :
 			if ( not os.path.isdir( d ) ) :
