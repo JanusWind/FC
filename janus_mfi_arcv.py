@@ -37,7 +37,7 @@ from janus_time import calc_time_str, calc_time_val, calc_time_epc
 
 # Load the necessary "numpy" array modules.
 
-from numpy import amax, amin, append, argsort, array, ceil, floor, tile, where
+from numpy import amax, amin, append, argsort, array, ceil, floor, tile, where, arange
 
 # Load the modules necessary for file I/O (including FTP).
 

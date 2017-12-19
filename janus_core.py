@@ -170,7 +170,7 @@ class core( QObject ) :
 		self.spin_arcv = spin_arcv( core=self,
 		                            n_file_max=self.opt['fls_n_spin']  ) 
 
-		self.mfi_arcv = mfi_arcv( core=self,
+		self.mfi_arcv = mfi_arcv( core=self, use_h2 = True,
 		                            n_file_max=self.opt['fls_n_mfi' ]  )
 
 		# Initialize a log of the analysis results.

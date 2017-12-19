@@ -98,8 +98,8 @@ class spin_arcv( object ) :
 			raise ValueError( 'Median window must be at least 1.'  )
 
 		if ( self.n_date_max < 0 ) :
-			raise ValueError( 'Maximum number of dates \
-			                                  cannot be negative.' )
+			raise ValueError( 'Maximum number of dates '+
+			                                  'cannot be negative.' )
 
 		# Initialize the list of dates loaded.
 
