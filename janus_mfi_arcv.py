@@ -99,11 +99,18 @@ class mfi_arcv( object ) :
 
 		# If no path has been requested by the user, use the default
 		# one.
-		suffix = ''
+
 		if ( self.path is None ) :
+
+			# Determine the correct suffix given the choice of data
+			# resolution.
+
+			suffix = ''
 
 			if ( use_h2 ) : suffix = 'hres'
 			else : suffix = 'lres'
+
+			# Generate and save the path.
 
 			self.path = os.path.join( os.path.dirname( __file__ ),
 			                          'data', 'mfi', suffix        )
@@ -299,28 +306,45 @@ class mfi_arcv( object ) :
 			self.mesg_txt( 'fail', date_str )
 			return
 
-		# Extract the data from the loaded file.
+		# Extract the data from the loaded file and select those data
+		# which seem to have valid (versus fill) values.
 
 		if ( self.use_h2 ) :
-			sub_t   = cdf['Epoch'][:,0]      #unsure
-			sub_b_x = cdf['BGSE'][:,0]       #p. sure
-			sub_b_y = cdf['BGSE'][:,1]       #p. sure
-			sub_b_z = cdf['BGSE'][:,2]       #p. sure
-			sub_pnt = cdf['NUM1_PTS_I'][:,0] #what is I/O?
+
+			# Extract the data from the loaded file.
+
+			sub_t   = cdf['Epoch'][:,0]
+			sub_b_x = cdf['BGSE'][:,0]
+			sub_b_y = cdf['BGSE'][:,1]
+			sub_b_z = cdf['BGSE'][:,2]
+
+			sub_ind = tile( self.t_date, len( sub_t ) )
+
+			# Select those data which seem to have valid (versus
+			# fill) values.
+
+			# TODO: Establish quality checks.
+
+			n_tk = len( sub_t )
+			tk   = arange( n_tk )
+
 		else :
+
+			# Extract the data from the loaded file.
+
 			sub_t   = cdf['Epoch3'][:,0]
 			sub_b_x = cdf['B3GSE'][:,0]
 			sub_b_y = cdf['B3GSE'][:,1]
 			sub_b_z = cdf['B3GSE'][:,2]
 			sub_pnt = cdf['NUM3_PTS'][:,0]
 
-		sub_ind = tile( self.t_date, len( sub_t ) )
+			sub_ind = tile( self.t_date, len( sub_t ) )
 
-		# Select those data which seem to have valid (versus
-		# fill) values.
+			# Select those data which seem to have valid (versus
+			# fill) values.
 
-		tk   = where( sub_pnt > 0 )[0]
-		n_tk = len( tk )
+			tk   = where( sub_pnt > 0 )[0]
+			n_tk = len( tk )
 
 		# Copy the date associated with this file into and
 		# array.
