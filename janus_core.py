@@ -508,6 +508,11 @@ class core( QObject ) :
 			             'fls_n_spin' :float('inf'),
 			             'fls_n_mfi'  :float('inf')    }
 
+			# TODO
+
+			# self.rstr_opt( )
+			# self.save_opt( )
+
 	#-----------------------------------------------------------------------
 	# LOAD THE REQUESTED WIND/FC SPECTRUM.
 	#-----------------------------------------------------------------------
@@ -2592,28 +2597,39 @@ class core( QObject ) :
 			# Assign the provided value to the specified key.
 
 			if ( key == 'fls_n_fc' ) :
+
 				try :
 					self.fc_arcv.chng_n_file_max( value )
-					self.opt['fls_n_fc'] =\
-					                 self.fc_arcv.n_file_max
 				except :
 					pass
+
+				self.opt['fls_n_fc'] = self.fc_arcv.n_file_max
 
 			if ( key == 'fls_n_spin' ) :
+
 				try :
 					self.spin_arcv.chng_n_file_max( value )
-					self.opt['fls_n_spin'] =\
-					               self.spin_arcv.n_file_max
 				except :
 					pass
 
+				self.opt['fls_n_spin'] =\
+				                       self.spin_arcv.n_file_max
+
 			if ( key == 'fls_n_mfi' ) :
+
 				try :
 					self.mfi_arcv.chng_n_file_max( value )
-					self.opt['fls_n_mfi'] =\
-					                self.mfi_arcv.n_file_max
 				except :
 					pass
+
+				self.opt['fls_n_mfi'] =\
+				                        self.mfi_arcv.n_file_max
+
+		# Save options to file.
+
+		# TODO
+
+		# self.save_opt( )
 
 		# Emit the signal that an option has changed.
 
