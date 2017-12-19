@@ -736,6 +736,9 @@ class core( QObject ) :
 		# Load the Wind/MFI magnetic field data associated with this
 		# spectrum.
 
+		# TODO: Insert an if statement to take care of option of low and
+		# high resolution data.
+
 		( self.mfi_t, self.mfi_b_x, self.mfi_b_y, self.mfi_b_z ) = \
 		   self.mfi_arcv.load_rang(
 		      ( self.time_val       - ( 2. * self.fc_spec['rot'] ) ),
