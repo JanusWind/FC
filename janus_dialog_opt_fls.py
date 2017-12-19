@@ -91,13 +91,6 @@ class dialog_opt_fls( QWidget ) :
 		self.lab_hdr1 = QLabel( 'Maximum # of saved downloaded files'  )
 		self.lab_hdr2 = QLabel( '( Use "inf" for no limit)'            )
 
-		self.lab_opt = {
-                       'def':QLabel( 'Default ( all value set to infinity )' ) ,
-		       'cst':QLabel( 'Custom Values'                        ) }
-
-		self.fls_opt = { 'def':event_RadioBox( self, 'def' ) ,
-		                 'cst':event_RadioBox( self, 'cst' ) }
-  
 		self.lab = { 'fls_n_fc'  :QLabel( 'FC Files'   ),
 		             'fls_n_spin':QLabel( 'Spin Files' ),
 		             'fls_n_mfi' :QLabel( 'MFI Files'  )  }
@@ -112,26 +105,20 @@ class dialog_opt_fls( QWidget ) :
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
-		self.lab_hdr1.setFont( QFont( "Times", 12 ) )
-		self.lab_hdr2.setFont( QFont( "Times", 12 ) )
+		self.lab_hdr1.setFont( QFont( "Sans", 12 ) )
+		self.lab_hdr2.setFont( QFont( "Sans", 12 ) )
 
 		self.sg.addWidget( self.lab_hdr1, 0, 0, 1, 3 )
 		self.sg.addWidget( self.lab_hdr2, 1, 0, 1, 3 )
 
-		self.sg.addWidget( self.lab_opt['def'], 2, 1, 1, 3 )
-		self.sg.addWidget( self.lab_opt['cst'], 3, 1, 1, 3 )
-		self.sg.addWidget( self.fls_opt['def'], 2, 0, 1, 1 )
-		self.sg.addWidget( self.fls_opt['cst'], 3, 0, 1, 1 )
-
-
 		for i, key in enumerate( self.order ) :
 
-			self.lab[key].setFont( QFont(     "Times", 12 ) )
-			self.arr_txt[key].setFont( QFont( "Times", 12 ) )
+			self.lab[key].setFont( QFont(     "Sans", 12 ) )
+			self.arr_txt[key].setFont( QFont( "Sans", 12 ) )
 
-			self.sg.addWidget( self.lab[key],     4+i, 1, 1, 1 )
-			self.sg.addWidget( self.arr_txt[key], 4+i, 2, 1, 1 )
-                        self.arr_txt[key].setMaximumWidth( 60 )
+			self.sg.addWidget( self.lab[key],     4+i, 0, 1, 1 )
+			self.sg.addWidget( self.arr_txt[key], 4+i, 1, 1, 1 )
+			self.arr_txt[key].setMaximumWidth( 60 )
 
 		# Populate the menu with the options settings from core.
 
@@ -175,36 +162,27 @@ class dialog_opt_fls( QWidget ) :
 
 	def user_event( self, event, fnc ) :
 
-                if ( fnc == self.fls_opt['def'] ) :
-        		for key in self.arr_txt :
-        
-        			self.arr_txt[key].text( ) == ''
- 
-#                        self.make_opt( )
+		txt = self.arr_txt[fnc].text( )
 
-                elif ( fnc == self.fls_opt['cst'] ) :
-
-        		txt = self.arr_txt[fnc].text( )
+		try :
+			val = str_to_nni( txt )
+		except :
+			val = None
         
-        		try :
-        			val = str_to_nni( txt )
-        		except :
-        			val = None
+        	# If no threads are running, make the change to the option with
+        	# core.  Otherwise, restore the original options settings.
         
-        		# If no threads are running, make the change to the option with
-        		# core.  Otherwise, restore the original options settings.
-        
-        		if ( ( n_thread( ) == 0 ) and ( val is not None ) ) :
-        
-        			# Start a new thread that makes the change to the option
-        			# with core.
-        
-        			Thread( target=thread_chng_opt,
-        			        args=( self.core, fnc, val ) ).start( )
-        
-        		else :
-        
-        			self.make_opt( )
+		if ( ( n_thread( ) == 0 ) and ( val is not None ) ) :
+		
+			# Start a new thread that makes the change to the option
+			# with core.
+		
+			Thread( target=thread_chng_opt,
+			        args=( self.core, fnc, val ) ).start( )
+		
+		else :
+		
+			self.make_opt( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A CHANGE OF AN OPTION.

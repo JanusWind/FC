@@ -114,12 +114,12 @@ class widget_ctrl_dspdyn( QWidget ) :
 			if ( key == 'dsp') :
 
 				self.lab_dsp[key].setFont(
-				        QFont( "Times", 12, QFont.Bold ) )
+				        QFont( "Sans", 12, QFont.Bold ) )
 
 				self.grd.addWidget( self.lab_dsp[key], i, 0, 1, 2 )
 			else :
-				self.box_dsp[key].setFont( QFont( "Times", 12 ) )
-				self.lab_dsp[key].setFont( QFont( "Times", 12 ) )
+				self.box_dsp[key].setFont( QFont( "Sans", 12 ) )
+				self.lab_dsp[key].setFont( QFont( "Sans", 12 ) )
 				self.grd.addWidget( self.box_dsp[key], i, 0, 1, 1 )
 				self.grd.addWidget( self.lab_dsp[key], i, 1, 1, 1 )
 
@@ -129,12 +129,12 @@ class widget_ctrl_dspdyn( QWidget ) :
 			if ( key == 'dyn') :
 
 				self.lab_dyn[key].setFont(
-				        QFont( "Times", 12, QFont.Bold ) )
+				        QFont( "Sans", 12, QFont.Bold ) )
 
 				self.grd.addWidget( self.lab_dyn[key], i, 3, 1, 2 )
 			else :
-				self.box_dyn[key].setFont( QFont( "Times", 12 ) )
-				self.lab_dyn[key].setFont( QFont( "Times", 12 ) )
+				self.box_dyn[key].setFont( QFont( "Sans", 12 ) )
+				self.lab_dyn[key].setFont( QFont( "Sans", 12 ) )
 				self.grd.addWidget( self.box_dyn[key], i, 3, 1, 1 )
 				self.grd.addWidget( self.lab_dyn[key], i, 4, 1, 1 )
 
