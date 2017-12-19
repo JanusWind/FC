@@ -63,7 +63,7 @@ class mfi_arcv( object ) :
 	#-----------------------------------------------------------------------
 
 	def __init__( self, core=None, buf=3600., tol=0.,
-	                    use_k0=False,
+	                    use_h2=False,
 	                    n_file_max=None, n_date_max=None,
 	                    path=None, verbose=True           ) :
 
@@ -76,7 +76,8 @@ class mfi_arcv( object ) :
 		self.buf        = buf
 		self.tol        = tol
 		self.path       = path
-		self.use_k0     = use_k0
+		self.use_h2     = use_h2
+		self.n_file_max = n_file_max
 		self.n_date_max = n_date_max
 		self.verbose    = verbose
 
@@ -86,6 +87,11 @@ class mfi_arcv( object ) :
 		n_file_max_def = float( 'inf' )
 		n_date_max_def = 40
 
+		if ( self.n_file_max is None ) :
+			self.n_file_max = n_file_max_def
+		elif ( self.n_file_max <= 0 ) :
+			self.n_file_max = n_file_max_def
+
 		if ( self.n_date_max is None ) :
 			self.n_date_max = n_date_max_def
 		elif ( self.n_date_max <= 0 ) :
@@ -93,11 +99,14 @@ class mfi_arcv( object ) :
 
 		# If no path has been requested by the user, use the default
 		# one.
-
+		suffix = ''
 		if ( self.path is None ) :
 
+			if ( use_h2 ) : suffix = 'hres'
+			else : suffix = 'lres'
+
 			self.path = os.path.join( os.path.dirname( __file__ ),
-			                          'data', 'mfi'                )
+			                          'data', 'mfi', suffix        )
 
 		# Initialize the array of dates loaded.
 
@@ -117,7 +126,7 @@ class mfi_arcv( object ) :
 
 		# Initialize "n_file_max".
 
-		self.chng_n_file_max( n_file_max )
+		self.chng_n_file_max( self.n_file_max )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING (AND RETURNING) A range OF THE DATA.
@@ -240,8 +249,8 @@ class mfi_arcv( object ) :
 		str_mon  = date_str[5:7]
 		str_day  = date_str[8:10]
 
-		if ( self.use_k0 ) :
-			fl0 = 'wi_k0_mfi_' + \
+		if ( self.use_h2 ) :
+			fl0 = 'wi_h2_mfi_' + \
 			      str_year + str_mon + str_day + '_v??.cdf'
 		else :
 			fl0 = 'wi_h0_mfi_' + \
@@ -261,8 +270,8 @@ class mfi_arcv( object ) :
 				ftp = FTP( 'cdaweb.gsfc.nasa.gov' )
 				ftp.login( )
 				ftp.cwd( 'pub/data/wind/mfi/' )
-				if ( self.use_k0 ) :
-					ftp.cwd( 'mfi_k0/' )
+				if ( self.use_h2 ) :
+					ftp.cwd( 'mfi_h2/' )
 				else :
 					ftp.cwd( 'mfi_h0/' )
 				ftp.cwd( str_year )
@@ -292,12 +301,12 @@ class mfi_arcv( object ) :
 
 		# Extract the data from the loaded file.
 
-		if ( self.use_k0 ) :
-			sub_t   = cdf['Epoch'][:]
-			sub_b_x = cdf['BGSEc'][:,0]
-			sub_b_y = cdf['BGSEc'][:,1]
-			sub_b_z = cdf['BGSEc'][:,2]
-			sub_pnt = cdf['N'][:]
+		if ( self.use_h2 ) :
+			sub_t   = cdf['Epoch'][:,0]      #unsure
+			sub_b_x = cdf['BGSE'][:,0]       #p. sure
+			sub_b_y = cdf['BGSE'][:,1]       #p. sure
+			sub_b_z = cdf['BGSE'][:,2]       #p. sure
+			sub_pnt = cdf['NUM1_PTS_I'][:,0] #what is I/O?
 		else :
 			sub_t   = cdf['Epoch3'][:,0]
 			sub_b_x = cdf['B3GSE'][:,0]
@@ -390,9 +399,9 @@ class mfi_arcv( object ) :
 		# type (as specified by the "use_*" keywords) in the data
 		# directory.
 
-		if ( self.use_k0 ) :
+		if ( self.use_h2 ) :
 			file_name = list( glob(
-			         os.path.join( self.path, 'wi_k0*' ) ) )
+			         os.path.join( self.path, 'wi_h2*' ) ) )
 		else :
 			file_name = list( glob(
 			         os.path.join( self.path, 'wi_h0*' ) ) )
@@ -455,7 +464,7 @@ class mfi_arcv( object ) :
 		# integer. Change the maximum file number if it is. Otherwise,
 		# raise an error.
 
-		if ( ( val != float( 'infinity' ) ) and
+		if ( ( val != float( 'inf' ) ) and
 		     ( type( val ) is not int   )       ) :
 
 			raise ValueError( 'Max file number must be\
