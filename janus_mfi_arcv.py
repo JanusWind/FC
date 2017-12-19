@@ -119,6 +119,7 @@ class mfi_arcv( object ) :
 
 		self.chng_n_file_max( n_file_max )
 
+		print n_file_max
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING (AND RETURNING) A range OF THE DATA.
 	#-----------------------------------------------------------------------
