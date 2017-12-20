@@ -75,8 +75,8 @@ class dialog_opt( QDialog ) :
 		self.wdg = QTabWidget( )
 		self.sg  = QGridLayout( )
 
-		self.grd.addWidget( self.wdg, 0, 0, 13, 3 )
-		self.grd.addLayout( self.sg,  14, 1, 1, 1 )
+		self.grd.addWidget( self.wdg, 0, 0, 1, 1 )
+		self.grd.addLayout( self.sg,  2, 0, 1, 1 )
 
 		self.wdg_opt_par   = dialog_opt_par( self.core   )
 		self.wdg_opt_fls   = dialog_opt_fls( self.core   )
@@ -84,11 +84,15 @@ class dialog_opt( QDialog ) :
 		self.wdg.addTab( self.wdg_opt_par, 'Results'   )
 		self.wdg.addTab( self.wdg_opt_fls, 'File Options' )
 
+		self.btn_rstr  = event_PushButton(
+		                          self, 'rstr', 'Restore Default' )
 		self.btn_close = event_PushButton( self, 'close', 'Close' )
 
+		self.btn_rstr.setAutoDefault(  False )
 		self.btn_close.setAutoDefault( False )
 
-		self.sg.addWidget( self.btn_close, 0, 0, 1, 1 )
+		self.sg.addWidget( self.btn_rstr , 1, 0, 1, 1 )
+		self.sg.addWidget( self.btn_close, 1, 1, 1, 1 )
 
 		# Execute this dialog.
 
@@ -106,5 +110,25 @@ class dialog_opt( QDialog ) :
 		if ( fnc == 'close' ) :
 
 			self.close( )
+
+		elif ( fnc == 'rstr' ) :
+
+			self.core.opt = { 'res_dw'       :True,
+			                  'res_dt'       :True,
+			                  'res'          :True,
+			                  'res_u'        :True,
+			                  'res_n'        :True,
+			                  'res_v'        :True,
+			                  'res_d'        :True,
+			                  'res_w'        :True,
+			                  'res_r'        :True,
+			                  'res_s'        :True,
+			                  'res_k'        :True,
+			                  'mfi_l'        :True,
+			                  'mfi_h'        :False,
+			                  'fls_n_fc'     :float('inf'),
+			                  'fls_n_spin'   :float('inf'),
+			                  'fls_n_mfi_l'  :float('inf'),
+			                  'fls_n_mfi_h'  :float('inf')    }
 
 			return

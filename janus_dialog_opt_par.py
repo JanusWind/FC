@@ -81,7 +81,7 @@ class dialog_opt_par( QWidget ) :
 
 		self.sg.setContentsMargins( 0, 0, 0, 0 )
 
-		self.grd.addLayout( self.sg, 0, 0, 16, 3 )
+		self.grd.addLayout( self.sg, 0, 0, 13, 3 )
 
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
@@ -99,10 +99,7 @@ class dialog_opt_par( QWidget ) :
                        'res_s'  :QLabel( 'Skewness (S)'              , self ),
                        'res_k'  :QLabel( 'Kurtosis (K)'              , self ),
                        'lab_3'  :QLabel( 'Uncertainties'             , self ),
-                       'res_u'  :QLabel( 'NLN Uncertainties'         , self ),
-                       'lab_4'  :QLabel( 'MFI Options'               , self ),
-                       'mfi_l'  :QLabel( 'Low Resolution ( 0.3 Hz)'  , self ),
-		       'mfi_h'  :QLabel( 'High Resolution (11 Hz)'   , self )  }
+                       'res_u'  :QLabel( 'NLN Uncertainties'         , self ), }
 
 		self.box = { 'res_dt':event_CheckBox( self, 'res_dt' ),
 		             'res_dw':event_CheckBox( self, 'res_dw' ),
@@ -113,15 +110,12 @@ class dialog_opt_par( QWidget ) :
 		             'res_r' :event_CheckBox( self, 'res_r'  ),
 		             'res_s' :event_CheckBox( self, 'res_s'  ),
 		             'res_k' :event_CheckBox( self, 'res_k'  ),
-		             'res_u' :event_CheckBox( self, 'res_u'  ),
-		             'mfi_l' :event_RadioBox( self, 'mfi_l'  ),
-		             'mfi_h' :event_RadioBox( self, 'mfi_h'  )  }
+		             'res_u' :event_CheckBox( self, 'res_u'  )   }
 
 
 		self.order = [ 'lab_1', 'res_dt', 'res_dw', 'lab_2', 'res_n',
 		               'res_v', 'res_d' , 'res_w' , 'res_r', 'res_s',
-		               'res_k', 'lab_3' , 'res_u' , 'lab_4', 'mfi_l',
-		               'mfi_h'                                        ]
+		               'res_k', 'lab_3' , 'res_u'                    ]
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
@@ -129,7 +123,7 @@ class dialog_opt_par( QWidget ) :
 		for i, key in enumerate( self.order ) :
 
 			if ( ( key == 'lab_1' ) or ( key == 'lab_2' ) or
-			     ( key == 'lab_3' ) or ( key == 'lab_4' )    ) :
+			     ( key == 'lab_3' )                          ) :
 
 				self.lab[key].setFont(
 				        QFont( "Sans", 12, QFont.Bold ) )
@@ -161,8 +155,6 @@ class dialog_opt_par( QWidget ) :
 		self.box['res_s' ].setChecked( self.core.opt['res_s' ] )
 		self.box['res_k' ].setChecked( self.core.opt['res_k' ] )
 		self.box['res_u' ].setChecked( self.core.opt['res_u' ] )
-		self.box['mfi_l' ].setChecked( self.core.opt['mfi_l' ] )
-		self.box['mfi_h' ].setChecked( self.core.opt['mfi_h' ] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.

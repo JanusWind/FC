@@ -52,7 +52,8 @@ from janus_const import const
 
 from janus_fc_arcv   import fc_arcv
 from janus_spin_arcv import spin_arcv
-from janus_mfi_arcv  import mfi_arcv
+from janus_mfi_arcv_lres  import mfi_arcv_lres
+from janus_mfi_arcv_hres import mfi_arcv_hres
 
 # Load the necessary array modules and mathematical functions.
 
@@ -170,8 +171,11 @@ class core( QObject ) :
 		self.spin_arcv = spin_arcv( core=self,
 		                            n_file_max=self.opt['fls_n_spin']  ) 
 
-		self.mfi_arcv = mfi_arcv( core=self,
-		                            n_file_max=self.opt['fls_n_mfi' ]  )
+		self.mfi_arcv_lres  = mfi_arcv_lres( core=self,
+		                          n_file_max=self.opt['fls_n_mfi_l' ]  )
+
+		self.mfi_arcv_hres = mfi_arcv_hres( core=self,
+		                          n_file_max=self.opt['fls_n_mfi_h' ]  )
 
 		# Initialize a log of the analysis results.
 
@@ -493,22 +497,23 @@ class core( QObject ) :
 
 		if ( var_opt ) :
 
-			self.opt = { 'res_dw'     :True,
-			             'res_dt'     :True,
-			             'res'        :True,
-			             'res_u'      :True,
-			             'res_n'      :True,
-			             'res_v'      :True,
-			             'res_d'      :True,
-			             'res_w'      :True,
-			             'res_r'      :True,
-			             'res_s'      :True,
-			             'res_k'      :True,
-			             'mfi_l'      :True,
-			             'mfi_h'      :False,
-			             'fls_n_fc'   :float('inf'),
-			             'fls_n_spin' :float('inf'),
-			             'fls_n_mfi'  :float('inf')    }
+			self.opt = { 'res_dw'       :True,
+			             'res_dt'       :True,
+			             'res'          :True,
+			             'res_u'        :True,
+			             'res_n'        :True,
+			             'res_v'        :True,
+			             'res_d'        :True,
+			             'res_w'        :True,
+			             'res_r'        :True,
+			             'res_s'        :True,
+			             'res_k'        :True,
+			             'mfi_l'        :True,
+			             'mfi_h'        :False,
+			             'fls_n_fc'     :float('inf'),
+			             'fls_n_spin'   :float('inf'),
+			             'fls_n_mfi_l'  :float('inf'),
+			             'fls_n_mfi_h'  :float('inf')    }
 
 			# TODO
 
@@ -741,10 +746,20 @@ class core( QObject ) :
 		# TODO: Insert an if statement to take care of option of low and
 		# high resolution data.
 
-		( self.mfi_t, self.mfi_b_x, self.mfi_b_y, self.mfi_b_z ) = \
-		  self.mfi_arcv.load_rang(
-		      ( self.time_val       - ( 2. * self.fc_spec['rot'] ) ),
-		      ( self.fc_spec['dur'] + ( 4. * self.fc_spec['rot'] ) )  )
+		if ( self.opt['mfi_l'] ) :
+
+			( self.mfi_t, self.mfi_b_x, self.mfi_b_y,
+			  self.mfi_b_z ) = self.mfi_arcv_lres.load_rang(
+			( self.time_val       - ( 2. * self.fc_spec['rot'] ) ),
+			( self.fc_spec['dur'] + ( 4. * self.fc_spec['rot'] ) ) )
+
+		elif ( self.opt['mfi_h'] ) :
+
+			( self.mfi_t, self.mfi_b_x, self.mfi_b_y,
+			  self.mfi_b_z ) = self.mfi_arcv_hres.load_rang(
+			( self.time_val       - ( 2. * self.fc_spec['rot'] ) ),
+			( self.fc_spec['dur'] + ( 4. * self.fc_spec['rot'] ) ) )
+
 
 		# Establish the number of data.
 
@@ -2636,15 +2651,28 @@ class core( QObject ) :
 				self.opt['fls_n_spin'] =\
 				                       self.spin_arcv.n_file_max
 
-			if ( key == 'fls_n_mfi' ) :
+			if ( key == 'fls_n_mfi_l' ) :
 
 				try :
-					self.mfi_arcv.chng_n_file_max( value )
+					self.mfi_arcv_lres.chng_n_file_max(
+					                                 value )
 				except :
 					pass
 
-				self.opt['fls_n_mfi'] =\
-				                        self.mfi_arcv.n_file_max
+				self.opt['fls_n_mfi_l'] =\
+				                    self.mfi_arcv_lres.n_file_max
+
+			if ( key == 'fls_n_mfi_h' ) :
+
+				try :
+					self.mfi_arcv_hres.chng_n_file_max(
+					                                 value )
+				except :
+					pass
+
+				self.opt['fls_n_mfi_h'] =\
+				                   self.mfi_arcv_hres.n_file_max
+
 
 		# Save options to file.
 

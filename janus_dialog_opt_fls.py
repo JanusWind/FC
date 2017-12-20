@@ -88,37 +88,66 @@ class dialog_opt_fls( QWidget ) :
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
 
-		self.lab_hdr1 = QLabel( 'Maximum # of saved downloaded files'  )
-		self.lab_hdr2 = QLabel( '( Use "inf" for no limit)'            )
+		self.lab_hdr1 = QLabel(
+		                'Maximum number of saved downloaded files'  )
+		self.lab_hdr2 = QLabel( '( Use "inf" for no limit)'         )
+		self.lab_hdr3 = QLabel( 'MFI Resolution'                    )
 
-		self.lab = { 'fls_n_fc'  :QLabel( 'FC Files'   ),
-		             'fls_n_spin':QLabel( 'Spin Files' ),
-		             'fls_n_mfi' :QLabel( 'MFI Files'  )  }
+		self.lab1 = { 'fls_n_fc'    :QLabel( 'FC Files'         ),
+		              'fls_n_spin'  :QLabel( 'Spin Files'       ),
+		              'fls_n_mfi_l' :QLabel(
+		                            'High Resolution MFI Files' ),
+		              'fls_n_mfi_h' :QLabel(
+		                            'Low Resolution MFI Files'  )     }
+
+		self.lab2 = {
+		          'mfi_l' :QLabel( 'Low Resolution (0.3 Hz) ', self ),
+		          'mfi_h' :QLabel( 'High Resolution (11 Hz)' , self )  }
 
 		self.arr_txt = {
-		           'fls_n_fc'  : event_LineEdit( self, 'fls_n_fc'   ),
-		           'fls_n_spin': event_LineEdit( self, 'fls_n_spin' ),
-		           'fls_n_mfi' : event_LineEdit( self, 'fls_n_mfi'  )  }
+		          'fls_n_fc'    :event_LineEdit( self, 'fls_n_fc'    ),
+		          'fls_n_spin'  :event_LineEdit( self, 'fls_n_spin'  ),
+		          'fls_n_mfi_l' :event_LineEdit( self, 'fls_n_mfi_l' ),
+		          'fls_n_mfi_h' :event_LineEdit( self, 'fls_n_mfi_h' ) }
 
-		self.order = [ 'fls_n_fc', 'fls_n_spin', 'fls_n_mfi' ]
+		self.box = { 'mfi_l' :event_RadioBox( self, 'mfi_l'  ),
+		             'mfi_h' :event_RadioBox( self, 'mfi_h'  )  }
+
+
+		self.order1 = [ 'fls_n_fc', 'fls_n_spin', 'fls_n_mfi_l',
+		                'fls_n_mfi_h'                                  ]
+
+		self.order2 = [ 'mfi_l','mfi_h' ]
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
 		self.lab_hdr1.setFont( QFont( "Sans", 12 ) )
 		self.lab_hdr2.setFont( QFont( "Sans", 12 ) )
+		self.lab_hdr3.setFont( QFont( "Sans", 12 ) )
 
 		self.sg.addWidget( self.lab_hdr1, 0, 0, 1, 3 )
 		self.sg.addWidget( self.lab_hdr2, 1, 0, 1, 3 )
 
-		for i, key in enumerate( self.order ) :
+		for i, key in enumerate( self.order1 ) :
 
-			self.lab[key].setFont( QFont(     "Sans", 12 ) )
+			self.lab1[key].setFont( QFont(    "Sans", 12 ) )
 			self.arr_txt[key].setFont( QFont( "Sans", 12 ) )
 
-			self.sg.addWidget( self.lab[key],     4+i, 0, 1, 1 )
-			self.sg.addWidget( self.arr_txt[key], 4+i, 1, 1, 1 )
+			self.sg.addWidget( self.lab1[key],     2+i, 0, 1, 1 )
+			self.sg.addWidget( self.arr_txt[key],  2+i, 1, 1, 1 )
 			self.arr_txt[key].setMaximumWidth( 60 )
+
+		self.lab_hdr3.setFont( QFont( "Sans", 12, QFont.Bold ) )
+		self.sg.addWidget( self.lab_hdr3, 6, 0, 1, 3 )
+
+		for i, key in enumerate( self.order2 ) :
+
+			self.lab2[key].setFont( QFont( "Sans", 12 ) )
+			self.box[key].setFont(  QFont( "Sans", 12 ) )
+
+			self.sg.addWidget( self.lab2[key], 7+i, 0, 1, 1 )
+			self.sg.addWidget( self.box[key],  7+i, 1, 1, 1 )
 
 		# Populate the menu with the options settings from core.
 
@@ -129,6 +158,9 @@ class dialog_opt_fls( QWidget ) :
 	#-----------------------------------------------------------------------
 
 	def make_opt( self ) :
+
+		self.box['mfi_l' ].setChecked( self.core.opt['mfi_l' ] )
+		self.box['mfi_h' ].setChecked( self.core.opt['mfi_h' ] )
 
 		for key in self.arr_txt :
 
@@ -162,27 +194,44 @@ class dialog_opt_fls( QWidget ) :
 
 	def user_event( self, event, fnc ) :
 
-		txt = self.arr_txt[fnc].text( )
+		if( ( fnc == 'mfi_l' ) or ( fnc == 'mfi_h' ) ) :
 
-		try :
-			val = str_to_nni( txt )
-		except :
-			val = None
-        
-        	# If no threads are running, make the change to the option with
-        	# core.  Otherwise, restore the original options settings.
-        
-		if ( ( n_thread( ) == 0 ) and ( val is not None ) ) :
-		
+			if ( n_thread( ) == 0 ) :
+
 			# Start a new thread that makes the change to the option
 			# with core.
-		
-			Thread( target=thread_chng_opt,
-			        args=( self.core, fnc, val ) ).start( )
-		
+
+				Thread( target=thread_chng_opt,
+				        args=( self.core, fnc,
+				        self.box[fnc].isChecked( ) ) ).start( )
+
+			else :
+
+				self.make_opt( )
+
 		else :
+			txt = self.arr_txt[fnc].text( )
+
+			try :
+				val = str_to_nni( txt )
+			except :
+				val = None
+        
+			# If no threads are running, make the change to the 
+			# option with core.  Otherwise, restore the original
+			#  options settings.
+        
+			if ( ( n_thread( ) == 0 ) and ( val is not None ) ) :
 		
-			self.make_opt( )
+				# Start a new thread that makes the change to
+				# the option with core.
+		
+				Thread( target=thread_chng_opt,
+				        args=( self.core, fnc, val ) ).start( )
+		
+			else :
+			
+				self.make_opt( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A CHANGE OF AN OPTION.

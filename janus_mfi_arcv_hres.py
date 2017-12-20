@@ -53,17 +53,17 @@ from scipy.io.idl import readsav
 
 
 ################################################################################
-## DEFINE THE "mfi_arcv" CLASS FOR ACCESSING THE ARCHIVE OF Wind/MFI DATA.
+## DEFINE THE "mfi_arcv_hres" CLASS FOR ACCESSING THE ARCHIVE OF Wind/MFI DATA.
 ################################################################################
 
-class mfi_arcv( object ) :
+class mfi_arcv_hres( object ) :
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE INITIALIZATION FUNCTION.
 	#-----------------------------------------------------------------------
 
 	def __init__( self, core=None, buf=3600., tol=0.,
-	                    use_h2=False,
+	                    use_h2=True,
 	                    n_file_max=None, n_date_max=None,
 	                    path=None, verbose=True           ) :
 
@@ -80,15 +80,6 @@ class mfi_arcv( object ) :
 		self.n_file_max = n_file_max
 		self.n_date_max = n_date_max
 		self.verbose    = verbose
-
-		print self.core.opt['mfi_l']
-		print self.core.opt['mfi_h']
-
-		if ( self.core.opt['mfi_l'] ) :
-
-			use_h2 = False
-		else :
-			use_h2 = True
 
 		# Validate the values of the "self.max_*" parameters and, if
 		# necessary, provide values for them.
@@ -111,18 +102,10 @@ class mfi_arcv( object ) :
 
 		if ( self.path is None ) :
 
-			# Determine the correct suffix given the choice of data
-			# resolution.
-
-			suffix = ''
-
-			if ( use_h2 ) : suffix = 'hres'
-			else : suffix = 'lres'
-
 			# Generate and save the path.
 
 			self.path = os.path.join( os.path.dirname( __file__ ),
-			                          'data', 'mfi', suffix        )
+			                          'data', 'mfi', 'hres'        )
 
 		# Initialize the array of dates loaded.
 
