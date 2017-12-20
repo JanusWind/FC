@@ -170,7 +170,7 @@ class core( QObject ) :
 		self.spin_arcv = spin_arcv( core=self,
 		                            n_file_max=self.opt['fls_n_spin']  ) 
 
-		self.mfi_arcv = mfi_arcv( core=self, use_h2 = True,
+		self.mfi_arcv = mfi_arcv( core=self,
 		                            n_file_max=self.opt['fls_n_mfi' ]  )
 
 		# Initialize a log of the analysis results.
@@ -742,7 +742,7 @@ class core( QObject ) :
 		# high resolution data.
 
 		( self.mfi_t, self.mfi_b_x, self.mfi_b_y, self.mfi_b_z ) = \
-		   self.mfi_arcv.load_rang(
+		  self.mfi_arcv.load_rang(
 		      ( self.time_val       - ( 2. * self.fc_spec['rot'] ) ),
 		      ( self.fc_spec['dur'] + ( 4. * self.fc_spec['rot'] ) )  )
 

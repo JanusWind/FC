@@ -81,6 +81,15 @@ class mfi_arcv( object ) :
 		self.n_date_max = n_date_max
 		self.verbose    = verbose
 
+		print self.core.opt['mfi_l']
+		print self.core.opt['mfi_h']
+
+		if ( self.core.opt['mfi_l'] ) :
+
+			use_h2 = False
+		else :
+			use_h2 = True
+
 		# Validate the values of the "self.max_*" parameters and, if
 		# necessary, provide values for them.
 
