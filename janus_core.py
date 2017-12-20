@@ -497,28 +497,107 @@ class core( QObject ) :
 
 		if ( var_opt ) :
 
-			self.opt = { 'res_dw'       :True,
-			             'res_dt'       :True,
-			             'res'          :True,
-			             'res_u'        :True,
-			             'res_n'        :True,
-			             'res_v'        :True,
-			             'res_d'        :True,
-			             'res_w'        :True,
-			             'res_r'        :True,
-			             'res_s'        :True,
-			             'res_k'        :True,
-			             'mfi_l'        :True,
-			             'mfi_h'        :False,
-			             'fls_n_fc'     :float('inf'),
-			             'fls_n_spin'   :float('inf'),
-			             'fls_n_mfi_l'  :float('inf'),
-			             'fls_n_mfi_h'  :float('inf')    }
+			opt_order = ['res_dw', 'res_dt', 'res'  , 'res_u',
+			             'res_n' , 'res_v' , 'res_d', 'res_w',
+			             'res_r' , 'res_s' , 'res_k', 'mfi_l',
+			             'mfi_h' , 'fls_n_fc', 'fls_n_spin'  ,
+			             'fls_n_mfi_l', 'fls_n_mfi_h'           ]
 
-			# TODO
+			if( os.path.isfile('janus.config') ) :
 
-			# self.rstr_opt( )
-			# self.save_opt( )
+				fl = open( "janus.config", "r" ).readlines( )
+				val = [ fl[-j].split()[-1]
+				        for j in range( 1, len( opt_order )+1 ) ]
+
+				for i in range(0,4) :
+					if ( val[i] != 'inf' ) :
+						val[i] = int( float( val[i] ) )
+					elif ( val[i] == 'inf' ) :
+						val[i] = float( 'inf' )
+
+				self.opt = { 'res_dw'     :bool(int(val[16]) ),
+				             'res_dt'     :bool(int(val[15]) ),
+				             'res'        :bool(int(val[14]) ),
+				             'res_u'      :bool(int(val[13]) ),
+				             'res_n'      :bool(int(val[12]) ),
+				             'res_v'      :bool(int(val[11]) ),
+				             'res_d'      :bool(int(val[10]) ),
+				             'res_w'      :bool(int(val[9])  ),
+				             'res_r'      :bool(int(val[8])  ),
+				             'res_s'      :bool(int(val[7])  ),
+				             'res_k'      :bool(int(val[6])  ),
+				             'mfi_l'      :bool(int(val[5])  ),
+				             'mfi_h'      :bool(int(val[4])  ),
+				             'fls_n_fc'   :val[3],
+				             'fls_n_spin' :val[2],
+				             'fls_n_mfi_l':val[1],
+				             'fls_n_mfi_h':val[0]  }
+			else :
+
+				self.opt = { 'res_dw'     :True,
+				             'res_dt'     :True,
+				             'res'        :True,
+				             'res_u'      :True,
+				             'res_n'      :True,
+				             'res_v'      :True,
+				             'res_d'      :True,
+				             'res_w'      :True,
+				             'res_r'      :True,
+				             'res_s'      :True,
+				             'res_k'      :True,
+				             'mfi_l'      :True,
+				             'mfi_h'      :False,
+				             'fls_n_fc'   :float('inf'),
+				             'fls_n_spin' :float('inf'),
+				             'fls_n_mfi_l':float('inf'),
+				             'fls_n_mfi_h':float('inf')    }
+
+			self.save_opt( )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR SAVING THE OPTIONS MENU TO A CONFIG FILE.
+	#-----------------------------------------------------------------------
+
+	def save_opt( self ) :
+
+		opt_order = ['res_dw', 'res_dt', 'res'  , 'res_u', 'res_n' ,
+		             'res_v' , 'res_d' , 'res_w', 'res_r', 'res_s' ,
+		             'res_k' , 'mfi_l' , 'mfi_h', 'fls_n_fc',
+	                     'fls_n_spin', 'fls_n_mfi_l', 'fls_n_mfi_h'        ]
+
+#		try : 
+		fl = open( 'janus.config', 'w' )
+
+		# Write a header.
+
+		fl.write( '# Janus Version ' )
+		fl.write( self.version )
+		fl.write( '\n' )
+		fl.write( '# Comments:\n' )
+		fl.write( '# This is the Janus configuration file\n'   )
+		fl.write( '# which stores the default value or the\n'  )
+		fl.write( '# user assigned values to the option\n'     )
+		fl.write( '# menu items.\n'                            )
+
+		for i, key in enumerate( opt_order ) :
+
+			prefix = key[0:3]
+
+			if ( ( prefix == 'res' ) or ( prefix == 'mfi' ) ) :
+
+				fl.write( '\n' )
+				fl.write( opt_order[i] + ' ' )
+
+				if ( bool( self.opt[key] ) ) :
+					fl.write('1')
+				else :
+					fl.write('0')
+
+			if ( prefix == 'fls' ) :
+
+				fl.write('\n')
+				fl.write( opt_order[i] + ' ' )
+				fl.write( str( self.opt[key] ) )
 
 	#-----------------------------------------------------------------------
 	# LOAD THE REQUESTED WIND/FC SPECTRUM.
@@ -2670,12 +2749,9 @@ class core( QObject ) :
 				self.opt['fls_n_mfi_h'] =\
 				                   self.mfi_arcv_hres.n_file_max
 
+		# Save updated options to the config file.
 
-		# Save options to file.
-
-		# TODO
-
-		# self.save_opt( )
+		self.save_opt( )
 
 		# Emit the signal that an option has changed.
 

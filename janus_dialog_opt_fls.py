@@ -96,9 +96,9 @@ class dialog_opt_fls( QWidget ) :
 		self.lab1 = { 'fls_n_fc'    :QLabel( 'FC Files'         ),
 		              'fls_n_spin'  :QLabel( 'Spin Files'       ),
 		              'fls_n_mfi_l' :QLabel(
-		                            'High Resolution MFI Files' ),
+		                            'low Resolution MFI Files'  ),
 		              'fls_n_mfi_h' :QLabel(
-		                            'Low Resolution MFI Files'  )     }
+		                            'High Resolution MFI Files' )    }
 
 		self.lab2 = {
 		          'mfi_l' :QLabel( 'Low Resolution (0.3 Hz) ', self ),
