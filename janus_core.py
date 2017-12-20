@@ -504,6 +504,8 @@ class core( QObject ) :
 			             'res_r'      :True,
 			             'res_s'      :True,
 			             'res_k'      :True,
+			             'mfi_l'      :True,
+			             'mfi_h'      :False,
 			             'fls_n_fc'   :float('inf'),
 			             'fls_n_spin' :float('inf'),
 			             'fls_n_mfi'  :float('inf')    }
@@ -2594,6 +2596,22 @@ class core( QObject ) :
 				self.opt['res'] = True
 			else :
 				self.opt['res'] = False
+
+		elif ( prefix == 'mfi' ) :
+
+			# Assign the provided value to the specified key.
+
+			self.opt[key] = bool( value )
+
+			# Validate the other keys' values.
+
+			if ( not ( self.opt['mfi_l'] or 
+			           self.opt['mfi_h'] ) ) :
+
+				if ( key == 'mfi_l' ) :
+					self.opt['mfi_h'] = True
+				else :
+					self.opt['mfi_l'] = True
 
 		elif ( prefix == 'fls' ) :
 
