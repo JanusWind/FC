@@ -740,11 +740,8 @@ class core( QObject ) :
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'mfi' )
 
-		# Load the Wind/MFI magnetic field data associated with this
-		# spectrum.
-
-		# TODO: Insert an if statement to take care of option of low and
-		# high resolution data.
+		# Load the Wind/MFI magnetic field data of appropriate
+		# resolution associated with this spectrum.
 
 		if ( self.opt['mfi_l'] ) :
 
