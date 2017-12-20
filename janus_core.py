@@ -503,9 +503,9 @@ class core( QObject ) :
 			             'mfi_h' , 'fls_n_fc', 'fls_n_spin'  ,
 			             'fls_n_mfi_l', 'fls_n_mfi_h'           ]
 
-			if( os.path.isfile('janus.config') ) :
+			if( os.path.isfile('janus.cfg') ) :
 
-				fl = open( "janus.config", "r" ).readlines( )
+				fl = open( "janus.cfg", "r" ).readlines( )
 				val = [ fl[-j].split()[-1]
 				        for j in range( 1, len( opt_order )+1 ) ]
 
@@ -566,7 +566,7 @@ class core( QObject ) :
 	                     'fls_n_spin', 'fls_n_mfi_l', 'fls_n_mfi_h'        ]
 
 #		try : 
-		fl = open( 'janus.config', 'w' )
+		fl = open( 'janus.cfg', 'w' )
 
 		# Write a header.
 
@@ -574,7 +574,7 @@ class core( QObject ) :
 		fl.write( self.version )
 		fl.write( '\n' )
 		fl.write( '# Comments:\n' )
-		fl.write( '# This is the Janus configuration file\n'   )
+		fl.write( '# This is the Janus cfguration file\n'   )
 		fl.write( '# which stores the default value or the\n'  )
 		fl.write( '# user assigned values to the option\n'     )
 		fl.write( '# menu items.\n'                            )
