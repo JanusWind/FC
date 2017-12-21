@@ -248,12 +248,7 @@ class mfi_arcv_hres( object ) :
 		str_mon  = date_str[5:7]
 		str_day  = date_str[8:10]
 
-		if ( self.use_h2 ) :
-			fl0 = 'wi_h2_mfi_' + \
-			      str_year + str_mon + str_day + '_v??.cdf'
-		else :
-			fl0 = 'wi_h0_mfi_' + \
-			      str_year + str_mon + str_day + '_v??.cdf'
+		fl0 = 'wi_h2_mfi_' + str_year + str_mon + str_day + '_v??.cdf'
 
 		fl0_path = os.path.join( self.path, fl0 )
 

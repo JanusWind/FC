@@ -72,11 +72,15 @@ class spin_arcv( object ) :
 
 		self.core = core
 
-		self.buf  = float( buf ) if ( buf is not None )\
-		                                  else 3600.
+		self.buf  = float( buf )            if ( buf is not None )\
+		                                    else 3600.
 
-		self.win  = int( win   ) if ( win is not None )\
-		                                  else 5
+		self.win  = int( win   )            if ( win is not None )\
+		                                    else 5
+
+		self.n_file_max = int( n_file_max ) if ( n_file_max 
+		                                    is not None )
+		                                    else float( 'inf' )
 
 		self.n_date_max = int( n_date_max ) if ( n_date_max 
 		                                    is not None ) else 40
@@ -98,8 +102,8 @@ class spin_arcv( object ) :
 			raise ValueError( 'Median window must be at least 1.'  )
 
 		if ( self.n_date_max < 0 ) :
-			raise ValueError( 'Maximum number of dates '+
-			                                  'cannot be negative.' )
+			raise ValueError( 'Maximum number of dates ' +
+			                                 'cannot be negative.' )
 
 		# Initialize the list of dates loaded.
 
@@ -396,15 +400,15 @@ class spin_arcv( object ) :
 		if ( ( val != float( 'infinity' ) ) and
 		     ( type( val ) is not int     )     ) :
 
-			raise ValueError( 'Max file number must be\
-			                      infinity or a positive integer.' )
+			raise ValueError( 'Max file number must be ' +
+			                     'infinity or a positive integer.' )
 
 			return
 
 		if ( val < 0 ) :
 
-			raise ValueError( 'Max file number cannot be\
-			                                            negative.' )
+			raise ValueError( 'Max file number cannot be ' +
+			                                           'negative.' )
 
 			return
 

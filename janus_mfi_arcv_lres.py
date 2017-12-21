@@ -62,10 +62,10 @@ class mfi_arcv_lres( object ) :
 	# DEFINE THE INITIALIZATION FUNCTION.
 	#-----------------------------------------------------------------------
 
-	def __init__( self, core=None, buf=3600., tol=0.,
-	                    use_h2=False,
+	def __init__( self, core=None, buf=None, tol=None,
+	                    use_h2=None,
 	                    n_file_max=None, n_date_max=None,
-	                    path=None, verbose=True           ) :
+	                    path=None, verbose=None           ) :
 
 		# Save the arguments for later use.
 
@@ -73,29 +73,48 @@ class mfi_arcv_lres( object ) :
 		#        function with a call of "chng_n_file_max".
 
 		self.core       = core
-		self.buf        = buf
-		self.tol        = tol
-		self.path       = path
-		self.use_h2     = use_h2
-		self.n_file_max = n_file_max
-		self.n_date_max = n_date_max
-		self.verbose    = verbose
+
+		self.buf        = float( buf )      if ( buf is not None )\
+		                                    else 3600.
+
+		self.tol        = float( tol )      if ( tol is not None )\
+		                                    else 0.
+
+		self.n_file_max = int( n_file_max ) if ( n_file_max 
+		                                    is not None )\
+		                                    else float( 'inf' )
+
+		self.n_date_max = int( n_date_max ) if ( n_date_max 
+		                                    is not None ) else 40
+
+		self.use_h2     = bool( use_h2 )    if (use_h2 is not None )\
+		                                    else False
+
+		self.path       = str( path )       if ( path  is not None )\
+		                                    else os.path.join( 
+		                                    os.path.dirname( __file__ ), 
+		                                    'data', 'mfi', 'lres' )
+
+		self.verbose    = bool( verbose )   if ( verbose is not None )\
+		                                    else True
 
 		# Validate the values of the "self.max_*" parameters and, if
 		# necessary, provide values for them.
 
-		n_file_max_def = float( 'inf' )
-		n_date_max_def = 40
+		if ( self.buf < 0 ) :
+			raise ValueError( 'Time buffer cannot be negative.'    )
 
-		if ( self.n_file_max is None ) :
-			self.n_file_max = n_file_max_def
-		elif ( self.n_file_max <= 0 ) :
-			self.n_file_max = n_file_max_def
+		if ( self.win <= 0 ) :
+			raise ValueError( 'Median window must be at least 1.'  )
 
-		if ( self.n_date_max is None ) :
-			self.n_date_max = n_date_max_def
-		elif ( self.n_date_max <= 0 ) :
-			self.n_date_max = n_date_max_def
+		if ( self.n_file_max < 0 ) :
+			raise ValueError( 'Maximum number of files ' +
+			                                 'cannot be negative.' )
+
+		if ( self.n_date_max < 0 ) :
+			raise ValueError( 'Maximum number of dates ' +
+			                                 'cannot be negative.' )
+
 
 		# If no path has been requested by the user, use the default
 		# one.
@@ -256,12 +275,7 @@ class mfi_arcv_lres( object ) :
 		str_mon  = date_str[5:7]
 		str_day  = date_str[8:10]
 
-		if ( self.use_h2 ) :
-			fl0 = 'wi_h2_mfi_' + \
-			      str_year + str_mon + str_day + '_v??.cdf'
-		else :
-			fl0 = 'wi_h0_mfi_' + \
-			      str_year + str_mon + str_day + '_v??.cdf'
+		fl0 = 'wi_h0_mfi_' + str_year + str_mon + str_day + '_v??.cdf'
 
 		fl0_path = os.path.join( self.path, fl0 )
 
