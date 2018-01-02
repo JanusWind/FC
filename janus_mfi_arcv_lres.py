@@ -80,8 +80,10 @@ class mfi_arcv_lres( object ) :
 		self.tol        = float( tol )      if ( tol is not None )\
 		                                    else 0.
 
-		self.n_file_max = int( n_file_max ) if ( n_file_max 
-		                                    is not None )\
+		self.n_file_max = int( n_file_max ) if ( ( n_file_max 
+		                                    is not None ) and \
+		                                    ( n_file_max
+		                                    != float( 'inf' ) ) )\
 		                                    else float( 'inf' )
 
 		self.n_date_max = int( n_date_max ) if ( n_date_max 
@@ -104,8 +106,6 @@ class mfi_arcv_lres( object ) :
 		if ( self.buf < 0 ) :
 			raise ValueError( 'Time buffer cannot be negative.'    )
 
-		if ( self.win <= 0 ) :
-			raise ValueError( 'Median window must be at least 1.'  )
 
 		if ( self.n_file_max < 0 ) :
 			raise ValueError( 'Maximum number of files ' +
@@ -115,24 +115,6 @@ class mfi_arcv_lres( object ) :
 			raise ValueError( 'Maximum number of dates ' +
 			                                 'cannot be negative.' )
 
-
-		# If no path has been requested by the user, use the default
-		# one.
-
-		if ( self.path is None ) :
-
-			# Determine the correct suffix given the choice of data
-			# resolution.
-
-			suffix = ''
-
-			if ( use_h2 ) : suffix = 'hres'
-			else : suffix = 'lres'
-
-			# Generate and save the path.
-
-			self.path = os.path.join( os.path.dirname( __file__ ),
-			                          'data', 'mfi', suffix        )
 
 		# Initialize the array of dates loaded.
 
@@ -503,17 +485,17 @@ class mfi_arcv_lres( object ) :
 		# raise an error.
 
 		if ( ( val != float( 'inf' ) ) and
-		     ( type( val ) is not int   )       ) :
+		     ( type( val ) is not int     )     ) :
 
-			raise ValueError( 'Max file number must be\
-			                      infinity or a positive integer.' )
+			raise ValueError( 'Max file number must be ' +
+			                     'infinity or a positive integer.' )
 
 			return
 
 		if ( val < 0 ) :
 
-			raise ValueError( 'Max file number cannot be\
-			                                            negative.' )
+			raise ValueError( 'Max file number cannot be ' +
+			                                           'negative.' )
 
 			return
 

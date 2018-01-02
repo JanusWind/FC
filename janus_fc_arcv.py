@@ -81,36 +81,51 @@ class fc_arcv( object ) :
 	# DEFINE THE INITIALIZATION FUNCTION.
 	#-----------------------------------------------------------------------
 
-	def __init__( self, core=None, buf=3600., tol=3600.,
+	def __init__( self, core=None, buf=None, tol=None,
 	                    n_file_max=None, n_date_max=None,
-	                    path=None, verbose=True           ) :
+	                    path=None, verbose=None           ) :
 
 		# Save the arguments for later use.
 
 		self.core       = core
-		self.buf        = buf
-		self.tol        = tol
-		self.path       = path
-		self.n_date_max = n_date_max
-		self.verbose    = verbose
 
-		# Validate the values of the "self.n_date_max", and if necessary
-		# provide value for it.
+		self.buf        = float( buf )      if ( buf is not None )\
+		                                    else 3600.
 
-		# Note.  The value of "n_file_max" is set at the end of this
-		#        function via the "chng_n_file_max" function.
+		self.tol        = float( tol )      if ( tol is not None )\
+		                                    else 3600.
 
-		if ( ( self.n_date_max is None ) or
-		     ( self.n_date_max <= 0    )    ) :
-			self.n_date_max = 40
+		self.n_file_max = int( n_file_max ) if ( ( n_file_max 
+		                                    is not None ) and \
+		                                    ( n_file_max
+		                                    != float( 'inf' ) ) )\
+		                                    else float( 'inf' )
 
-		# If no path has been requested by the user, use the default
-		# one.
+		self.n_date_max = int( n_date_max ) if ( n_date_max 
+		                                    is not None ) else 40
 
-		if ( self.path is None ) :
+		self.path       = str( path )       if ( path  is not None )\
+		                                    else os.path.join( 
+		                                    os.path.dirname( __file__ ), 
+		                                    'data', 'fc' )
 
-			self.path = os.path.join( os.path.dirname( __file__ ),
-			                          'data', 'fc'                 )
+		self.verbose    = bool( verbose )   if ( verbose is not None )\
+		                                    else True
+
+		# Validate the values of the "self.max_*" parameters and, if
+		# necessary, provide values for them.
+
+		if ( self.buf < 0 ) :
+			raise ValueError( 'Time buffer cannot be negative.'    )
+
+
+		if ( self.n_file_max < 0 ) :
+			raise ValueError( 'Maximum number of files ' +
+			                                 'cannot be negative.' )
+
+		if ( self.n_date_max < 0 ) :
+			raise ValueError( 'Maximum number of dates ' +
+			                                 'cannot be negative.' )
 
 		# Initialize arrays of date and times loaded.
 
@@ -198,7 +213,8 @@ class fc_arcv( object ) :
 		# If the selected spectrum is not within the the request
 		# tolerence, abort.
 
-		if ( ( adt[tk] ).total_seconds() > self.tol ) :		#In case of Data gap for a long time  
+		if ( ( adt[tk] ).total_seconds() > self.tol ) :# In case of long
+		                                               # Data gap  
 			self.mesg_txt( 'none' )
 			return None
 
@@ -238,23 +254,34 @@ class fc_arcv( object ) :
 
 		time = cdf['Epoch'][s]			
 
-		elev = [ float( cdf['inclination_angle'][0] ), float( cdf['inclination_angle'][1] ) ]
+		elev = [ float( cdf['inclination_angle'][0] ),
+		         float( cdf['inclination_angle'][1] ) ]
 
-		azim = [ [ float( cdf['cup1_azimuth'][s][d] ) for d in range( n_dir ) ],
-			 [ float( cdf['cup2_azimuth'][s][d] ) for d in range( n_dir ) ]  ]
+		azim = [ [ float( cdf['cup1_azimuth'][s][d] ) 
+		                for d in range( n_dir )       ],
+			 [ float( cdf['cup2_azimuth'][s][d] )
+		                for d in range( n_dir )       ]  ]
 
-		volt_cen=[ [ float( cdf['cup1_EperQ'][s][b] ) for b in range( n_bin ) ],
-			   [ float( cdf['cup2_EperQ'][s][b] ) for b in range( n_bin ) ]  ]
+		volt_cen=[ [ float( cdf['cup1_EperQ'][s][b] ) 
+		                  for b in range( n_bin )     ],
+			   [ float( cdf['cup2_EperQ'][s][b] )
+		                  for b in range( n_bin )     ]  ]
 
-		volt_del=[ [ float( cdf['cup1_EperQ_DEL'][s][b] ) for b in range( n_bin ) ],
-			   [ float( cdf['cup2_EperQ_DEL'][s][b] ) for b in range( n_bin ) ]  ]
+		volt_del=[ [ float( cdf['cup1_EperQ_DEL'][s][b] )
+		                  for b in range( n_bin )         ],
+			   [ float( cdf['cup2_EperQ_DEL'][s][b] )
+		                  for b in range( n_bin )         ]  ]
 
-		curr = [ [ [ float( cdf['cup1_qflux'][s][d][b] ) for b in range( n_bin ) ] for d in range( n_dir ) ],
-			 [ [ float( cdf['cup2_qflux'][s][d][b] ) for b in range( n_bin ) ] for d in range( n_dir ) ]  ]
+		curr = [ [ [ float( cdf['cup1_qflux'][s][d][b] )
+		             for b in range( n_bin )             ] 
+		             for d in range( n_dir )               ],
+			 [ [ float( cdf['cup2_qflux'][s][d][b] )
+		             for b in range( n_bin )             ]
+		             for d in range( n_dir )               ]  ]
 
 
 		spec = fc_spec( n_bin, elev=elev, azim=azim, volt_cen=volt_cen,\
-					volt_del=volt_del, curr=curr,  time=time )
+		                       volt_del=volt_del, curr=curr, time=time )
 
 		# Request a cleanup of the data loaded into this archive.
 
@@ -293,11 +320,12 @@ class fc_arcv( object ) :
 
 		fl0_path = os.path.join( self.path, fl0 )
 
-		gb = glob( fl0_path )	# returns all files with common names in argument
+		gb = glob( fl0_path )	# returns all files with 
+		                        # common names in argument
 
 		# If the file does not exist, attempt to download it.
 
-		if ( len( gb ) > 0 ) :				# Take the last one : gb[-1]
+		if ( len( gb ) > 0 ) :	# Take the last one : gb[-1]
 			fl_path = gb[-1]
 		else :
 			try :
@@ -333,8 +361,9 @@ class fc_arcv( object ) :
 
 		c = len( self.arr_cdf )
 
-		self.arr_cdf  = self.arr_cdf  + [ cdf ]		# arr_cdf and arr_date of same size	
-		self.arr_date = self.arr_date + [ date_str ]
+		self.arr_cdf  = self.arr_cdf  + [ cdf ]	     # arr_cdf and	
+		self.arr_date = self.arr_date + [ date_str ] # arr_date of
+		                                             # same size
 
 		n_spec = len( cdf['Epoch'] )
 		self.arr_tag = self.arr_tag + [ fc_tag( c=c, s=s,
@@ -452,18 +481,18 @@ class fc_arcv( object ) :
 		# integer. Change the maximum file number if it is. Otherwise,
 		# raise an error.
 
-		if ( ( val != float( 'infinity' ) ) and
+		if ( ( val != float( 'inf' ) ) and
 		     ( type( val ) is not int     )     ) :
 
-			raise ValueError( 'Max file number must be\
-			                      infinity or a positive integer.' )
+			raise ValueError( 'Max file number must be ' +
+			                     'infinity or a positive integer.' )
 
 			return
 
 		if ( val < 0 ) :
 
-			raise ValueError( 'Max file number cannot be\
-			                                            negative.' )
+			raise ValueError( 'Max file number cannot be ' +
+			                                           'negative.' )
 
 			return
 
