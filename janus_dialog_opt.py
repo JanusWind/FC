@@ -33,6 +33,11 @@ from janus_dialog_opt_par import dialog_opt_par
 from janus_dialog_opt_fls import dialog_opt_fls
 from janus_event_PushButton import event_PushButton
 
+# Load the necessary threading modules.
+
+from threading import Thread
+from janus_thread import n_thread, thread_rstr_opt
+
 ################################################################################
 ## DEFINE CLASS "dialog_opt" TO CUSTOMIZE "QDialog" FOR OPTION CONTROL.
 ################################################################################
@@ -104,31 +109,20 @@ class dialog_opt( QDialog ) :
 
 	def user_event( self, event, fnc ) :
 
-		# If the 'Close' button has been pressed, close the window and
-		# return.
+		# Take the appropriate action based on which button was pressed.
 
 		if ( fnc == 'close' ) :
+
+			# Close the window.
 
 			self.close( )
 
 		elif ( fnc == 'rstr' ) :
 
-			self.core.opt = { 'res_dw'       :True,
-			                  'res_dt'       :True,
-			                  'res'          :True,
-			                  'res_u'        :True,
-			                  'res_n'        :True,
-			                  'res_v'        :True,
-			                  'res_d'        :True,
-			                  'res_w'        :True,
-			                  'res_r'        :True,
-			                  'res_s'        :True,
-			                  'res_k'        :True,
-			                  'mfi_l'        :True,
-			                  'mfi_h'        :False,
-			                  'fls_n_fc'     :float('inf'),
-			                  'fls_n_spin'   :float('inf'),
-			                  'fls_n_mfi_l'  :float('inf'),
-			                  'fls_n_mfi_h'  :float('inf')    }
+			# If no other threads are currently running, start a new
+			# thread to restore the default values for all option.
 
-			return
+			if ( n_thread( ) == 0 ) :
+
+				Thread( target=thread_rstr_opt,
+				        args=( self.core, )     ).start( )

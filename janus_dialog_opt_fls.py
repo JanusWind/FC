@@ -68,6 +68,8 @@ class dialog_opt_fls( QWidget ) :
 
 		self.connect( self.core, SIGNAL('janus_chng_opt'),
 		                                            self.resp_chng_opt )
+		self.connect( self.core, SIGNAL('janus_rstr_opt'),
+		                                            self.resp_rstr_opt )
 
 		# Give this widget a grid layout, "self.grd".
 
@@ -90,13 +92,13 @@ class dialog_opt_fls( QWidget ) :
 
 		self.lab_hdr1 = QLabel(
 		                'Maximum number of saved downloaded files'  )
-		self.lab_hdr2 = QLabel( '( Use "inf" for no limit)'         )
+		self.lab_hdr2 = QLabel( '(Use "inf" for no limit)'          )
 		self.lab_hdr3 = QLabel( 'MFI Resolution'                    )
 
 		self.lab1 = { 'fls_n_fc'    :QLabel( 'FC Files'         ),
 		              'fls_n_spin'  :QLabel( 'Spin Files'       ),
 		              'fls_n_mfi_l' :QLabel(
-		                            'low Resolution MFI Files'  ),
+		                            'Low Resolution MFI Files'  ),
 		              'fls_n_mfi_h' :QLabel(
 		                            'High Resolution MFI Files' )    }
 
@@ -157,7 +159,9 @@ class dialog_opt_fls( QWidget ) :
 	# DEFINE THE FUNCTION FOR POPULATING MENU.
 	#-----------------------------------------------------------------------
 
-	def make_opt( self ) :
+	def make_opt( self, clear=False ) :
+
+		#FIXME
 
 		self.box['mfi_l' ].setChecked( self.core.opt['mfi_l' ] )
 		self.box['mfi_h' ].setChecked( self.core.opt['mfi_h' ] )
@@ -242,3 +246,13 @@ class dialog_opt_fls( QWidget ) :
 		# Regenerate the menu.
 
 		self.make_opt( )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR RESPONDING TO A RESTORE OF OPTIONS.
+	#-----------------------------------------------------------------------
+
+	def resp_rstr_opt( self ) :
+
+		# Regenerate the menu.
+
+		self.make_opt( clear=True )

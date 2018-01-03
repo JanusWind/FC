@@ -117,6 +117,7 @@ class core( QObject ) :
 	# | chng_dsp          |                              |
 	# | chng_dyn          |                              |
 	# | chng_opt          |                              |
+	# | rstr_opt          |                              |
 	# | done_auto_run     |                              |
 	# | exit              |                              |
 	# +-------------------+------------------------------+
@@ -497,60 +498,69 @@ class core( QObject ) :
 
 		if ( var_opt ) :
 
-			opt_order = ['res_dw', 'res_dt', 'res'  , 'res_u',
-			             'res_n' , 'res_v' , 'res_d', 'res_w',
-			             'res_r' , 'res_s' , 'res_k', 'mfi_l',
-			             'mfi_h' , 'fls_n_fc', 'fls_n_spin'  ,
-			             'fls_n_mfi_l', 'fls_n_mfi_h'           ]
+			# Load the default options 'silently' (i.e., without
+			# overwriting the configuration file or emitting a
+			# signal).
+
+			self.rstr_opt( save=False, signal=False,
+			               propagate=False           )
+
+			# If a configuration file exists, open it and load the
+			# options therein line by line.
 
 			if( os.path.isfile('janus.cfg') ) :
 
-				fl = open( "janus.cfg", "r" ).readlines( )
-				val = [ fl[-j].split()[-1]
-				        for j in range( 1, len( opt_order )+1 ) ]
+				# Load each line of the file and, if it contains
+				# configuration information, add it to the
+				# options dictionary.
 
-				for i in range(0,4) :
-					if ( val[i] != 'inf' ) :
-						val[i] = int( float( val[i] ) )
-					elif ( val[i] == 'inf' ) :
-						val[i] = float( 'inf' )
+				for ln in open( "janus.cfg", "r" ).readlines( ) :
 
-				self.opt = { 'res_dw'     :bool(int(val[16]) ),
-				             'res_dt'     :bool(int(val[15]) ),
-				             'res'        :bool(int(val[14]) ),
-				             'res_u'      :bool(int(val[13]) ),
-				             'res_n'      :bool(int(val[12]) ),
-				             'res_v'      :bool(int(val[11]) ),
-				             'res_d'      :bool(int(val[10]) ),
-				             'res_w'      :bool(int(val[9])  ),
-				             'res_r'      :bool(int(val[8])  ),
-				             'res_s'      :bool(int(val[7])  ),
-				             'res_k'      :bool(int(val[6])  ),
-				             'mfi_l'      :bool(int(val[5])  ),
-				             'mfi_h'      :bool(int(val[4])  ),
-				             'fls_n_fc'   :val[3],
-				             'fls_n_spin' :val[2],
-				             'fls_n_mfi_l':val[1],
-				             'fls_n_mfi_h':val[0]  }
-			else :
+					# If the line is blank or is a comment,
+					# skip it.
 
-				self.opt = { 'res_dw'     :True,
-				             'res_dt'     :True,
-				             'res'        :True,
-				             'res_u'      :True,
-				             'res_n'      :True,
-				             'res_v'      :True,
-				             'res_d'      :True,
-				             'res_w'      :True,
-				             'res_r'      :True,
-				             'res_s'      :True,
-				             'res_k'      :True,
-				             'mfi_l'      :True,
-				             'mfi_h'      :False,
-				             'fls_n_fc'   :float('inf'),
-				             'fls_n_spin' :float('inf'),
-				             'fls_n_mfi_l':float('inf'),
-				             'fls_n_mfi_h':float('inf')    }
+					if ( ( len( ln ) == 0   ) or
+					     ( ln[0]     == '#' )    ) :
+						continue
+
+					# Attempt to parse the line into its key
+					# and value.  If this fails, skip to the
+					# next line. 
+
+					prsd = ln.lower( ).split( )
+
+					if ( len( prsd ) != 2 ) :
+						continue
+
+					[ key, val ] = prsd
+
+					# If the key is invalid or is not
+					# already in the options dictionary,
+					# skip to the next line.
+
+					if ( ( len( key ) < 3           ) or
+					     ( key not in
+					               self.opt.keys( ) )    ) :
+						continue
+
+					# Store the loaded key's value (with the
+					# appropriate type) to the dictionary.
+
+					if ( ( val == 'inf'      ) or
+					     ( val == 'infinity' )    ) :
+						val = float( 'inf' )
+					else :
+						val = int( val )
+
+					prefix = key[0:3]
+
+					if ( ( prefix == 'res' ) or
+					     ( prefix == 'mfi' )    ) :
+						self.opt[key] = bool( val )
+					else :
+						self.opt[key] = val
+
+			# Save the options dictionary to the configuration file.
 
 			self.save_opt( )
 
@@ -560,43 +570,45 @@ class core( QObject ) :
 
 	def save_opt( self ) :
 
-		opt_order = ['res_dw', 'res_dt', 'res'  , 'res_u', 'res_n' ,
-		             'res_v' , 'res_d' , 'res_w', 'res_r', 'res_s' ,
-		             'res_k' , 'mfi_l' , 'mfi_h', 'fls_n_fc',
-	                     'fls_n_spin', 'fls_n_mfi_l', 'fls_n_mfi_h'        ]
+		# Attempt to open the configuration file (replacing any that
+		# already exists).  If this fails, abort.
 
-#		try : 
-		fl = open( 'janus.cfg', 'w' )
+		try : 
+			fl = open( 'janus.cfg', 'w' )
+		except :
+			return
 
 		# Write a header.
 
 		fl.write( '# Janus Version ' )
 		fl.write( self.version )
 		fl.write( '\n' )
-		fl.write( '# Comments:\n' )
-		fl.write( '# This is the Janus cfguration file\n'   )
-		fl.write( '# which stores the default value or the\n'  )
-		fl.write( '# user assigned values to the option\n'     )
-		fl.write( '# menu items.\n'                            )
+		fl.write( '# This configuration file stores the values\n'   )
+		fl.write( '# from the options menu that were used in the\n' )
+		fl.write( '# last Janus session.\n'                         )
 
-		for i, key in enumerate( opt_order ) :
+		# Write out the name and value of each key in the options
+		# dictionary.
+
+		keys = self.opt.keys( )
+		keys.sort( )
+
+		for key in keys :
 
 			prefix = key[0:3]
 
+			fl.write( '\n' )
+			fl.write( key + ' ' )
+
 			if ( ( prefix == 'res' ) or ( prefix == 'mfi' ) ) :
 
-				fl.write( '\n' )
-				fl.write( opt_order[i] + ' ' )
-
-				if ( bool( self.opt[key] ) ) :
+				if ( self.opt[key] ) :
 					fl.write('1')
 				else :
 					fl.write('0')
 
-			if ( prefix == 'fls' ) :
+			else :
 
-				fl.write('\n')
-				fl.write( opt_order[i] + ' ' )
 				fl.write( str( self.opt[key] ) )
 
 	#-----------------------------------------------------------------------
@@ -2756,6 +2768,77 @@ class core( QObject ) :
 		# Emit the signal that an option has changed.
 
 		self.emit( SIGNAL('janus_chng_opt') )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR RESTORING THE DEFAULT OPTIONS.
+	#-----------------------------------------------------------------------
+
+	def rstr_opt( self,
+	              propagate=True, save=True, signal=True ) :
+
+		# Reset the options dictionary to its default values.
+
+		self.opt = { 'res_dw'     :True,
+		             'res_dt'     :True,
+		             'res'        :True,
+		             'res_u'      :True,
+		             'res_n'      :True,
+		             'res_v'      :True,
+		             'res_d'      :True,
+		             'res_w'      :True,
+		             'res_r'      :True,
+		             'res_s'      :True,
+		             'res_k'      :True,
+		             'mfi_l'      :True,
+		             'mfi_h'      :False,
+		             'fls_n_fc'   :float('inf'),
+		             'fls_n_spin' :float('inf'),
+		             'fls_n_mfi_l':float('inf'),
+		             'fls_n_mfi_h':float('inf')    }
+
+		# If requested, propagate any changes.
+
+		if ( propagate ) :
+
+			try :
+				self.fc_arcv.chng_n_file_max(
+				                       self.opt['fls_n_fc'] )
+			except :
+				pass
+
+			try :
+				self.spin_arcv.chng_n_file_max(
+				                       self.opt['fls_n_spin'] )
+			except :
+				pass
+
+			try :
+				self.mfi_arcv_lres.chng_n_file_max(
+				                       self.opt['fls_n_mfi_l'] )
+			except :
+				pass
+
+			try :
+				self.mfi_arcv_hres.chng_n_file_max(
+				                       self.opt['fls_n_mfi_h'] )
+			except :
+				pass
+
+			self.opt['fls_n_fc']    = self.fc_arcv.n_file_max
+			self.opt['fls_n_spin']  = self.spin_arcv.n_file_max
+			self.opt['fls_n_mfi_l'] = self.mfi_arcv_lres.n_file_max
+			self.opt['fls_n_mfi_h'] = self.mfi_arcv_hres.n_file_max
+
+		# If requested, save the options dictionary.
+
+		if ( save ) :
+			self.save_opt( )
+
+		# If requested, emit the signal that the options have changed.
+
+		if ( signal ) :
+			#FIXME
+			self.emit( SIGNAL('janus_chng_opt') )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR AUTOMATICALLY RUNNING A RANGE OF SPECTRA.
