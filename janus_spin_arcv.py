@@ -61,8 +61,8 @@ class spin_arcv( object ) :
 	#-----------------------------------------------------------------------
 
 	def __init__( self, core=None, buf=None, win=None,
-	                    n_file_max=None, n_date_max=None,
-	                    path=None, verbose=None           ) :
+	                    n_file_max=float('inf'), n_date_max=None,
+	                    path=None, verbose=None                   ) :
 
 		# Save the arguments for later use and, if necessary,
 		# provide values
@@ -77,12 +77,6 @@ class spin_arcv( object ) :
 
 		self.win  = int( win   )            if ( win is not None )\
 		                                    else 5
-
-		self.n_file_max = int( n_file_max ) if ( ( n_file_max 
-		                                    is not None ) and \
-		                                    ( n_file_max
-		                                    != float( 'inf' ) ) )\
-		                                    else float( 'inf' )
 
 		self.n_date_max = int( n_date_max ) if ( n_date_max 
 		                                    is not None ) else 40
@@ -399,8 +393,8 @@ class spin_arcv( object ) :
 		# integer. Change the maximum file number if it is. Otherwise,
 		# raise an error.
 
-		if ( ( val != float( 'inf' ) ) and
-		     ( type( val ) is not int     )     ) :
+		if ( ( val != float( 'inf' )  ) and
+		     ( type( val ) is not int )     ) :
 
 			raise ValueError( 'Max file number must be ' +
 			                     'infinity or a positive integer.' )
