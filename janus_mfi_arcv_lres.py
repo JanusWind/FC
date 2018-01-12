@@ -64,8 +64,8 @@ class mfi_arcv_lres( object ) :
 
 	def __init__( self, core=None, buf=None, tol=None,
 	                    use_h2=None,
-	                    n_file_max=None, n_date_max=None,
-	                    path=None, verbose=None           ) :
+	                    n_file_max=float('inf'), n_date_max=None,
+	                    path=None, verbose=None                   ) :
 
 		# Save the arguments for later use.
 
@@ -79,12 +79,6 @@ class mfi_arcv_lres( object ) :
 
 		self.tol        = float( tol )      if ( tol is not None )\
 		                                    else 0.
-
-		self.n_file_max = int( n_file_max ) if ( ( n_file_max 
-		                                    is not None ) and \
-		                                    ( n_file_max
-		                                    != float( 'inf' ) ) )\
-		                                    else float( 'inf' )
 
 		self.n_date_max = int( n_date_max ) if ( n_date_max 
 		                                    is not None ) else 40
@@ -107,14 +101,9 @@ class mfi_arcv_lres( object ) :
 			raise ValueError( 'Time buffer cannot be negative.'    )
 
 
-		if ( self.n_file_max < 0 ) :
-			raise ValueError( 'Maximum number of files ' +
-			                                 'cannot be negative.' )
-
 		if ( self.n_date_max < 0 ) :
 			raise ValueError( 'Maximum number of dates ' +
 			                                 'cannot be negative.' )
-
 
 		# Initialize the array of dates loaded.
 
@@ -134,7 +123,7 @@ class mfi_arcv_lres( object ) :
 
 		# Initialize "n_file_max".
 
-		self.chng_n_file_max( self.n_file_max )
+		self.chng_n_file_max( n_file_max )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING (AND RETURNING) A range OF THE DATA.

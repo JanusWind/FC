@@ -82,10 +82,13 @@ class fc_arcv( object ) :
 	#-----------------------------------------------------------------------
 
 	def __init__( self, core=None, buf=None, tol=None,
-	                    n_file_max=None, n_date_max=None,
-	                    path=None, verbose=None           ) :
+	                    n_file_max=float('inf'), n_date_max=None,
+	                    path=None, verbose=None                   ) :
 
 		# Save the arguments for later use.
+
+		# Note.  The "n_file_max" argument is handled at the end of this
+		#        function with a call of "chng_n_file_max".
 
 		self.core       = core
 
@@ -94,12 +97,6 @@ class fc_arcv( object ) :
 
 		self.tol        = float( tol )      if ( tol is not None )\
 		                                    else 3600.
-
-		self.n_file_max = int( n_file_max ) if ( ( n_file_max 
-		                                    is not None ) and \
-		                                    ( n_file_max
-		                                    != float( 'inf' ) ) )\
-		                                    else float( 'inf' )
 
 		self.n_date_max = int( n_date_max ) if ( n_date_max 
 		                                    is not None ) else 40
@@ -117,11 +114,6 @@ class fc_arcv( object ) :
 
 		if ( self.buf < 0 ) :
 			raise ValueError( 'Time buffer cannot be negative.'    )
-
-
-		if ( self.n_file_max < 0 ) :
-			raise ValueError( 'Maximum number of files ' +
-			                                 'cannot be negative.' )
 
 		if ( self.n_date_max < 0 ) :
 			raise ValueError( 'Maximum number of dates ' +
