@@ -172,6 +172,8 @@ class widget_nln_res( format_TextEdit ) :
 				lab_w_par = '<i>w</i><sub>||<i>' + \
 				                 sym + '</i></sub>'
 				lab_r     = '<i>R<sub>' + sym + '</sub></i>'
+				lab_b     = '<i>&beta;</i><sub>||<i>' + \
+				                sym + '</i></sub>'
 				lab_t     = '<i>T<sub>' + sym + '</sub></i>'
 				lab_t_per = '<i>T</i><sub>&perp;<i>' + \
 				                 sym + '</i></sub>'
@@ -353,8 +355,17 @@ class widget_nln_res( format_TextEdit ) :
 								self.prnt_dcm(
 								pop[
 							        'sig_w'],1     )
-							self.prnt_htm( 'km/s'  )
-		
+							self.prnt_htm( 'km/s'  ) 
+
+					if ( ( self.core.opt['res_b'] )  and 
+					     ( self.core.opt['res_dt']==False)):
+
+						self.prnt_brk( )
+						self.prnt_tab( 3 )
+						self.prnt_htm( lab_b + ' = ' )
+						self.prnt_dcm( pop['beta_par'],
+						                             4 )
+
 				# Print the population's temperature(s).
 
 				if ( ( self.core.opt['res_dt'] ) and
@@ -391,6 +402,14 @@ class widget_nln_res( format_TextEdit ) :
 							         lab_r + ' = ' )
 							self.prnt_dcm(
 							           pop['r'], 2 )
+
+					if ( self.core.opt['res_b'] ) :
+
+						self.prnt_brk( )
+						self.prnt_tab( 3 )
+						self.prnt_htm( lab_b + ' = ' )
+						self.prnt_dcm( pop['beta_par'],
+						                             4 )
 
 				# If both temperature and thermal speed is
 				# unselected for display but anisotropy is

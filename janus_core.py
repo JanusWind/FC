@@ -2694,8 +2694,8 @@ class core( QObject ) :
 
 			if ( self.opt['res_n'] or self.opt['res_v'] or
 			     self.opt['res_d'] or self.opt['res_w'] or
-        	             self.opt['res_r'] or self.opt['res_s'] or
-        	             self.opt['res_k']                              ) :
+        	             self.opt['res_r'] or self.opt['res_b'] or
+        	             self.opt['res_s'] or self.opt['res_k']     ) :
 				self.opt['res'] = True
 			else :
 				self.opt['res'] = False
@@ -2787,6 +2787,7 @@ class core( QObject ) :
 		             'res_d'      :True,
 		             'res_w'      :True,
 		             'res_r'      :True,
+		             'res_b'      :True,
 		             'res_s'      :True,
 		             'res_k'      :True,
 		             'mfi_l'      :True,
