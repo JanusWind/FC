@@ -29,7 +29,7 @@
 
 from PyQt4.QtGui import QWidget, QGridLayout, QLabel, QFont
 from PyQt4.QtCore import SIGNAL
-
+from numpy import inf
 # Load the customized push button and one-line text editor.
 
 from janus_event_CheckBox import event_CheckBox, event_RadioBox

@@ -96,6 +96,7 @@ class dialog_opt_par( QWidget ) :
                        'res_d'  :QLabel( 'Drift (dv)'                , self ),
                        'res_w'  :QLabel( 'Therm. Speed/Temp. (W/T)'  , self ),
                        'res_r'  :QLabel( 'Anisotropy (R)'            , self ),
+                       'res_b'  :QLabel( 'Beta ( parallel )'         , self ),
                        'res_s'  :QLabel( 'Skewness (S)'              , self ),
                        'res_k'  :QLabel( 'Kurtosis (K)'              , self ),
                        'lab_3'  :QLabel( 'Uncertainties'             , self ),
@@ -108,14 +109,15 @@ class dialog_opt_par( QWidget ) :
 		             'res_d' :event_CheckBox( self, 'res_d'  ),
 		             'res_w' :event_CheckBox( self, 'res_w'  ),
 		             'res_r' :event_CheckBox( self, 'res_r'  ),
+		             'res_b' :event_CheckBox( self, 'res_b'  ),
 		             'res_s' :event_CheckBox( self, 'res_s'  ),
 		             'res_k' :event_CheckBox( self, 'res_k'  ),
 		             'res_u' :event_CheckBox( self, 'res_u'  )   }
 
 
 		self.order = [ 'lab_1', 'res_dt', 'res_dw', 'lab_2', 'res_n',
-		               'res_v', 'res_d' , 'res_w' , 'res_r', 'res_s',
-		               'res_k', 'lab_3' , 'res_u'                    ]
+		               'res_v', 'res_d' , 'res_w' , 'res_r', 'res_b',
+		               'res_s', 'res_k' , 'lab_3' , 'res_u'            ]
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
@@ -152,6 +154,7 @@ class dialog_opt_par( QWidget ) :
 		self.box['res_d' ].setChecked( self.core.opt['res_d' ] )
 		self.box['res_w' ].setChecked( self.core.opt['res_w' ] )
 		self.box['res_r' ].setChecked( self.core.opt['res_r' ] )
+		self.box['res_b' ].setChecked( self.core.opt['res_b' ] )
 		self.box['res_s' ].setChecked( self.core.opt['res_s' ] )
 		self.box['res_k' ].setChecked( self.core.opt['res_k' ] )
 		self.box['res_u' ].setChecked( self.core.opt['res_u' ] )
