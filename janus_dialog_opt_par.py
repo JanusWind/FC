@@ -66,6 +66,8 @@ class dialog_opt_par( QWidget ) :
 
 		self.connect( self.core, SIGNAL('janus_chng_opt'),
 		                                            self.resp_chng_opt )
+		self.connect( self.core, SIGNAL('janus_rstr_opt'),
+		                                            self.resp_rstr_opt )
 
 		# Give this widget a grid layout, "self.grd".
 
@@ -186,6 +188,16 @@ class dialog_opt_par( QWidget ) :
 	#-----------------------------------------------------------------------
 
 	def resp_chng_opt( self ) :
+
+		# Regenerate the menu.
+
+		self.make_opt( )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR RESPONDING TO RESTORING DEFAULT OPTIONS.
+	#-----------------------------------------------------------------------
+
+	def resp_rstr_opt( self ) :
 
 		# Regenerate the menu.
 

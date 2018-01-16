@@ -498,6 +498,11 @@ class core( QObject ) :
 
 		if ( var_opt ) :
 
+			# Define the file name of the configuration file for the
+			# options menu.
+
+			self.opt_flnm = os.path.join( 'data', 'janus.cfg' )
+
 			# Load the default options 'silently' (i.e., without
 			# overwriting the configuration file or emitting a
 			# signal).
@@ -508,13 +513,13 @@ class core( QObject ) :
 			# If a configuration file exists, open it and load the
 			# options therein line by line.
 
-			if( os.path.isfile('janus.cfg') ) :
+			if( os.path.isfile( self.opt_flnm ) ) :
 
 				# Load each line of the file and, if it contains
 				# configuration information, add it to the
 				# options dictionary.
 
-				for ln in open( "janus.cfg", "r" ).readlines( ) :
+				for ln in open( self.opt_flnm, 'r' ).readlines( ) :
 
 					# If the line is blank or is a comment,
 					# skip it.
@@ -574,7 +579,7 @@ class core( QObject ) :
 		# already exists).  If this fails, abort.
 
 		try : 
-			fl = open( 'janus.cfg', 'w' )
+			fl = open( self.opt_flnm, 'w' )
 		except :
 			return
 
@@ -720,11 +725,6 @@ class core( QObject ) :
 		if ( self.fc_spec is None ) :
 			self.emit( SIGNAL('janus_chng_spc') )
 			return
-
-		# Message the user that a new Wind/FC ion spectrum is about to
-		# be loaded.
-
-		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'fc' )
 
 		# Extract the parameters of the loaded Wind/FC ion spectrum.
 		  
@@ -1524,12 +1524,16 @@ class core( QObject ) :
 			else :
 				self.nln_plas.arr_pop[i]['spec'] = None
 
+			# FIXME: What is "pop_name"?  It seems to be undefined.
+
 			if ( pop_name is not None ) :
 				try :
 					self.nln_plas.arr_pop[i]['name'] = \
 					                         str( pop_name )
 				except :
 					self.nln_plas.arr_pop[i]['name'] = None
+
+			# FIXME: What is "pop_sym"?  It seems to be undefined.
 
 			if ( pop_sym is not None ) :
 				try :
@@ -2839,7 +2843,7 @@ class core( QObject ) :
 
 		if ( signal ) :
 			#FIXME
-			self.emit( SIGNAL('janus_chng_opt') )
+			self.emit( SIGNAL('janus_rstr_opt') )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR AUTOMATICALLY RUNNING A RANGE OF SPECTRA.

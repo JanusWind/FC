@@ -161,7 +161,16 @@ class dialog_opt_fls( QWidget ) :
 
 	def make_opt( self, clear=False ) :
 
-		#FIXME
+		# If the clear option has been selected, delete the contents of
+		# all text boxes prior to proceeding.
+
+		if ( clear ) :
+
+			for key in self.arr_txt :
+
+				self.arr_txt[key].clear( )
+
+		# Validate/update the displayed options.
 
 		self.box['mfi_l' ].setChecked( self.core.opt['mfi_l' ] )
 		self.box['mfi_h' ].setChecked( self.core.opt['mfi_h' ] )
@@ -243,9 +252,10 @@ class dialog_opt_fls( QWidget ) :
 
 	def resp_chng_opt( self ) :
 
-		# Regenerate the menu.
+		# Regenerate the menu (without clearing any contents already
+		# therein).
 
-		self.make_opt( )
+		self.make_opt( clear=False )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A RESTORE OF OPTIONS.
@@ -253,6 +263,6 @@ class dialog_opt_fls( QWidget ) :
 
 	def resp_rstr_opt( self ) :
 
-		# Regenerate the menu.
+		# Clear the menu contents and regenerate it.
 
 		self.make_opt( clear=True )
