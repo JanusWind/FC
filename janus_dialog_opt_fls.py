@@ -124,29 +124,29 @@ class dialog_opt_fls( QWidget ) :
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
-		self.lab_hdr1.setFont( QFont( "Sans", 12 ) )
-		self.lab_hdr2.setFont( QFont( "Sans", 12 ) )
-		self.lab_hdr3.setFont( QFont( "Sans", 12 ) )
+		self.lab_hdr1.setFont( QFont( "Helvetica", 12 ) )
+		self.lab_hdr2.setFont( QFont( "Helvetica", 12 ) )
+		self.lab_hdr3.setFont( QFont( "Helvetica", 12 ) )
 
 		self.sg.addWidget( self.lab_hdr1, 0, 0, 1, 3 )
 		self.sg.addWidget( self.lab_hdr2, 1, 0, 1, 3 )
 
 		for i, key in enumerate( self.order1 ) :
 
-			self.lab1[key].setFont( QFont(    "Sans", 12 ) )
-			self.arr_txt[key].setFont( QFont( "Sans", 12 ) )
+			self.lab1[key].setFont( QFont(    "Helvetica", 12 ) )
+			self.arr_txt[key].setFont( QFont( "Helvetica", 12 ) )
 
 			self.sg.addWidget( self.lab1[key],     2+i, 0, 1, 1 )
 			self.sg.addWidget( self.arr_txt[key],  2+i, 1, 1, 1 )
 			self.arr_txt[key].setMaximumWidth( 60 )
 
-		self.lab_hdr3.setFont( QFont( "Sans", 12, QFont.Bold ) )
+		self.lab_hdr3.setFont( QFont( "Helvetica", 12, QFont.Bold ) )
 		self.sg.addWidget( self.lab_hdr3, 6, 0, 1, 3 )
 
 		for i, key in enumerate( self.order2 ) :
 
-			self.lab2[key].setFont( QFont( "Sans", 12 ) )
-			self.box[key].setFont(  QFont( "Sans", 12 ) )
+			self.lab2[key].setFont( QFont( "Helvetica", 12 ) )
+			self.box[key].setFont(  QFont( "Helvetica", 12 ) )
 
 			self.sg.addWidget( self.lab2[key], 7+i, 0, 1, 1 )
 			self.sg.addWidget( self.box[key],  7+i, 1, 1, 1 )
