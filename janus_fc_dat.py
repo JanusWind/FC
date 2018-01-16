@@ -143,7 +143,7 @@ class fc_dat( ) :
 		elif ( key == 'norm_b_z' ) :
 			return self._norm_b_z
 		elif ( key == 'norm_b' ) :
-			return ( self._norm_b_x, self._norm_b_y, self._norm_b_z )
+			return ( self._norm_b_x,self._norm_b_y,self._norm_b_z )
 		elif ( key == 'maglook' ) :
 			return ( self._maglook )
 		else :
