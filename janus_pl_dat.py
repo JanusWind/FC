@@ -39,11 +39,14 @@ from janus_helper import calc_arr_norm, calc_arr_dot
 
 class pl_dat( ) :
 
-	def __init__( self,
+	def __init__( self, spec=None
 	              t_strt=None, t_stop=None, phi_cen=None, phi_del=None
 	              the_cen=None, the_del=None, volt_cen=None, volt_del=None,
-	              psd=None, valid=False ) :
+	              psd=None, curr=None, valid=False ) :
+		#FIXME Does curr go here?
 
+
+		self._spec      = spec
 		self._t_strt    = t_strt
 		self._t_stop    = t_stop
 		self._phi_cen   = phi_cen
@@ -55,8 +58,9 @@ class pl_dat( ) :
 		self._psd       = psd
 		self._valid     = valid
 
-		self._t_cen     = ( self._t_strt + ( self._t_stop - self._t_strt )*
-	                                     self._phi_cen / 360.           )
+		self._t_del     = ( self._t_stop - self._t_strt )
+		self._t_cen     = ( self._t_strt + self._t_del*
+		                                   self._phi_cen / 360.     )
 
 		#Note: The voltage sweeps from high to low voltage
 		self._volt_strt = ( self._volt_cen + ( self._volt_del / 2. ) )
@@ -68,13 +72,130 @@ class pl_dat( ) :
 		                         self['volt_stop']/const['m_p']))   )
 
 		self._vel_cen   = 1E-3*( sqrt(2.0*const['q_p']*
-		                         self['volt_cen']/const['m_p'])     )
+		                         self._volt_cen/const['m_p'])       )
 
 		self._vel_del   = (  self['vel_strt']-self['vel_stop']      )
+
+		#TODO It is currently assumed that the given values of theta and
+		#     phi are the proper look directions. Confirmation needed.
+		self._dir_x     = sin( self._the ) * cos( self._phi )
+		self._dir_y     = sin( self._the ) * sin( self._phi )
+		self._dir_z     = cos( self._the )
+		#/TODO
 
 		self._norm_b_x  = None
 		self._norm_b_y  = None
 		self._norm_b_z  = None
 
 		self._maglook   = None
+
+		if ( ( self._t_strt   is None ) or ( self._t_stop   is None ) or
+		     ( self._phi_cen  is None ) or ( self._phi_del  is None ) or
+                     ( self._the_cen  is None ) or ( self._the_del  is None ) or
+		     ( self._volt_cen is None ) or ( self._volt_del is None ) or
+		     ( self._psd      is None )                              ) :
+			self._valid = False
+		else :
+			self._valid = True
+
+	def __getitem__( self, key ) :
+#
+#               return self.__dict__['_'+key]
+#
+		if ( key == 'spec' ) :
+			return self._spec
+		elif ( key == 'valid' ) :
+			return self._valid
+		elif ( key == 't_strt' ) :
+			return self._t_strt
+		elif ( key == 't_stop' ) :
+			return self._t_stop
+                elif ( key == 't_cen' ) :
+                        return self._t_cen
+                elif ( key == 't_del' ) :
+                        return self._t_del
+		elif ( key == 'volt_cen' ) :
+			return self._volt_cen
+		elif ( key == 'volt_del' ) :
+			return self._volt_del
+		elif ( key == 'volt_strt' ) :
+			return self._volt_strt
+		elif ( key == 'volt_stop' ) :
+			return self._volt_stop
+		elif ( key == 'vel_strt' ) :
+			return self._vel_strt
+		elif ( key == 'vel_stop' ) :
+			return self._vel_stop
+		elif ( key == 'vel_cen' ) :
+			return self._vel_cen
+		elif ( key == 'vel_del' ) :
+			return self._vel_del
+		elif ( key == 'curr' ) :
+			return self._curr
+		elif ( key == 'curr_valid' ) :
+			if ( self['valid'] ) :
+				return self['curr']
+			else :
+				return 0.
+		elif ( key == 'the_cen' ) :
+			return self._the_cen
+		elif ( key == 'the_del' ) :
+			return self._the_del
+		elif ( key == 'phi' ) :
+			return self._phi
+		elif ( key == 'phi_del' ) :
+			return self._phi_del
+		elif ( key == 'psd' ) :
+			return self._psd
+		elif ( key == 'dir_x' ) :
+			return self._dir_x
+		elif ( key == 'dir_y' ) :
+			return self._dir_y
+		elif ( key == 'dir_z' ) :
+			return self._dir_z
+		elif ( key == 'dir' ) :
+			return ( self._dir_x, self._dir_y, self._dir_z )
+		elif ( key == 'norm_b_x' ) :
+			return self._norm_b_x
+		elif ( key == 'norm_b_y' ) :
+			return self._norm_b_y
+		elif ( key == 'norm_b_z' ) :
+			return self._norm_b_z
+		elif ( key == 'norm_b' ) :
+			return ( self._norm_b_x,self._norm_b_y,self._norm_b_z )
+		elif ( key == 'maglook' ) :
+			return ( self._maglook )
+		else :
+			raise KeyError( 'Invalid key for "pl_dat ".' )
+
+	def __setitem__( self, key, val ) :
+
+		raise KeyError('Reassignment not allowed after initialization.')
+
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR SETIING THE MAGNETIC FIELD DIRECTION.
+	#-----------------------------------------------------------------------
+
+	def set_mag( self, b_vec ) :
+
+		# Normalize the magnetic-field vector.
+
+		norm_b = calc_arr_norm( b_vec )
+
+		# Store the components of the normalized magnetic-field vector.
+
+		self._norm_b_x = norm_b[0]
+		self._norm_b_y = norm_b[1]
+		self._norm_b_z = norm_b[2]
+
+		self._maglook = calc_arr_dot( self['norm_b'], self['dir'] )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION TO CALCULATE EXPECTED MAXWELLIAN CURRENT.
+	#-----------------------------------------------------------------------
+
+	def calc_curr( self, m, q, v0, n, dv, w ) :
+
+	#TODO What are these formulae?
 
