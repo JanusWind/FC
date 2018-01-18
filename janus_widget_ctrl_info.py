@@ -306,7 +306,7 @@ class widget_ctrl_info( format_TextEdit ) :
 			else :
 				txt = 'Spin rate: '
 
-			txt += str( self.core.fc_spec['rot'] ) + ' s'
+			txt += str( self.core.fc_spec['rot'] )[0:5] + ' s'
 
 			self.prnt_tab( 1 )
 			self.prnt_htm( txt )

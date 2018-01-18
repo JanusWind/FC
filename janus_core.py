@@ -969,7 +969,9 @@ class core( QObject ) :
 		else :
 			try :
 				self.mom_win_bin = int( val )
-				if ( self.mom_win_bin < self.mom_min_sel_bin ) :
+				if( ( self.mom_win_bin < self.mom_min_sel_bin  )
+				or  ( self.mom_win_bin > self.fc_spec['n_bin'] )
+				                                             ) :
 					self.mom_win_bin = None
 			except :
 				self.mom_win_bin = None
@@ -996,12 +998,14 @@ class core( QObject ) :
 
 		# Initially, deselect all look directions and bins.
 
-		self.mom_sel_dir = [ [ False for d in range(self.fc_spec['n_dir']) ]
-                                             for c in range(self.fc_spec['n_cup']) ]
+		self.mom_sel_dir = [ [ False 
+		                       for d in range(self.fc_spec['n_dir']) ]
+		                       for c in range(self.fc_spec['n_cup']) ]
 
-		self.mom_sel_bin = [ [ [ False for b in range(self.fc_spec['n_bin']) ]
-                                               for d in range(self.fc_spec['n_dir']) ]
-		                               for c in range(self.fc_spec['n_cup']) ]
+		self.mom_sel_bin = [ [ [ False 
+		                         for b in range(self.fc_spec['n_bin']) ]
+                                         for d in range(self.fc_spec['n_dir']) ]
+		                         for c in range(self.fc_spec['n_cup']) ]
 
 		# If the "mom_win_???" variables are invalid, abort.
 
@@ -1523,24 +1527,6 @@ class core( QObject ) :
 					self.nln_plas.arr_pop[i]['spec'] = None
 			else :
 				self.nln_plas.arr_pop[i]['spec'] = None
-
-			# FIXME: What is "pop_name"?  It seems to be undefined.
-
-			if ( pop_name is not None ) :
-				try :
-					self.nln_plas.arr_pop[i]['name'] = \
-					                         str( pop_name )
-				except :
-					self.nln_plas.arr_pop[i]['name'] = None
-
-			# FIXME: What is "pop_sym"?  It seems to be undefined.
-
-			if ( pop_sym is not None ) :
-				try :
-					self.nln_plas.arr_pop[i]['sym'] = \
-					                          str( pop_sym )
-				except :
-					self.nln_plas.arr_pop[i]['sym'] = None
 
 		if ( param == 'name' ) :
 

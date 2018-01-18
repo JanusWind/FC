@@ -6,5 +6,6 @@ results/export/*.dat
 results/save/*.jns
 data/fc/*.cdf
 data/mfi/*.cdf
+data/*.cfg
 .gitignore
 .cdf

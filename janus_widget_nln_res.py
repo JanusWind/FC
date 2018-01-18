@@ -70,6 +70,8 @@ class widget_nln_res( format_TextEdit ) :
 		self.connect( self.core, SIGNAL('janus_rset'), self.resp_rset  )
 		self.connect( self.core, SIGNAL('janus_chng_opt'),
 		                                            self.resp_chng_opt )
+		self.connect( self.core, SIGNAL('janus_rstr_opt'),
+		                                            self.resp_chng_opt )
 		self.connect( self.core, SIGNAL('janus_chng_mfi'),
 		                                            self.resp_chng_mfi )
 		self.connect( self.core, SIGNAL('janus_chng_nln_res'),
@@ -325,17 +327,6 @@ class widget_nln_res( format_TextEdit ) :
 								'sig_w_par'] ,1)
 							self.prnt_htm( 'km/s' )
 
-						if (
-						   ( self.core.opt['res_r'] )
-						   and ( 
-						     self.core.opt['res_w'] )
-						                            ) :
-							self.prnt_brk( )
-							self.prnt_tab( 3 )
-							self.prnt_htm(
-							         lab_r + ' = ' )
-							self.prnt_dcm(
-							           pop['r'], 2 )
 					else :
 	
 						if ( self.core.opt['res_w'] ) :
@@ -356,15 +347,6 @@ class widget_nln_res( format_TextEdit ) :
 								pop[
 							        'sig_w'],1     )
 							self.prnt_htm( 'km/s'  ) 
-
-					if ( ( self.core.opt['res_b'] )  and 
-					     ( self.core.opt['res_dt']==False)):
-
-						self.prnt_brk( )
-						self.prnt_tab( 3 )
-						self.prnt_htm( lab_b + ' = ' )
-						self.prnt_dcm( pop['beta_par'],
-						                             4 )
 
 				# Print the population's temperature(s).
 
@@ -391,40 +373,20 @@ class widget_nln_res( format_TextEdit ) :
 					 	self.prnt_dcm(
 						         pop['t_par'], 1, 'kK' )
 
-						if ( ( self.core.opt['res_r']
-						                           ) and
-						(self.core.opt['res_dw']==False
-						                           ) ) :
+				if ( self.core.opt['res_r'] ) :
 
-							self.prnt_brk( )
-							self.prnt_tab( 3 )
-							self.prnt_htm(
-							         lab_r + ' = ' )
-							self.prnt_dcm(
-							           pop['r'], 2 )
+					self.prnt_brk( )
+					self.prnt_tab( 2 )
+					self.prnt_htm( lab_r + ' = ' )
+					self.prnt_dcm( pop['r'], 2 )
 
-					if ( self.core.opt['res_b'] ) :
+				if ( self.core.opt['res_b'] ) :
 
-						self.prnt_brk( )
-						self.prnt_tab( 3 )
-						self.prnt_htm( lab_b + ' = ' )
-						self.prnt_dcm( pop['beta_par'],
-						                             4 )
-
-				# If both temperature and thermal speed is
-				# unselected for display but anisotropy is
-				# selected, just print the population's
-				# anisotropy.
-
-				if ( ( self.core.opt['res_w']==False ) and
-				     ( self.core.opt['res_r']        )     ) :
-
-					if ( pop['aniso'] ) :
-
-						self.prnt_brk( )
-						self.prnt_tab( 2 )
-						self.prnt_htm( lab_r + ' = '   )
-						self.prnt_dcm( pop['r'], 2     )
+					self.prnt_brk( )
+					self.prnt_tab( 2 )
+					self.prnt_htm( lab_b + ' = ' )
+					self.prnt_dcm( pop['beta_par'],
+					                             4 )
 
 					# Clear the first population indicator.
 
