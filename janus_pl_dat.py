@@ -42,7 +42,7 @@ class pl_dat( ) :
 	def __init__( self, spec=None
 	              t_strt=None, t_stop=None, phi_cen=None, phi_del=None
 	              the_cen=None, the_del=None, volt_cen=None, volt_del=None,
-	              psd=None, curr=None, valid=False ) :
+	              psd=None, valid=False ) :
 		#FIXME Does curr go here?
 
 
@@ -132,9 +132,9 @@ class pl_dat( ) :
 			return self._vel_del
 		elif ( key == 'curr' ) :
 			return self._curr
-		elif ( key == 'curr_valid' ) :
+		elif ( key == 'psd_valid' ) :
 			if ( self['valid'] ) :
-				return self['curr']
+				return self['psd']
 			else :
 				return 0.
 		elif ( key == 'the_cen' ) :
@@ -145,8 +145,6 @@ class pl_dat( ) :
 			return self._phi
 		elif ( key == 'phi_del' ) :
 			return self._phi_del
-		elif ( key == 'psd' ) :
-			return self._psd
 		elif ( key == 'dir_x' ) :
 			return self._dir_x
 		elif ( key == 'dir_y' ) :
@@ -190,12 +188,3 @@ class pl_dat( ) :
 		self._norm_b_z = norm_b[2]
 
 		self._maglook = calc_arr_dot( self['norm_b'], self['dir'] )
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION TO CALCULATE EXPECTED MAXWELLIAN CURRENT.
-	#-----------------------------------------------------------------------
-
-	def calc_curr( self, m, q, v0, n, dv, w ) :
-
-	#TODO What are these formulae?
-
