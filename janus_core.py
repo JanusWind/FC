@@ -303,8 +303,10 @@ class core( QObject ) :
 
 		if ( var_mom_sel ) :
 
-			self.mom_min_sel_dir = 5
-			self.mom_min_sel_bin = 3
+			self.mom_min_sel_dir =  5
+			self.mom_min_sel_bin =  3
+
+			self.mom_max_sel_dir = 20
 
 			self.mom_sel_dir     = None
 			self.mom_sel_bin     = None
@@ -937,13 +939,23 @@ class core( QObject ) :
 		# If this fails, store "None".
     
 		if ( val is None ) :
+
 			self.mom_win_dir = None
+
 		else :
+
 			try :
+
 				self.mom_win_dir = int( val )
+
 				if ( self.mom_win_dir < self.mom_min_sel_dir ) :
 					self.mom_win_dir = None
+
+				if ( self.mom_win_dir > self.mom_max_sel_dir ) :
+					self.mom_win_dir = None
+
 			except :
+
 				self.mom_win_dir = None
 
 		# Emit a signal that a change has occured to the moments window
@@ -995,6 +1007,12 @@ class core( QObject ) :
 		# analysis.
 
 		self.rset_var( var_mom_sel=True )
+
+		# If no spectrum has been loaded, abort.
+
+		if ( self.fc_spec is None ) :
+
+			return
 
 		# Initially, deselect all look directions and bins.
 

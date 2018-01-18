@@ -108,8 +108,7 @@ class widget_mom_ctrl( QWidget ) :
 		# Update the "win_dir" text-box based on the value stored in
 		# "core".
 
-		if ( ( self.core.mom_win_dir is None ) or
-		     ( self.core.mom_win_dir > 20    ) ) :
+		if ( self.core.mom_win_dir is None ) :
 
 			self.txt_win_dir.setStyleSheet( "color: red;" )
 
@@ -157,21 +156,15 @@ class widget_mom_ctrl( QWidget ) :
 
 		if ( fnc == 'win_dir' ) :
 
-			if( self.core.fc_spec is None ):
-				return
-			else:
-				Thread( target=thread_chng_mom_win_dir,
-					args=( self.core,
-				               self.txt_win_dir.text( ) ) ).start( )
+			Thread( target=thread_chng_mom_win_dir,
+				args=( self.core,
+			               self.txt_win_dir.text( ) ) ).start( )
 
 		elif ( fnc == 'win_bin' ) :
-			if( self.core.fc_spec is None ):
-				return
-			else:
 
-				Thread( target=thread_chng_mom_win_bin,
-					args=( self.core,
-				               self.txt_win_bin.text( ) ) ).start( )
+			Thread( target=thread_chng_mom_win_bin,
+				args=( self.core,
+			               self.txt_win_bin.text( ) ) ).start( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "rset" SIGNAL.
