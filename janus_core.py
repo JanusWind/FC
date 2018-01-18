@@ -1062,7 +1062,7 @@ class core( QObject ) :
 				# Compute the actual direction-index (versus the
 				# pseudo-direction-index).
 
-				d = pd % self.fc_spec['n_dir']
+				d = pd % self.fc_spec['n_dir'   ]
                                 self.mom_sel_dir[c][d] = True
 
 				# Select the bins in this look direction's
@@ -1219,11 +1219,12 @@ class core( QObject ) :
 		#   -- No (valid) ion spectrum has been requested.
 		#   -- Insufficient data have been selected.
 
-		if ( ( self.fc_spec is None                      ) or
-		     ( self.mom_n_sel_dir < self.mom_min_sel_dir )    ) :
+		if ( ( self.fc_spec is None                       ) or
+		     ( self.mom_n_sel_dir < self.mom_min_sel_dir  ) or
+		     ( self.mom_n_sel_dir > self.fc_spec['n_dir'] )    ) :
 
 			self.emit( SIGNAL('janus_mesg'),
-			           'core', 'norun', 'mom' )
+			                  'core', 'norun', 'mom' )
 
 			self.emit( SIGNAL('janus_chng_mom_res') )
 
