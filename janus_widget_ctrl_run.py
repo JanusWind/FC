@@ -36,9 +36,10 @@ from janus_event_PushButton import event_PushButton
 
 # Load the customized dialog windows.
 
+from janus_dialog_opt import dialog_opt
+from janus_dialog_missing import dialog_missing
 from janus_dialog_auto_ctrl import dialog_auto_ctrl
 from janus_dialog_auto_prog import dialog_auto_prog
-from janus_dialog_missing import dialog_missing
 
 # Load the modules necessary for time convertion.
 
@@ -116,6 +117,11 @@ class widget_ctrl_run( QWidget ) :
 		self.req_auto_next = False
 		self.req_auto_halt = True
 
+		self.req_opt_temp = True
+		self.req_opt_tvel = False
+		self.req_opt_skew = True
+		self.req_opt_kurt = True
+
 		# Initialize the variable that will hold the progress-bar dialog
 		# (if an when one is created).
 
@@ -166,16 +172,9 @@ class widget_ctrl_run( QWidget ) :
 
 		if ( fnc == 'opt' ) :
 
-			# WARNING!  THIS FEATURE IS INCOMPLETE.  DURING
-			#           DEVELOPMENT, IT IS ONLY AVAILABLE IN
-			#           DEBUGGING MODE.
+			# Launch a dialog box to request options from the user.
 
-			# If debugging mode is not active, alert the user and
-			# abort.
-
-			if ( not self.core.debug ) :
-				dialog_missing( ).alert( )
-				return
+			dialog_opt( self.core )
 
 			# Return.
 

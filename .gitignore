@@ -1,8 +1,12 @@
 *.pyc
 *.swp
 *.swo
+*.sh
 results/export/*.dat
 results/save/*.jns
 data/fc/*.cdf
 data/mfi/*.cdf
 upload.*
+data/*.cfg
+.gitignore
+.cdf

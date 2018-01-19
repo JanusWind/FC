@@ -37,7 +37,7 @@ from janus_time import calc_time_str, calc_time_val, calc_time_epc
 
 # Load the necessary "numpy" array modules.
 
-from numpy import amax, amin, append, argsort, array, ceil, floor, tile, where
+from numpy import amax, amin, append, argsort, array, ceil, floor, tile, where, arange
 
 # Load the modules necessary for file I/O (including FTP).
 
@@ -53,54 +53,56 @@ from scipy.io.idl import readsav
 
 
 ################################################################################
-## DEFINE THE "mfi_arcv" CLASS FOR ACCESSING THE ARCHIVE OF Wind/MFI DATA.
+## DEFINE THE "mfi_arcv_hres" CLASS FOR ACCESSING THE ARCHIVE OF Wind/MFI DATA.
 ################################################################################
 
-class mfi_arcv( object ) :
+class mfi_arcv_hres( object ) :
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE INITIALIZATION FUNCTION.
 	#-----------------------------------------------------------------------
 
-	def __init__( self, core=None, buf=3600., tol=0.,
-	                    use_k0=False,
-	                    n_file_max=None, n_date_max=None,
-	                    path=None, verbose=True           ) :
+	def __init__( self, core=None, buf=None, tol=None,
+	                    use_h2=None,
+	                    n_file_max=float('inf'), n_date_max=None,
+	                    path=None, verbose=None                   ) :
 
 		# Save the arguments for later use.
 
+		# Note.  The "n_file_max" argument is handled at the end of this
+		#        function with a call of "chng_n_file_max".
+
 		self.core       = core
-		self.buf        = buf
-		self.tol        = tol
-		self.path       = path
-		self.use_k0     = use_k0
-		self.n_file_max = n_file_max
-		self.n_date_max = n_date_max
-		self.verbose    = verbose
+
+		self.buf        = float( buf )      if ( buf is not None )\
+		                                    else 3600.
+
+		self.tol        = float( tol )      if ( tol is not None )\
+		                                    else 0.
+
+		self.n_date_max = int( n_date_max ) if ( n_date_max 
+		                                    is not None ) else 40
+
+		self.use_h2     = bool( use_h2 )    if (use_h2 is not None )\
+		                                    else True
+
+		self.path       = str( path )       if ( path  is not None )\
+		                                    else os.path.join( 
+		                                    os.path.dirname( __file__ ), 
+		                                    'data', 'mfi', 'hres' )
+
+		self.verbose    = bool( verbose )   if ( verbose is not None )\
+		                                    else True
 
 		# Validate the values of the "self.max_*" parameters and, if
 		# necessary, provide values for them.
 
-		n_file_max_def = float( 'infinity' )
-		n_date_max_def = 40
+		if ( self.buf < 0 ) :
+			raise ValueError( 'Time buffer cannot be negative.'    )
 
-		if ( self.n_file_max is None ) :
-			self.n_file_max = n_file_max_def
-		elif ( self.n_file_max < 0 ) :
-			self.n_file_max = n_file_max_def
-
-		if ( self.n_date_max is None ) :
-			self.n_date_max = n_date_max_def
-		elif ( self.n_date_max <= 0 ) :
-			self.n_date_max = n_date_max_def
-
-		# If no path has been requested by the user, use the default
-		# one.
-
-		if ( self.path is None ) :
-
-			self.path = os.path.join( os.path.dirname( __file__ ),
-			                          'data', 'mfi'                )
+		if ( self.n_date_max < 0 ) :
+			raise ValueError( 'Maximum number of dates ' +
+			                                 'cannot be negative.' )
 
 		# Initialize the array of dates loaded.
 
@@ -117,6 +119,10 @@ class mfi_arcv( object ) :
 		self.mfi_b_y = array( [ ] )
 		self.mfi_b_z = array( [ ] )
 		self.mfi_ind = array( [ ] )
+
+		# Initialize "n_file_max".
+
+		self.chng_n_file_max( n_file_max )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING (AND RETURNING) A range OF THE DATA.
@@ -239,12 +245,7 @@ class mfi_arcv( object ) :
 		str_mon  = date_str[5:7]
 		str_day  = date_str[8:10]
 
-		if ( self.use_k0 ) :
-			fl0 = 'wi_k0_mfi_' + \
-			      str_year + str_mon + str_day + '_v??.cdf'
-		else :
-			fl0 = 'wi_h0_mfi_' + \
-			      str_year + str_mon + str_day + '_v??.cdf'
+		fl0 = 'wi_h2_mfi_' + str_year + str_mon + str_day + '_v??.cdf'
 
 		fl0_path = os.path.join( self.path, fl0 )
 
@@ -260,8 +261,8 @@ class mfi_arcv( object ) :
 				ftp = FTP( 'cdaweb.gsfc.nasa.gov' )
 				ftp.login( )
 				ftp.cwd( 'pub/data/wind/mfi/' )
-				if ( self.use_k0 ) :
-					ftp.cwd( 'mfi_k0/' )
+				if ( self.use_h2 ) :
+					ftp.cwd( 'mfi_h2/' )
 				else :
 					ftp.cwd( 'mfi_h0/' )
 				ftp.cwd( str_year )
@@ -289,28 +290,45 @@ class mfi_arcv( object ) :
 			self.mesg_txt( 'fail', date_str )
 			return
 
-		# Extract the data from the loaded file.
+		# Extract the data from the loaded file and select those data
+		# which seem to have valid (versus fill) values.
 
-		if ( self.use_k0 ) :
-			sub_t   = cdf['Epoch'][:]
-			sub_b_x = cdf['BGSEc'][:,0]
-			sub_b_y = cdf['BGSEc'][:,1]
-			sub_b_z = cdf['BGSEc'][:,2]
-			sub_pnt = cdf['N'][:]
+		if ( self.use_h2 ) :
+
+			# Extract the data from the loaded file.
+
+			sub_t   = cdf['Epoch'][:,0]
+			sub_b_x = cdf['BGSE'][:,0]
+			sub_b_y = cdf['BGSE'][:,1]
+			sub_b_z = cdf['BGSE'][:,2]
+
+			sub_ind = tile( self.t_date, len( sub_t ) )
+
+			# Select those data which seem to have valid (versus
+			# fill) values.
+
+			# TODO: Establish quality checks.
+
+			n_tk = len( sub_t )
+			tk   = arange( n_tk )
+
 		else :
+
+			# Extract the data from the loaded file.
+
 			sub_t   = cdf['Epoch3'][:,0]
 			sub_b_x = cdf['B3GSE'][:,0]
 			sub_b_y = cdf['B3GSE'][:,1]
 			sub_b_z = cdf['B3GSE'][:,2]
 			sub_pnt = cdf['NUM3_PTS'][:,0]
 
-		sub_ind = tile( self.t_date, len( sub_t ) )
+			sub_ind = tile( self.t_date, len( sub_t ) )
 
-		# Select those data which seem to have valid (versus
-		# fill) values.
+			# Select those data which seem to have valid (versus
+			# fill) values.
 
-		tk   = where( sub_pnt > 0 )[0]
-		n_tk = len( tk )
+			tk   = where( sub_pnt > 0 )[0]
+			n_tk = len( tk )
 
 		# Copy the date associated with this file into and
 		# array.
@@ -356,14 +374,14 @@ class mfi_arcv( object ) :
 		# Delete dates (and all associated data) from this archive so
 		# that the number of loaded dates equals the maximum allowed.
 
-		n_rm = self.n_date - self.n_date_max
+		n_rmv = self.n_date - self.n_date_max
 
 		ind_min = self.t_date - self.n_date_max
 
-		self.date_str = self.date_str[n_rm:]
-		self.date_ind = self.date_ind[n_rm:]
+		self.date_str = self.date_str[n_rmv:]
+		self.date_ind = self.date_ind[n_rmv:]
 
-		self.n_date -= n_rm
+		self.n_date -= n_rmv
 
 		tk = where( self.mfi_ind >= ind_min )[0]
 
@@ -382,47 +400,47 @@ class mfi_arcv( object ) :
 		# If there is no limit on the number files in the data
 		# directory, abort (as there's nothing to be done).
 
-		if ( self.n_file_max >= float( 'infinity' ) ) :
+		if ( self.n_file_max >= float( 'inf' ) ) :
 			return
 
 		# Generate a list of the names of all files of the requested
 		# type (as specified by the "use_*" keywords) in the data
 		# directory.
 
-		if ( self.use_idl ) :
-			file_name = array( glob(
-			              os.path.join( self.path, 'wind_mag*' ) ) )
+		if ( self.use_h2 ) :
+			file_name = list( glob(
+			         os.path.join( self.path, 'wi_h2*' ) ) )
 		else :
-			if ( self.use_k0 ) :
-				file_name = array( glob(
-				         os.path.join( self.path, 'wi_k0*' ) ) )
-			else :
-				file_name = array( glob(
-				         os.path.join( self.path, 'wi_h0*' ) ) )
-
-		n_file = len( file_name )
+			file_name = list( glob(
+			         os.path.join( self.path, 'wi_h0*' ) ) )
 
 		# If the number of files is less than or equal to the maximum,
 		# abort (as nothing needs to be done).
 
-		if ( n_file <= self.n_file_max ) :
+		if ( len( file_name )<= self.n_file_max ) :
 			return
 
 		# Determine the access time of each of the files, and then sort
 		# the files in ascending value.
 
-		file_time = array( [ os.path.getatime( fl )
-		                     for fl in file_name    ] )
+		file_time = [ os.path.getatime( fl )
+		                     for fl in file_name    ]
 
-		srt = argsort( file_time )
+		srt = sorted( range( len( file_time ) ),
+		              key=file_time.__getitem__  )
 
-		file_name = file_name[srt]
-		file_time = file_time[srt]
+		file_name = [ file_name[i] for i in srt ]
+		file_time = [ file_time[i] for i in srt ]
+
+#		srt = argsort( file_time )
+#
+#		file_name = file_name[srt]
+#		file_time = file_time[srt]
 
 		# Delete files so that the number of files equals the maximum
 		# allowed.
 
-		for f in range( n_file - self.n_file_max ) :
+		for f in range( len( file_name ) - self.n_file_max ) :
 			os.remove( file_name[f] )
 
 	#-----------------------------------------------------------------------
@@ -443,3 +461,32 @@ class mfi_arcv( object ) :
 
 		self.core.emit( SIGNAL('janus_mesg'),
 		                'mfi', mesg_typ, mesg_obj )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR CHANGING THE MAXIMUM NUMBER OF FILES.
+	#-----------------------------------------------------------------------
+
+	def chng_n_file_max( self, val ) :
+
+		# Check the maximum file number input to ensure it is a postive
+		# integer. Change the maximum file number if it is. Otherwise,
+		# raise an error.
+
+		if ( ( val != float( 'inf' ) ) and
+		     ( type( val ) is not int     )     ) :
+
+			raise ValueError( 'Max file number must be ' +
+			                     'infinity or a positive integer.' )
+
+			return
+
+		if ( val < 0 ) :
+
+			raise ValueError( 'Max file number cannot be ' +
+			                                           'negative.' )
+
+			return
+
+		self.n_file_max = val
+
+		self.cleanup_file( )

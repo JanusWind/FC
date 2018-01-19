@@ -76,6 +76,44 @@ def calc_arr_dot( u,v ) :
 	return fsum([ x[0]*x[1] for x in zip(u,v) ]) 
 
 
+################################################################################
+## DEFINE THE FUNCTIONS FOR CONVERTING TO/FROM NNI'S
+################################################################################
+
+# Note.  The set of "NNI" values is defined to include all non-negative integers
+#        and "float('inf')".
+
+# Define the function for converting a string to an NNI.
+
+def str_to_nni( v ) :
+
+	# Standardize the argument by ensuring that it is a string, writing
+	# all letters in lower case, and removing whitespace.
+
+	val = str( v ).lower( ).replace( ' ', '' )
+
+	# If the string indicates an infinite value, return 'float( 'inf' )'.
+	# Otherwise, attempt to return a non-negative integer.
+
+	if ( ( val == 'inf' ) or ( val == 'infinity' ) ) :
+
+		return float( 'inf' )
+
+	else :
+
+		# Convert the argument to an integer.
+
+		ret = int( val )
+
+		# If the integer is negative, raise an error.  Otherwise, return
+		# it.
+
+		if ( ret < 0 ) :
+			raise TypeError( 'Negative integer not permitted.' )
+			return None
+		else :
+			return ret
+
 """
 # Define the function for converting a numerical value to a string with a
 # specified number of significant digits.

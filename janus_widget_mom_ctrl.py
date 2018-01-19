@@ -28,7 +28,7 @@
 # Load the modules necessary for the graphical interface.
 
 from PyQt4.QtCore import SIGNAL
-from PyQt4.QtGui import QGridLayout, QLabel, QLineEdit, QWidget
+from PyQt4.QtGui import QGridLayout, QLabel, QLineEdit, QWidget, QFont
 
 # Load the customized push button and one-line text editor.
 
@@ -82,6 +82,9 @@ class widget_mom_ctrl( QWidget ) :
 
 		self.lab_win_dir = QLabel( 'Directions per cup:'    )
 		self.lab_win_bin = QLabel( 'Bins per direction:'    )
+
+		self.lab_win_dir.setFont( QFont( "Helvetica", 12 ) )
+		self.lab_win_bin.setFont( QFont( "Helvetica", 12 ) )
 
 		# Row by row, add the text areas, buttons, and labels to this
 		# widget's grid.

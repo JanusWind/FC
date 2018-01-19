@@ -25,23 +25,19 @@
 ## LOAD THE NECESSARY MODULES.
 ################################################################################
 
-
 # Load the modules necessary for one-line text editors.
 
-from PyQt4.QtGui import QCheckBox
+from PyQt4.QtGui  import QCheckBox, QRadioButton
 from PyQt4.QtCore import QSize
-
 
 # Load the modules necessary for signal handling.
 
 from PyQt4.QtCore import SIGNAL
 
 
-
 ################################################################################
 ## DEFINE THE "event_CheckBox" CLASS TO CUSTOMIZE "QCheckBox".
 ################################################################################
-
 
 # Note.  When a widget or other object intializes and instance of this class,
 #        it passes itself to the initialization function "self.__init__()",
@@ -54,9 +50,7 @@ from PyQt4.QtCore import SIGNAL
 #        to "self.owner" via "self.owner.user_event()" so that the appropriate
 #        action can be taken.
 
-
 class event_CheckBox( QCheckBox ) :
-
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE INITIALIZATION FUNCTION.
@@ -64,21 +58,17 @@ class event_CheckBox( QCheckBox ) :
 
 	def __init__( self, owner, fnc ) :
 
-
 		# Inherit all attributes of an instance of "QLineEdit".
 
 		super( event_CheckBox, self ).__init__( )
-
 
 		# Store the user-provided instance of the initializing object.
 
 		self.owner = owner
 
-
 		# Store the string indicating the function of this text area.
 
 		self.fnc = fnc
-
 
 		# If the 'stateChanged()' signal is emitted (i.e., if the user
 		# clicks on this check box), notify "self.owner".
@@ -86,15 +76,55 @@ class event_CheckBox( QCheckBox ) :
 		self.connect( self, SIGNAL('clicked(bool)'),
 		              self.signal_clicked            )
 
-
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "clicked" SIGNAL.
 	#-----------------------------------------------------------------------
 
 	def signal_clicked( self ) :
 
-
 		# Alert the object that initialized this widget (i.e., its
 		# "owner") that the check box has been clicked.
+
+		self.owner.user_event( None, self.fnc )
+
+
+################################################################################
+## DEFINE THE "event_RadioBox" CLASS TO CUSTOMIZE "QRadioButton".
+################################################################################
+
+class event_RadioBox( QRadioButton ) :
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE INITIALIZATION FUNCTION.
+	#-----------------------------------------------------------------------
+
+	def __init__( self, owner, fnc ) :
+
+		# Inherit all attributes of an instance of "QLineEdit".
+
+		super( event_RadioBox, self ).__init__( )
+
+		# Store the user-provided instance of the initializing object.
+
+		self.owner = owner
+
+		# Store the string indicating the function of this text area.
+
+		self.fnc = fnc
+
+		# If the 'stateChanged()' signal is emitted (i.e., if the user
+		# clicks on this check box), notify "self.owner".
+
+		self.connect( self, SIGNAL('toggled(bool)'),
+		              self.signal_toggled            )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR RESPONDING TO THE "toggled" SIGNAL.
+	#-----------------------------------------------------------------------
+
+	def signal_toggled( self ) :
+
+		# Alert the object that initialized this widget (i.e., its
+		# "owner") that the check box has been toggled.
 
 		self.owner.user_event( None, self.fnc )

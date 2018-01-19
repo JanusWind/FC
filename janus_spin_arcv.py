@@ -35,9 +35,9 @@ from datetime import datetime, timedelta
 
 from janus_time import calc_time_str, calc_time_val, calc_time_epc
 
-# Load the necessary "numpy" array modules.
+# Load the modules necessary for data handling.
 
-from numpy import amax, amin, append, argsort, array, ceil, floor, tile, where
+from numpy import median, pi
 
 # Load the modules necessary for file I/O (including FTP).
 
@@ -60,61 +60,63 @@ class spin_arcv( object ) :
 	# DEFINE THE INITIALIZATION FUNCTION.
 	#-----------------------------------------------------------------------
 
-	def __init__( self, core=None, buf=3600., tol=0.,
-	                    n_file_max=None, n_date_max=None,
-	                    path=None, verbose=True           ) :
+	def __init__( self, core=None, buf=None, win=None,
+	                    n_file_max=float('inf'), n_date_max=None,
+	                    path=None, verbose=None                   ) :
 
-		# Save the arguments for later use.
+		# Save the arguments for later use and, if necessary,
+		# provide values
 
-		self.core       = core
-		self.buf        = buf
-		self.tol        = tol
-		self.path       = path
-		self.use_k0     = use_k0
-		self.n_file_max = n_file_max
-		self.n_date_max = n_date_max
-		self.verbose    = verbose
+		# Note.  The value of "n_file_max" is set at the end of this
+		#        function via the "chng_n_file_max" function.
 
-		# Validate the values of the "self.max_*" parameters and, if
-		# necessary, provide values for them.
+		self.core = core
 
-		n_file_max_def = float( 'infinity' )
-		n_date_max_def = 40
+		self.buf  = float( buf )            if ( buf is not None )\
+		                                    else 3600.
 
-		if ( self.n_file_max is None ) :
-			self.n_file_max = n_file_max_def
-		elif ( self.n_file_max < 0 ) :
-			self.n_file_max = n_file_max_def
+		self.win  = int( win   )            if ( win is not None )\
+		                                    else 5
 
-		if ( self.n_date_max is None ) :
-			self.n_date_max = n_date_max_def
-		elif ( self.n_date_max <= 0 ) :
-			self.n_date_max = n_date_max_def
+		self.n_date_max = int( n_date_max ) if ( n_date_max 
+		                                    is not None ) else 40
 
-		# If no path has been requested by the user, use the default
-		# one.
+		self.path       = str( path )       if ( path  is not None )\
+		                                    else os.path.join( 
+		                                    os.path.dirname( 
+		                                    __file__ ), 'data', 'spin' )
 
-		if ( self.path is None ) :
+		self.verbose    = bool( verbose )   if ( verbose is not None )\
+		                                    else True
 
-			self.path = os.path.join( os.path.dirname( __file__ ),
-			                          'data', 'spin'               )
+		# Validate the values of the parameters.
 
-		# Initialize the array of dates loaded.
+		if ( self.buf < 0 ) :
+			raise ValueError( 'Time buffer cannot be negative.'    )
 
-		self.date_str = array( [ ] )
-		self.date_ind = array( [ ] )
+		if ( self.win <= 0 ) :
+			raise ValueError( 'Median window must be at least 1.'  )
 
-		self.n_date = 0
-		self.t_date = 0
+		if ( self.n_date_max < 0 ) :
+			raise ValueError( 'Maximum number of dates ' +
+			                                 'cannot be negative.' )
 
-		# Initialize the data arrays.
+		# Initialize the list of dates loaded.
 
-		self.spin_t   = array( [ ] )
-		self.spin_w   = array( [ ] )
-		self.spin_ind = array( [ ] )
+		self.arr_date = [ ]
+
+		# Initialize the data lists.
+
+		self.arr_spin_t   = [ ]
+		self.arr_spin_w   = [ ]
+		self.arr_spin_ind = [ ]
+
+		# Initialize "n_file_max"
+
+		self.chng_n_file_max( n_file_max )
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR LOADING (AND RETURNING) A range OF THE DATA.
+	# DEFINE THE FUNCTION FOR LOADING (AND RETURNING) A SPIN RATE.
 	#-----------------------------------------------------------------------
 
 	def load_spin( self, time ) :
@@ -125,12 +127,12 @@ class spin_arcv( object ) :
 		time_str = calc_time_str( time )
 		time_epc = calc_time_epc( time )
 
-		# Construct an array of the dates requested.
+		# Construct a list of the dates requested.
 
 		req_date = [ ]
 
-		tm_strt = time_epc - timedelt( seconds=buf )
-		tm_stop = time_epc + timedelt( seconds=buf )
+		tm_strt = time_epc - timedelta( seconds=self.buf )
+		tm_stop = time_epc + timedelta( seconds=self.buf )
 
 		dt_strt = datetime( tm_strt.year, tm_strt.month, tm_strt.day )
 		dt_stop = datetime( tm_stop.year, tm_stop.month, tm_stop.day )
@@ -147,59 +149,35 @@ class spin_arcv( object ) :
 		for date in req_date :
 			self.load_date( date )
 
+		# Compute the absolute time difference between the requested
+		# time and the timestamp of each loaded datum.
 
+		adt = [ abs( ( t - time_epc ).total_seconds( ) )
+		                                      for t in self.arr_spin_t ]
 
+		# Determine the ordering of the absolute time differences.
 
+		arg = sorted( range( len( adt ) ), key=adt.__getitem__ )
 
+		# If the smallest time difference is greater than the tolerance,
+		# return 'None'.
 
+		if ( adt[arg[0]] > self.buf ) :
+			return None
 
+		# Compute and the median spin rate for the data with the
+		# smallest time difference.
 
-
-
-
-
-
-		# Identify and extract the requested range of Wind/MFI data.
-
-		tk = where( ( self.mfi_t >= ( time_strt_epc -
-		                              timedelta( 0, self.tol ) ) ) &
-		            ( self.mfi_t <= ( time_stop_epc +
-		                              timedelta( 0, self.tol ) ) )   )
-		tk = tk[0]
-
-		n_tk = len( tk )
-
-		if ( n_tk <= 0 ) :
-
-			self.mesg_txt( 'none' )
-
-			ret_t   = array( [ ] )
-			ret_b_x = array( [ ] )
-			ret_b_y = array( [ ] )
-			ret_b_z = array( [ ] )
-
-		else :
-
-			ret_t   = self.mfi_t[tk]
-			ret_b_x = self.mfi_b_x[tk]
-			ret_b_y = self.mfi_b_y[tk]
-			ret_b_z = self.mfi_b_z[tk]
-
-			srt = argsort( ret_t )
-
-			ret_t   = ret_t[srt]
-			ret_b_x = ret_b_x[srt]
-			ret_b_y = ret_b_y[srt]
-			ret_b_z = ret_b_z[srt]
+		w = median( [ self.arr_spin_w[arg[i]]
+		              for i in range( self.win ) ] )
 
 		# Request a cleanup of the data loaded into this archive.
 
 		self.cleanup_date( )
 
-		# Return the requested range of Wind/MFI data.
+		# Return the spin period.
 
-		return ( list( ret_t ), list( ret_b_x ),
-		                        list( ret_b_y ), list( ret_b_z ) )
+		return ( 2. * pi / w )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING ALL DATA FROM DATE-SPECIFIED FILE.
@@ -210,12 +188,9 @@ class spin_arcv( object ) :
 		# Determine whether or not the requested date has already been
 		# loaded.  If it has, abort.
 
-		if ( self.n_date > 0 ) :
+		if ( date_str in self.arr_date ) :
 
-			tk = where( self.date_str == date_str )[0]
-
-			if ( len( tk ) > 0 ) :
-				return
+			return
 
 		# Extract the year, month, day, and day of year of the requested
 		# date.
@@ -224,110 +199,90 @@ class spin_arcv( object ) :
 		mon  = int( date_str[5:7]  )
 		day  = int( date_str[8:10] )
 
-		# Determine the name of the file that contains data
-		# from the requested date.
+		# Determine the name of the file that contains data from the
+		# requested date.
 
 		str_year = date_str[0:4]
 		str_mon  = date_str[5:7]
 		str_day  = date_str[8:10]
 
-		if ( self.use_k0 ) :
-			fl0 = 'wi_k0_mfi_' + \
-			      str_year + str_mon + str_day + '_v??.cdf'
-		else :
-			fl0 = 'wi_h0_mfi_' + \
-			      str_year + str_mon + str_day + '_v??.cdf'
+		fl0 = 'wi_k0_spha_' + str_year + str_mon + str_day + '_v??.cdf'
 
 		fl0_path = os.path.join( self.path, fl0 )
 
+		# Search for the file in the local data directory.  If it is not
+		# found, attempt to download it.
+
 		gb = glob( fl0_path )
 
-		# If the file does not exist, attempt to download it.
-
 		if ( len( gb ) > 0 ) :
+
 			fl_path = gb[-1]
+
 		else :
+
 			try :
+
 				self.mesg_txt( 'ftp', date_str )
+
 				ftp = FTP( 'cdaweb.gsfc.nasa.gov' )
+
 				ftp.login( )
-				ftp.cwd( 'pub/data/wind/mfi/' )
-				if ( self.use_k0 ) :
-					ftp.cwd( 'mfi_k0/' )
-				else :
-					ftp.cwd( 'mfi_h0/' )
+
+				ftp.cwd( 'pub/data/wind/orbit/spha_k0' )
+
 				ftp.cwd( str_year )
+
 				ls = ftp.nlst( fl0 )
+
 				fl = ls[-1]
+
 				fl_path = os.path.join( self.path, fl )
+
 				ftp.retrbinary( "RETR " + fl,
 				           open( fl_path, 'wb' ).write )
+
 			except :
+
 				self.mesg_txt( 'fail', date_str )
+
 				return
 
-		# If the file now exists, try to load it; otherwise,
+		# If the file now exists locally, try to load it; otherwise,
 		# abort.
 
 		self.mesg_txt( 'load', date_str )
 
 		if ( os.path.isfile( fl_path ) ) :
+
 			try :
+
 				cdf = pycdf.CDF( fl_path )
+
 			except :
+
 				self.mesg_txt( 'fail', date_str )
+
 				return
+
 		else :
+
 			self.mesg_txt( 'fail', date_str )
+
 			return
+
+		# Append the requested date to the list of dates loaded.
+
+		ind = len( self.arr_date )
+
+		self.arr_date.append( date_str )
 
 		# Extract the data from the loaded file.
 
-		if ( self.use_k0 ) :
-			sub_t   = cdf['Epoch'][:]
-			sub_b_x = cdf['BGSEc'][:,0]
-			sub_b_y = cdf['BGSEc'][:,1]
-			sub_b_z = cdf['BGSEc'][:,2]
-			sub_pnt = cdf['N'][:]
-		else :
-			sub_t   = cdf['Epoch3'][:,0]
-			sub_b_x = cdf['B3GSE'][:,0]
-			sub_b_y = cdf['B3GSE'][:,1]
-			sub_b_z = cdf['B3GSE'][:,2]
-			sub_pnt = cdf['NUM3_PTS'][:,0]
+		self.arr_spin_t += list( cdf['Epoch'        ][:] )
+		self.arr_spin_w += list( cdf['AVG_SPIN_RATE'][:] )
 
-		sub_ind = tile( self.t_date, len( sub_t ) )
-
-		# Select those data which seem to have valid (versus
-		# fill) values.
-
-		tk   = where( sub_pnt > 0 )[0]
-		n_tk = len( tk )
-
-		# Copy the date associated with this file into and
-		# array.
-
-		new_date_str = [ date_str ]
-		new_date_ind = [ self.t_date ]
-		n_new_date = 1
-
-		# Append any valid, newly-loaded data to the saved arrays.
-
-		if ( n_tk > 0 ) :
-			self.mfi_t   = append( self.mfi_t  , sub_t[tk]   )
-			self.mfi_b_x = append( self.mfi_b_x, sub_b_x[tk] )
-			self.mfi_b_y = append( self.mfi_b_y, sub_b_y[tk] )
-			self.mfi_b_z = append( self.mfi_b_z, sub_b_z[tk] )
-			self.mfi_ind = append( self.mfi_ind, sub_ind[tk] )
-
-		# Append the array of loaded dates with the date(s) loaded in
-		# this call of this function.
-
-		self.date_str = append( self.date_str, new_date_str )
-		self.date_ind = append( self.date_ind, new_date_ind )
-
-		self.n_date += n_new_date
-		self.t_date += n_new_date
+		self.arr_spin_ind += [ ind for ep in cdf['Epoch'] ]
 
 		# Request a clean-up of the files in the data directory.
 
@@ -339,31 +294,35 @@ class spin_arcv( object ) :
 
 	def cleanup_date( self ) :
 
-		# If the number of dates is less than or equal to the maximum,
-		# abort (as nothing needs to be done).
+		# For each date over the maximum number, remove that date and
+		# all loaded data.
 
-		if ( self.n_date <= self.n_date_max ) :
-			return
+		while ( len( self.arr_date ) > self.n_date_max ) :
 
-		# Delete dates (and all associated data) from this archive so
-		# that the number of loaded dates equals the maximum allowed.
+			# Remove the least recently loaded date from the list
+			# of loaded dates.
 
-		n_rm = self.n_date - self.n_date_max
+			self.arr_date = self.arr_date[1:]
 
-		ind_min = self.t_date - self.n_date_max
+			# Remove the timestamps and spin rates from the removed
+			# date.
 
-		self.date_str = self.date_str[n_rm:]
-		self.date_ind = self.date_ind[n_rm:]
+			rng = range( len( self.arr_spin_ind ) )
 
-		self.n_date -= n_rm
+			self.arr_spin_t = [ self.arr_spin_t[i]
+			                    for i in rng
+			                    if  self.arr_spin_ind[i] != 0 ]
 
-		tk = where( self.mfi_ind >= ind_min )[0]
+			self.arr_spin_w = [ self.arr_spin_w[i]
+			                    for i in rng
+			                    if  self.arr_spin_ind[i] != 0 ]
 
-		self.mfi_t   = self.mfi_t[tk]
-		self.mfi_b_x = self.mfi_b_x[tk]
-		self.mfi_b_y = self.mfi_b_y[tk]
-		self.mfi_b_z = self.mfi_b_z[tk]
-		self.mfi_ind = self.mfi_ind[tk]
+			# Remove the indices for the removed data and decrement
+			# the remaining indices.
+
+			self.arr_spin_ind = [ ind - 1
+			                      for ind in self.arr_spin_ind
+			                      if  ind != 0                 ]
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CLEANING UP THE DATA DIRECTORY.
@@ -377,44 +336,32 @@ class spin_arcv( object ) :
 		if ( self.n_file_max >= float( 'infinity' ) ) :
 			return
 
-		# Generate a list of the names of all files of the requested
-		# type (as specified by the "use_*" keywords) in the data
-		# directory.
+		# Generate a list of the names of all spin data files.
 
-		if ( self.use_idl ) :
-			file_name = array( glob(
-			              os.path.join( self.path, 'wind_mag*' ) ) )
-		else :
-			if ( self.use_k0 ) :
-				file_name = array( glob(
-				         os.path.join( self.path, 'wi_k0*' ) ) )
-			else :
-				file_name = array( glob(
-				         os.path.join( self.path, 'wi_h0*' ) ) )
-
-		n_file = len( file_name )
+		file_name = list( glob(
+				  os.path.join( self.path, 'wi_k0_spha_*' ) ) )
 
 		# If the number of files is less than or equal to the maximum,
 		# abort (as nothing needs to be done).
 
-		if ( n_file <= self.n_file_max ) :
+		if ( len( file_name ) <= self.n_file_max ) :
 			return
 
 		# Determine the access time of each of the files, and then sort
 		# the files in ascending value.
 
-		file_time = array( [ os.path.getatime( fl )
-		                     for fl in file_name    ] )
+		file_time = [ os.path.getatime( fl ) for fl in file_name ]
 
-		srt = argsort( file_time )
+		srt = sorted( range( len( file_time ) ),
+		              key=file_time.__getitem__  )
 
-		file_name = file_name[srt]
-		file_time = file_time[srt]
+		file_name = [ file_name[i] for i in srt ]
+		file_time = [ file_time[i] for i in srt ]
 
 		# Delete files so that the number of files equals the maximum
 		# allowed.
 
-		for f in range( n_file - self.n_file_max ) :
+		for f in range( len( file_name ) - self.n_file_max ) :
 			os.remove( file_name[f] )
 
 	#-----------------------------------------------------------------------
@@ -434,4 +381,33 @@ class spin_arcv( object ) :
 		# message parameters.
 
 		self.core.emit( SIGNAL('janus_mesg'),
-		                'mfi', mesg_typ, mesg_obj )
+		                'spin', mesg_typ, mesg_obj )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR CHANGING THE MAXIMUM NUMBER OF FILES.
+	#-----------------------------------------------------------------------
+
+	def chng_n_file_max( self, val ) :
+
+		# Check the maximum file number input to ensure it is a postive
+		# integer. Change the maximum file number if it is. Otherwise,
+		# raise an error.
+
+		if ( ( val != float( 'inf' )  ) and
+		     ( type( val ) is not int )     ) :
+
+			raise ValueError( 'Max file number must be ' +
+			                     'infinity or a positive integer.' )
+
+			return
+
+		if ( val < 0 ) :
+
+			raise ValueError( 'Max file number cannot be ' +
+			                                           'negative.' )
+
+			return
+
+		self.n_file_max = val
+
+		self.cleanup_file( )

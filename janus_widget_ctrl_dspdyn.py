@@ -28,7 +28,7 @@
 # Load the modules necessary for the graphical interface.
 
 from PyQt4.QtCore import SIGNAL, Qt
-from PyQt4.QtGui import QGridLayout, QLabel, QWidget
+from PyQt4.QtGui import QWidget, QGridLayout, QLabel, QFont
 
 # Load the customized push button and one-line text editor.
 
@@ -73,47 +73,70 @@ class widget_ctrl_dspdyn( QWidget ) :
 
 		self.setLayout( self.grd )
 
+		# Create the sub-grids and add them to the widget's main grid.
+
+		self.sg = QGridLayout( )
+
+		self.sg.setContentsMargins( 0, 0, 0, 0 )
+
+		self.grd.addLayout( self.sg, 0, 0, 5, 4 )
+
 		# Initialize the check boxes that comprise this widget.
 
-		self.lab_dsp     = QLabel( 'Display:'     )
-		self.lab_dsp_mom = QLabel( '  Moments'    )
-		self.lab_dsp_gsl = QLabel( '  Guess/Sel.' )
-		self.lab_dsp_nln = QLabel( '  Non-Linear' )
+		self.lab_dsp = { 'dsp':QLabel( 'Display:'   ),
+		                 'mom':QLabel( 'Moments'    ),
+		                 'gsl':QLabel( 'Guess/Sel.' ),
+		                 'nln':QLabel( 'Non-Linear' )  }
 
-		self.box_dsp_mom = event_CheckBox( self, 'dsp_mom' )
-		self.box_dsp_gsl = event_CheckBox( self, 'dsp_gsl' )
-		self.box_dsp_nln = event_CheckBox( self, 'dsp_nln' )
+		self.lab_dyn = { 'dyn': QLabel( 'Dynamic:'    ),
+		                 'mom': QLabel( 'Moments'     ),
+		                 'gss': QLabel( 'Init. Guess' ),
+		                 'sel': QLabel( 'Data Sel.'   ),
+		                 'nln': QLabel( 'Non-Linear'  )  }
 
-		self.lab_dyn     = QLabel( 'Dynamic:'      )
-		self.lab_dyn_mom = QLabel( '  Moments'     )
-		self.lab_dyn_gss = QLabel( '  Init. Guess' )
-		self.lab_dyn_sel = QLabel( '  Data Sel.'   )
-		self.lab_dyn_nln = QLabel( '  Non-Linear'  )
+		self.box_dsp = { 'mom':event_CheckBox( self, 'mom' ),
+                                 'gsl':event_CheckBox( self, 'gsl' ),
+                                 'nln':event_CheckBox( self, 'nln' )  }
 
-		self.box_dyn_mom = event_CheckBox( self, 'dyn_mom' )
-		self.box_dyn_gss = event_CheckBox( self, 'dyn_gss' )
-		self.box_dyn_sel = event_CheckBox( self, 'dyn_sel' )
-		self.box_dyn_nln = event_CheckBox( self, 'dyn_nln' )
+		self.box_dyn = { 'mom':event_CheckBox( self, 'mom' ),
+                                 'gss':event_CheckBox( self, 'gss' ),
+                                 'sel':event_CheckBox( self, 'sel' ),
+                                 'nln':event_CheckBox( self, 'nln' )  }
+
+		self.order_dsp = [ 'dsp', 'mom', 'gsl', 'nln' ]
+
+		self.order_dyn  = [ 'dyn', 'mom', 'gss', 'sel', 'nln' ]
 
 		# Row by row, add the boxes to this widget's grid.
 
-		self.grd.addWidget( self.lab_dsp    , 1, 0, 1, 2 )
-		self.grd.addWidget( self.lab_dsp_mom, 2, 0, 1, 1 )
-		self.grd.addWidget( self.box_dsp_mom, 2, 1, 1, 1 )
-		self.grd.addWidget( self.lab_dsp_gsl, 3, 0, 2, 1 )
-		self.grd.addWidget( self.box_dsp_gsl, 3, 1, 2, 1 )
-		self.grd.addWidget( self.lab_dsp_nln, 5, 0, 1, 1 )
-		self.grd.addWidget( self.box_dsp_nln, 5, 1, 1, 1 )
+		for i, key in enumerate( self.order_dsp ) :
 
-		self.grd.addWidget( self.lab_dyn    , 1, 2, 1, 1 )
-		self.grd.addWidget( self.lab_dyn_mom, 2, 2, 1, 1 )
-		self.grd.addWidget( self.box_dyn_mom, 2, 3, 1, 1 )
-		self.grd.addWidget( self.lab_dyn_gss, 3, 2, 1, 1 )
-		self.grd.addWidget( self.box_dyn_gss, 3, 3, 1, 1 )
-		self.grd.addWidget( self.lab_dyn_sel, 4, 2, 1, 1 )
-		self.grd.addWidget( self.box_dyn_sel, 4, 3, 1, 1 )
-		self.grd.addWidget( self.lab_dyn_nln, 5, 2, 1, 1 )
-		self.grd.addWidget( self.box_dyn_nln, 5, 3, 1, 1 )
+			if ( key == 'dsp') :
+
+				self.lab_dsp[key].setFont(
+				        QFont( "Helvetica", 12, QFont.Bold ) )
+
+				self.grd.addWidget( self.lab_dsp[key], i, 0, 1, 2 )
+			else :
+				self.box_dsp[key].setFont( QFont( "Helvetica", 12 ) )
+				self.lab_dsp[key].setFont( QFont( "Helvetica", 12 ) )
+				self.grd.addWidget( self.box_dsp[key], i, 0, 1, 1 )
+				self.grd.addWidget( self.lab_dsp[key], i, 1, 1, 1 )
+
+
+		for i, key in enumerate( self.order_dyn ) :
+
+			if ( key == 'dyn') :
+
+				self.lab_dyn[key].setFont(
+				        QFont( "Helvetica", 12, QFont.Bold ) )
+
+				self.grd.addWidget( self.lab_dyn[key], i, 3, 1, 2 )
+			else :
+				self.box_dyn[key].setFont( QFont( "Helvetica", 12 ) )
+				self.lab_dyn[key].setFont( QFont( "Helvetica", 12 ) )
+				self.grd.addWidget( self.box_dyn[key], i, 3, 1, 1 )
+				self.grd.addWidget( self.lab_dyn[key], i, 4, 1, 1 )
 
 		# Populate the check boxes.
 
@@ -128,28 +151,28 @@ class widget_ctrl_dspdyn( QWidget ) :
 		# Set the values of the "display" tick boxes.
 
 		if ( self.core.dsp == 'mom' ) :
-			self.box_dsp_mom.setChecked( True  )
-			self.box_dsp_gsl.setChecked( False )
-			self.box_dsp_nln.setChecked( False )
+			self.box_dsp['mom'].setChecked( True  )
+			self.box_dsp['gsl'].setChecked( False )
+			self.box_dsp['nln'].setChecked( False )
 		elif ( self.core.dsp == 'gsl' ) :
-			self.box_dsp_mom.setChecked( False )
-			self.box_dsp_gsl.setChecked( True  )
-			self.box_dsp_nln.setChecked( False )
+			self.box_dsp['mom'].setChecked( False )
+			self.box_dsp['gsl'].setChecked( True  )
+			self.box_dsp['nln'].setChecked( False )
 		elif ( self.core.dsp == 'nln' ) :
-			self.box_dsp_mom.setChecked( False )
-			self.box_dsp_gsl.setChecked( False )
-			self.box_dsp_nln.setChecked( True  )
+			self.box_dsp['mom'].setChecked( False )
+			self.box_dsp['gsl'].setChecked( False )
+			self.box_dsp['nln'].setChecked( True  )
 		else :
-			self.box_dsp_mom.setChecked( False )
-			self.box_dsp_gsl.setChecked( False )
-			self.box_dsp_nln.setChecked( False )
+			self.box_dsp['mom'].setChecked( False )
+			self.box_dsp['gsl'].setChecked( False )
+			self.box_dsp['nln'].setChecked( False )
 
 		# Set the values of the "dynamic" tick boxes.
 
-		self.box_dyn_mom.setChecked( self.core.dyn_mom )
-		self.box_dyn_gss.setChecked( self.core.dyn_gss )
-		self.box_dyn_sel.setChecked( self.core.dyn_sel )
-		self.box_dyn_nln.setChecked( self.core.dyn_nln )
+		self.box_dyn['mom'].setChecked( self.core.dyn_mom )
+		self.box_dyn['gss'].setChecked( self.core.dyn_gss )
+		self.box_dyn['sel'].setChecked( self.core.dyn_sel )
+		self.box_dyn['nln'].setChecked( self.core.dyn_nln )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
@@ -174,30 +197,30 @@ class widget_ctrl_dspdyn( QWidget ) :
 		#        a bit of lag in this process, so an immediate
 		#        unchecking of these boxes is warranted.
 
-		if ( fnc == 'dsp_mom' ) :
-			if ( self.box_dsp_mom.isChecked( ) ) :
-				self.box_dsp_gsl.setChecked( False )
-				self.box_dsp_nln.setChecked( False )
+		if ( fnc == 'mom' ) :
+			if ( self.box_dsp['mom'].isChecked( ) ) :
+				self.box_dsp['gsl'].setChecked( False )
+				self.box_dsp['nln'].setChecked( False )
 				Thread( target=thread_chng_dsp,
 				        args=( self.core, 'mom' ) ).start()
 			else :
 				Thread( target=thread_chng_dsp,
 				        args=( self.core, None ) ).start()
 
-		if ( fnc == 'dsp_gsl' ) :
-			if ( self.box_dsp_gsl.isChecked( ) ) :
-				self.box_dsp_mom.setChecked( False )
-				self.box_dsp_nln.setChecked( False )
+		if ( fnc == 'gsl' ) :
+			if ( self.box_dsp['gsl'].isChecked( ) ) :
+				self.box_dsp['mom'].setChecked( False )
+				self.box_dsp['nln'].setChecked( False )
 				Thread( target=thread_chng_dsp,
 				        args=( self.core, 'gsl' ) ).start()
 			else :
 				Thread( target=thread_chng_dsp,
 				        args=( self.core, None ) ).start()
 
-		if ( fnc == 'dsp_nln' ) :
-			if ( self.box_dsp_nln.isChecked( ) ) :
-				self.box_dsp_mom.setChecked( False )
-				self.box_dsp_gsl.setChecked( False )
+		if ( fnc == 'nln' ) :
+			if ( self.box_dsp['nln'].isChecked( ) ) :
+				self.box_dsp['mom'].setChecked( False )
+				self.box_dsp['gsl'].setChecked( False )
 				Thread( target=thread_chng_dsp,
 				        args=( self.core, 'nln' ) ).start()
 			else :
@@ -207,25 +230,25 @@ class widget_ctrl_dspdyn( QWidget ) :
 		# If one of the "Dynamic" boxes has been (un)checked, update the
 		# value of the corresponding "self.core.dyn_???".
 
-		if ( fnc == 'dyn_mom' ) :
+		if ( fnc == 'mom' ) :
 			Thread( target=thread_chng_dyn,
 			        args=( self.core, 'mom',
-			               self.box_dyn_mom.isChecked( ) ) ).start()
+			               self.box_dyn['mom'].isChecked( ) ) ).start()
 
-		if ( fnc == 'dyn_gss' ) :
+		if ( fnc == 'gss' ) :
 			Thread( target=thread_chng_dyn,
 			        args=( self.core, 'gss',
-			               self.box_dyn_gss.isChecked( ) ) ).start()
+			               self.box_dyn['gss'].isChecked( ) ) ).start()
 
-		if ( fnc == 'dyn_sel' ) :
+		if ( fnc == 'sel' ) :
 			Thread( target=thread_chng_dyn,
 			        args=( self.core, 'sel',
-			               self.box_dyn_sel.isChecked( ) ) ).start()
+			               self.box_dyn['sel'].isChecked( ) ) ).start()
 
-		if ( fnc == 'dyn_nln' ) :
+		if ( fnc == 'nln' ) :
 			Thread( target=thread_chng_dyn,
 			        args=( self.core, 'nln',
-			               self.box_dyn_nln.isChecked( ) ) ).start()
+			               self.box_dyn['nln'].isChecked( ) ) ).start()
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_dsp" SIGNAL.

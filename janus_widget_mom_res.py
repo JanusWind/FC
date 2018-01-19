@@ -58,6 +58,8 @@ class widget_mom_res( format_TextEdit ) :
 		# Prepare to respond to signals received from the Janus core.
 
 		self.connect( self.core, SIGNAL('janus_rset'), self.resp_rset )
+		self.connect( self.core, SIGNAL('janus_chng_opt'),
+		                                            self.resp_chng_opt )
 		self.connect( self.core, SIGNAL('janus_chng_mfi'),
 		                                            self.resp_chng_mfi )
 		self.connect( self.core, SIGNAL('janus_chng_mom_res'),
@@ -91,59 +93,54 @@ class widget_mom_res( format_TextEdit ) :
 
 		# Print the results of the moments analysis.
 
-		#self.prnt_htm( '<table border="0" width="100%">\n' +
-		#               '<tr><td><i>n<sub>p</sub></i> = </td>' +
-		#                   '<td>value</td></tr>\n' +
-		#               '<tr><td>name</td>' +
-		#                   '<td>value</td></tr>\n' +
-		#               '<tr><td>name</td>' +
-		#                   '<td>value</td></tr>\n' +
-		#               '<tr><td>name</td>' +
-		#                   '<td>value</td></tr>\n' +
-		#               '<tr><td>name</td>' +
-		#                   '<td>value</td></tr>\n' +
-		#               '<tr><td>name</td>' +
-		#                   '<td>value</td></tr>\n' +
-		#               '</table>' )
+		if ( self.core.opt['res_n'] ) :
 
-		self.prnt_htm( '<i>n<sub>p</sub></i> = ' )
-		self.prnt_dcm( self.core.mom_res['n_p_c'],
-		               2, 'cm<sup>-3</sup>'        )
-		self.prnt_brk( )
+			self.prnt_htm( '<i>n<sub>p</sub></i> = ' )
+			self.prnt_dcm( self.core.mom_res['n_p_c'],
+		                             2, 'cm<sup>-3</sup>'        )
+			self.prnt_brk( )
 
-		self.prnt_brk( )
+			self.prnt_brk( )
 
-		self.prnt_htm( '<i>v<sub>p</sub></i> = ' )
-		self.prnt_dcm( self.core.mom_res['v_p_c'], 0, 'km/s' )
-		self.prnt_brk( )
+		if ( self.core.opt['res_v'] ) :
 
-		v_vec = self.core.mom_res['v_vec_p_c']
+			self.prnt_htm( '<i>v<sub>p</sub></i> = ' )
+			self.prnt_dcm( self.core.mom_res['v_p_c'], 0, 'km/s' )
+			self.prnt_brk( )
 
-		self.prnt_tab( 1 )
-		self.prnt_htm( '<i>v<sub>xp</sub></i> = ' )
-		self.prnt_dcm( v_vec[0], 0, 'km/s' )
-		self.prnt_brk( )
+			v_vec = self.core.mom_res['v_vec_p_c']
+	
+			self.prnt_tab( 1 )
+			self.prnt_htm( '<i>v<sub>xp</sub></i> = ' )
+			self.prnt_dcm( v_vec[0], 0, 'km/s' )
+			self.prnt_brk( )
+	
+			self.prnt_tab( 1 )
+			self.prnt_htm( '<i>v<sub>yp</sub></i> = ' )
+			self.prnt_dcm( v_vec[1], 0, 'km/s' )
+			self.prnt_brk( )
+	
+			self.prnt_tab( 1 )
+			self.prnt_htm( '<i>v<sub>zp</sub></i> = ' )
+			self.prnt_dcm( v_vec[2], 0, 'km/s' )
+			self.prnt_brk( )
+	
+			self.prnt_brk( )
 
-		self.prnt_tab( 1 )
-		self.prnt_htm( '<i>v<sub>yp</sub></i> = ' )
-		self.prnt_dcm( v_vec[1], 0, 'km/s' )
-		self.prnt_brk( )
+		if ( ( self.core.opt['res_dw'] ) and
+		     ( self.core.opt['res_w'] )    ) :
 
-		self.prnt_tab( 1 )
-		self.prnt_htm( '<i>v<sub>zp</sub></i> = ' )
-		self.prnt_dcm( v_vec[2], 0, 'km/s' )
-		self.prnt_brk( )
+			self.prnt_htm( '<i>w<sub>p</sub></i> = ' )
+			self.prnt_dcm( self.core.mom_res['w_p_c'], 0, 'km/s' )
+			self.prnt_brk( )
 
-		self.prnt_brk( )
+			self.prnt_brk( )
 
-		self.prnt_htm( '<i>w<sub>p</sub></i> = ' )
-		self.prnt_dcm( self.core.mom_res['w_p_c'], 0, 'km/s' )
-		self.prnt_brk( )
+		if ( ( self.core.opt['res_dt'] ) and
+		     ( self.core.opt['res_w'] )    ) :
 
-		self.prnt_brk( )
-
-		self.prnt_htm( '<i>T<sub>p</sub></i> = ' )
-		self.prnt_dcm( self.core.mom_res['T_p_c'], 1, 'kK' )
+			self.prnt_htm( '<i>T<sub>p</sub></i> = ' )
+			self.prnt_dcm( self.core.mom_res['T_p_c'], 1, 'kK' )
 
 		# Scroll to the top of the text area.
 
@@ -158,6 +155,16 @@ class widget_mom_res( format_TextEdit ) :
 		# Reset the text area.
 
 		self.clear( )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_opt" SIGNAL.
+	#-----------------------------------------------------------------------
+
+	def resp_chng_opt( self ) :
+
+		# Regenerate the text in the text area.
+
+		self.make_txt( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_mfi" SIGNAL.

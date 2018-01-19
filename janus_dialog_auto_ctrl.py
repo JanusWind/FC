@@ -35,7 +35,7 @@ from janus_event_CheckBox import event_CheckBox
 from janus_event_LineEdit import event_LineEdit
 from janus_event_PushButton import event_PushButton
 
-# Load the modules necessary for time convertion.
+# Load the modules necessary for time conversion.
 
 from janus_time import calc_time_epc, calc_time_sec, calc_time_str
 
@@ -112,9 +112,6 @@ class dialog_auto_ctrl( QDialog ) :
 		self.btn_auto.setDefault( False )
 		self.btn_cncl.setDefault( False )
 
-		self.btn_auto.setAutoDefault( False )
-		self.btn_cncl.setAutoDefault( False )
-
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
@@ -137,6 +134,7 @@ class dialog_auto_ctrl( QDialog ) :
 		# Note.  The call of "self.aply_time" below initializes the
 		#        "self.time_????" and "self.vld_????" parameters and
 		#        populates the text boxes approriately.
+
 
 		self.aply_time( time_strt=time_strt, time_stop=time_stop,
 		                get_next=get_next, err_halt=err_halt      )

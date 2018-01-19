@@ -50,8 +50,10 @@ from janus_const import const
 
 # Load the modules necessary for loading Wind/FC and Wind/MFI data.
 
-from janus_fc_arcv import fc_arcv
-from janus_mfi_arcv import mfi_arcv
+from janus_fc_arcv   import fc_arcv
+from janus_spin_arcv import spin_arcv
+from janus_mfi_arcv_lres  import mfi_arcv_lres
+from janus_mfi_arcv_hres import mfi_arcv_hres
 
 # Load the necessary array modules and mathematical functions.
 
@@ -62,10 +64,10 @@ from numpy import amax, amin, append, arccos, arctan2, arange, argsort, array, \
 
 from numpy.linalg import lstsq
 
+from scipy.special     import erf
 from scipy.interpolate import interp1d
-from scipy.optimize import curve_fit
-from scipy.special import erf
-from scipy.stats import pearsonr, spearmanr
+from scipy.optimize    import curve_fit
+from scipy.stats       import pearsonr, spearmanr
 
 from janus_helper import round_sig
 
@@ -99,6 +101,7 @@ class core( QObject ) :
 	# | rset              |                              |
 	# | chng_spc          |                              |
 	# | chng_mfi          |                              |
+	# | chng_spin         |                              |
 	# | chng_mom_win      |                              |
 	# | chng_mom_sel_bin  | c, d, b                      |
 	# | chng_mom_sel_dir  | c, d                         |
@@ -113,6 +116,8 @@ class core( QObject ) :
 	# | chng_nln_res      |                              |
 	# | chng_dsp          |                              |
 	# | chng_dyn          |                              |
+	# | chng_opt          |                              |
+	# | rstr_opt          |                              |
 	# | done_auto_run     |                              |
 	# | exit              |                              |
 	# +-------------------+------------------------------+
@@ -151,31 +156,31 @@ class core( QObject ) :
 
 		self.debug = False
 
-		# Initialize and store the archive of Wind/FC ion spectra.
-
-		self.fc_arcv = fc_arcv( core=self )
-		###self.fc_arcv = fc_arcv( core=self, use_idl=True,
-		###                        buf=-1.                  )
-
-		# Initialize and store the archive of Wind/MFI magnetic field
-		# data.
-
-		self.mfi_arcv = mfi_arcv( core=self )
-		###self.mfi_arcv = mfi_arcv( core=self, use_k0=True,
-		###                          buf=-1., tol=90.         )
-		###self.mfi_arcv = mfi_arcv( core=self, use_idl=True,
-		###                          buf=-1., tol=90.         )
-
-		# Initialize a log of the analysis results.
-
-		self.series = series( )
-
 		# Initialize the variables that will contain the Wind/FC ion
 		# spectrum's data, the associated Wind/MFI magnetic field data,
 		# the ion spectrum's point selection, and the results of the
 		# moments analysis of the ion spectrum.
 
 		self.init_var( )
+
+		# Initialize and store the archives for downloading, loading,
+		# and managing data files.
+
+		self.fc_arcv = fc_arcv( core=self,
+		                            n_file_max=self.opt['fls_n_fc'  ]  )
+
+		self.spin_arcv = spin_arcv( core=self,
+		                            n_file_max=self.opt['fls_n_spin']  ) 
+
+		self.mfi_arcv_lres  = mfi_arcv_lres( core=self,
+		                          n_file_max=self.opt['fls_n_mfi_l' ]  )
+
+		self.mfi_arcv_hres = mfi_arcv_hres( core=self,
+		                          n_file_max=self.opt['fls_n_mfi_h' ]  )
+
+		# Initialize a log of the analysis results.
+
+		self.series = series( )
 
 		# Load the requested Wind/FC ion spectrum (if one has been
 		# requested).
@@ -203,12 +208,13 @@ class core( QObject ) :
 		# and the settings, data selections, and results from all
 		# analyses.
 
-		self.rset_var( var_swe     = True, var_mfi     = True,
-		               var_mom_win = True, var_mom_sel = True,
-		               var_mom_res = True, var_nln_ion = True,
-		               var_nln_set = True, var_nln_gss = True,
-		               var_nln_sel = True, var_nln_res = True,
-		               var_dsp     = True, var_dyn     = True          )
+		self.rset_var( var_swe     = True, var_spin    = True,
+		               var_mfi     = True, var_mom_win = True,
+		               var_mom_sel = True, var_mom_res = True,
+		               var_nln_ion = True, var_nln_set = True,
+		               var_nln_gss = True, var_nln_sel = True,
+		               var_nln_res = True, var_dsp     = True,
+		               var_dyn     = True, var_opt     = True          )
 		
 		# Initialize the value of the indicator variable of whether the
 		# automatic analysis should be aborted.
@@ -228,13 +234,13 @@ class core( QObject ) :
 	#-----------------------------------------------------------------------
 
 	def rset_var( self,
-	              var_swe     = False, var_mfi     = False,
-	              var_mom_win = False, var_mom_sel = False,
-	              var_mom_res = False, var_nln_ion = False,
-	              var_nln_set = False, var_nln_gss = False,
-	              var_nln_sel = False, var_nln_res = False,
-	              var_dsp     = False, var_dyn     = False          ) :
-
+	              var_swe     = False, var_spin    = False,
+	              var_mfi     = False, var_mom_win = False,
+	              var_mom_sel = False, var_mom_res = False,
+	              var_nln_ion = False, var_nln_set = False,
+	              var_nln_gss = False, var_nln_sel = False,
+	              var_nln_res = False, var_dsp     = False,
+	              var_dyn     = False, var_opt     = False   ) :
 
 		# If requested, (re-)initialize the variables associated with
 		# the ion spectrum's data.
@@ -248,6 +254,13 @@ class core( QObject ) :
 			self.time_txt = ''
 			self.time_vld = True
 
+		# If requested, (re-)initialize the variables associated with
+		# the spin rate.
+
+		if ( var_spin ) :
+
+			self.spin_period = None
+
 		# If requested, (re-)initialize the varaibles for the Wind/MFI
 		# data associated with this spectrum.
 
@@ -258,7 +271,6 @@ class core( QObject ) :
 			self.mfi_dur       = 0.
 
 			self.mfi_t         = None
-                        self.n_mfi         = None
 			self.mfi_b         = None
 			self.mfi_b_x       = None
 			self.mfi_b_y       = None
@@ -291,8 +303,10 @@ class core( QObject ) :
 
 		if ( var_mom_sel ) :
 
-			self.mom_min_sel_dir = 5
-			self.mom_min_sel_bin = 3
+			self.mom_min_sel_dir =  5
+			self.mom_min_sel_bin =  3
+
+			self.mom_max_sel_dir = 20
 
 			self.mom_sel_dir     = None
 			self.mom_sel_bin     = None
@@ -481,13 +495,135 @@ class core( QObject ) :
 			self.dyn_sel = True
 			self.dyn_nln = False
 
+		# If requested, (re-)initialize the variables which indicate
+		# the various options for the GUI's option menu.
+
+		if ( var_opt ) :
+
+			# Define the file name of the configuration file for the
+			# options menu.
+
+			self.opt_flnm = os.path.join( 'data', 'janus.cfg' )
+
+			# Load the default options 'silently' (i.e., without
+			# overwriting the configuration file or emitting a
+			# signal).
+
+			self.rstr_opt( save=False, signal=False,
+			               propagate=False           )
+
+			# If a configuration file exists, open it and load the
+			# options therein line by line.
+
+			if( os.path.isfile( self.opt_flnm ) ) :
+
+				# Load each line of the file and, if it contains
+				# configuration information, add it to the
+				# options dictionary.
+
+				for ln in open( self.opt_flnm, 'r' ).readlines( ) :
+
+					# If the line is blank or is a comment,
+					# skip it.
+
+					if ( ( len( ln ) == 0   ) or
+					     ( ln[0]     == '#' )    ) :
+						continue
+
+					# Attempt to parse the line into its key
+					# and value.  If this fails, skip to the
+					# next line. 
+
+					prsd = ln.lower( ).split( )
+
+					if ( len( prsd ) != 2 ) :
+						continue
+
+					[ key, val ] = prsd
+
+					# If the key is invalid or is not
+					# already in the options dictionary,
+					# skip to the next line.
+
+					if ( ( len( key ) < 3           ) or
+					     ( key not in
+					               self.opt.keys( ) )    ) :
+						continue
+
+					# Store the loaded key's value (with the
+					# appropriate type) to the dictionary.
+
+					if ( ( val == 'inf'      ) or
+					     ( val == 'infinity' )    ) :
+						val = float( 'inf' )
+					else :
+						val = int( val )
+
+					prefix = key[0:3]
+
+					if ( ( prefix == 'res' ) or
+					     ( prefix == 'mfi' )    ) :
+						self.opt[key] = bool( val )
+					else :
+						self.opt[key] = val
+
+			# Save the options dictionary to the configuration file.
+
+			self.save_opt( )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR SAVING THE OPTIONS MENU TO A CONFIG FILE.
+	#-----------------------------------------------------------------------
+
+	def save_opt( self ) :
+
+		# Attempt to open the configuration file (replacing any that
+		# already exists).  If this fails, abort.
+
+		try : 
+			fl = open( self.opt_flnm, 'w' )
+		except :
+			return
+
+		# Write a header.
+
+		fl.write( '# Janus Version ' )
+		fl.write( self.version )
+		fl.write( '\n' )
+		fl.write( '# This configuration file stores the values\n'   )
+		fl.write( '# from the options menu that were used in the\n' )
+		fl.write( '# last Janus session.\n'                         )
+
+		# Write out the name and value of each key in the options
+		# dictionary.
+
+		keys = self.opt.keys( )
+		keys.sort( )
+
+		for key in keys :
+
+			prefix = key[0:3]
+
+			fl.write( '\n' )
+			fl.write( key + ' ' )
+
+			if ( ( prefix == 'res' ) or ( prefix == 'mfi' ) ) :
+
+				if ( self.opt[key] ) :
+					fl.write('1')
+				else :
+					fl.write('0')
+
+			else :
+
+				fl.write( str( self.opt[key] ) )
+
 	#-----------------------------------------------------------------------
 	# LOAD THE REQUESTED WIND/FC SPECTRUM.
 	#-----------------------------------------------------------------------
 
 	def load_spec( self, time_req=None,
 	               get_prev=False, get_next=False ) :
-
 
 		# Reset the variables that contain the Wind/FC ion spectrum's
 		# data, the associated Wind/MFI magnetic field data, and the
@@ -499,11 +635,10 @@ class core( QObject ) :
 
 		self.emit( SIGNAL('janus_rset') )
 
-		self.rset_var( var_swe     = True, var_mfi     = True,
-		               var_mom_sel = True, var_mom_res = True,
-		               var_nln_gss = True, var_nln_sel = True,
-		               var_nln_res = True                         )
-
+		self.rset_var( var_swe     = True, var_spin    = True,
+		               var_mfi     = True, var_mom_sel = True,
+		               var_mom_res = True, var_nln_gss = True,
+		               var_nln_sel = True, var_nln_res = True  )
 
 		# If a special code has been entered, take the specified action.
 
@@ -550,7 +685,6 @@ class core( QObject ) :
 
 			self.time_vld = True
 
-
 		# If necessary, adjust "self.dsp" and "self.dyn_???" keywords to
 		# make them a bit more mutually consistent.
 
@@ -567,7 +701,6 @@ class core( QObject ) :
 			self.emit( SIGNAL('janus_chng_dyn') )
 			self.emit( SIGNAL('janus_chng_dsp') )
 
-
 		# If no valid time was requested, alert the user and abort.
 
 		if ( not self.time_vld ) :
@@ -577,13 +710,10 @@ class core( QObject ) :
 
 			return
 
-
 		# Message the user that a new Wind/FC ion spectrum is about to
 		# be loaded.
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'fc' )
-
-
 
 		# Load the Wind/FC ion spectrum with a timestamp closest to that
 		# requested.
@@ -597,12 +727,6 @@ class core( QObject ) :
 		if ( self.fc_spec is None ) :
 			self.emit( SIGNAL('janus_chng_spc') )
 			return
-
-
-		# Message the user that a new Wind/FC ion spectrum is about to
-		# be loaded.
-
-		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'fc' )
 
 		# Extract the parameters of the loaded Wind/FC ion spectrum.
 		  
@@ -626,6 +750,11 @@ class core( QObject ) :
 
 		self.emit( SIGNAL('janus_chng_spc') )
 
+		# Load the associated Wind/SPIN data associated with this
+		# spectrum.
+
+		self.load_spin( )
+
 		# Load the associated Wind/MFI magnetic field data associated
 		# with this spectrum.
 
@@ -636,7 +765,54 @@ class core( QObject ) :
 		if ( self.dyn_mom ) :
 			self.auto_mom_sel( )
 
-  #-----------------------------------------------------------------------
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR LOADING THE Wind/SPIN DATA.
+	#-----------------------------------------------------------------------
+
+	def load_spin( self ) :
+
+		# Reset the spin variables.
+
+		self.rset_var( var_spin=True )
+
+		# If no Wind/FC ion spectrum has been loaded, abort.
+
+		if ( self.fc_spec is None ) :
+			self.emit( SIGNAL('janus_chng_spin') )
+			return
+
+		# Message the user that new Wind/SPIN data are about to be
+		# loaded.
+
+		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'spin' )
+
+		# Load the Wind/SPIN data associated with this spectrum.
+
+		self.spin_period = self.spin_arcv.load_spin( self.time_val )
+
+		# If no spin data were returned, abort with a signal that the
+		# data have changed.
+
+		if ( self.spin_period is None ) :
+			self.emit( SIGNAL('janus_chng_spin') )
+			return
+
+		# Assign the loaded spin rate to the spectrum rotation value.
+
+		self.fc_spec.set_rot( self.spin_period )
+
+		# Message the user that the spin period has been updated.
+
+		self.emit( SIGNAL('janus_mesg'), 'core', 'val', 'spin' )
+
+		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'spin' )
+
+		# Emit a signal that indicates that a new Wind/MFI data have now
+		# been loaded.
+
+		self.emit( SIGNAL('janus_chng_spin') )
+
+	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR LOADING THE Wind/MFI MAGNETIC FIELD DATA.
 	#-----------------------------------------------------------------------
 
@@ -649,6 +825,7 @@ class core( QObject ) :
 		# If no Wind/FC ion spectrum has been loaded, abort.
 
 		if ( self.fc_spec is None ) :
+			self.emit( SIGNAL('janus_chng_mfi') )
 			return
 
 		# Message the user that new Wind/MFI data are about to be
@@ -656,13 +833,23 @@ class core( QObject ) :
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'mfi' )
 
+		# Load the Wind/MFI magnetic field data of appropriate
+		# resolution associated with this spectrum.
 
-		# Load the Wind/MFI magnetic field data associated with this
-		# spectrum.
+		if ( self.opt['mfi_l'] ) :
 
-		( self.mfi_t, self.mfi_b_x, self.mfi_b_y, self.mfi_b_z ) = \
-		            self.mfi_arcv.load_rang( self.time_val - 6.,
-		                                     self.fc_spec['dur'] + 12. )
+			( self.mfi_t, self.mfi_b_x, self.mfi_b_y,
+			  self.mfi_b_z ) = self.mfi_arcv_lres.load_rang(
+			( self.time_val       - ( 2. * self.fc_spec['rot'] ) ),
+			( self.fc_spec['dur'] + ( 4. * self.fc_spec['rot'] ) ) )
+
+		elif ( self.opt['mfi_h'] ) :
+
+			( self.mfi_t, self.mfi_b_x, self.mfi_b_y,
+			  self.mfi_b_z ) = self.mfi_arcv_hres.load_rang(
+			( self.time_val       - ( 2. * self.fc_spec['rot'] ) ),
+			( self.fc_spec['dur'] + ( 4. * self.fc_spec['rot'] ) ) )
+
 
 		# Establish the number of data.
 
@@ -672,9 +859,7 @@ class core( QObject ) :
 		# that the data have changed.
 
 		if ( self.n_mfi == 0 ) :
-
 			self.emit( SIGNAL('janus_chng_mfi') )
-
 			return
 
 		# Compute and store derived paramters.
@@ -689,7 +874,7 @@ class core( QObject ) :
                                      self.mfi_b_z[i]**2 )
                                      for i in range( len( self.mfi_b_x ) ) ]
     
-		# Compute the average magetic field.
+		# Compute the average magetic field and its norm.
 
 		self.mfi_avg_vec = array( [ mean( self.mfi_b_x ),
 		                            mean( self.mfi_b_y ),
@@ -720,12 +905,12 @@ class core( QObject ) :
 		self.mfi_amag_ang = array( [ mean( self.mfi_b_colat ),
 		                                   mean( self.mfi_b_lon   )  ] )
 
-		# Calculating the average angular deviation of magnetic field
+		# Calculate the average angular deviation of magnetic field
 
 		self.mfi_psi_b = [ arccos( [ sum ( mfi_nrm[i][j] *
 		                               self.mfi_avg_nrm[j]
-		                               for j in range( 3 )      ) ] )
-	                              for i in range( len( mfi_nrm ) ) ]
+		                              for j in range( 3 )          ) ] )
+	                                      for i in range( len( mfi_nrm ) ) ]
 
                 self.mfi_psi_b_avg = rad2deg(sum ( self.mfi_psi_b )/self.n_mfi )
 
@@ -754,13 +939,23 @@ class core( QObject ) :
 		# If this fails, store "None".
     
 		if ( val is None ) :
+
 			self.mom_win_dir = None
+
 		else :
+
 			try :
+
 				self.mom_win_dir = int( val )
+
 				if ( self.mom_win_dir < self.mom_min_sel_dir ) :
 					self.mom_win_dir = None
+
+				if ( self.mom_win_dir > self.mom_max_sel_dir ) :
+					self.mom_win_dir = None
+
 			except :
+
 				self.mom_win_dir = None
 
 		# Emit a signal that a change has occured to the moments window
@@ -786,7 +981,9 @@ class core( QObject ) :
 		else :
 			try :
 				self.mom_win_bin = int( val )
-				if ( self.mom_win_bin < self.mom_min_sel_bin ) :
+				if( ( self.mom_win_bin < self.mom_min_sel_bin  )
+				or  ( self.mom_win_bin > self.fc_spec['n_bin'] )
+				                                             ) :
 					self.mom_win_bin = None
 			except :
 				self.mom_win_bin = None
@@ -811,14 +1008,22 @@ class core( QObject ) :
 
 		self.rset_var( var_mom_sel=True )
 
+		# If no spectrum has been loaded, abort.
+
+		if ( self.fc_spec is None ) :
+
+			return
+
 		# Initially, deselect all look directions and bins.
 
-		self.mom_sel_dir = [ [ False for d in range(self.fc_spec['n_dir']) ]
-                                             for c in range(self.fc_spec['n_cup']) ]
+		self.mom_sel_dir = [ [ False 
+		                       for d in range(self.fc_spec['n_dir']) ]
+		                       for c in range(self.fc_spec['n_cup']) ]
 
-		self.mom_sel_bin = [ [ [ False for b in range(self.fc_spec['n_bin']) ]
-                                               for d in range(self.fc_spec['n_dir']) ]
-		                               for c in range(self.fc_spec['n_cup']) ]
+		self.mom_sel_bin = [ [ [ False 
+		                         for b in range(self.fc_spec['n_bin']) ]
+                                         for d in range(self.fc_spec['n_dir']) ]
+		                         for c in range(self.fc_spec['n_cup']) ]
 
 		# If the "mom_win_???" variables are invalid, abort.
 
@@ -834,15 +1039,15 @@ class core( QObject ) :
 		# Find the maximum current window (of "self.mom_win_bin" bins)
 		# for each direction
 		dir_max_ind  = [ [ self.fc_spec.find_max_curr( c, d,
-		                             win=self.mom_win_bin            )
-		                             for d in range(self.fc_spec['n_dir']) ]
-		                             for c in range(self.fc_spec['n_cup']) ]
+		                             win=self.mom_win_bin              )
+		                        for d in range(self.fc_spec['n_dir'] ) ]
+		                        for c in range(self.fc_spec['n_cup'] ) ]
 
 		dir_max_curr = [ [ self.fc_spec.calc_tot_curr( c, d,
 		                             dir_max_ind[c][d],
-		                             win=self.mom_win_bin           )
-		                             for d in range(self.fc_spec['n_dir']) ]
-		                             for c in range(self.fc_spec['n_cup']) ]
+		                             win=self.mom_win_bin              )
+		                        for d in range(self.fc_spec['n_dir'] ) ]
+		                        for c in range(self.fc_spec['n_cup'] ) ]
 
 		# Compute "cup_max_ind" (two element list)
 		# List of indices with maximum current for each cup
@@ -856,7 +1061,7 @@ class core( QObject ) :
 			for d in range( self.fc_spec['n_dir'] ) :
 
 				curr_sum = sum( [ dir_max_curr[c][
-				                  (d+i)%self.fc_spec['n_dir']]
+				                  (d+i)%self.fc_spec['n_dir']  ]
 				                  for i in range(
 				                           self.mom_win_dir) ] )
 
@@ -875,7 +1080,7 @@ class core( QObject ) :
 				# Compute the actual direction-index (versus the
 				# pseudo-direction-index).
 
-				d = pd % self.fc_spec['n_dir']
+				d = pd % self.fc_spec['n_dir'   ]
                                 self.mom_sel_dir[c][d] = True
 
 				# Select the bins in this look direction's
@@ -1032,11 +1237,12 @@ class core( QObject ) :
 		#   -- No (valid) ion spectrum has been requested.
 		#   -- Insufficient data have been selected.
 
-		if ( ( self.fc_spec is None                      ) or
-		     ( self.mom_n_sel_dir < self.mom_min_sel_dir )    ) :
+		if ( ( self.fc_spec is None                       ) or
+		     ( self.mom_n_sel_dir < self.mom_min_sel_dir  ) or
+		     ( self.mom_n_sel_dir > self.fc_spec['n_dir'] )    ) :
 
 			self.emit( SIGNAL('janus_mesg'),
-			           'core', 'norun', 'mom' )
+			                  'core', 'norun', 'mom' )
 
 			self.emit( SIGNAL('janus_chng_mom_res') )
 
@@ -1158,7 +1364,7 @@ class core( QObject ) :
 		# look directions.
 
 		eta_t = ( 1.E-3 / const['k_b'] ) * \
-		        const['m_p'] * ( ( 1.E3 * eta_w )**2 )
+		        const['m_p'] * ( ( 1.E3  * eta_w )**2 )
 
 		# Calculate a net estimators of the number density and thermal
 		# speed.
@@ -1185,7 +1391,7 @@ class core( QObject ) :
 		self.mom_res.add_pop( 'p',
 		                      drift=False, aniso=False,
 		                      name='Core', sym='c',
-		                      n=mom_n, w=mom_w          )
+		                      n=mom_n,     w=mom_w          )
 
 		# Calculate the expected currents based on the results of the
 		# (linear) moments analysis.
@@ -1331,8 +1537,8 @@ class core( QObject ) :
 					self.nln_plas.arr_pop[i]['name'] = None
 					self.nln_plas.arr_pop[i]['sym']  = None
 
-					self.emit( SIGNAL('janus_chng_nln_pop'), i )
-
+					self.emit( SIGNAL(
+					              'janus_chng_nln_pop'), i )
 				try :
 					self.nln_plas.arr_pop[i]['spec'] = \
 					             self.nln_plas.arr_spec[val]
@@ -1340,20 +1546,6 @@ class core( QObject ) :
 					self.nln_plas.arr_pop[i]['spec'] = None
 			else :
 				self.nln_plas.arr_pop[i]['spec'] = None
-
-			if ( pop_name is not None ) :
-				try :
-					self.nln_plas.arr_pop[i]['name'] = \
-					                         str( pop_name )
-				except :
-					self.nln_plas.arr_pop[i]['name'] = None
-
-			if ( pop_sym is not None ) :
-				try :
-					self.nln_plas.arr_pop[i]['sym'] = \
-					                          str( pop_sym )
-				except :
-					self.nln_plas.arr_pop[i]['sym'] = None
 
 		if ( param == 'name' ) :
 
@@ -1475,9 +1667,7 @@ class core( QObject ) :
 			                      >= self.nln_set_sel_b[i] )     ) :
 				self.nln_set_sel_a[i] = None
 				self.nln_set_sel_b[i] = None
-
 		else :
-
 			return
 
 		# Validate the settings for the specified ion population.
@@ -1485,6 +1675,7 @@ class core( QObject ) :
 		if   ( ( self.nln_set_gss_n[i] is None ) or
 		       ( self.nln_set_gss_w[i] is None )    ) :
 			self.nln_set_gss_vld[i] = False
+
 		elif ( ( self.nln_plas.arr_pop[i]['drift'] ) and
 		       ( self.nln_set_gss_d[i] is None     )     ) :
 			self.nln_set_gss_vld[i] = False
@@ -1494,6 +1685,7 @@ class core( QObject ) :
 		if ( ( self.nln_set_sel_a[i] is None ) or
 		     ( self.nln_set_sel_b[i] is None )    ) :
 			self.nln_set_sel_vld[i] = False
+
 		else :
 			self.nln_set_sel_vld[i] = True
 
@@ -1520,6 +1712,7 @@ class core( QObject ) :
 
 		if   ( chng == 'gss' ) :
 			self.auto_nln_gss( )
+
 		elif ( chng == 'sel' ) :
 			self.auto_nln_sel( )
 		else :
@@ -1804,9 +1997,7 @@ class core( QObject ) :
 				pop_dv = self.nln_plas.arr_pop[p]['dv']
 
 				self.nln_gss_prm.append( pop_dv )
-
 			else :
-
 				pop_dv = 0.
 
 			# If the population is anisotropic, extract its
@@ -1821,9 +2012,7 @@ class core( QObject ) :
 
 				self.nln_gss_prm.append( pop_w[0] )
 				self.nln_gss_prm.append( pop_w[1] )
-
 			else :
-
 				pop_w     = self.nln_plas.arr_pop[p]['w']
 
 				self.nln_gss_prm.append( pop_w )
@@ -1940,9 +2129,6 @@ class core( QObject ) :
 
 			c   = tk_c[j]
 			d   = tk_d[j]
-
-#			cup = self.cup[c]
-#			dir = self.dir[c,d]
 
 			dlk = self.fc_spec.arr[c][d][0]['dir']
 
@@ -2244,12 +2430,12 @@ class core( QObject ) :
 		self.nln_res_plas['b0_z']     = self.mfi_avg_vec[2]
 
 		pop_v0_vec                    = [fit[0], fit[1], fit[2]]
-		self.nln_res_plas['v0_x']     = fit[0]
-		self.nln_res_plas['v0_y']     = fit[1]
-		self.nln_res_plas['v0_z']     = fit[2]
-		self.nln_res_plas['sig_v0_x'] = sig[0]
-		self.nln_res_plas['sig_v0_y'] = sig[1]
-		self.nln_res_plas['sig_v0_z'] = sig[2]
+		self.nln_res_plas['v0_x']     =  fit[0]
+		self.nln_res_plas['v0_y']     =  fit[1]
+		self.nln_res_plas['v0_z']     =  fit[2]
+		self.nln_res_plas['sig_v0_x'] =  sig[0]
+		self.nln_res_plas['sig_v0_y'] =  sig[1]
+		self.nln_res_plas['sig_v0_z'] =  sig[2]
 
 		c = 3
 
@@ -2279,8 +2465,8 @@ class core( QObject ) :
 
 			pop_drift = self.nln_plas.arr_pop[p]['drift']
 			pop_aniso = self.nln_plas.arr_pop[p]['aniso']
-			pop_name  = self.nln_plas.arr_pop[p]['name']
-			pop_sym   = self.nln_plas.arr_pop[p]['sym']
+			pop_name  = self.nln_plas.arr_pop[p]['name' ]
+			pop_sym   = self.nln_plas.arr_pop[p]['sym'  ]
 
 			pop_n     = fit[c]
 			pop_sig_n = sig[c]
@@ -2334,7 +2520,8 @@ class core( QObject ) :
 
 		self.nln_res_curr_ion = [ [ [ [
 		                     self.nln_res_curr_ion[p][c][d][b]
-		                     for p in range( len(self.nln_res_plas.arr_pop) ) ]
+		                     for p in range( len(
+		                                 self.nln_res_plas.arr_pop ) ) ]
 		                     for b in range( self.fc_spec['n_bin']   ) ]
 		                     for d in range( self.fc_spec['n_dir']   ) ]
 		                     for c in range( self.fc_spec['n_cup']   ) ]
@@ -2429,7 +2616,6 @@ class core( QObject ) :
 				self.dyn_nln = value
 			else :
 				return
-
 		else :
 
 			return
@@ -2452,6 +2638,7 @@ class core( QObject ) :
 				if ( ( not self.dyn_sel ) and
 				     ( not self.dyn_gss )     ) :
 					self.chng_dsp( 'mom' )
+
 				elif ( self.dyn_nln ) :
 					self.chng_dsp( 'nln' )
 				else :
@@ -2480,6 +2667,188 @@ class core( QObject ) :
 				self.anls_nln( )
 
 				self.chng_dsp( 'nln' )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION CHANGING THE STATE OF AN OPTION.
+	#-----------------------------------------------------------------------
+
+	def chng_opt( self, key, value ) :
+
+		# Extract the prefix of the key.  If the key is invalid, abort.
+
+		if ( key in self.opt ) :
+			prefix = key[0:3]
+		else :
+			self.emit( SIGNAL('janus_chng_opt') )
+			return
+
+		# Take the appropriate actions based on the prefix
+		# provided.
+
+		if ( prefix == 'res' ) :
+
+			# Assign the provided value to the specified key.
+
+			self.opt[key] = bool( value )
+
+			# Validate the other keys' values.
+
+			if ( not ( self.opt['res_dw'] or 
+			           self.opt['res_dt'] ) ) :
+
+				if ( key == 'res_dw' ) :
+					self.opt['res_dt'] = True
+				else :
+					self.opt['res_dw'] = True
+
+			if ( self.opt['res_n'] or self.opt['res_v'] or
+			     self.opt['res_d'] or self.opt['res_w'] or
+        	             self.opt['res_r'] or self.opt['res_b'] or
+        	             self.opt['res_s'] or self.opt['res_k']     ) :
+				self.opt['res'] = True
+			else :
+				self.opt['res'] = False
+
+		elif ( prefix == 'mfi' ) :
+
+			# Assign the provided value to the specified key.
+
+			self.opt[key] = bool( value )
+
+			# Validate the other keys' values.
+
+			if ( not ( self.opt['mfi_l'] or 
+			           self.opt['mfi_h'] ) ) :
+
+				if ( key == 'mfi_l' ) :
+					self.opt['mfi_h'] = True
+				else :
+					self.opt['mfi_l'] = True
+
+		elif ( prefix == 'fls' ) :
+
+			# Assign the provided value to the specified key.
+
+			if ( key == 'fls_n_fc' ) :
+
+				try :
+					self.fc_arcv.chng_n_file_max( value )
+				except :
+					pass
+
+				self.opt['fls_n_fc'] = self.fc_arcv.n_file_max
+
+			if ( key == 'fls_n_spin' ) :
+
+				try :
+					self.spin_arcv.chng_n_file_max( value )
+				except :
+					pass
+
+				self.opt['fls_n_spin'] =\
+				                       self.spin_arcv.n_file_max
+
+			if ( key == 'fls_n_mfi_l' ) :
+
+				try :
+					self.mfi_arcv_lres.chng_n_file_max(
+					                                 value )
+				except :
+					pass
+
+				self.opt['fls_n_mfi_l'] =\
+				                    self.mfi_arcv_lres.n_file_max
+
+			if ( key == 'fls_n_mfi_h' ) :
+
+				try :
+					self.mfi_arcv_hres.chng_n_file_max(
+					                                 value )
+				except :
+					pass
+
+				self.opt['fls_n_mfi_h'] =\
+				                   self.mfi_arcv_hres.n_file_max
+
+		# Save updated options to the config file.
+
+		self.save_opt( )
+
+		# Emit the signal that an option has changed.
+
+		self.emit( SIGNAL('janus_chng_opt') )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR RESTORING THE DEFAULT OPTIONS.
+	#-----------------------------------------------------------------------
+
+	def rstr_opt( self,
+	              propagate=True, save=True, signal=True ) :
+
+		# Reset the options dictionary to its default values.
+
+		self.opt = { 'res_dw'     :True,
+		             'res_dt'     :True,
+		             'res'        :True,
+		             'res_u'      :True,
+		             'res_n'      :True,
+		             'res_v'      :True,
+		             'res_d'      :True,
+		             'res_w'      :True,
+		             'res_r'      :True,
+		             'res_b'      :True,
+		             'res_s'      :True,
+		             'res_k'      :True,
+		             'mfi_l'      :True,
+		             'mfi_h'      :False,
+		             'fls_n_fc'   :float('inf'),
+		             'fls_n_spin' :float('inf'),
+		             'fls_n_mfi_l':float('inf'),
+		             'fls_n_mfi_h':float('inf')    }
+
+		# If requested, propagate any changes.
+
+		if ( propagate ) :
+
+			try :
+				self.fc_arcv.chng_n_file_max(
+				                       self.opt['fls_n_fc'] )
+			except :
+				pass
+
+			try :
+				self.spin_arcv.chng_n_file_max(
+				                       self.opt['fls_n_spin'] )
+			except :
+				pass
+
+			try :
+				self.mfi_arcv_lres.chng_n_file_max(
+				                       self.opt['fls_n_mfi_l'] )
+			except :
+				pass
+
+			try :
+				self.mfi_arcv_hres.chng_n_file_max(
+				                       self.opt['fls_n_mfi_h'] )
+			except :
+				pass
+
+			self.opt['fls_n_fc']    = self.fc_arcv.n_file_max
+			self.opt['fls_n_spin']  = self.spin_arcv.n_file_max
+			self.opt['fls_n_mfi_l'] = self.mfi_arcv_lres.n_file_max
+			self.opt['fls_n_mfi_h'] = self.mfi_arcv_hres.n_file_max
+
+		# If requested, save the options dictionary.
+
+		if ( save ) :
+			self.save_opt( )
+
+		# If requested, emit the signal that the options have changed.
+
+		if ( signal ) :
+			#FIXME
+			self.emit( SIGNAL('janus_rstr_opt') )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR AUTOMATICALLY RUNNING A RANGE OF SPECTRA.

@@ -42,7 +42,7 @@ from math import log10, floor
 
 from janus_helper import round_sig
 
-from tabulate import tabulate
+#from tabulate import tabulate
 
 
 ################################################################################
@@ -67,7 +67,11 @@ class widget_nln_res( format_TextEdit ) :
 
 		# Prepare to respond to signals received from the Janus core.
 
-		self.connect( self.core, SIGNAL('janus_rset'), self.resp_rset )
+		self.connect( self.core, SIGNAL('janus_rset'), self.resp_rset  )
+		self.connect( self.core, SIGNAL('janus_chng_opt'),
+		                                            self.resp_chng_opt )
+		self.connect( self.core, SIGNAL('janus_rstr_opt'),
+		                                            self.resp_chng_opt )
 		self.connect( self.core, SIGNAL('janus_chng_mfi'),
 		                                            self.resp_chng_mfi )
 		self.connect( self.core, SIGNAL('janus_chng_nln_res'),
@@ -107,6 +111,13 @@ class widget_nln_res( format_TextEdit ) :
                 self.prnt_brk( )
                 self.prnt_brk( )
 
+		# If none of the display menus is selected, do not print
+		# anything in the non-linear display widget.
+
+		if (self.core.opt['res'] == False ) :
+
+			return
+
 		# Print the results for each population that was considered in
 		# the non-linear analysis, grouping the populations by their
 		# species.
@@ -126,9 +137,8 @@ class widget_nln_res( format_TextEdit ) :
 			# Print the name of the species
 
 			self.prnt_htm( '<b><u>' + spc['name']
-			                + ' (<i>' + spc['sym']
-			                + '</i>):</b></u>'     )
-
+			              + ' (<i>' + spc['sym']
+			              + '</i>):</b></u>'     )
 
 			# Print the results for each population of this species.
 
@@ -144,16 +154,15 @@ class widget_nln_res( format_TextEdit ) :
 
 				self.prnt_brk( )
 				self.prnt_tab( 1 )
-				self.prnt_htm( '<u>' + pop['name']
-				               + ' (<i>' + pop['sym']
-				               + '</i>):</u>'         )
+				self.prnt_htm( '<u>' + pop['name'] + ' (<i>'
+				                   + pop['sym'] + '</i>):</u>' )
 
 				# Generate the mathematical labels.
 
 				sym = spc['sym'] + pop['sym']
 
-				lab_n     = '<i>n<sub>' + sym + '</sub></i>'
-				lab_v     = '<i>v<sub>' + sym + '</sub></i>'
+				lab_n     = '<i>n<sub>'  + sym + '</sub></i>'
+				lab_v     = '<i>v<sub>'  + sym + '</sub></i>'
 				lab_v_x   = '<i>v<sub>x' + sym + '</sub></i>'
 				lab_v_y   = '<i>v<sub>y' + sym + '</sub></i>'
 				lab_v_z   = '<i>v<sub>z' + sym + '</sub></i>'
@@ -165,6 +174,8 @@ class widget_nln_res( format_TextEdit ) :
 				lab_w_par = '<i>w</i><sub>||<i>' + \
 				                 sym + '</i></sub>'
 				lab_r     = '<i>R<sub>' + sym + '</sub></i>'
+				lab_b     = '<i>&beta;</i><sub>||<i>' + \
+				                sym + '</i></sub>'
 				lab_t     = '<i>T<sub>' + sym + '</sub></i>'
 				lab_t_per = '<i>T</i><sub>&perp;<i>' + \
 				                 sym + '</i></sub>'
@@ -180,14 +191,18 @@ class widget_nln_res( format_TextEdit ) :
 				dcm = max( [ 1, 2 - int( floor( log10(
 				                       abs( pop['n'] ) ) ) ) ] )
 
-				self.prnt_brk( )
-				self.prnt_tab( 2 )
-				self.prnt_htm( lab_n + ' = ' )
-				self.prnt_dcm( pop['n'], dcm )
-				self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-				self.prnt_dcm( pop['sig_n'], dcm,
-				               'cm<sup>-3</sup>' )
+				if ( self.core.opt['res_n'] ) :
 
+					self.prnt_brk( )
+					self.prnt_tab( 2 )
+					self.prnt_htm( lab_n + ' = ' )
+					self.prnt_dcm( pop['n'], dcm )
+					if ( self.core.opt['res_u'] ) :
+						self.prnt_htm(
+						        '&nbsp;&plusmn;&nbsp;' )
+						self.prnt_dcm( pop['sig_n'],dcm)
+					self.prnt_htm( 'cm<sup>-3</sup>' )
+	
 				# If this is the first population of the first
 				# species, print the bulk velocity.  Otherwise,
 				# if the population has drift, print its drift
@@ -195,124 +210,214 @@ class widget_nln_res( format_TextEdit ) :
 
 				if ( ( first_spc ) and ( first_pop ) ) :
 
-					self.prnt_brk( )
-					self.prnt_tab( 2 )
-					self.prnt_htm( lab_v + ' = ' )
-					self.prnt_dcm(
-					       self.core.nln_res_plas['v0'],
-					       0, 'km/s'                     )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_v_x + ' = ' )
-					self.prnt_dcm(
-					     self.core.nln_res_plas['v0_x'], 0 )
-					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm(
-					     self.core.nln_res_plas['sig_v0_x'],
-					     0, 'km/s'                         )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_v_y + ' = ' )
-					self.prnt_dcm(
-					     self.core.nln_res_plas['v0_y'], 0 )
-					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm(
-					     self.core.nln_res_plas['sig_v0_y'],
-					     0, 'km/s'                         )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_v_z + ' = ' )
-					self.prnt_dcm(
-					     self.core.nln_res_plas['v0_z'], 0 )
-					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm(
-					     self.core.nln_res_plas['sig_v0_z'],
-					     0, 'km/s'                         )
+					if ( self.core.opt['res_v'] ) :
+
+						self.prnt_brk( )
+						self.prnt_tab( 2 )
+						self.prnt_htm( lab_v + ' = '   )
+						self.prnt_dcm(
+						   self.core.nln_res_plas[
+						        'v0'], 0, 'km/s'       )
+						self.prnt_brk( )
+						self.prnt_tab( 3 )
+						self.prnt_htm( lab_v_x + ' = ' )
+						self.prnt_dcm(
+						   self.core.nln_res_plas[
+						                    'v0_x'], 0 )
+
+						if ( self.core.opt['res_u'] ) :
+
+							self.prnt_htm( 
+						        '&nbsp;&plusmn;&nbsp;' )
+							self.prnt_dcm(
+						        self.core.nln_res_plas[
+						               'sig_v0_x'], 0  )
+						self.prnt_htm( 'km/s'          )
+
+						self.prnt_brk( )
+						self.prnt_tab( 3 )
+						self.prnt_htm( lab_v_y + ' = ' )
+						self.prnt_dcm(
+						   self.core.nln_res_plas[
+						                    'v0_y'], 0 )
+
+						if ( self.core.opt['res_u'] ):
+
+							self.prnt_htm(
+						        '&nbsp;&plusmn;&nbsp;' )
+							self.prnt_dcm(
+						         self.core.nln_res_plas[
+						               'sig_v0_y'], 0  )
+						self.prnt_htm( 'km/s'          )
+
+						self.prnt_brk( )
+						self.prnt_tab( 3 )
+						self.prnt_htm( lab_v_z + ' = ' )
+						self.prnt_dcm(
+						   self.core.nln_res_plas[
+						                    'v0_z'], 0 )
+
+						if ( self.core.opt['res_u'] ):
+							self.prnt_htm(
+						        '&nbsp;&plusmn;&nbsp;' )
+							self.prnt_dcm(
+						         self.core.nln_res_plas[
+						               'sig_v0_z'], 0  )
+						self.prnt_htm( 'km/s'          )
 
 				elif ( pop['drift'] ) :
 
-					self.prnt_brk( )
-					self.prnt_tab( 2 )
-					self.prnt_htm( lab_dv + ' = ' )
-					self.prnt_dcm( pop['dv'], 1 )
-					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm( pop['sig_dv'], 1, 'km/s')
+					if ( self.core.opt['res_d'] ) :
+						self.prnt_brk( )
+						self.prnt_tab( 2 )
+						self.prnt_htm( lab_dv + ' = ' )
+						self.prnt_dcm( pop['dv'], 1 )
+						if( self.core.opt['res_u'] ) :
+							self.prnt_htm(
+							'&nbsp;&plusmn;&nbsp;' )
+							self.prnt_dcm(
+							pop['sig_dv'], 1       )
+						self.prnt_htm( 'km/s')
 
 				# Print the population's thermal speed(s).
 
-				if ( pop['aniso'] ) :
+				if ( self.core.opt['res_dw'] ) :
 
-					self.prnt_brk( )
-					self.prnt_tab( 2 )
-					self.prnt_htm( lab_w + ' = ' )
-					self.prnt_dcm( pop['w'], 1, 'km/s' )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_w_per + ' = ' )
-					self.prnt_dcm( pop['w_per'], 1 )
-					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm( pop['sig_w_per'],
-					               1, 'km/s'       )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_w_par + ' = ' )
-					self.prnt_dcm( pop['w_par'], 1 )
-					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm( pop['sig_w_par'],
-					               1, 'km/s'       )
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-					self.prnt_htm( lab_r + ' = ' )
-					self.prnt_dcm( pop['r'], 2 )
-				else :
+					if ( pop['aniso'] ) :
 
-					self.prnt_brk( )
-					self.prnt_tab( 2 )
-					self.prnt_htm( lab_w + ' = ' )
-					self.prnt_dcm( pop['w'], 1 )
-					self.prnt_htm( '&nbsp;&plusmn;&nbsp;' )
-					self.prnt_dcm( pop['sig_w'], 1, 'km/s' )
+						if ( self.core.opt['res_w'] ) :
+
+							self.prnt_brk( )
+							self.prnt_tab( 2 )
+							self.prnt_htm(
+							         lab_w + ' = ' )
+							self.prnt_dcm(
+							   pop['w'], 1, 'km/s' )
+							self.prnt_brk( )
+							self.prnt_tab( 3 )
+							self.prnt_htm(
+							     lab_w_per + ' = ' )
+							self.prnt_dcm(
+							       pop['w_per'], 1 )
+							if (
+							self.core.opt['res_u']
+							                     ) :
+								self.prnt_htm(
+								'&nbsp;&plusmn;\
+							         &nbsp;'       )
+								self.prnt_dcm(
+								pop[
+								'sig_w_per'] ,1)
+							self.prnt_htm( 'km/s' )
+
+							self.prnt_brk( )
+							self.prnt_tab( 3 )
+							self.prnt_htm(
+							     lab_w_par + ' = ' )
+							self.prnt_dcm(
+							       pop['w_par'], 1 )
+							if (
+							self.core.opt['res_u']
+							                     ) :
+								self.prnt_htm(
+								'&nbsp;&plusmn;\
+							         &nbsp;'       )
+								self.prnt_dcm(
+								pop[
+								'sig_w_par'] ,1)
+							self.prnt_htm( 'km/s' )
+
+					else :
+	
+						if ( self.core.opt['res_w'] ) :
+
+							self.prnt_brk( )
+							self.prnt_tab( 2 )
+							self.prnt_htm(
+							         lab_w + ' = ' )
+							self.prnt_dcm(
+							           pop['w'], 1 )
+							if (
+							self.core.opt['res_u']
+							                     ) :
+								self.prnt_htm(
+								'&nbsp;&plusmn;\
+								 &nbsp;'       )
+								self.prnt_dcm(
+								pop[
+							        'sig_w'],1     )
+							self.prnt_htm( 'km/s'  ) 
 
 				# Print the population's temperature(s).
 
-				self.prnt_brk( )
-				self.prnt_tab( 2 )
-				self.prnt_htm( lab_t + ' = ' )
-				self.prnt_dcm( pop['t'], 1, 'kK' )
-
-				if ( pop['aniso'] ) :
+				if ( ( self.core.opt['res_dt'] ) and
+				     ( self.core.opt['res_w'] )     ) :
 
 					self.prnt_brk( )
-				 	self.prnt_tab( 3 )
-				 	self.prnt_htm( lab_t_per + ' = ' )
-				 	self.prnt_dcm( pop['t_per'], 1, 'kK' )
-				 	self.prnt_brk( )
-				 	self.prnt_tab( 3 )
-				 	self.prnt_htm( lab_t_par + ' = ' )
-				 	self.prnt_dcm( pop['t_par'], 1, 'kK' )
+					self.prnt_tab( 2 )
+					self.prnt_htm( lab_t + ' = ' )
+					self.prnt_dcm( pop['t'], 1, 'kK' )
+
+					if ( pop['aniso'] ) :
+	
+						self.prnt_brk( )
+					 	self.prnt_tab( 3 )
+					 	self.prnt_htm(
+						             lab_t_per + ' = ' )
+					 	self.prnt_dcm(
+						         pop['t_per'], 1, 'kK' )
+					 	self.prnt_brk( )
+					 	self.prnt_tab( 3 )
+					 	self.prnt_htm(
+						             lab_t_par + ' = ' )
+					 	self.prnt_dcm(
+						         pop['t_par'], 1, 'kK' )
+
+				if ( self.core.opt['res_r'] ) :
+
+					self.prnt_brk( )
+					self.prnt_tab( 2 )
+					self.prnt_htm( lab_r + ' = ' )
+					self.prnt_dcm( pop['r'], 2 )
+
+				if ( self.core.opt['res_b'] ) :
+
+					self.prnt_brk( )
+					self.prnt_tab( 2 )
+					self.prnt_htm( lab_b + ' = ' )
+					self.prnt_dcm( pop['beta_par'],
+					                             4 )
+
+					# Clear the first population indicator.
+
+				first_pop = False
 
 			# Print the Skewness and Excess Kurtosis value
 
-			if  ( len( self.core.nln_res_plas.lst_pop( spc)
-			                                       ) > 1 ) :
-				self.prnt_brk( )
-				self.prnt_brk( )
-       				self.prnt_tab( 1 )
-  				self.prnt_htm( '<u>Higher-Order Moments:</u>' )
+			if  ( len( self.core.nln_res_plas.lst_pop( spc )
+			                                               ) > 1 ) :
+				if ( ( self.core.opt['res_s'] == True ) or
+				     ( self.core.opt['res_k'] == True )  )  :
 
-       				self.prnt_brk( )
-       				self.prnt_tab( 2 )
-       				self.prnt_htm( lab_s + ' = ' )
-       				self.prnt_dcm( spc['s'], 3 )
+					self.prnt_brk( )
+					self.prnt_brk( )
+	       				self.prnt_tab( 1 )
+	  				self.prnt_htm(
+					        '<u>Higher-Order Moments:</u>' )
 
-       				self.prnt_brk( )
-       				self.prnt_tab( 2 )
-       				self.prnt_htm( lab_k + ' = ' )
-       				self.prnt_dcm( spc['k'] - 3, 3 )
+				if ( self.core.opt['res_s'] == True ) :
+	
+	       				self.prnt_brk( )
+	       				self.prnt_tab( 2 )
+	       				self.prnt_htm( lab_s + ' = ' )
+	       				self.prnt_dcm( spc['s'], 3 )
 
-				# Clear the first population indicator.
+				if ( self.core.opt['res_k'] == True ) :
 
-				first_pop = False
+					self.prnt_brk( )
+       					self.prnt_tab( 2 )
+       					self.prnt_htm( lab_k + ' = ' )
+       					self.prnt_dcm( spc['k'] - 3, 3 )
 
 			# Clear the first-species indicator.
 
@@ -331,6 +436,16 @@ class widget_nln_res( format_TextEdit ) :
 		# Reset the text area.
 
 		self.clear( )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_opt" SIGNAL.
+	#-----------------------------------------------------------------------
+
+	def resp_chng_opt( self ) :
+
+		# Regenerate the text in the text area.
+
+		self.make_txt( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_mfi" SIGNAL.
