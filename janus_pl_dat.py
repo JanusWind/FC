@@ -43,8 +43,6 @@ class pl_dat( ) :
 	              t_strt=None, t_stop=None, phi_cen=None, phi_del=None
 	              the_cen=None, the_del=None, volt_cen=None, volt_del=None,
 	              psd=None, valid=False ) :
-		#FIXME Does curr go here?
-
 
 		self._spec      = spec
 		self._t_strt    = t_strt
@@ -130,8 +128,8 @@ class pl_dat( ) :
 			return self._vel_cen
 		elif ( key == 'vel_del' ) :
 			return self._vel_del
-		elif ( key == 'curr' ) :
-			return self._curr
+		elif ( key == 'psd' ) :
+			return self._psd
 		elif ( key == 'psd_valid' ) :
 			if ( self['valid'] ) :
 				return self['psd']
@@ -141,8 +139,8 @@ class pl_dat( ) :
 			return self._the_cen
 		elif ( key == 'the_del' ) :
 			return self._the_del
-		elif ( key == 'phi' ) :
-			return self._phi
+		elif ( key == 'phi_cen' ) :
+			return self._phi_cen
 		elif ( key == 'phi_del' ) :
 			return self._phi_del
 		elif ( key == 'dir_x' ) :

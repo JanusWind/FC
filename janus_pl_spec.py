@@ -47,7 +47,8 @@ class pl_spec( ) :
 		self._n_the     = 16
 		self._n_phi     = 64 #TODO Confirm this
 		self._n_bin     = n_bin
-		self._time      = time
+		self._t_strt    = t_strt
+		self._t_stop    = t_stop
 
 		if ( phi_cen == None ) :
 			phi_cen = [ None for p in range( self._n_phi ) ]
@@ -69,8 +70,8 @@ class pl_spec( ) :
 
 		if ( psd == None ) :
 			psd = [ [ [ None for b in range( self._n_bin ) ]
-			                  for t in range( self._n_the ) ]
-			                  for p in range( self._n_phi ) ]
+			                 for t in range( self._n_the ) ]
+			                 for p in range( self._n_phi ) ]
 
 		self.arr = [[[ pl_dat( spec=self,
 		                       phi_cen = phi_cen[p],
@@ -85,4 +86,89 @@ class pl_spec( ) :
 		                   for p in range(self._n_phi) ]
 
 		self.set_rot( rot )
+
+		# Validate the data in the spectrum.
+
+		self.validate( )
+
+		#List of shape [[[n_bin] n_the] n_phi]
+		#where bin is the voltage number,
+		#the specifies theta of the look direction, and
+		#phi specifies phi of the look direction
+
+	def __getitem__(self, key ) : #TODO not yet finished
+
+		elif ( key == 'n_the' ) :
+			return self._n_the
+		elif ( key == 'n_phi' ) :
+			return self._n_phi
+		elif ( key == 'n_bin' ) :
+			return self._n_bin
+		elif ( key == 't_strt' ) :
+			return self._t_strt
+		elif ( key == 't_stop' ) :
+			return self.t_stop
+		elif ( key == 'elev' ) :
+			return [  self.arr[c][0][0]['elev'] 
+					for c in range(self._n_cup)]
+		elif ( key == 'azim' ) :
+			return [[ self.arr[c][d][0]['azim'] 
+					for d in range(self._n_dir) ]
+					for c in range(self._n_cup) ]
+		elif ( key == 'volt_strt' ) :
+			return  [[ self.arr[c][0][b]['volt_strt'] 
+					for b in range(self._n_bin)] 
+					for c in range(self._n_cup)]
+		elif ( key == 'volt_stop' ) :
+			return  [[ self.arr[c][0][b]['volt_stop'] 
+					for b in range(self._n_bin)] 
+					for c in range(self._n_cup)]
+		elif ( key == 'volt_cen' ) :
+			return  [[ self.arr[c][0][b]['volt_cen'] 
+					for b in range(self._n_bin)] 
+					for c in range(self._n_cup)]
+		elif ( key == 'volt_del' ) :
+			return  [[ self.arr[c][0][b]['volt_del'] 
+					for b in range(self._n_bin)] 
+					for c in range(self._n_cup)]
+		elif ( key == 'vel_strt' ) :
+			return  [[ self.arr[c][0][b]['vel_strt'] 
+					for b in range(self._n_bin)] 
+					for c in range(self._n_cup)]
+		elif ( key == 'vel_stop' ) :
+			return  [[ self.arr[c][0][b]['vel_stop'] 
+					for b in range(self._n_bin)] 
+					for c in range(self._n_cup)]
+		elif ( key == 'vel_cen' ) :
+			return  [[ self.arr[c][0][b]['vel_cen'] 
+					for b in range(self._n_bin)] 
+					for c in range(self._n_cup)]
+		elif ( key == 'vel_del' ) :
+			return  [[ self.arr[c][0][b]['vel_del'] 
+					for b in range(self._n_bin)] 
+					for c in range(self._n_cup)]
+		elif ( key == 'curr' ) :
+			return [ [ [ self.arr[c][d][b]['curr']
+			             for b in range( self._n_bin ) ]
+			             for d in range( self._n_dir ) ]
+			             for c in range( self._n_cup ) ]
+		elif ( key == 'psd_valid' ) :
+			return [ [ [ self.arr[c][d][b]['psd']
+			             for b in range( self._n_bin ) ]
+			             for t in range( self._n_the ) ]
+			             for p in range( self._n_phi ) ]
+		elif ( key == 'rot' ) :
+			return self._rot
+		else :
+			raise KeyError( 'Invalid key for "fc_spec".' )
+
+	def __setitem__( self, key, val ) :		
+
+		raise KeyError( 'Reassignment not permitted except through'
+		                                    + ' "set_*" functions.' )
+
+
+
+
+
 
