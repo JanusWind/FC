@@ -8,5 +8,5 @@ data/fc/*.cdf
 data/mfi/*.cdf
 data*.cfg
 .gitignore
-.cdf
+*.cdf
 upload.*
