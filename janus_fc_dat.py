@@ -147,7 +147,7 @@ class fc_dat( ) :
 		elif ( key == 'maglook' ) :
 			return ( self._maglook )
 		else :
-			raise KeyError( 'Invalid key for "fc_dat ".' )
+			raise KeyError( 'Invalid key for "fc_dat".' )
 
 	def __setitem__( self, key, val ) :
 

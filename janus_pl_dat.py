@@ -162,7 +162,7 @@ class pl_dat( ) :
 		elif ( key == 'maglook' ) :
 			return ( self._maglook )
 		else :
-			raise KeyError( 'Invalid key for "pl_dat ".' )
+			raise KeyError( 'Invalid key for "pl_dat".' )
 
 	def __setitem__( self, key, val ) :
 

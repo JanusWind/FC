@@ -39,11 +39,12 @@ class pl_spec( ) :
 	# DEFINE THE INITIALIZATION FUNCTION.
 	#-----------------------------------------------------------------------
 
-	def __init__( self, n_bin,
+	def __init__( self,
 	              t_strt=None, t_stop=None, phi_cen=None, phi_del=None
 	              the_cen=None, the_del=None, volt_cen=None, volt_del=None,
 	              psd=None, rot=3.                                       ) :
 
+		self._n_bin     = 14 #TODO Confirm
 		self._n_the     = 16
 		self._n_phi     = 64 #TODO Confirm this
 		self._n_bin     = n_bin
@@ -107,7 +108,7 @@ class pl_spec( ) :
 		elif ( key == 't_strt' ) :
 			return self._t_strt
 		elif ( key == 't_stop' ) :
-			return self.t_stop
+			return self._t_stop
 		elif ( key == 'the_cen' ) :
 			return [[ self.arr[0][t][0]['the_cen']
 					for t in range(self._n_the)]

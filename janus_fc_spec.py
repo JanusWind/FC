@@ -110,8 +110,6 @@ class fc_spec( ) :
                      [ 24, 24, 6, 6, 6, 6, 6, 6,  6,  6,
                         6,  6, 6, 6, 6, 6, 6, 6,  6,  6  ]  ]
 
-
-
 		self.set_rot( rot )
 
 		self._eff_deg  = [ float(i) for i in range(91) ]
