@@ -44,12 +44,13 @@ class pl_spec( ) :
 	              the_cen=None, the_del=None, volt_cen=None, volt_del=None,
 	              psd=None, rot=3.                                       ) :
 
-		self._n_bin     = 14 #TODO Confirm
-		self._n_the     = 16
-		self._n_phi     = 64 #TODO Confirm this
+		self._n_bin     = 5 #TODO Confirm
+		self._n_the     = 5
+		self._n_phi     = 14 #TODO Confirm this
 		self._n_bin     = n_bin
 		self._t_strt    = t_strt
 		self._t_stop    = t_stop
+		self._rot       = t_stop - t_strt
 
 		if ( phi_cen == None ) :
 			phi_cen = [ None for p in range( self._n_phi ) ]
@@ -86,11 +87,11 @@ class pl_spec( ) :
 		                   for t in range(self._n_the) ]
 		                   for p in range(self._n_phi) ]
 
-		self.set_rot( rot )
+#		self.set_rot( rot )
 
 		# Validate the data in the spectrum.
 
-		self.validate( )
+#		self.validate( )
 
 		# List of shape [[[n_bin] n_the] n_phi] where
 		# 'bin' is the voltage sweep number,
@@ -105,10 +106,9 @@ class pl_spec( ) :
 			return self._n_phi
 		elif ( key == 'n_bin' ) :
 			return self._n_bin
-		elif ( key == 't_strt' ) :
-			return self._t_strt
-		elif ( key == 't_stop' ) :
-			return self._t_stop
+		elif ( key == 'time' ) :
+			return [[ self.arr[p][0][0]['time']
+					for p in range(self._n_phi)]
 		elif ( key == 'the_cen' ) :
 			return [[ self.arr[0][t][0]['the_cen']
 					for t in range(self._n_the)]

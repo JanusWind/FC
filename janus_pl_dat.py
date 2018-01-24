@@ -45,8 +45,6 @@ class pl_dat( ) :
 	              psd=None, valid=False ) :
 
 		self._spec      = spec
-		self._t_strt    = t_strt
-		self._t_stop    = t_stop
 		self._phi_cen   = phi_cen
 		self._phi_del   = phi_del
 		self._the_cen   = the_cen
@@ -56,9 +54,7 @@ class pl_dat( ) :
 		self._psd       = psd
 		self._valid     = valid
 
-		self._t_del     = ( self._t_stop - self._t_strt )
-		self._t_cen     = ( self._t_strt + self._t_del*
-		                                   self._phi_cen / 360.     )
+		self._time = t_strt + ( t_stop - t_strt ) / 360. * phi_cen
 
 		#Note: The voltage sweeps from high to low voltage
 		self._volt_strt = ( self._volt_cen + ( self._volt_del / 2. ) )
@@ -108,10 +104,8 @@ class pl_dat( ) :
 			return self._t_strt
 		elif ( key == 't_stop' ) :
 			return self._t_stop
-                elif ( key == 't_cen' ) :
-                        return self._t_cen
-                elif ( key == 't_del' ) :
-                        return self._t_del
+                elif ( key == 'time' ) :
+                        return self._time
 		elif ( key == 'volt_cen' ) :
 			return self._volt_cen
 		elif ( key == 'volt_del' ) :
