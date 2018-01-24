@@ -40,8 +40,8 @@ class pl_spec( ) :
 	#-----------------------------------------------------------------------
 
 	def __init__( self,
-	              t_strt=None, t_stop=None, phi_cen=None, phi_del=None
-	              the_cen=None, the_del=None, volt_cen=None, volt_del=None,
+	              t_strt=None, t_stop=None, elev_cen=None, the_del=None
+	              azim_cen=None, phi_del=None, volt_cen=None, volt_del=None,
 	              psd=None, rot=3.                                       ) :
 
 		self._n_bin     = 5 #TODO Confirm
@@ -52,14 +52,14 @@ class pl_spec( ) :
 		self._t_stop    = t_stop
 		self._rot       = t_stop - t_strt
 
-		if ( phi_cen == None ) :
-			phi_cen = [ None for p in range( self._n_phi ) ]
+		if ( azim_cen == None ) :
+			azim_cen = [ None for p in range( self._n_phi ) ]
 
 		if ( phi_del == None ) :
 			phi_del = [ None for p in range( self._n_phi ) ]
 
-		if ( the_cen == None ) :
-			the_cen = [ None for t in range( self._n_the )    ]
+		if ( elev_cen == None ) :
+			elev_cen = [ None for t in range( self._n_the )    ]
 
 		if ( the_del == None ) :
 			the_del = [ None for t in range( self._n_the )    ]
@@ -76,13 +76,13 @@ class pl_spec( ) :
 			                 for p in range( self._n_phi ) ]
 
 		self.arr = [[[ pl_dat( spec=self,
-		                       phi_cen = phi_cen[p],
-		                       phi_del = phi_del[p],
-		                       the_cen = the_cen[t],
-		                       the_del = the_del[t],
-		                       volt_cen=volt_cen[b] 
-		                       volt_del=volt_del[b], 
-		                       psd=psd[b][t][p]      ) 
+		                       azim_cen = azim_cen[p],
+		                       phi_del  = phi_del[p],
+		                       elev_cen = elev_cen[t],
+		                       the_del  = the_del[t],
+		                       volt_cen = volt_cen[b] 
+		                       volt_del = volt_del[b], 
+		                       psd = psd[b][t][p]      ) 
 		                   for b in range(self._n_bin) ]
 		                   for t in range(self._n_the) ]
 		                   for p in range(self._n_phi) ]
@@ -109,17 +109,17 @@ class pl_spec( ) :
 		elif ( key == 'time' ) :
 			return [[ self.arr[p][0][0]['time']
 					for p in range(self._n_phi)]
-		elif ( key == 'the_cen' ) :
-			return [[ self.arr[0][t][0]['the_cen']
+		elif ( key == 'elev_cen' ) :
+			return [[ self.arr[0][t][0]['elev_cen']
 					for t in range(self._n_the)]
 		elif ( key == 'the_del' ) :
 			return [[ self.arr[0][t][0]['the_del']
 					for t in range(self._n_the)]
-		elif ( key == 'phi_cen' ) :
-			return [[ self.arr[p][0][0]['the_cen']
+		elif ( key == 'azim_cen' ) :
+			return [[ self.arr[p][0][0]['azim_cen']
 					for p in range(self._n_phi)]
 		elif ( key == 'phi_del' ) :
-			return [[ self.arr[p][0][0]['the_del']
+			return [[ self.arr[p][0][0]['phi_del']
 					for p in range(self._n_phi)]
 		elif ( key == 'volt_strt' ) :
 			return  [[ self.arr[0][0][b]['volt_strt'] 

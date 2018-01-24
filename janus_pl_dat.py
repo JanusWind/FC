@@ -40,14 +40,14 @@ from janus_helper import calc_arr_norm, calc_arr_dot
 class pl_dat( ) :
 
 	def __init__( self, spec=None
-	              t_strt=None, t_stop=None, phi_cen=None, phi_del=None
-	              the_cen=None, the_del=None, volt_cen=None, volt_del=None,
+	              t_strt=None, t_stop=None, azim_cen=None, phi_del=None
+	              elev_cen=None, the_del=None, volt_cen=None, volt_del=None,
 	              psd=None, valid=False ) :
 
 		self._spec      = spec
-		self._phi_cen   = phi_cen
+		self._azim_cen  = phi_cen
 		self._phi_del   = phi_del
-		self._the_cen   = the_cen
+		self._elev_cen  = the_cen
 		self._the_del   = the_del
 		self._volt_cen  = volt_cen
 		self._volt_del  = volt_del
@@ -72,6 +72,12 @@ class pl_dat( ) :
 
 		#TODO It is currently assumed that the given values of theta and
 		#     phi are the proper look directions. Confirmation needed.
+
+		# TODO: Confirm these two formulae
+
+		self._the       = ( 90 - self._elev ) * pi/180
+		self._phi       = ( 180- self._azim ) * pi/180
+
 		self._dir_x     = sin( self._the ) * cos( self._phi )
 		self._dir_y     = sin( self._the ) * sin( self._phi )
 		self._dir_z     = cos( self._the )
@@ -129,6 +135,10 @@ class pl_dat( ) :
 				return self['psd']
 			else :
 				return 0.
+		elif ( key == 'azim_cen' ) :
+			return self._azim_cen
+		elif ( key == 'elev_cen' ) :
+			return self._elev
 		elif ( key == 'the_cen' ) :
 			return self._the_cen
 		elif ( key == 'the_del' ) :
