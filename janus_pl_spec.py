@@ -120,7 +120,7 @@ class pl_spec( ) :
 		# 'the' specifies theta of the look direction, and
 		# 'phi' specifies phi of the look direction
 
-	def reverse(matrix) :
+	def adjust(matrix) :
 
 	# This function 'adjust':
 	# 1. takes data whose phi values and voltages are reversed and returns
