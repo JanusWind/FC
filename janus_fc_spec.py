@@ -55,16 +55,16 @@ class fc_spec( ) :
 			elev = [ None for c in range( self._n_cup ) ]
 
 		if ( azim == None ) :
-			azim = [ [ None for d in range( self._n_dir )       ]
-						for c in range(self._n_cup) ]
+			azim = [ [ None for d in range( self._n_dir ) ]
+			                for c in range( self._n_cup ) ]
 
 		if ( volt_cen == None ) :
-			volt_cen = [ [ None for b in range( self._n_bin )   ]
-						for c in range(self._n_cup) ]
+			volt_cen = [ [ None for b in range( self._n_bin ) ]
+			                    for c in range( self._n_cup ) ]
 
 		if ( volt_del == None ) :
-			volt_del = [ [ None for b in range( self._n_bin )   ]
-						for c in range(self._n_cup) ]		
+			volt_del = [ [ None for b in range( self._n_bin ) ]
+			                    for c in range( self._n_cup ) ]
 
 		if ( curr == None ) :
 			curr = [ [ [ None for b in range( self._n_bin ) ]
@@ -77,9 +77,9 @@ class fc_spec( ) :
 		self.arr = [[[ fc_dat( spec=self,
 		                       elev=elev[c],
 		                       azim=azim[c][d],
-		                       volt_cen=volt_cen[c][b], 
-		                       volt_del=volt_del[c][b], 
-		                       curr=curr[c][d][b]) 
+		                       volt_cen=volt_cen[c][b],
+		                       volt_del=volt_del[c][b],
+		                       curr=curr[c][d][b])
 		               for b in range(self._n_bin) ]
 		               for d in range(self._n_dir) ]
 		               for c in range(self._n_cup) ]
