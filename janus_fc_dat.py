@@ -56,13 +56,12 @@ class fc_dat( ) :
 		self._volt_stop = (self._volt_cen + ( self._volt_del / 2. ) )
 
 		self._vel_strt  = 1E-3*( sqrt(2.0*const['q_p']*
-                                         self['volt_strt']/const['m_p'])    )
+		                         self['volt_strt']/const['m_p'] )   )
 		self._vel_stop  = 1E-3*( sqrt((2.0*const['q_p']*
-                                         self['volt_stop']/const['m_p']))   )
-#		self._vel_cen   = ( (self['vel_strt']+self['vel_stop'])/2.  )
+		                         self['volt_stop']/const['m_p'] ) ) )
                 self._vel_cen   = 1E-3*( sqrt(2.0*const['q_p']*
-                                         self['volt_cen']/const['m_p'])    )
-		self._vel_del   = (  self['vel_stop']-self['vel_strt']      )
+		                         self['volt_cen']/const['m_p']  )   )
+		self._vel_del   = ( self['vel_stop']-self['vel_strt']       )
 		self._curr      = curr
 
                 # TODO: Confirm these two formulae
@@ -88,9 +87,9 @@ class fc_dat( ) :
 			self._valid = True
 
 	def __getitem__( self, key ) :
-#
+
 #               return self.__dict__['_'+key]
-#
+
 		if ( key == 'spec' ) :
 			return self._spec
 		elif ( key == 'valid' ) :
