@@ -28,6 +28,7 @@
 from janus_pl_dat import pl_dat
 from datetime import timedelta
 from scipy.interpolate import interp1d
+from numpy import shape
 
 ################################################################################
 ## DEFINE THE "pl_spec" CLASS.
@@ -40,74 +41,80 @@ class pl_spec( ) :
 	#-----------------------------------------------------------------------
 
 	def __init__( self,
-	              t_strt=None, t_stop=None, elev_cen=None, the_del=None
+	              t_strt=None, t_stop=None, elev_cen=None, the_del=None,
 	              azim_cen=None, phi_del=None, volt_cen=None, volt_del=None,
 	              psd=None, rot=3.                                       ) :
 
 		self._n_bin     = 14 #TODO Confirm
 		self._n_the     = 5
 		self._n_phi     = 5 #TODO Confirm this
-		self._n_bin     = n_bin
 		self._t_strt    = t_strt
 		self._t_stop    = t_stop
 		self._rot       = t_stop - t_strt
 
-		if ( azim_cen == None ) :
+		if ( azim_cen is None ) :
 			azim_cen = [ [ [ None for b in range( self._n_bin ) ]
 			                      for p in range( self._n_phi ) ]
 			                      for t in range( self._n_the ) ]
 		else:
-			azim_cen = adjust(azim_cen)
+			azim_cen = self.adjust(azim_cen)
 
-		if ( phi_del == None ) :
+		if ( phi_del is None ) :
 			phi_del  = [ [ [ None for b in range( self._n_bin ) ]
 			                      for p in range( self._n_phi ) ]
 			                      for t in range( self._n_the ) ]
 		else:
-			phi_del = adjust(phi_del)
+			phi_del = self.adjust(phi_del)
 
-		if ( elev_cen == None ) :
+		if ( elev_cen is None ) :
 			elev_cen = [ [ [ None for b in range( self._n_bin ) ]
 			                      for p in range( self._n_phi ) ]
 			                      for t in range( self._n_the ) ]
+		else:
+			elev_cen = self.adjust(elev_cen)
 
-		if ( the_del == None ) :
+
+		if ( the_del is None ) :
 			the_del  = [ [ [ None for b in range( self._n_bin ) ]
 			                      for p in range( self._n_phi ) ]
 			                      for t in range( self._n_the ) ]
+		else:
+			the_del = self.adjust(the_del)
 
-		if ( volt_cen == None ) :
+		if ( volt_cen is None ) :
 			volt_cen = [ [ [ None for b in range( self._n_bin ) ]
 			                      for p in range( self._n_phi ) ]
 			                      for t in range( self._n_the ) ]
 		else:
-			volt_cen = adjust(volt_cen)	
+			volt_cen = self.adjust(volt_cen)	
 
-		if ( volt_del == None ) :
+		if ( volt_del is None ) :
 			volt_del = [ [ [ None for b in range( self._n_bin ) ]
 			                      for p in range( self._n_phi ) ]
 			                      for t in range( self._n_the ) ]
 		else:
-			volt_del = adjust(volt_del)	
+			volt_del = self.adjust(volt_del)	
 
-		if ( psd == None ) :
+		if ( psd is None ) :
 			psd      = [ [ [ None for b in range( self._n_bin ) ]
 			                      for p in range( self._n_phi ) ]
 			                      for t in range( self._n_the ) ]
 		else:
-			psd = adjust(psd)
+			psd = self.adjust(psd)
 
 		self.arr = [[[ pl_dat( spec=self,
-		                       azim_cen = azim_cen[b][p][t],
-		                       phi_del  = phi_del[b][p][t],
-		                       elev_cen = elev_cen[b][p][t],
-		                       the_del  = the_del[b][p][t],
-		                       volt_cen = volt_cen[b][p][t] 
-		                       volt_del = volt_del[b][p][t], 
-		                       psd = psd[b][p][t]            ) 
+		                       azim_cen = azim_cen[t][p][b],
+		                       phi_del  = phi_del[t][p][b],
+		                       elev_cen = elev_cen[t][p][b],
+		                       the_del  = the_del[t][p][b],
+		                       volt_cen = volt_cen[t][p][b], 
+		                       volt_del = volt_del[t][p][b], 
+		                       t_strt   = self._t_strt,
+		                       t_stop   = self._t_stop,
+		                       psd      = psd[t][p][b]       ) 
 		                              for b in range( self._n_bin ) ]
-		                              for t in range( self._n_phi ) ]
-		                              for p in range( self._n_the ) ]
+		                              for p in range( self._n_phi ) ]
+		                              for t in range( self._n_the ) ]
 
 #		self.set_rot( rot )
 
@@ -120,7 +127,7 @@ class pl_spec( ) :
 		# 'the' specifies theta of the look direction, and
 		# 'phi' specifies phi of the look direction
 
-	def adjust(matrix) :
+	def adjust(self, matrix) :
 
 	# This function 'adjust':
 	# 1. takes data whose phi values and voltages are reversed and returns
@@ -130,59 +137,59 @@ class pl_spec( ) :
 		new_matrix = [ [ [ None for b in range( self._n_bin ) ]
 		                        for p in range( self._n_phi ) ]
 		                        for t in range( self._n_the ) ]
-		for t in range(5):
-			for p in range(5):
-				for b in range(14):
-					new_matrix[-t-1][p][b] =
+		for t in range( self._n_the ):
+			for p in range( self._n_phi ):
+				for b in range( self._n_bin ):
+					new_matrix[-t-1][p][b] = \
 					    matrix[-(5*t+p)-1][-b-1]
 		return new_matrix
 
 	def __getitem__(self, key ) : #TODO not yet finished
 
-		elif ( key == 'n_the' ) :
+		if ( key == 'n_the' ) :
 			return self._n_the
 		elif ( key == 'n_phi' ) :
 			return self._n_phi
 		elif ( key == 'n_bin' ) :
 			return self._n_bin
 		elif ( key == 'time' ) :
-			return [[ self.arr[p][0][0]['time']
+			return [ self.arr[p][0][0]['time']
 					for p in range(self._n_phi)]
 		elif ( key == 'elev_cen' ) :
-			return [[ self.arr[0][t][0]['elev_cen']
+			return [ self.arr[0][t][0]['elev_cen']
 					for t in range(self._n_the)]
 		elif ( key == 'the_del' ) :
-			return [[ self.arr[0][t][0]['the_del']
+			return [ self.arr[0][t][0]['the_del']
 					for t in range(self._n_the)]
 		elif ( key == 'azim_cen' ) :
-			return [[ self.arr[p][0][0]['azim_cen']
+			return [ self.arr[p][0][0]['azim_cen']
 					for p in range(self._n_phi)]
 		elif ( key == 'phi_del' ) :
-			return [[ self.arr[p][0][0]['phi_del']
+			return [ self.arr[p][0][0]['phi_del']
 					for p in range(self._n_phi)]
 		elif ( key == 'volt_strt' ) :
-			return  [[ self.arr[0][0][b]['volt_strt'] 
+			return  [ self.arr[0][0][b]['volt_strt'] 
 					for b in range(self._n_bin)]
 		elif ( key == 'volt_stop' ) :
-			return  [[ self.arr[0][0][b]['volt_stop'] 
+			return  [ self.arr[0][0][b]['volt_stop'] 
 					for b in range(self._n_bin)]
 		elif ( key == 'volt_cen' ) :
-			return  [[ self.arr[0][0][b]['volt_cen'] 
+			return  [ self.arr[0][0][b]['volt_cen'] 
 					for b in range(self._n_bin)]
 		elif ( key == 'volt_del' ) :
-			return  [[ self.arr[0][0][b]['volt_del'] 
+			return  [ self.arr[0][0][b]['volt_del'] 
 					for b in range(self._n_bin)]
 		elif ( key == 'vel_strt' ) :
-			return  [[ self.arr[0][0][b]['vel_strt'] 
+			return  [ self.arr[0][0][b]['vel_strt'] 
 					for b in range(self._n_bin)]
 		elif ( key == 'vel_stop' ) :
-			return  [[ self.arr[0][0][b]['vel_stop'] 
+			return  [ self.arr[0][0][b]['vel_stop'] 
 					for b in range(self._n_bin)]
 		elif ( key == 'vel_cen' ) :
-			return  [[ self.arr[0][0][b]['vel_cen'] 
+			return  [ self.arr[0][0][b]['vel_cen'] 
 					for b in range(self._n_bin)]
 		elif ( key == 'vel_del' ) :
-			return  [[ self.arr[0][0][b]['vel_del'] 
+			return  [ self.arr[0][0][b]['vel_del'] 
 					for b in range(self._n_bin)]
 		elif ( key == 'psd' ) :
 			return [ [ [ self.arr[p][t][b]['psd']
