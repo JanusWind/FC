@@ -441,17 +441,14 @@ class fc_spec( ) :
 					for b in range( self['n_bin'] ) :
 
 						s = ( self.arr[c][d][b]['time']
-                                                   - mfi_t[0] ).total_seconds( )
+                                                  - mfi_t[0] ).total_seconds( )
 
 						b_x = fnc_b_x( s )
 						b_y = fnc_b_y( s )
 						b_z = fnc_b_z( s )
 
-						self.arr[c][d][b].set_mag( ( b_x
-                                                                           , b_y
-                                                                           , b_z
-                                                                             ) )
-
+						self.arr[c][d][b].set_mag( (
+						            b_x, b_y, b_z ) )
 		except :
 
 			avg_b_x = sum( mfi_b_x ) / float( len( mfi_b_x ) )

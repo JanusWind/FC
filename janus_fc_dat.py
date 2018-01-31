@@ -255,12 +255,10 @@ class fc_dat( ) :
 		ret_erf_2 = 1.e3 * dlk_v * erf( ( vel_stop - dlk_v ) /
 		                                ( sqrt(2.) * w_eff ) )
 
-
 		# Calculate the parenthetical expression.
 
 		ret_prn = ( ( ret_exp_2 + ret_erf_2 ) -
 		            ( ret_exp_1 + ret_erf_1 )   )
-
 
 		# Calculate the expected current.
 
