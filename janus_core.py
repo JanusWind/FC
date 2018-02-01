@@ -52,7 +52,7 @@ from janus_const import const
 
 from janus_fc_arcv   import fc_arcv
 from janus_spin_arcv import spin_arcv
-from janus_mfi_arcv_lres  import mfi_arcv_lres
+from janus_mfi_arcv_lres import mfi_arcv_lres
 from janus_mfi_arcv_hres import mfi_arcv_hres
 
 # Load the necessary array modules and mathematical functions.
@@ -572,53 +572,6 @@ class core( QObject ) :
 			self.save_opt( )
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR SAVING THE OPTIONS MENU TO A CONFIG FILE.
-	#-----------------------------------------------------------------------
-
-	def save_opt( self ) :
-
-		# Attempt to open the configuration file (replacing any that
-		# already exists).  If this fails, abort.
-
-		try : 
-			fl = open( self.opt_flnm, 'w' )
-		except :
-			return
-
-		# Write a header.
-
-		fl.write( '# Janus Version ' )
-		fl.write( self.version )
-		fl.write( '\n' )
-		fl.write( '# This configuration file stores the values\n'   )
-		fl.write( '# from the options menu that were used in the\n' )
-		fl.write( '# last Janus session.\n'                         )
-
-		# Write out the name and value of each key in the options
-		# dictionary.
-
-		keys = self.opt.keys( )
-		keys.sort( )
-
-		for key in keys :
-
-			prefix = key[0:3]
-
-			fl.write( '\n' )
-			fl.write( key + ' ' )
-
-			if ( ( prefix == 'res' ) or ( prefix == 'mfi' ) ) :
-
-				if ( self.opt[key] ) :
-					fl.write('1')
-				else :
-					fl.write('0')
-
-			else :
-
-				fl.write( str( self.opt[key] ) )
-
-	#-----------------------------------------------------------------------
 	# LOAD THE REQUESTED WIND/FC SPECTRUM.
 	#-----------------------------------------------------------------------
 
@@ -849,7 +802,6 @@ class core( QObject ) :
 			  self.mfi_b_z ) = self.mfi_arcv_hres.load_rang(
 			( self.time_val       - ( 2. * self.fc_spec['rot'] ) ),
 			( self.fc_spec['dur'] + ( 4. * self.fc_spec['rot'] ) ) )
-
 
 		# Establish the number of data.
 
@@ -2779,6 +2731,53 @@ class core( QObject ) :
 		self.emit( SIGNAL('janus_chng_opt') )
 
 	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR SAVING THE OPTIONS MENU TO A CONFIG FILE.
+	#-----------------------------------------------------------------------
+
+	def save_opt( self ) :
+
+		# Attempt to open the configuration file (replacing any that
+		# already exists).  If this fails, abort.
+
+		try : 
+			fl = open( self.opt_flnm, 'w' )
+		except :
+			return
+
+		# Write a header.
+
+		fl.write( '# Janus Version ' )
+		fl.write( self.version )
+		fl.write( '\n' )
+		fl.write( '# This configuration file stores the values\n'   )
+		fl.write( '# from the options menu that were used in the\n' )
+		fl.write( '# last Janus session.\n'                         )
+
+		# Write out the name and value of each key in the options
+		# dictionary.
+
+		keys = self.opt.keys( )
+		keys.sort( )
+
+		for key in keys :
+
+			prefix = key[0:3]
+
+			fl.write( '\n' )
+			fl.write( key + ' ' )
+
+			if ( ( prefix == 'res' ) or ( prefix == 'mfi' ) ) :
+
+				if ( self.opt[key] ) :
+					fl.write('1')
+				else :
+					fl.write('0')
+
+			else :
+
+				fl.write( str( self.opt[key] ) )
+
+	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESTORING THE DEFAULT OPTIONS.
 	#-----------------------------------------------------------------------
 
@@ -2847,7 +2846,6 @@ class core( QObject ) :
 		# If requested, emit the signal that the options have changed.
 
 		if ( signal ) :
-			#FIXME
 			self.emit( SIGNAL('janus_rstr_opt') )
 
 	#-----------------------------------------------------------------------
