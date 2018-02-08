@@ -22,7 +22,6 @@ for k in range(5):
 			c[j] += data[0]['psd'][k][i][j]
 
 	mpl.figure(0)
-	mpl.scatter(b,-1.*np.log(c))
-	mpl.xlim(0, np.sqrt(5000))
-	mpl.ylim(0.1*np.log(max(c)), -1.1*np.log(max(c)))
+	mpl.scatter(b,np.log(c/sum(c)+1.))
+	mpl.xlim(0, 1.1*np.sqrt(5000))
 	mpl.show()
