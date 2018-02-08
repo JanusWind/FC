@@ -133,6 +133,7 @@ class mfi_arcv_hres( object ) :
 		# Compute the requested start and stop times as values, as
 		# strings, and as "datetime" epochs.
 
+		print time_strt, dur_sec
 		time_strt_val = calc_time_val( time_strt               )
 		time_stop_val = calc_time_val( time_strt_val + dur_sec )
 
