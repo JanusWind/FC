@@ -1,4 +1,3 @@
-# Nothing
 from scipy.io import readsav
 from janus_pl_spec import pl_spec
 import numpy as np
