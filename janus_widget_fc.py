@@ -30,6 +30,7 @@
 from PyQt4.QtGui import QTabWidget
 
 from janus_widget_fc_cup import widget_fc_cup
+from janus_widget_fm_moments import widget_fm_moments
 
 
 ################################################################################
@@ -60,6 +61,9 @@ class widget_fc( QTabWidget ) :
 		                              n_plt_x=n_plt_x, n_plt_y=n_plt_y )
 		self.wdg_fc2 = widget_fc_cup( core=self.core, cup=2,
 		                              n_plt_x=n_plt_x, n_plt_y=n_plt_y )
+		self.wdg_fm1 = widget_fm_moments( core=self.core, cup=1,
+		                              n_plt_x=n_plt_x, n_plt_y=n_plt_y )
 
 		self.addTab( self.wdg_fc1, 'Faraday Cup 1' )
-		self.addTab( self.wdg_fc2, 'Faraday Cup 2' )
+		self.addTab( self.wdg_fc2, 'Faraday Cup 1' )
+		self.addTab( self.wdg_fm1, 'Fluctuating Moments' )

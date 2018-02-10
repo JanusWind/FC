@@ -854,28 +854,117 @@ class core( QObject ) :
 		                  self.mfi_b_z[i] ) /self.mfi_b[i]
 		                  for i in range( len( self.mfi_b ) ) ]
 
+		# Fluctuating data fitting algorithm.
+
+		z  = [0., 0., 1.]
+		e1 = mfi_avg_nrm
+		e2 = cross( z, e1 )/ norm( cross( e1, z ) )
+		e3 = cross( e1, e2 )
+		
+		bx = [ sum( [ self.mfi_b_vec[i][j]*e1[j] for j in range(3)] )
+		                        for i in range( len( self.mfi_s ) ) ]
+		by = [ sum( [ self.mfi_b_vec[i][j]*e2[j] for j in range(3)] )
+		                        for i in range( len( self.mfi_s ) ) ]
+		bz = [ sum( [ self.mfi_b_vec[i][j]*e3[j] for j in range(3)] )
+		                        for i in range( len( self.mfi_s ) ) ]
+		
+		b_vec = [ [ bx[i], by[i], bz[i] ] for i in range( len( self.mfi_s ) ) ]
+		
+		f_x = rfft( bx )
+		f_y = rfft( by )
+		f_z = rfft( bz )
+		
+		# Compute the standard deviation of magnetic field.
+		
+		davb = [ std( array( [ self.mfi_b_vec[i][j]
+		         for i in range( len( self.mfi_b_vec ) ) ] ) )
+		         for j in range( 3 )                         ]
+		
+		N = len( self.mfi_s )
+		# w = [ i / ( max( self.mfi_s ) ) for i in range( len( self.mfi_s ) ) ]
+		w = rfftfreq( N, 1/11. )
+		
+		af_x = fft(self.mfi_b_x)
+		af_y = fft(self.mfi_b_y)
+		af_z = fft(self.mfi_b_z)
+		
+		pf_x = [ degrees( angle(af_x[i] ) ) for i in range( len( self.mfi_s ) ) ]
+		pf_y = [ degrees( angle(af_y[i] ) ) for i in range( len( self.mfi_s ) ) ]
+		pf_z = [ degrees( angle(af_z[i] ) ) for i in range( len( self.mfi_s ) ) ]
+		
+		saf_x = [af_x[i]**2 for i in range( len( f_x ) ) ]
+		saf_y = [af_y[i]**2 for i in range( len( f_x ) ) ]
+		saf_z = [af_z[i]**2 for i in range( len( f_x ) ) ]
+		
+		sf_x = [f_x[i]**2 for i in range( len( f_x ) ) ]
+		sf_y = [f_y[i]**2 for i in range( len( f_x ) ) ]
+		sf_z = [f_z[i]**2 for i in range( len( f_x ) ) ]
+		
+		gss_y = [ mean( self.mfi_b_y), 3*std( self.mfi_b_y )/sqrt( 2 ), 0.13, 0 ]
+		
+		def model( t, bt, db, omega, p ) :
+		#
+			return bt+db*cos( 2*pi*omega*t + p )
+		#
+		#( fitx, covarx ) = curve_fit( model, self.mfi_s, bx)
+		( fity, covary ) = curve_fit( model, self.mfi_s, by, p0 = gss_y)
+		#( fitz, covarz ) = curve_fit( model, self.mfi_s, bz)
+		#
+		#bx_m = [ fitx[0]*self.mfi_s[i] + fitx[1]*cos( omega * self.mfi_s[i] + fitx[2] )
+		#                                     for i in range( len( self.mfi_s ) ) ]
+		by_m = [ fity[0] + fity[1] * cos( 2*pi*fity[2] * self.mfi_s[i] + fity[3] )
+		                                     for i in range( len( self.mfi_s ) ) ]
+		#bz_m = [ fity[0]*self.mfi_s[i] + 0.16*cos( omega * self.mfi_s[i] + fitz[2] )
+		#                                     for i in range( len( self.mfi_s ) ) ]
+		
+		byy = [ gss_y[0] + gss_y[1]*cos( 2*pi*gss_y[2]*self.mfi_s[i] + gss_y[3] )
+		                                for i in range( len( self.mfi_s ) ) ]
+		
+		def fit_sin( t, b ) :
+		
+			f = numpy.fft.fftfreq( len( t ), ( t[1] - t[0] ) )
+			fb = abs( numpy.fft.fft( b ) )
+			gss_f = abs( f[ numpy.argmax( fb[1:] ) + 1 ] )
+			gss_a = std( b ) * 2.**0.5
+			gss_i = mean( b )
+			gss = [ gss_a, 2.*numpy.pi*gss_f, 0., gss_i ]
+		
+			def sinfunc( t, A, w, p, c ):  return A * numpy.sin( w*t + p ) + c
+		
+			popt, pcov = curve_fit(sinfunc, t, b, p0=gss)
+			A, w, p, c = popt
+			af = w/(2.*numpy.pi)
+			fitfunc = lambda t: A * numpy.sin(w*t + p) + c
+		
+			return {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
+			     "fitfunc": fitfunc, "maxcov": numpy.max(pcov), "rawres": (gss,popt,pcov)}
+		
+		res_x = fit_sin( self.mfi_s, bx )
+		res_y = fit_sin( self.mfi_s, by )
+		res_z = fit_sin( self.mfi_s, bz )
+
 #		# Curve fitting for MFI data.
 #
 #		def model( x, b0, db, w, p ) :
 #
-#			b = [ 0. for d in range( len( self.mfi_s ) ) ]
+#			b = [ 0. for d in range( len( self.self.mfi_s ) ) ]
 #
-#			b =  [ b0 + db*cos( w*self.mfi_s[i] + p )
-#			                   for i in range( len( self.mfi_s ) ) ]
+#			b =  [ b0 + db*cos( w*self.self.mfi_s[i] + p )
+#			                   for i in range( len( self.self.mfi_s ) ) ]
 #
 #			print b[0]
 #			return b
 #
 #		avb  = [ sum( [ self.mfi_b_vec[i][j]
-#		         for i in range( len( self.mfi_s ) ) ] )/
-#		         ( len(self.mfi_s ) ) for j in range ( 3 ) ]
+#		         for i in range( len( self.self.mfi_s ) ) ] )/
+#		         ( len(self.self.mfi_s ) ) for j in range ( 3 ) ]
 #
 #		davb = [ std( array( [ self.mfi_b_vec[i][j]
 #		         for i in range( len( self.mfi_b_vec ) ) ] ) )
 #		         for j in range( 3 )                         ]
 #
 #		y = transpose( [ model( [ self.mfi_b_vec[i][j]
-#		                           for i in range( len(self.mfi_s ) ) ],
+#		                           for i in range( len(self.self.mfi_s ) ) ],
 #		                           avb[j], davb[j], 1., 20. )
 #		                           for j in range( 3 ) ]               )
 #
@@ -886,11 +975,11 @@ class core( QObject ) :
 #
 #
 #		y = [ [ y[j][i] for i in range(3)]
-#		                for j in range( len( self.mfi_s)  ) ]
+#		                for j in range( len( self.self.mfi_s)  ) ]
 #
-#		y_x = [ y[i][0] for i in range( len( self.mfi_s ) ) ]
-#		y_y = [ y[i][1] for i in range( len( self.mfi_s ) ) ]
-#		y_z = [ y[i][2] for i in range( len( self.mfi_s ) ) ]
+#		y_x = [ y[i][0] for i in range( len( self.self.mfi_s ) ) ]
+#		y_y = [ y[i][1] for i in range( len( self.self.mfi_s ) ) ]
+#		y_z = [ y[i][2] for i in range( len( self.self.mfi_s ) ) ]
 #
 #		( fitx, covarx ) = curve_fit(
 #		                         model, self.mfi_b_x, y_x, maxfev=5000 )
@@ -899,12 +988,12 @@ class core( QObject ) :
 #		( fitz, covarz ) = curve_fit(
 #		                         model, self.mfi_b_z, y_z, maxfev=5000 )
 #
-#		self.mfi_b_x_m = [ fitx[0] + fitx[1]*cos(fitx[2]*self.mfi_s[i] +
-#		                   fitx[3] ) for i in range( len(self.mfi_s )) ]
-#		self.mfi_b_y_m = [ fity[0] + fity[1]*cos(fity[2]*self.mfi_s[i] +
-#		                   fity[3] ) for i in range( len(self.mfi_s )) ]
-#		self.mfi_b_z_m = [ fitz[0] + fitz[1]*cos(fitz[2]*self.mfi_s[i] +
-#		                   fitz[3] ) for i in range( len(self.mfi_s )) ]
+#		self.mfi_b_x_m = [ fitx[0] + fitx[1]*cos(fitx[2]*self.self.mfi_s[i] +
+#		                   fitx[3] ) for i in range( len(self.self.mfi_s )) ]
+#		self.mfi_b_y_m = [ fity[0] + fity[1]*cos(fity[2]*self.self.mfi_s[i] +
+#		                   fity[3] ) for i in range( len(self.self.mfi_s )) ]
+#		self.mfi_b_z_m = [ fitz[0] + fitz[1]*cos(fitz[2]*self.self.mfi_s[i] +
+#		                   fitz[3] ) for i in range( len(self.self.mfi_s )) ]
 #
 #		self.avb_x  = fitx[0]
 #		self.avb_y  = fity[0]
