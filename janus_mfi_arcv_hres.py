@@ -27,7 +27,12 @@
 
 # Load the necessary modules for signaling the graphical interface.
 
-from PyQt4.QtCore import SIGNAL
+# TODO: Had to change the way in which we import signal since in importing it in
+# that fashion while running iPython with matplotlib-qt, it shows and error.
+# Also the plots weren't working great when it was being imported in that style.
+
+#from PyQt4.QtCore import SIGNAL
+from matplotlib.backends.qt_compat import QtCore
 
 # Load the modules necessary handling dates and times.
 
@@ -459,7 +464,7 @@ class mfi_arcv_hres( object ) :
 		# Emit a message signal (on behalf of the core) containing the
 		# message parameters.
 
-		self.core.emit( SIGNAL('janus_mesg'),
+		self.core.emit( QtCore.SIGNAL('janus_mesg'),
 		                'mfi', mesg_typ, mesg_obj )
 
 	#-----------------------------------------------------------------------

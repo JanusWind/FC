@@ -1,6 +1,8 @@
 # Load the modules necessary for signaling the graphical interface.
 
-from PyQt4.QtCore import QObject, SIGNAL, QThread
+#from PyQt4.QtCore import QObject, SIGNAL, QThread
+from matplotlib.backends.qt_compat import QtCore
+#from QtCore import QObject, SIGNAL, QThread
 
 # Load the modules necessary for file operations.
 
@@ -23,9 +25,9 @@ from janus_const import const
 
 # Load the modules necessary for loading Wind/FC and Wind/MFI data.
 
-from janus_fc_arcv   import fc_arcv
-from janus_spin_arcv import spin_arcv
-from janus_mfi_arcv_lres  import mfi_arcv_lres
+#from janus_fc_arcv   import fc_arcv
+#from janus_spin_arcv import spin_arcv
+#from janus_mfi_arcv_lres  import mfi_arcv_lres
 from janus_mfi_arcv_hres import mfi_arcv_hres
 
 # Load the necessary array modules and mathematical functions.

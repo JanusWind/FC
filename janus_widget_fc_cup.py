@@ -76,7 +76,7 @@ class widget_fc_cup( QWidget ) :
 		#        is rendered.  Thus, once a paint event occurs, the
 		#        "self.paintEvent( )" function picks it up and makes a
 		#        call to "self.ajst_grd( )".  This counter and its
-		#        maximum value are used ensure that "self.paintEvent( )"
+		#        maximum value are to used ensure that "self.paintEvent( )"
 		#        makes such a call only in response to the intial few
 		#        painting (so as to prevent an infinite loop).
 
