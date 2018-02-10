@@ -72,7 +72,7 @@ start = time.time( )
 arcv = mfi_arcv_hres( )
 
 ( mfi_t, mfi_b_x, mfi_b_y,
-  mfi_b_z ) = arcv.load_rang('2008-11-04-12-00-00', 100 )
+  mfi_b_z ) = arcv.load_rang('2008-11-04-12-00-00', 101 )
 
 # Establish the number of data.
 
