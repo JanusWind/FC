@@ -55,16 +55,16 @@ class fc_spec( ) :
 			elev = [ None for c in range( self._n_cup ) ]
 
 		if ( azim == None ) :
-			azim = [ [ None for d in range( self._n_dir )       ]
-						for c in range(self._n_cup) ]
+			azim = [ [ None for d in range( self._n_dir ) ]
+			                for c in range( self._n_cup ) ]
 
 		if ( volt_cen == None ) :
-			volt_cen = [ [ None for b in range( self._n_bin )   ]
-						for c in range(self._n_cup) ]
+			volt_cen = [ [ None for b in range( self._n_bin ) ]
+			                    for c in range( self._n_cup ) ]
 
 		if ( volt_del == None ) :
-			volt_del = [ [ None for b in range( self._n_bin )   ]
-						for c in range(self._n_cup) ]		
+			volt_del = [ [ None for b in range( self._n_bin ) ]
+			                    for c in range( self._n_cup ) ]
 
 		if ( curr == None ) :
 			curr = [ [ [ None for b in range( self._n_bin ) ]
@@ -77,9 +77,9 @@ class fc_spec( ) :
 		self.arr = [[[ fc_dat( spec=self,
 		                       elev=elev[c],
 		                       azim=azim[c][d],
-		                       volt_cen=volt_cen[c][b], 
-		                       volt_del=volt_del[c][b], 
-		                       curr=curr[c][d][b]) 
+		                       volt_cen=volt_cen[c][b],
+		                       volt_del=volt_del[c][b],
+		                       curr=curr[c][d][b])
 		               for b in range(self._n_bin) ]
 		               for d in range(self._n_dir) ]
 		               for c in range(self._n_cup) ]
@@ -291,7 +291,6 @@ class fc_spec( ) :
 					     * self.arr[c][d][b+1]['curr'] ) ) :
 						self.arr[c][d][b]._valid = False
 
-
         #-----------------------------------------------------------------------
         # DEFINE THE FUNCTION FOR CALCULATING THE TIMESTAMP OF A SINGLE DATUM.
         #-----------------------------------------------------------------------
@@ -444,17 +443,14 @@ class fc_spec( ) :
 					for b in range( self['n_bin'] ) :
 
 						s = ( self.arr[c][d][b]['time']
-                                                    - mfi_t[0] ).total_seconds( )
+                                                   - mfi_t[0] ).total_seconds( )
 
 						b_x = fnc_b_x( s )
 						b_y = fnc_b_y( s )
 						b_z = fnc_b_z( s )
 
-						self.arr[c][d][b].set_mag( ( b_x
-                                                                           , b_y
-                                                                           , b_z
-                                                                             ) )
-
+						self.arr[c][d][b].set_mag( (
+						            b_x, b_y, b_z ) )
 		except :
 
 			avg_b_x = sum( mfi_b_x ) / float( len( mfi_b_x ) )
@@ -467,7 +463,5 @@ class fc_spec( ) :
 
                                         for b in range( self['n_bin'] ) :
 
-                                                self.arr[c][d][b].set_mag( ( avg_b_x,
-                                                                             avg_b_y,
-                                                                             avg_b_z ) )
-
+                                                self.arr[c][d][b].set_mag( (
+						avg_b_x, avg_b_y, avg_b_z ) )

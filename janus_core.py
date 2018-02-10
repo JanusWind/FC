@@ -60,7 +60,7 @@ from janus_mfi_arcv_hres import mfi_arcv_hres
 from numpy import amax, amin, append, arccos, arctan2, arange, argsort, array, \
                     average, cos, deg2rad, diag, dot, exp, indices, interp, \
                     mean, pi, polyfit, rad2deg, reshape, sign, sin, sum, sqrt, \
-                    std, tile, transpose, where, zeros
+                    std, tile, transpose, where, zeros, shape
 
 from numpy.linalg import lstsq
 
@@ -572,53 +572,6 @@ class core( QObject ) :
 			self.save_opt( )
 
 	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR SAVING THE OPTIONS MENU TO A CONFIG FILE.
-	#-----------------------------------------------------------------------
-
-	def save_opt( self ) :
-
-		# Attempt to open the configuration file (replacing any that
-		# already exists).  If this fails, abort.
-
-		try : 
-			fl = open( self.opt_flnm, 'w' )
-		except :
-			return
-
-		# Write a header.
-
-		fl.write( '# Janus Version ' )
-		fl.write( self.version )
-		fl.write( '\n' )
-		fl.write( '# This configuration file stores the values\n'   )
-		fl.write( '# from the options menu that were used in the\n' )
-		fl.write( '# last Janus session.\n'                         )
-
-		# Write out the name and value of each key in the options
-		# dictionary.
-
-		keys = self.opt.keys( )
-		keys.sort( )
-
-		for key in keys :
-
-			prefix = key[0:3]
-
-			fl.write( '\n' )
-			fl.write( key + ' ' )
-
-			if ( ( prefix == 'res' ) or ( prefix == 'mfi' ) ) :
-
-				if ( self.opt[key] ) :
-					fl.write('1')
-				else :
-					fl.write('0')
-
-			else :
-
-				fl.write( str( self.opt[key] ) )
-
-	#-----------------------------------------------------------------------
 	# LOAD THE REQUESTED WIND/FC SPECTRUM.
 	#-----------------------------------------------------------------------
 
@@ -843,13 +796,17 @@ class core( QObject ) :
 			( self.time_val       - ( 2. * self.fc_spec['rot'] ) ),
 			( self.fc_spec['dur'] + ( 4. * self.fc_spec['rot'] ) ) )
 
+			a =  self.time_val - (2 * self.fc_spec['rot'] )
+			b =  self.fc_spec['dur'] + ( 4. * self.fc_spec['rot'])
+			print a, type(a)
+			print b, type(b)
+
 		elif ( self.opt['mfi_h'] ) :
 
 			( self.mfi_t, self.mfi_b_x, self.mfi_b_y,
 			  self.mfi_b_z ) = self.mfi_arcv_hres.load_rang(
 			( self.time_val       - ( 2. * self.fc_spec['rot'] ) ),
 			( self.fc_spec['dur'] + ( 4. * self.fc_spec['rot'] ) ) )
-
 
 		# Establish the number of data.
 
@@ -866,6 +823,13 @@ class core( QObject ) :
 
 		self.mfi_s = [ ( t - self.fc_spec['time'] ).total_seconds( )
 		                                       for t in self.mfi_t ]
+
+		# Compute the vector magnetic field.
+
+		self.mfi_b_vec = [ [ self.mfi_b_x[i],
+		                     self.mfi_b_y[i],
+		                     self.mfi_b_z[i]                     ]
+		                     for i in range( len( self.mfi_s ) ) ]
 
 		# Compute the magnetic field magnitude.
 
@@ -889,6 +853,76 @@ class core( QObject ) :
 		mfi_nrm     = [ ( self.mfi_b_x[i], self.mfi_b_y[i],
 		                  self.mfi_b_z[i] ) /self.mfi_b[i]
 		                  for i in range( len( self.mfi_b ) ) ]
+
+#		# Curve fitting for MFI data.
+#
+#		def model( x, b0, db, w, p ) :
+#
+#			b = [ 0. for d in range( len( self.mfi_s ) ) ]
+#
+#			b =  [ b0 + db*cos( w*self.mfi_s[i] + p )
+#			                   for i in range( len( self.mfi_s ) ) ]
+#
+#			print b[0]
+#			return b
+#
+#		avb  = [ sum( [ self.mfi_b_vec[i][j]
+#		         for i in range( len( self.mfi_s ) ) ] )/
+#		         ( len(self.mfi_s ) ) for j in range ( 3 ) ]
+#
+#		davb = [ std( array( [ self.mfi_b_vec[i][j]
+#		         for i in range( len( self.mfi_b_vec ) ) ] ) )
+#		         for j in range( 3 )                         ]
+#
+#		y = transpose( [ model( [ self.mfi_b_vec[i][j]
+#		                           for i in range( len(self.mfi_s ) ) ],
+#		                           avb[j], davb[j], 1., 20. )
+#		                           for j in range( 3 ) ]               )
+#
+#		bx = self.mfi_b_x
+#		test_bx = model( bx, sum(bx)/len(bx), std(array(bx)),0.,0. )
+#		(tfit, tcovar) = curve_fit( model, bx, test_bx, maxfev=5000 )
+#		print tfit, sum(bx)/len(bx), std(array(bx))
+#
+#
+#		y = [ [ y[j][i] for i in range(3)]
+#		                for j in range( len( self.mfi_s)  ) ]
+#
+#		y_x = [ y[i][0] for i in range( len( self.mfi_s ) ) ]
+#		y_y = [ y[i][1] for i in range( len( self.mfi_s ) ) ]
+#		y_z = [ y[i][2] for i in range( len( self.mfi_s ) ) ]
+#
+#		( fitx, covarx ) = curve_fit(
+#		                         model, self.mfi_b_x, y_x, maxfev=5000 )
+#		( fity, covary ) = curve_fit(
+#		                         model, self.mfi_b_y, y_y, maxfev=5000 )
+#		( fitz, covarz ) = curve_fit(
+#		                         model, self.mfi_b_z, y_z, maxfev=5000 )
+#
+#		self.mfi_b_x_m = [ fitx[0] + fitx[1]*cos(fitx[2]*self.mfi_s[i] +
+#		                   fitx[3] ) for i in range( len(self.mfi_s )) ]
+#		self.mfi_b_y_m = [ fity[0] + fity[1]*cos(fity[2]*self.mfi_s[i] +
+#		                   fity[3] ) for i in range( len(self.mfi_s )) ]
+#		self.mfi_b_z_m = [ fitz[0] + fitz[1]*cos(fitz[2]*self.mfi_s[i] +
+#		                   fitz[3] ) for i in range( len(self.mfi_s )) ]
+#
+#		self.avb_x  = fitx[0]
+#		self.avb_y  = fity[0]
+#		self.avb_z  = fitz[0]
+#
+#		self.avb_vec = [ fitx[0], fity[0], fitz[0] ]
+#
+#		self.davb_x = fitx[1]
+#		self.davb_y = fity[1]
+#		self.davb_z = fitz[1]
+#
+#		self.davb_vec = [ fitx[1], fity[1], fitz[1] ]
+# 
+#		self.mfi_omega = sum( fitx[0]*fitx[2] + fity[0]*fity[2] +
+#		                      fitz[0]*fitz[2] ) / sum( self.avb_vec )
+#
+#		self.mfi_phi   = 180*( sum( fitx[0]*fitx[3] + fity[0]*fity[3] +
+#		                 fitz[0]*fitz[3] )/ ( pi*sum( self.avb_vec ) ) )
 
 		# Compute the mfi angles.
 
@@ -2403,7 +2437,6 @@ class core( QObject ) :
 			( fit, covar ) = curve_fit( model, x, y, 
 			                            self.nln_gss_prm,
 			                            sigma=sigma       )
-
 			sig = sqrt( diag( covar ) )
 
 		except :
@@ -2777,6 +2810,53 @@ class core( QObject ) :
 		# Emit the signal that an option has changed.
 
 		self.emit( SIGNAL('janus_chng_opt') )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR SAVING THE OPTIONS MENU TO A CONFIG FILE.
+	#-----------------------------------------------------------------------
+
+	def save_opt( self ) :
+
+		# Attempt to open the configuration file (replacing any that
+		# already exists).  If this fails, abort.
+
+		try : 
+			fl = open( self.opt_flnm, 'w' )
+		except :
+			return
+
+		# Write a header.
+
+		fl.write( '# Janus Version ' )
+		fl.write( self.version )
+		fl.write( '\n' )
+		fl.write( '# This configuration file stores the values\n'   )
+		fl.write( '# from the options menu that were used in the\n' )
+		fl.write( '# last Janus session.\n'                         )
+
+		# Write out the name and value of each key in the options
+		# dictionary.
+
+		keys = self.opt.keys( )
+		keys.sort( )
+
+		for key in keys :
+
+			prefix = key[0:3]
+
+			fl.write( '\n' )
+			fl.write( key + ' ' )
+
+			if ( ( prefix == 'res' ) or ( prefix == 'mfi' ) ) :
+
+				if ( self.opt[key] ) :
+					fl.write('1')
+				else :
+					fl.write('0')
+
+			else :
+
+				fl.write( str( self.opt[key] ) )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESTORING THE DEFAULT OPTIONS.

@@ -138,7 +138,44 @@ class widget_mfi_info( format_TextEdit ) :
 		self.prnt_tab( 1 )
 		self.prnt_htm( '<i>&Psi;<sub>B<sub><i> = ' )
 		self.prnt_dcm( self.core.mfi_psi_b_avg, 1, '<sup>o</sup>')
+		self.prnt_brk( )
 
+		self.prnt_brk( )
+
+		self.prnt_tab( 1 )
+		self.prnt_htm( '<i>&omega;<i> = ' )
+		self.prnt_dcm( self.core.mfi_omega, 2, 'rads/sec' )
+
+		self.prnt_brk( )
+
+		self.prnt_tab( 1 )
+		self.prnt_htm( '<i>&phi;<i> = ' )
+		self.prnt_dcm( self.core.mfi_phi, 2, '<sup>o</sup>')
+		self.prnt_brk( )
+
+		self.prnt_brk( )
+
+		self.prnt_tab( 1 )
+		self.prnt_htm( '<i>B<sub>x</sub><i> = ' )
+		self.prnt_dcm( self.core.avb_x, 2, 'nT' )
+		self.prnt_tab( 1 )
+		self.prnt_htm( '<i>B<sub>y</sub><i> = ' )
+		self.prnt_dcm( self.core.avb_y, 2, 'nT' )
+		self.prnt_tab( 1 )
+		self.prnt_htm( '<i>B<sub>z</sub><i> = ' )
+		self.prnt_dcm( self.core.avb_z, 2, 'nT' )
+
+		self.prnt_brk( )
+
+		self.prnt_tab( 1 )
+		self.prnt_htm( '<i>&Delta;B<sub>x</sub><i> = ' )
+		self.prnt_dcm( self.core.davb_x, 5, 'nT' )
+		self.prnt_tab( 1 )
+		self.prnt_htm( '<i>&Delta;B<sub>y</sub><i> = ' )
+		self.prnt_dcm( self.core.davb_y, 5, 'nT' )
+		self.prnt_tab( 1 )
+		self.prnt_htm( '<i>&Delta;B<sub>z</sub><i> = ' )
+		self.prnt_dcm( self.core.davb_z, 5, 'nT' )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "rset" SIGNAL.
