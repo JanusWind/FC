@@ -36,19 +36,15 @@ from numpy import amax, amin, append, arccos, arctan2, arange, argsort, array, \
                     average, cos, deg2rad, diag, dot, exp, indices, interp, \
                     mean, pi, polyfit, rad2deg, reshape, sign, sin, sum, sqrt, \
                     std, tile, transpose, where, zeros, shape, abs, linspace,\
-                    cross, angle
+                    cross, angle, argmax, max
 
-from math import atan, degrees
-
-import numpy
 from numpy.linalg import lstsq, norm
-from numpy.fft import rfftfreq, fftfreq
+from numpy.fft import rfftfreq, fftfreq, fft
 
 from scipy.special     import erf
 from scipy.interpolate import interp1d
 from scipy.optimize    import curve_fit
 from scipy.stats       import pearsonr, spearmanr
-from scipy.fftpack     import fft, rfft
 from scipy.signal      import medfilt
 
 from janus_helper import round_sig
@@ -125,79 +121,88 @@ bz = [ sum( [ mfi_b_vec[i][j]*e3[j] for j in range(3)] )
                         for i in range( len( mfi_s ) ) ]
 
 b_vec = [ [ bx[i], by[i], bz[i] ] for i in range( len( mfi_s ) ) ]
-
-f_x = rfft( bx )
-f_y = rfft( by )
-f_z = rfft( bz )
-
+#
+#f_x = rfft( bx )
+#f_y = rfft( by )
+#f_z = rfft( bz )
+#
 # Compute the standard deviation of magnetic field.
 
-davb = [ std( array( [ mfi_b_vec[i][j]
-         for i in range( len( mfi_b_vec ) ) ] ) )
-         for j in range( 3 )                         ]
-
-N = len( mfi_s )
+#davb = [ std( array( [ mfi_b_vec[i][j]
+#         for i in range( len( mfi_b_vec ) ) ] ) )
+#         for j in range( 3 )                         ]
+#
+#N = len( mfi_s )
 # w = [ i / ( max( mfi_s ) ) for i in range( len( mfi_s ) ) ]
-w = rfftfreq( N, 1/11. )
-
-af_x = fft(mfi_b_x)
-af_y = fft(mfi_b_y)
-af_z = fft(mfi_b_z)
-
-pf_x = [ degrees( angle(af_x[i] ) ) for i in range( len( mfi_s ) ) ]
-pf_y = [ degrees( angle(af_y[i] ) ) for i in range( len( mfi_s ) ) ]
-pf_z = [ degrees( angle(af_z[i] ) ) for i in range( len( mfi_s ) ) ]
-
-saf_x = [af_x[i]**2 for i in range( len( f_x ) ) ]
-saf_y = [af_y[i]**2 for i in range( len( f_x ) ) ]
-saf_z = [af_z[i]**2 for i in range( len( f_x ) ) ]
-
-sf_x = [f_x[i]**2 for i in range( len( f_x ) ) ]
-sf_y = [f_y[i]**2 for i in range( len( f_x ) ) ]
-sf_z = [f_z[i]**2 for i in range( len( f_x ) ) ]
-
-gss_y = [ mean( mfi_b_y), 3*std( mfi_b_y )/sqrt( 2 ), 0.13, 0 ]
-
-def model( t, bt, db, omega, p ) :
+#w = rfftfreq( N, 1/11. )
 #
-	return bt+db*cos( 2*pi*omega*t + p )
+#af_x = fft(bx)
+#af_y = fft(by)
+#af_z = fft(bz)
 #
-#( fitx, covarx ) = curve_fit( model, mfi_s, bx)
-( fity, covary ) = curve_fit( model, mfi_s, by, p0 = gss_y)
-#( fitz, covarz ) = curve_fit( model, mfi_s, bz)
+#pf_x = [ degrees( angle(af_x[i] ) ) for i in range( len( mfi_s ) ) ]
+#pf_y = [ degrees( angle(af_y[i] ) ) for i in range( len( mfi_s ) ) ]
+#pf_z = [ degrees( angle(af_z[i] ) ) for i in range( len( mfi_s ) ) ]
 #
-#bx_m = [ fitx[0]*mfi_s[i] + fitx[1]*cos( omega * mfi_s[i] + fitx[2] )
+#saf_x = [af_x[i]**2 for i in range( len( f_x ) ) ]
+#saf_y = [af_y[i]**2 for i in range( len( f_x ) ) ]
+#saf_z = [af_z[i]**2 for i in range( len( f_x ) ) ]
+#
+#sf_x = [f_x[i]**2 for i in range( len( f_x ) ) ]
+#sf_y = [f_y[i]**2 for i in range( len( f_x ) ) ]
+#sf_z = [f_z[i]**2 for i in range( len( f_x ) ) ]
+#
+#gss_y = [ mean( mfi_b_y), 3*std( mfi_b_y )/sqrt( 2 ), 0.13, 0 ]
+#
+#def model( t, bt, db, omega, p ) :
+##
+#	return bt+db*cos( 2*pi*omega*t + p )
+##
+##( fitx, covarx ) = curve_fit( model, mfi_s, bx)
+#( fity, covary ) = curve_fit( model, mfi_s, by, p0 = gss_y)
+##( fitz, covarz ) = curve_fit( model, mfi_s, bz)
+##
+##bx_m = [ fitx[0]*mfi_s[i] + fitx[1]*cos( omega * mfi_s[i] + fitx[2] )
+##                                     for i in range( len( mfi_s ) ) ]
+#by_m = [ fity[0] + fity[1] * cos( 2*pi*fity[2] * mfi_s[i] + fity[3] )
 #                                     for i in range( len( mfi_s ) ) ]
-by_m = [ fity[0] + fity[1] * cos( 2*pi*fity[2] * mfi_s[i] + fity[3] )
-                                     for i in range( len( mfi_s ) ) ]
-#bz_m = [ fity[0]*mfi_s[i] + 0.16*cos( omega * mfi_s[i] + fitz[2] )
-#                                     for i in range( len( mfi_s ) ) ]
+##bz_m = [ fity[0]*mfi_s[i] + 0.16*cos( omega * mfi_s[i] + fitz[2] )
+##                                     for i in range( len( mfi_s ) ) ]
+#
+#byy = [ gss_y[0] + gss_y[1]*cos( 2*pi*gss_y[2]*mfi_s[i] + gss_y[3] )
+#                                for i in range( len( mfi_s ) ) ]
 
-byy = [ gss_y[0] + gss_y[1]*cos( 2*pi*gss_y[2]*mfi_s[i] + gss_y[3] )
-                                for i in range( len( mfi_s ) ) ]
+def fit_sin( t, b, axes ) :
 
-def fit_sin( t, b ) :
-
-	f = numpy.fft.fftfreq( len( t ), ( t[1] - t[0] ) )
-	fb = abs( numpy.fft.fft( b ) )
-	gss_f = abs( f[ numpy.argmax( fb[1:] ) + 1 ] )
+	f = fftfreq( len( t ), ( t[1] - t[0] ) )
+	fb = abs( fft( b ) )
+	gss_f = abs( f[ argmax( fb[1:] ) + 1 ] )
 	gss_a = std( b ) * 2.**0.5
 	gss_i = mean( b )
-	gss = [ gss_a, 2.*numpy.pi*gss_f, 0., gss_i ]
+	gss = [ gss_a, 2.*pi*gss_f, 0., gss_i ]
 
-	def sinfunc( t, A, w, p, c ):  return A * numpy.sin( w*t + p ) + c
+	def sinfunc( t, A, w, p, c ):  return A * sin( w*t + p ) + c
 
 	popt, pcov = curve_fit(sinfunc, t, b, p0=gss)
 	A, w, p, c = popt
-	af = w/(2.*numpy.pi)
-	fitfunc = lambda t: A * numpy.sin(w*t + p) + c
+	af = w/(2.*pi)
+	fitfunc = lambda t: A * sin(w*t + p) + c
 
-	return {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
-	     "fitfunc": fitfunc, "maxcov": numpy.max(pcov), "rawres": (gss,popt,pcov)}
+	if( axes == 0 ) :
+		return res_x == {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
+		     "fitfunc": fitfunc, "maxcov": max(pcov), "rawres": (gss,popt,pcov)}
 
-res_x = fit_sin( mfi_s, bx )
-res_y = fit_sin( mfi_s, by )
-res_z = fit_sin( mfi_s, bz )
+	if( axes == 1 ) :
+		return res_y == {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
+		     "fitfunc": fitfunc, "maxcov": max(pcov), "rawres": (gss,popt,pcov)}
+
+	if( axes == 2 ) :
+		return res_z == {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
+		     "fitfunc": fitfunc, "maxcov": max(pcov), "rawres": (gss,popt,pcov)}
+
+res_x1 = fit_sin( mfi_s, bx, 0 )
+res_y1 = fit_sin( mfi_s, by, 1 )
+res_z1 = fit_sin( mfi_s, bz, 2 )
 
 tt2 = linspace(0, max( mfi_s ), len( mfi_s ) )
 

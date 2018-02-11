@@ -36,7 +36,7 @@ from pyqtgraph import mkPen, PlotDataItem, PlotWidget, setConfigOption
 
 # Load the necessary "numpy" array modules and numeric-function modules.
 
-from numpy import amax, amin, array
+from numpy import amax, amin, array, linspace
 
 ################################################################################
 ## DEFINE THE "widget_mfi_lin_plot" CLASS FOR "QWidget" TO PLOT MFI DATA.
@@ -205,6 +205,7 @@ class widget_mfi_fmo_plot( QWidget ) :
 		self.plt.setXRange( t_min, t_max, padding=0.0 )
 		self.plt.setYRange( b_min, b_max, padding=0.0 )
 
+
 		# If the core contains no Wind/MFI magnetic field data, return.
 
 		if ( self.core.n_mfi <= 0 ) :
@@ -219,23 +220,27 @@ class widget_mfi_fmo_plot( QWidget ) :
 #		                           [ -b for b in self.core.mfi_b ],
 #		                           pen=self.pen_crv_n )
 		self.crv_x = PlotDataItem( self.core.mfi_s,
-		                           self.core.mfi_b_x,
+		                           self.core.mfi_b_x_t,
 		                           pen=self.pen_crv_x )
 		self.crv_y = PlotDataItem( self.core.mfi_s,
-		                           self.core.mfi_b_y,
+		                           self.core.mfi_b_y_t,
 		                           pen=self.pen_crv_y )
 		self.crv_z = PlotDataItem( self.core.mfi_s,
-		                           self.core.mfi_b_z,
+		                           self.core.mfi_b_z_t,
 		                           pen=self.pen_crv_z )
 		self.crv_x_m = PlotDataItem( self.core.mfi_s,
-		                           self.core.mfi_b_x_m,
+		                           self.core.mfi_b_x_fit,
 		                           pen=self.pen_crv_x_m )
+#		print(self.core.mfi_b_x_fit['fitfunc'](self.tt)) 
 		self.crv_y_m = PlotDataItem( self.core.mfi_s,
-		                           self.core.mfi_b_y_m,
+		                           self.core.mfi_b_y_fit,
 		                           pen=self.pen_crv_y_m )
+#		print(self.core.mfi_b_y_fit['fitfunc'](self.tt)) 
 		self.crv_z_m = PlotDataItem( self.core.mfi_s,
-		                           self.core.mfi_b_z_m,
+		                           self.core.mfi_b_z_fit,
 		                           pen=self.pen_crv_z_m )
+#		print(self.core.mfi_b_z_fit)
+#		print(self.core.mfi_b_z_t)
 
 
 #		self.plt.addItem( self.crv_m   )
