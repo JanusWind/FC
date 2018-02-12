@@ -172,7 +172,7 @@ b_vec = [ [ bx[i], by[i], bz[i] ] for i in range( len( mfi_s ) ) ]
 #byy = [ gss_y[0] + gss_y[1]*cos( 2*pi*gss_y[2]*mfi_s[i] + gss_y[3] )
 #                                for i in range( len( mfi_s ) ) ]
 
-def fit_sin( t, b, axes ) :
+def fit_sin( t, b ) :
 
 	f = fftfreq( len( t ), ( t[1] - t[0] ) )
 	fb = abs( fft( b ) )
@@ -188,7 +188,7 @@ def fit_sin( t, b, axes ) :
 	af = w/(2.*pi)
 	fitfunc = lambda t: A * sin(w*t + p) + c
 
-	return {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
+	return { "amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
 	     "fitfunc": fitfunc, "maxcov": max(pcov), "rawres": (gss,popt,pcov)}
 
 #	if( axes == 0 ) :
@@ -203,11 +203,15 @@ def fit_sin( t, b, axes ) :
 #		return res_z == {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
 #		     "fitfunc": fitfunc, "maxcov": max(pcov), "rawres": (gss,popt,pcov)}
 
-res_x1 = fit_sin( mfi_s, bx, 0 )
-res_y1 = fit_sin( mfi_s, by, 1 )
-res_z1 = fit_sin( mfi_s, bz, 2 )
+res_x = fit_sin( mfi_s, bx )
+res_y = fit_sin( mfi_s, by )
+res_z = fit_sin( mfi_s, bz )
 
-tt2 = linspace(0, max( mfi_s ), len( mfi_s ) )
+ts = linspace(0, max( mfi_s ), len( mfi_s ) )
+
+res_dx = [ ( bx[i] - res_x['fitfunc'](ts)[i] ) for i in range( len( mfi_s ) ) ]
+res_dy = [ ( by[i] - res_y['fitfunc'](ts)[i] ) for i in range( len( mfi_s ) ) ]
+res_dz = [ ( bz[i] - res_z['fitfunc'](ts)[i] ) for i in range( len( mfi_s ) ) ]
 
 plt.close('all')
 
@@ -215,16 +219,19 @@ fig, axs = plt.subplots( 3, 1, sharex = True )
 fig.subplots_adjust(hspace=0)
 
 #plt.figure( )
-axs[0].plot(mfi_s, bx, "-b", label="Data_x", linewidth=1)
-axs[0].plot( mfi_s, res_x["fitfunc"](tt2), "r-", label="curve_fit", linewidth=1)
+axs[0].plot(mfi_s, bx, "-b", label="Data_x", linewidth=0.5)
+axs[0].plot( mfi_s, res_x["fitfunc"](ts), "r-", label="curve_fit", linewidth=0.5)
+axs[0].plot( mfi_s, res_dx, 'k-', linestyle =  '-', label = 'Residue', linewidth = 0.5)
 axs[0].legend(loc="upper right")
 
-axs[1].plot(mfi_s, by, "-b", label="Data_y", linewidth=1)
-axs[1].plot( mfi_s, res_y["fitfunc"](tt2), "r-", label="curve_fit", linewidth=1)
+axs[1].plot(mfi_s, by, "-b", label="Data_y", linewidth=0.5)
+axs[1].plot( mfi_s, res_y["fitfunc"](ts), "r-", label="curve_fit", linewidth=0.5)
+axs[1].plot( mfi_s, res_dy, 'k-', linestyle =  '-', label = 'Residue', linewidth = 0.5)
 axs[1].legend(loc="upper right")
 
-axs[2].plot(mfi_s, bz, "-b", label="Data_z", linewidth=1)
-axs[2].plot( mfi_s, res_z["fitfunc"](tt2), "r-", label="curve_fit", linewidth=1)
+axs[2].plot(mfi_s, bz, "-b", label="Data_z", linewidth=0.5)
+axs[2].plot( mfi_s, res_z["fitfunc"](ts), "r-", label="curve_fit", linewidth=0.5)
+axs[2].plot( mfi_s, res_dz, 'k-', linestyle =  '-', label = 'Residue', linewidth = 0.5)
 axs[2].legend(loc="upper right")
 axs[2].set_xlabel('Linear Frequency (Hz) ')
 #plt.figure( )
