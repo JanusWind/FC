@@ -188,17 +188,20 @@ def fit_sin( t, b, axes ) :
 	af = w/(2.*pi)
 	fitfunc = lambda t: A * sin(w*t + p) + c
 
-	if( axes == 0 ) :
-		return res_x == {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
-		     "fitfunc": fitfunc, "maxcov": max(pcov), "rawres": (gss,popt,pcov)}
+	return {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
+	     "fitfunc": fitfunc, "maxcov": max(pcov), "rawres": (gss,popt,pcov)}
 
-	if( axes == 1 ) :
-		return res_y == {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
-		     "fitfunc": fitfunc, "maxcov": max(pcov), "rawres": (gss,popt,pcov)}
-
-	if( axes == 2 ) :
-		return res_z == {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
-		     "fitfunc": fitfunc, "maxcov": max(pcov), "rawres": (gss,popt,pcov)}
+#	if( axes == 0 ) :
+#		return res_x == {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
+#		     "fitfunc": fitfunc, "maxcov": max(pcov), "rawres": (gss,popt,pcov)}
+#
+#	if( axes == 1 ) :
+#		return res_y == {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
+#		     "fitfunc": fitfunc, "maxcov": max(pcov), "rawres": (gss,popt,pcov)}
+#
+#	if( axes == 2 ) :
+#		return res_z == {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
+#		     "fitfunc": fitfunc, "maxcov": max(pcov), "rawres": (gss,popt,pcov)}
 
 res_x1 = fit_sin( mfi_s, bx, 0 )
 res_y1 = fit_sin( mfi_s, by, 1 )

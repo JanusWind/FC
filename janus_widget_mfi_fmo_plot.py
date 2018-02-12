@@ -93,8 +93,6 @@ class widget_mfi_fmo_plot( QWidget ) :
 		# Initialize and store the pens and fonts.
 
 		self.pen_vbx     = mkPen( color='k'       )
-#		self.pen_crv_m   = mkPen( color='k'       )
-#		self.pen_crv_n   = mkPen( color='k'       )
 		self.pen_crv_x   = mkPen( color='r'       )
 		self.pen_crv_y   = mkPen( color='g'       )
 		self.pen_crv_z   = mkPen( color='b'       )
@@ -118,8 +116,6 @@ class widget_mfi_fmo_plot( QWidget ) :
 		self.plt.setBackground( 'w' )
 		setConfigOption( 'foreground', 'k')
 
-		#####self.plt.showGrid( True, True )
-
 		labelStyle = {'color':'k'}
 		self.axs_x.setLabel( 'Time [s]'           , **labelStyle )
 		self.axs_y.setLabel( 'Magnetic Field [nT]', **labelStyle )
@@ -139,8 +135,6 @@ class widget_mfi_fmo_plot( QWidget ) :
 
 		# Initialize the curves that will be added to this plot.
 
-#		self.crv_m   = None
-#		self.crv_n   = None
 		self.crv_x   = None
 		self.crv_y   = None
 		self.crv_z   = None
@@ -213,12 +207,6 @@ class widget_mfi_fmo_plot( QWidget ) :
 
 		# Generate and display each curve for the plot.
 
-#		self.crv_m = PlotDataItem( self.core.mfi_s,
-#		                           self.core.mfi_b,
-#		                           pen=self.pen_crv_m )
-#		self.crv_n = PlotDataItem( self.core.mfi_s,
-#		                           [ -b for b in self.core.mfi_b ],
-#		                           pen=self.pen_crv_n )
 		self.crv_x = PlotDataItem( self.core.mfi_s,
 		                           self.core.mfi_b_x_t,
 		                           pen=self.pen_crv_x )
@@ -229,22 +217,15 @@ class widget_mfi_fmo_plot( QWidget ) :
 		                           self.core.mfi_b_z_t,
 		                           pen=self.pen_crv_z )
 		self.crv_x_m = PlotDataItem( self.core.mfi_s,
-		                           self.core.mfi_b_x_fit,
+		                           self.core.mfi_b_vec_fit[0],
 		                           pen=self.pen_crv_x_m )
-#		print(self.core.mfi_b_x_fit['fitfunc'](self.tt)) 
 		self.crv_y_m = PlotDataItem( self.core.mfi_s,
-		                           self.core.mfi_b_y_fit,
+		                           self.core.mfi_b_vec_fit[1],
 		                           pen=self.pen_crv_y_m )
-#		print(self.core.mfi_b_y_fit['fitfunc'](self.tt)) 
 		self.crv_z_m = PlotDataItem( self.core.mfi_s,
-		                           self.core.mfi_b_z_fit,
+		                           self.core.mfi_b_vec_fit[2],
 		                           pen=self.pen_crv_z_m )
-#		print(self.core.mfi_b_z_fit)
-#		print(self.core.mfi_b_z_t)
 
-
-#		self.plt.addItem( self.crv_m   )
-#		self.plt.addItem( self.crv_n   )
 		self.plt.addItem( self.crv_x   )
 		self.plt.addItem( self.crv_y   )
 		self.plt.addItem( self.crv_z   )
@@ -259,12 +240,6 @@ class widget_mfi_fmo_plot( QWidget ) :
 	def rset_plt( self ) :
 
 		# Hide and remove each of this plot's elements.
-
-#		if ( self.crv_m is not None ) :
-#			self.plt.removeItem( self.crv_m )
-#
-#		if ( self.crv_n is not None ) :
-#			self.plt.removeItem( self.crv_n )
 
 		if ( self.crv_x is not None ) :
 			self.plt.removeItem( self.crv_x )
@@ -284,18 +259,9 @@ class widget_mfi_fmo_plot( QWidget ) :
 		if ( self.crv_z_m is not None ) :
 			self.plt.removeItem( self.crv_z_m )
 
-		# if ( self.crv_colat is not None ) :
-		# 	self.plt.removeItem( self.crv_colat )
-
-		# if ( self.crv_lon is not None ) :
-		# 	self.plt.removeItem( self.crv_lon )
-
-
 		# Permanently delete this plot's elements by setting each of the
 		# variables that store them to "None".
 
-#		self.crv_m   = None
-#		self.crv_n   = None
 		self.crv_x   = None
 		self.crv_y   = None
 		self.crv_z   = None

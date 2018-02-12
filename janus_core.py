@@ -283,10 +283,6 @@ class core( QObject ) :
 			self.mfi_avg_vec   = None
 			self.mfi_avg_nrm   = None
 
-			self.mfi_b_x_fit_par = None
-			self.mfi_b_y_fit_par = None
-			self.mfi_b_z_fit_par = None
-
 			self.mfi_b_x_fit = None
 			self.mfi_b_y_fit = None
 			self.mfi_b_z_fit = None
@@ -885,19 +881,15 @@ class core( QObject ) :
 		self.mfi_b_z_t = [ sum( [ self.mfi_b_vec[i][j]*e3[j]
 		                           for j in range( 3 ) ]             )
 		                           for i in range( len( self.mfi_s ) ) ]
-		
+
 		# Vector magnetic field in the new basis.
 
-		self.mfi_b_vec_t = [ [ self.mfi_b_x_t[i],
-		                       self.mfi_b_y_t[i],
-		                       self.mfi_b_z_t[i]                       ]
-		                           for i in range( len( self.mfi_s ) ) ]
-		
-#		gss_y = [ mean( self.mfi_b_y), 3*std( self.mfi_b_y )/sqrt( 2 ), 0.13, 0 ]
-		
+		self.mfi_b_vec_t = [ self.mfi_b_x_t, self.mfi_b_y_t,
+		                                                self.mfi_b_z_t ]
+
 		# Program to compute the fit parameters.
 
-		def fit_sin( t, b, axes ) :
+		def fit_sin( t, b ) :
 
 			# Compute the all the frequency of the data.
 
@@ -940,133 +932,24 @@ class core( QObject ) :
 			af = w/(2.*pi)
 			fitfunc = lambda t: A * sin(w*t + p) + c
 		
-			if( axes == 0) :
-				return self.mfi_b_x_fit_par == { "amp": A,
-				       "omega": w, "phase": p, "offset": c,
-				       "freq": f, "period":1./f,
-				       "fitfunc": fitfunc, "maxcov": max( pcov ),
-				       "rawres": ( gss,popt,pcov ) }
+			return { "amp": A,
+			       "omega": w, "phase": p, "offset": c,
+			       "freq": f, "period":1./f,
+			       "fitfunc": fitfunc, "maxcov": max( pcov ),
+			       "rawres": ( gss,popt,pcov ) }
 
-			if( axes == 1) :
-				return self.mfi_b_y_fit_par == { "amp": A,
-				       "omega": w, "phase": p, "offset": c,
-				       "freq": f, "period":1./f,
-				       "fitfunc": fitfunc, "maxcov": max( pcov ),
-				       "rawres": ( gss,popt,pcov ) }
+		ind = linspace(0, max( self.mfi_s ), len( self.mfi_s ) )
 
-			if( axes == 2) :
-				return self.mfi_b_z_fit_par == { "amp": A,
-				       "omega": w, "phase": p, "offset": c,
-				       "freq": f, "period":1./f,
-				       "fitfunc": fitfunc, "maxcov": max( pcov ),
-				       "rawres": ( gss,popt,pcov ) }
+		self.mfi_b_x_fits = fit_sin( self.mfi_s, self.mfi_b_x_t )
+		self.mfi_b_y_fits = fit_sin( self.mfi_s, self.mfi_b_y_t )
+		self.mfi_b_z_fits = fit_sin( self.mfi_s, self.mfi_b_z_t )
 
-		# Compute the best fit paramemters for each component of
-		# magnetic field.
+		self.mfi_b_x_fit = self.mfi_b_x_fits['fitfunc']( ind )
+		self.mfi_b_y_fit = self.mfi_b_y_fits['fitfunc']( ind )
+		self.mfi_b_z_fit = self.mfi_b_z_fits['fitfunc']( ind )
 
-		tt = linspace(0, max( self.mfi_s ), len( self.mfi_s ) )
-
-		self.mfi_b_x_fits = fit_sin( self.mfi_s, self.mfi_b_x_t, 0 )
-		self.mfi_b_y_fits = fit_sin( self.mfi_s, self.mfi_b_x_t, 1 )
-		self.mfi_b_z_fits = fit_sin( self.mfi_s, self.mfi_b_x_t, 2 )
-
-#		self.mfi_b_x_fit =[ ( self.mfi_b_x_fit_par['amp']*\
-#		                      sin(self.mfi_b_x_fit_par['omega']*\
-#		                      self.mfi_s[i] + \
-#		                      self.mfi_b_x_fit_par['phase'] ) +\
-#		                      self.mfi_b_x_fit_par['offset'] )
-#		                      for i in range( len ( self.mfi_s ) ) ]
-#
-#		self.mfi_b_y_fit =[ ( self.mfi_b_y_fit_par['amp']*\
-#		                      sin(self.mfi_b_y_fit_par['omega']*\
-#		                      self.mfi_s[i] + \
-#		                      self.mfi_b_y_fit_par['phase'] ) +\
-#		                      self.mfi_b_y_fit_par['offset'] )
-#		                      for i in range( len ( self.mfi_s ) ) ]
-#
-#		self.mfi_b_z_fit =[ ( self.mfi_b_z_fit_par['amp']*\
-#		                      sin(self.mfi_b_z_fit_par['omega']*\
-#		                      self.mfi_s[i] + \
-#		                      self.mfi_b_z_fit_par['phase'] ) +\
-#		                      self.mfi_b_z_fit_par['offset'] )
-#		                      for i in range( len ( self.mfi_s ) ) ]
-
-		self.mfi_b_x_fit = self.mfi_b_x_fit_par['fitfunc']( tt )
-		self.mfi_b_y_fit = self.mfi_b_y_fit_par['fitfunc']( tt )
-		self.mfi_b_z_fit = self.mfi_b_z_fit_par['fitfunc']( tt )
-
-		print self.mfi_b_y_fit
-		print self.mfi_b_y_fit_test
-#		# Curve fitting for MFI data.
-#
-#		def model( x, b0, db, w, p ) :
-#
-#			b = [ 0. for d in range( len( self.self.mfi_s ) ) ]
-#
-#			b =  [ b0 + db*cos( w*self.self.mfi_s[i] + p )
-#			                   for i in range( len( self.self.mfi_s ) ) ]
-#
-#			print b[0]
-#			return b
-#
-#		avb  = [ sum( [ self.mfi_b_vec[i][j]
-#		         for i in range( len( self.self.mfi_s ) ) ] )/
-#		         ( len(self.self.mfi_s ) ) for j in range ( 3 ) ]
-#
-#		davb = [ std( array( [ self.mfi_b_vec[i][j]
-#		         for i in range( len( self.mfi_b_vec ) ) ] ) )
-#		         for j in range( 3 )                         ]
-#
-#		y = transpose( [ model( [ self.mfi_b_vec[i][j]
-#		                           for i in range( len(self.self.mfi_s ) ) ],
-#		                           avb[j], davb[j], 1., 20. )
-#		                           for j in range( 3 ) ]               )
-#
-#		bx = self.mfi_b_x
-#		test_bx = model( bx, sum(bx)/len(bx), std(array(bx)),0.,0. )
-#		(tfit, tcovar) = curve_fit( model, bx, test_bx, maxfev=5000 )
-#		print tfit, sum(bx)/len(bx), std(array(bx))
-#
-#
-#		y = [ [ y[j][i] for i in range(3)]
-#		                for j in range( len( self.self.mfi_s)  ) ]
-#
-#		y_x = [ y[i][0] for i in range( len( self.self.mfi_s ) ) ]
-#		y_y = [ y[i][1] for i in range( len( self.self.mfi_s ) ) ]
-#		y_z = [ y[i][2] for i in range( len( self.self.mfi_s ) ) ]
-#
-#		( fitx, covarx ) = curve_fit(
-#		                         model, self.mfi_b_x, y_x, maxfev=5000 )
-#		( fity, covary ) = curve_fit(
-#		                         model, self.mfi_b_y, y_y, maxfev=5000 )
-#		( fitz, covarz ) = curve_fit(
-#		                         model, self.mfi_b_z, y_z, maxfev=5000 )
-#
-#		self.mfi_b_x_m = [ fitx[0] + fitx[1]*cos(fitx[2]*self.self.mfi_s[i] +
-#		                   fitx[3] ) for i in range( len(self.self.mfi_s )) ]
-#		self.mfi_b_y_m = [ fity[0] + fity[1]*cos(fity[2]*self.self.mfi_s[i] +
-#		                   fity[3] ) for i in range( len(self.self.mfi_s )) ]
-#		self.mfi_b_z_m = [ fitz[0] + fitz[1]*cos(fitz[2]*self.self.mfi_s[i] +
-#		                   fitz[3] ) for i in range( len(self.self.mfi_s )) ]
-#
-#		self.avb_x  = fitx[0]
-#		self.avb_y  = fity[0]
-#		self.avb_z  = fitz[0]
-#
-#		self.avb_vec = [ fitx[0], fity[0], fitz[0] ]
-#
-#		self.davb_x = fitx[1]
-#		self.davb_y = fity[1]
-#		self.davb_z = fitz[1]
-#
-#		self.davb_vec = [ fitx[1], fity[1], fitz[1] ]
-# 
-#		self.mfi_omega = sum( fitx[0]*fitx[2] + fity[0]*fity[2] +
-#		                      fitz[0]*fitz[2] ) / sum( self.avb_vec )
-#
-#		self.mfi_phi   = 180*( sum( fitx[0]*fitx[3] + fity[0]*fity[3] +
-#		                 fitz[0]*fitz[3] )/ ( pi*sum( self.avb_vec ) ) )
-
+		self.mfi_b_vec_fit = [self.mfi_b_x_fit, self.mfi_b_y_fit,
+		                                        self.mfi_b_z_fit ]
 		# Compute the mfi angles.
 
 		mfi_b_rho      = [sqrt( self.mfi_b_x[i]**2.0 

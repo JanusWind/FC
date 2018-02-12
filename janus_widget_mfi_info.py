@@ -107,29 +107,34 @@ class widget_mfi_info( format_TextEdit ) :
 		self.prnt_brk( )
 
 		self.prnt_tab( 1 )
-		self.prnt_htm( '<i><font color="#FF0000">B<sub>x</sub></font></i> = ' )
+		self.prnt_htm( '<i><font color="#FF0000">B<sub>x\
+		                           </sub></font></i> = ' )
 		self.prnt_dcm( self.core.mfi_avg_vec[0], 1, 'nT' )
 		self.prnt_brk( )
 
 		self.prnt_tab( 1 )
-		self.prnt_htm( '<i><font color="#00FF00">B<sub>y</sub></font></i> = ' )
+		self.prnt_htm( '<i><font color="#00FF00">B<sub>y\
+		                           </sub></font></i> = ' )
 		self.prnt_dcm( self.core.mfi_avg_vec[1], 1, 'nT' )
 		self.prnt_brk( )
 
 		self.prnt_tab( 1 )
-		self.prnt_htm( '<i><font color="#0000FF">B<sub>z</sub></font></i> = ' )
+		self.prnt_htm( '<i><font color="#0000FF">B<sub>z\
+		                           </sub></font></i> = ' )
 		self.prnt_dcm( self.core.mfi_avg_vec[2], 1, 'nT' )
 		self.prnt_brk( )
 
 		self.prnt_brk( )
 
 		self.prnt_tab( 1 )
-		self.prnt_htm( '<i><font color="#8B008B">B<sub>&lambda;</sub></i> = ')
+		self.prnt_htm( '<i><font color="#8B008B">B\
+		                                 <sub>&lambda;</sub></i> = ')
 		self.prnt_dcm( self.core.mfi_amag_ang[0], 1, '<sup>o</sup>' )
 		self.prnt_brk( )
 
 		self.prnt_tab( 1 )
-		self.prnt_htm( '<i><font color="#FFD700">B<sub>&phi;</sub></i> = ')
+		self.prnt_htm( '<i><font color="#FFD700">B<sub>&phi;\
+		                                              </sub></i> = ')
 		self.prnt_dcm( self.core.mfi_amag_ang[1], 1, '<sup>o</sup>' )
 		self.prnt_brk( )
 
@@ -140,42 +145,7 @@ class widget_mfi_info( format_TextEdit ) :
 		self.prnt_dcm( self.core.mfi_psi_b_avg, 1, '<sup>o</sup>')
 		self.prnt_brk( )
 
-#		self.prnt_brk( )
-#
-#		self.prnt_tab( 1 )
-#		self.prnt_htm( '<i>&omega;<i> = ' )
-#		self.prnt_dcm( self.core.mfi_omega, 2, 'rads/sec' )
-#
-#		self.prnt_brk( )
-#
-#		self.prnt_tab( 1 )
-#		self.prnt_htm( '<i>&phi;<i> = ' )
-#		self.prnt_dcm( self.core.mfi_phi, 2, '<sup>o</sup>')
-#		self.prnt_brk( )
-#
-#		self.prnt_brk( )
-#
-#		self.prnt_tab( 1 )
-#		self.prnt_htm( '<i>B<sub>x</sub><i> = ' )
-#		self.prnt_dcm( self.core.avb_x, 2, 'nT' )
-#		self.prnt_tab( 1 )
-#		self.prnt_htm( '<i>B<sub>y</sub><i> = ' )
-#		self.prnt_dcm( self.core.avb_y, 2, 'nT' )
-#		self.prnt_tab( 1 )
-#		self.prnt_htm( '<i>B<sub>z</sub><i> = ' )
-#		self.prnt_dcm( self.core.avb_z, 2, 'nT' )
-#
-#		self.prnt_brk( )
-#
-#		self.prnt_tab( 1 )
-#		self.prnt_htm( '<i>&Delta;B<sub>x</sub><i> = ' )
-#		self.prnt_dcm( self.core.davb_x, 5, 'nT' )
-#		self.prnt_tab( 1 )
-#		self.prnt_htm( '<i>&Delta;B<sub>y</sub><i> = ' )
-#		self.prnt_dcm( self.core.davb_y, 5, 'nT' )
-#		self.prnt_tab( 1 )
-#		self.prnt_htm( '<i>&Delta;B<sub>z</sub><i> = ' )
-#		self.prnt_dcm( self.core.davb_z, 5, 'nT' )
+		self.prnt_brk( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "rset" SIGNAL.
