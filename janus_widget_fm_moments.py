@@ -113,9 +113,12 @@ class widget_fm_moments( QWidget ) :
 		self.pen_pnt_c = mkPen( color='k' )
 		self.pen_pnt_y = mkPen( color='k' )
 		self.pen_pnt_r = mkPen( color='k' )
-		self.pen_crv_b = mkPen( color='b' )
+		self.pen_crv_c = mkPen( color='c' )
 		self.pen_crv_r = mkPen( color='r' )
+		self.pen_crv_g = mkPen( color='g' )
+		self.pen_crv_b = mkPen( color='b' )
 
+		self.pen_crv = [self.pen_crv_r, self.pen_crv_g, self.pen_crv_b]    
 		self.bsh_pnt_c = mkBrush( color='c' )
 		self.bsh_pnt_y = mkBrush( color='y' )
 		self.bsh_pnt_r = mkBrush( color='r' )
@@ -378,10 +381,10 @@ class widget_fm_moments( QWidget ) :
 			self.lbl[j,i].setPos( self.lim_x[1], self.lim_y[1] )
 
 			self.crv_dat[j,i] = PlotDataItem( x, y_dat,
-			                                  pen = self.pen_crv_b )
+			                                  pen = self.pen_crv_c )
 
 			self.crv_fit[j,i] = PlotDataItem( x, y_fit,
-			                                  pen = self.pen_crv_r )
+			                                  pen = self.pen_crv[d] )
 
 			self.plt[j,i].addItem( self.crv_dat[j][i] )
 			self.plt[j,i].addItem( self.crv_fit[j][i] )

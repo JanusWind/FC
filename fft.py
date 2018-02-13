@@ -36,10 +36,10 @@ from numpy import amax, amin, append, arccos, arctan2, arange, argsort, array, \
                     average, cos, deg2rad, diag, dot, exp, indices, interp, \
                     mean, pi, polyfit, rad2deg, reshape, sign, sin, sum, sqrt, \
                     std, tile, transpose, where, zeros, shape, abs, linspace,\
-                    cross, angle, argmax, max
+                    cross, angle, argmax, max, zeros_like, argmin
 
 from numpy.linalg import lstsq, norm
-from numpy.fft import rfftfreq, fftfreq, fft
+from numpy.fft import rfftfreq, fftfreq, fft, irfft, rfft
 from operator import add
 
 from scipy.special     import erf
@@ -173,6 +173,50 @@ b_vec = [ [ bx[i], by[i], bz[i] ] for i in range( len( mfi_s ) ) ]
 #byy = [ gss_y[0] + gss_y[1]*cos( 2*pi*gss_y[2]*mfi_s[i] + gss_y[3] )
 #                                for i in range( len( mfi_s ) ) ]
 
+# Define the time interval between measurements
+
+dt = mfi_s[1] - mfi_s[0]
+
+# Compute all the frequencies.
+
+fq = rfftfreq( len( mfi_s ), d = dt )
+
+# Compute the Fourier Transform of each component of magnetic field.
+
+fbx = rfft( bx )
+fby = rfft( by )
+fbz = rfft( bz )
+
+# Compute the absolute value of fourier transformed data.
+
+afbx = abs( fbx**2 )
+afby = abs( fby**2 )
+afbz = abs( fbz**2 )
+
+# Compute the index at which maximum frequency occurs.
+
+max_ind_x = argmin( abs( afbx - max( afbx ) ) )
+max_ind_y = argmin( abs( afby - max( afby ) ) )
+max_ind_z = argmin( abs( afbz - max( afbz ) ) )
+
+# Compute the value of maximum frequency.
+
+fq_x = fq[ max_ind_x ]
+fq_y = fq[ max_ind_y ]
+fq_z = fq[ max_ind_z ]
+
+ffbx = zeros_like( fbx ) 
+ffby = zeros_like( fby ) 
+ffbz = zeros_like( fbz ) 
+
+ffbx[ max_ind_x ] = fby[ max_ind_x ]
+ffby[ max_ind_y ] = fby[ max_ind_y ]
+ffbz[ max_ind_z ] = fby[ max_ind_z ]
+
+bbx = irfft( ffbx )
+bby = irfft( ffby )
+bbz = irfft( ffbz )
+
 def fit_sin( t, b ) :
 
 	f = fftfreq( len( t ), ( t[1] - t[0] ) )
@@ -281,16 +325,19 @@ fig.subplots_adjust(hspace=0)
 #plt.figure( )
 axs[0].plot(mfi_s, bx, "-b", label="Data_x", linewidth=0.5)
 axs[0].plot( mfi_s, fit1_x["fitfunc"](ts), "r-", label="curve_fit", linewidth=0.5)
+axs[0].plot( mfi_s, bbx)
 #axs[0].plot( mfi_s, ffit_x, 'k-', linestyle =  '-', label = 'Residue', linewidth = 0.5)
 axs[0].legend(loc="upper right")
 
 axs[1].plot(mfi_s, by, "-b", label="Data_y", linewidth=0.5)
 axs[1].plot( mfi_s, fit1_y["fitfunc"](ts), "r-", label="curve_fit", linewidth=0.5)
+axs[1].plot( mfi_s, bby, 'k-', label = 'New Data', linewidth = 0.5)
 #axs[1].plot( mfi_s, ffit_y, 'k-', linestyle =  '-', label = 'Residue', linewidth = 0.5)
 axs[1].legend(loc="upper right")
 
 axs[2].plot(mfi_s, bz, "-b", label="Data_z", linewidth=0.5)
 axs[2].plot( mfi_s, fit1_z["fitfunc"](ts), "r-", label="curve_fit", linewidth=0.5)
+axs[2].plot( mfi_s, bbz, 'k-', label = 'New Data', linewidth = 0.5)
 #axs[2].plot( mfi_s, ffit_z, 'k-', linestyle =  '-', label = 'Residue', linewidth = 0.5)
 axs[2].legend(loc="upper right")
 axs[2].set_xlabel('Linear Frequency (Hz) ')
