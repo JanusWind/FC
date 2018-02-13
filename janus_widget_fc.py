@@ -65,5 +65,5 @@ class widget_fc( QTabWidget ) :
 		                              n_plt_x=n_plt_x, n_plt_y=n_plt_y )
 
 		self.addTab( self.wdg_fc1, 'Faraday Cup 1' )
-		self.addTab( self.wdg_fc2, 'Faraday Cup 1' )
+		self.addTab( self.wdg_fc2, 'Faraday Cup 2' )
 		self.addTab( self.wdg_fm1, 'Fluctuating Moments' )
