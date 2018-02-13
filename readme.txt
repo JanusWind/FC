@@ -1,4 +1,4 @@
-Changes from the previous version: (Development)
+Changes from the previous version:
 
 Version 0.4.0 ---> version 0.4.1
 

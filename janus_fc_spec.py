@@ -55,16 +55,16 @@ class fc_spec( ) :
 			elev = [ None for c in range( self._n_cup ) ]
 
 		if ( azim == None ) :
-			azim = [ [ None for d in range( self._n_dir ) ]
-			                for c in range( self._n_cup ) ]
+			azim = [ [ None for d in range( self._n_dir )       ]
+						for c in range(self._n_cup) ]
 
 		if ( volt_cen == None ) :
-			volt_cen = [ [ None for b in range( self._n_bin ) ]
-			                    for c in range( self._n_cup ) ]
+			volt_cen = [ [ None for b in range( self._n_bin )   ]
+						for c in range(self._n_cup) ]
 
 		if ( volt_del == None ) :
-			volt_del = [ [ None for b in range( self._n_bin ) ]
-			                    for c in range( self._n_cup ) ]
+			volt_del = [ [ None for b in range( self._n_bin )   ]
+						for c in range(self._n_cup) ]		
 
 		if ( curr == None ) :
 			curr = [ [ [ None for b in range( self._n_bin ) ]
@@ -74,12 +74,12 @@ class fc_spec( ) :
 		#if ( len( elev ) != self._n_cup ) :
 		#	raise TypeError( 'List elev must be length n_cup.' )
 
-		self.arr = [ [ [ fc_dat( spec=self,
+		self.arr = [[[ fc_dat( spec=self,
 		                       elev=elev[c],
 		                       azim=azim[c][d],
-		                       volt_cen=volt_cen[c][b],
-		                       volt_del=volt_del[c][b],
-		                       curr=curr[c][d][b] )
+		                       volt_cen=volt_cen[c][b], 
+		                       volt_del=volt_del[c][b], 
+		                       curr=curr[c][d][b]) 
 		               for b in range(self._n_bin) ]
 		               for d in range(self._n_dir) ]
 		               for c in range(self._n_cup) ]
@@ -109,6 +109,8 @@ class fc_spec( ) :
                         6,  6, 6, 6, 6, 6, 6, 6, 24, 24  ],
                      [ 24, 24, 6, 6, 6, 6, 6, 6,  6,  6,
                         6,  6, 6, 6, 6, 6, 6, 6,  6,  6  ]  ]
+
+
 
 		self.set_rot( rot )
 
@@ -140,7 +142,7 @@ class fc_spec( ) :
 
 		#List of shape [[[n_bin] n_dir] n_cup]
 
-	def __getitem__( self, key ) :
+	def __getitem__(self, key ) :
 
 		if ( key == 'curr_min' ) :
 			return self._curr_min
@@ -158,43 +160,43 @@ class fc_spec( ) :
 			return self._eff_area
 		elif ( key == 'elev' ) :
 			return [  self.arr[c][0][0]['elev'] 
-					for c in range( self._n_cup ) ]
+					for c in range(self._n_cup)]
 		elif ( key == 'azim' ) :
-			return [ [ self.arr[c][d][0]['azim'] 
-					for d in range( self._n_dir ) ]
-					for c in range( self._n_cup ) ]
+			return [[ self.arr[c][d][0]['azim'] 
+					for d in range(self._n_dir) ]
+					for c in range(self._n_cup) ]
 		elif ( key == 'volt_strt' ) :
-			return  [ [ self.arr[c][0][b]['volt_strt'] 
-					for b in range( self._n_bin )] 
-					for c in range( self._n_cup )]
+			return  [[ self.arr[c][0][b]['volt_strt'] 
+					for b in range(self._n_bin)] 
+					for c in range(self._n_cup)]
 		elif ( key == 'volt_stop' ) :
-			return  [ [ self.arr[c][0][b]['volt_stop'] 
-					for b in range( self._n_bin ) ] 
-					for c in range( self._n_cup ) ]
+			return  [[ self.arr[c][0][b]['volt_stop'] 
+					for b in range(self._n_bin)] 
+					for c in range(self._n_cup)]
 		elif ( key == 'volt_cen' ) :
-			return  [ [ self.arr[c][0][b]['volt_cen'] 
-					for b in range( self._n_bin ) ] 
-					for c in range( self._n_cup ) ]
+			return  [[ self.arr[c][0][b]['volt_cen'] 
+					for b in range(self._n_bin)] 
+					for c in range(self._n_cup)]
 		elif ( key == 'volt_del' ) :
-			return  [ [ self.arr[c][0][b]['volt_del'] 
-					for b in range( self._n_bin ) ] 
-					for c in range( self._n_cup ) ]
+			return  [[ self.arr[c][0][b]['volt_del'] 
+					for b in range(self._n_bin)] 
+					for c in range(self._n_cup)]
 		elif ( key == 'vel_strt' ) :
-			return  [ [ self.arr[c][0][b]['vel_strt'] 
-					for b in range( self._n_bin ) ] 
-					for c in range( self._n_cup ) ]
+			return  [[ self.arr[c][0][b]['vel_strt'] 
+					for b in range(self._n_bin)] 
+					for c in range(self._n_cup)]
 		elif ( key == 'vel_stop' ) :
-			return  [ [ self.arr[c][0][b]['vel_stop'] 
-					for b in range( self._n_bin ) ] 
-					for c in range( self._n_cup ) ]
+			return  [[ self.arr[c][0][b]['vel_stop'] 
+					for b in range(self._n_bin)] 
+					for c in range(self._n_cup)]
 		elif ( key == 'vel_cen' ) :
-			return  [ [ self.arr[c][0][b]['vel_cen'] 
-					for b in range( self._n_bin ) ] 
-					for c in range( self._n_cup ) ]
+			return  [[ self.arr[c][0][b]['vel_cen'] 
+					for b in range(self._n_bin)] 
+					for c in range(self._n_cup)]
 		elif ( key == 'vel_del' ) :
-			return  [ [ self.arr[c][0][b]['vel_del'] 
-					for b in range( self._n_bin ) ] 
-					for c in range( self._n_cup ) ]
+			return  [[ self.arr[c][0][b]['vel_del'] 
+					for b in range(self._n_bin)] 
+					for c in range(self._n_cup)]
 		elif ( key == 'curr' ) :
 			return [ [ [ self.arr[c][d][b]['curr']
 			             for b in range( self._n_bin ) ]
@@ -288,6 +290,7 @@ class fc_spec( ) :
 					           > self['curr_jump']
 					     * self.arr[c][d][b+1]['curr'] ) ) :
 						self.arr[c][d][b]._valid = False
+
 
         #-----------------------------------------------------------------------
         # DEFINE THE FUNCTION FOR CALCULATING THE TIMESTAMP OF A SINGLE DATUM.
@@ -441,14 +444,17 @@ class fc_spec( ) :
 					for b in range( self['n_bin'] ) :
 
 						s = ( self.arr[c][d][b]['time']
-                                                  - mfi_t[0] ).total_seconds( )
+                                                    - mfi_t[0] ).total_seconds( )
 
 						b_x = fnc_b_x( s )
 						b_y = fnc_b_y( s )
 						b_z = fnc_b_z( s )
 
-						self.arr[c][d][b].set_mag( (
-						            b_x, b_y, b_z ) )
+						self.arr[c][d][b].set_mag( ( b_x
+                                                                           , b_y
+                                                                           , b_z
+                                                                             ) )
+
 		except :
 
 			avg_b_x = sum( mfi_b_x ) / float( len( mfi_b_x ) )
@@ -461,6 +467,7 @@ class fc_spec( ) :
 
                                         for b in range( self['n_bin'] ) :
 
-                                                self.arr[c][d][b].set_mag( (
-						avg_b_x, avg_b_y, avg_b_z ) )
+                                                self.arr[c][d][b].set_mag( ( avg_b_x,
+                                                                             avg_b_y,
+                                                                             avg_b_z ) )
 
