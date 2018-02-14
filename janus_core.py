@@ -275,20 +275,43 @@ class core( QObject ) :
 			self.mfi_dur       = 0.
 
 			self.mfi_t         = None
+			self.mfi_s         = None
 			self.mfi_b         = None
 			self.mfi_b_x       = None
 			self.mfi_b_y       = None
 			self.mfi_b_z       = None
+			self.mfi_b_vec     = None
 
+			self.mfi_nrm       = None
 			self.mfi_avg_mag   = None
 			self.mfi_avg_vec   = None
 			self.mfi_avg_nrm   = None
 
-			self.mfi_b_x_fit = None
-			self.mfi_b_y_fit = None
-			self.mfi_b_z_fit = None
+			self.mfi_b_x_t     = None
+			self.mfi_b_y_t     = None
+			self.mfi_b_z_t     = None
+			self.mfi_b_vec_t   = None
 
-			self.mfi_s         = None
+			self.mfi_frq_x     = None
+			self.mfi_frq_y     = None
+			self.mfi_frq_z     = None
+
+			self.mfi_bbx_t     = None
+			self.mfi_bby_t     = None
+			self.mfi_bbz_t     = None
+			self.mfi_b_vec_t   = None
+
+			self.mfi_b_x_fits  = None
+			self.mfi_b_y_fits  = None
+			self.mfi_b_z_fits  = None
+
+			self.mfi_b_x_fit   = None
+			self.mfi_b_y_fit   = None
+			self.mfi_b_z_fit   = None
+
+			self.mfi_phase_x   = None
+			self.mfi_phase_y   = None
+			self.mfi_phase_z   = None
 
 			self.mfi_b_colat   = None
 			self.mfi_b_lon     = None
@@ -804,9 +827,6 @@ class core( QObject ) :
 			( self.time_val       - ( 2. * self.fc_spec['rot'] ) ),
 			( self.fc_spec['dur'] + ( 4. * self.fc_spec['rot'] ) ) )
 
-			a =  self.time_val - (2 * self.fc_spec['rot'] )
-			b =  self.fc_spec['dur'] + ( 4. * self.fc_spec['rot'])
-
 		elif ( self.opt['mfi_h'] ) :
 
 			( self.mfi_t, self.mfi_b_x, self.mfi_b_y,
@@ -856,9 +876,9 @@ class core( QObject ) :
 
 		self.mfi_avg_nrm = self.mfi_avg_vec / self.mfi_avg_mag
 
-		mfi_nrm     = [ ( self.mfi_b_x[i], self.mfi_b_y[i],
-		                  self.mfi_b_z[i] ) /self.mfi_b[i]
-		                  for i in range( len( self.mfi_b ) ) ]
+		self.mfi_nrm      = [ ( self.mfi_b_x[i], self.mfi_b_y[i],
+		                        self.mfi_b_z[i] ) /self.mfi_b[i]
+		                           for i in range( len( self.mfi_b ) ) ]
 
 		# Fluctuating data fitting algorithm.
 
@@ -893,9 +913,9 @@ class core( QObject ) :
 
 		if ( self.opt['mfi_fit_fft'] ) :
 
-			################################################################
+			########################################################
 			## Method 1
-			################################################################
+			########################################################
 	
 			# Define the time interval between measurements
 			
@@ -905,13 +925,15 @@ class core( QObject ) :
 			
 			fq = rfftfreq( len( self.mfi_s ), d = dt )
 			
-			# Compute the Fourier Transform of each component of magnetic field.
+			# Compute the Fourier Transform of each component of
+			# magnetic field.
 			
 			fbx = rfft( self.mfi_b_x_t )
 			fby = rfft( self.mfi_b_y_t )
 			fbz = rfft( self.mfi_b_z_t )
 			
-			# Compute the absolute value of fourier transformed data.
+			# Compute the absolute value of fourier transformed
+			# data.
 			
 			afbx = abs( fbx**2 )
 			afby = abs( fby**2 )
@@ -942,8 +964,8 @@ class core( QObject ) :
 			ffby[ max_ind_y ] = fby[ max_ind_y ]
 			ffbz[ max_ind_z ] = fby[ max_ind_z ]
 	
-			# Take the inverse transform of the data to get the sinusoidal
-			# solution for the input data.
+			# Take the inverse transform of the data to get the
+			# sinusoidal solution for the input data.
 			
 			self.bbx = irfft( ffbx, n = len( self.mfi_s ) )
 			self.bby = irfft( ffby, n = len( self.mfi_s ) )
@@ -961,13 +983,13 @@ class core( QObject ) :
 	
 			phase_x = array( [ arctan2( real( fbx[i]/afbx[i] ),
 			                            imag( fbx[i]/afbx[i] ) )
-			                            for i in range( len( afbx ) ) ] )
+			                       for i in range( len( afbx ) ) ] )
 			phase_y = array( [ arctan2( real( fby[i]/afby[i] ),
 			                            imag( fby[i]/afby[i] ) )
-			                            for i in range( len( afbx ) ) ] )
+			                       for i in range( len( afbx ) ) ] )
 			phase_z = array( [ arctan2( real( fbz[i]/afbz[i] ),
 			                            imag( fbz[i]/afbz[i] ) )
-			                            for i in range( len( afbx ) ) ] )
+			                       for i in range( len( afbx ) ) ] )
 	
 			# Compute the mean phase for each direction.
 	
@@ -977,9 +999,9 @@ class core( QObject ) :
 	
 		elif ( self.opt['mfi_fit_crv'] ) :
 
-			################################################################
+			########################################################
 			## Method 2
-			################################################################
+			########################################################
 	
 			# Program to compute the fit parameters.
 	
@@ -989,33 +1011,35 @@ class core( QObject ) :
 	
 				f = fftfreq( len( t ), ( t[1] - t[0] ) )
 	
-				# Compute the amplitude of each point in the fourier
-				# spectrum.
+				# Compute the amplitude of each point in the
+				# fourier spectrum.
 	
 				fb = abs( fft( b ) )
 	
-				# Compute the most dominant frequency, which will also
-				# be the initial guess to the fit function.
-	
+				# Compute the most dominant frequency, which
+				# will also be the initial guess to the fit
+				#  function.
+
 				gss_f = abs( f[ argmax( fb[1:] ) + 1 ] )
 	
-				# Compute the standard deviation of the magnetic field
-				# and use it as initial guess for the amplitude of
-				# fluctuation.
+				# Compute the standard deviation of the magnetic
+				# field and use it as initial guess for the
+				# amplitude of fluctuation.
 	
 				gss_a = std( b ) * 2.**0.5
 	
-				# Compute the mean of the magnetic filed and use it as
-				# the initial guess of off-set of the data.
+				# Compute the mean of the magnetic filed and use
+				# it as the initial guess of off-set of the data.
 	
 				gss_i = mean( b )
 	
-				# Define the list of initial guess for curve fitting.
-	
+				# Define the list of initial guess for curve
+				# fitting.
+
 				gss = [ gss_a, 2.*pi*gss_f, 0., gss_i ]
 	
-				# Define the model for curve-fitting and provide the
-				# 'gss' as the initial guess for fitting.
+				# Define the model for curve-fitting and provide
+				# the 'gss' as the initial guess for fitting.
 	
 				def sinfunc( t, A, w, p, c ):
 	
@@ -1034,16 +1058,17 @@ class core( QObject ) :
 	
 			ind = linspace(0, max( self.mfi_s ), len( self.mfi_s ) )
 	
-			self.mfi_b_x_fits = fit_sin( self.mfi_s, self.mfi_b_x_t )
-			self.mfi_b_y_fits = fit_sin( self.mfi_s, self.mfi_b_y_t )
-			self.mfi_b_z_fits = fit_sin( self.mfi_s, self.mfi_b_z_t )
+			self.mfi_b_x_fits = fit_sin( self.mfi_s,self.mfi_b_x_t )
+			self.mfi_b_y_fits = fit_sin( self.mfi_s,self.mfi_b_y_t )
+			self.mfi_b_z_fits = fit_sin( self.mfi_s,self.mfi_b_z_t )
 	
 			self.mfi_b_x_fit = self.mfi_b_x_fits['fitfunc']( ind )
 			self.mfi_b_y_fit = self.mfi_b_y_fits['fitfunc']( ind )
 			self.mfi_b_z_fit = self.mfi_b_z_fits['fitfunc']( ind )
 	
-			self.mfi_b_vec_fit = [self.mfi_b_x_fit, self.mfi_b_y_fit,
-			                                        self.mfi_b_z_fit ]
+			self.mfi_b_vec_fit = [ self.mfi_b_x_fit,
+			                       self.mfi_b_y_fit,
+		 	                       self.mfi_b_z_fit  ]
 	
 			# Compute the amplitude of sinusoidal solution.
 	
