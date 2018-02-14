@@ -43,10 +43,10 @@ from janus_thread import n_thread, thread_chng_opt
 
 
 ################################################################################
-## DEFINE CLASS "dialog_opt_par" TO CUSTOMIZE "QDialog" FOR OPTION CONTROL.
+## DEFINE CLASS "dialog_opt_fmo" TO CUSTOMIZE "QDialog" FOR OPTION CONTROL.
 ################################################################################
 
-class dialog_opt_par( QWidget ) :
+class dialog_opt_fmo( QWidget ) :
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE INITIALIZATION FUNCTION.
@@ -56,7 +56,7 @@ class dialog_opt_par( QWidget ) :
 
 		# Inherit all attributes of an instance of "QDialog".
 
-		super( dialog_opt_par, self ).__init__( )
+		super( dialog_opt_fmo, self ).__init__( )
 
 		# Store the Janus core.
 
@@ -83,51 +83,29 @@ class dialog_opt_par( QWidget ) :
 
 		self.sg.setContentsMargins( 0, 0, 0, 0 )
 
-		self.grd.addLayout( self.sg, 0, 0, 13, 3 )
+		self.grd.addLayout( self.sg, 0, 0, 3, 2 )
 
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
 
 		self.lab = {
-		       'lab_1'  :QLabel( 'NLN 2nd Moment Paramters'  , self ),
-                       'res_dt' :QLabel( 'Temperature (T)'           , self ),
-                       'res_dw' :QLabel( 'Thermal Speed (W)'         , self ),
-                       'lab_2'  :QLabel( 'Species NLN Parameters'    , self ),
-                       'res_n'  :QLabel( 'Number density (n)'        , self ),
-                       'res_v'  :QLabel( 'Velocity (v)'              , self ),
-                       'res_d'  :QLabel( 'Drift (dv)'                , self ),
-                       'res_w'  :QLabel( 'Therm. Speed/Temp. (W/T)'  , self ),
-                       'res_r'  :QLabel( 'Anisotropy (R)'            , self ),
-                       'res_b'  :QLabel( 'Beta ( parallel )'         , self ),
-                       'res_s'  :QLabel( 'Skewness (S)'              , self ),
-                       'res_k'  :QLabel( 'Kurtosis (K)'              , self ),
-                       'lab_3'  :QLabel( 'Uncertainties'             , self ),
-                       'res_u'  :QLabel( 'NLN Uncertainties'         , self ), }
+		     'lab_1'       :QLabel( 'Select Algorithm'       , self ),
+		     'mfi_fit_crv' :QLabel( 'Use Curve Fit algorithm', self ),
+		     'mfi_fit_fft' :QLabel( 'Use Fourier algorithm'  , self ), }
 
-		self.box = { 'res_dt':event_CheckBox( self, 'res_dt' ),
-		             'res_dw':event_CheckBox( self, 'res_dw' ),
-		             'res_n' :event_CheckBox( self, 'res_n'  ),
-		             'res_v' :event_CheckBox( self, 'res_v'  ),
-		             'res_d' :event_CheckBox( self, 'res_d'  ),
-		             'res_w' :event_CheckBox( self, 'res_w'  ),
-		             'res_r' :event_CheckBox( self, 'res_r'  ),
-		             'res_b' :event_CheckBox( self, 'res_b'  ),
-		             'res_s' :event_CheckBox( self, 'res_s'  ),
-		             'res_k' :event_CheckBox( self, 'res_k'  ),
-		             'res_u' :event_CheckBox( self, 'res_u'  )   }
+		self.box = { 
+		        'mfi_fit_crv' :event_RadioBox( self, 'mfi_fit_crv'  ),
+		        'mfi_fit_fft' :event_RadioBox( self, 'mfi_fit_fft'  ), }
 
 
-		self.order = [ 'lab_1', 'res_dt', 'res_dw', 'lab_2', 'res_n',
-		               'res_v', 'res_d' , 'res_w' , 'res_r', 'res_b',
-		               'res_s', 'res_k' , 'lab_3' , 'res_u'            ]
+		self.order = [ 'lab_1', 'mfi_fit_crv', 'mfi_fit_fft' ]
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
 		for i, key in enumerate( self.order ) :
 
-			if ( ( key == 'lab_1' ) or ( key == 'lab_2' ) or
-			     ( key == 'lab_3' )                          ) :
+			if ( key == 'lab_1' ) :
 
 				self.lab[key].setFont(
 				        QFont( "Sans", 12, QFont.Bold ) )
@@ -149,17 +127,10 @@ class dialog_opt_par( QWidget ) :
 
 	def make_opt( self ) :
 
-		self.box['res_dt'].setChecked( self.core.opt['res_dt'] )
-		self.box['res_dw'].setChecked( self.core.opt['res_dw'] )
-		self.box['res_n' ].setChecked( self.core.opt['res_n' ] )
-		self.box['res_v' ].setChecked( self.core.opt['res_v' ] )
-		self.box['res_d' ].setChecked( self.core.opt['res_d' ] )
-		self.box['res_w' ].setChecked( self.core.opt['res_w' ] )
-		self.box['res_r' ].setChecked( self.core.opt['res_r' ] )
-		self.box['res_b' ].setChecked( self.core.opt['res_b' ] )
-		self.box['res_s' ].setChecked( self.core.opt['res_s' ] )
-		self.box['res_k' ].setChecked( self.core.opt['res_k' ] )
-		self.box['res_u' ].setChecked( self.core.opt['res_u' ] )
+		self.box['mfi_fit_crv' ].setChecked(
+		                                 self.core.opt['mfi_fit_crv' ] )
+		self.box['mfi_fit_fft' ].setChecked(
+		                                 self.core.opt['mfi_fit_fft' ] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.

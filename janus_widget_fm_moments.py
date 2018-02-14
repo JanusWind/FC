@@ -48,7 +48,8 @@ from numpy import amax, amin, array, ceil, floor, log10, sqrt, tile, where
 # Load the necessary threading modules.
 
 from threading import Thread
-from janus_thread import n_thread, thread_chng_mom_sel, thread_chng_nln_sel
+from janus_thread import n_thread, thread_chng_opt
+
 
 
 ################################################################################
@@ -96,6 +97,10 @@ class widget_fm_moments( QWidget ) :
 		self.connect( self.core, SIGNAL('janus_rset'), self.resp_rset )
 		self.connect( self.core, SIGNAL('janus_chng_mfi'),
 		                                            self.resp_chng_mfi )
+		self.connect( self.core, SIGNAL('janus_chng_opt'),
+		                                            self.resp_chng_opt )
+		self.connect( self.core, SIGNAL('janus_rstr_opt'),
+		                                            self.resp_rstr_opt )
 
 		# Assign (if not done so already) and store the shape of the
 		# plot-grid array.
@@ -481,5 +486,25 @@ class widget_fm_moments( QWidget ) :
 		# Clear the plots of all their elements and regenerate them.
 
 		self.rset_crv( )
+
+		self.make_crv( )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR RESPONDING TO A CHANGE OF AN OPTION.
+	#-----------------------------------------------------------------------
+
+	def resp_chng_opt( self ) :
+
+		# Regenerate the menu.
+
+		self.make_crv( )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR RESPONDING TO RESTORING DEFAULT OPTIONS.
+	#-----------------------------------------------------------------------
+
+	def resp_rstr_opt( self ) :
+
+		# Regenerate the menu.
 
 		self.make_crv( )
