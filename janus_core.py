@@ -816,6 +816,8 @@ class core( QObject ) :
 		# loaded.
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'mfi' )
+		self.connect( self, SIGNAL('janus_chng_opt'),
+		                                            self.resp_chng_opt )
 
 		# Load the Wind/MFI magnetic field data of appropriate
 		# resolution associated with this spectrum.
@@ -1111,10 +1113,10 @@ class core( QObject ) :
 
 		# Calculate the average angular deviation of magnetic field
 
-		self.mfi_psi_b = [ arccos( [ sum ( mfi_nrm[i][j] *
-		                               self.mfi_avg_nrm[j]
-		                              for j in range( 3 )          ) ] )
-	                                      for i in range( len( mfi_nrm ) ) ]
+		self.mfi_psi_b = [ arccos( [ sum ( self.mfi_nrm[i][j] *
+		                                   self.mfi_avg_nrm[j]
+		                         for j in range( 3 )               ) ] )
+	                                 for i in range( len( self.mfi_nrm ) ) ]
 
                 self.mfi_psi_b_avg = rad2deg(sum ( self.mfi_psi_b )/self.n_mfi )
 
@@ -3485,3 +3487,13 @@ class core( QObject ) :
 
 		if ( exit ) :
 			self.emit( SIGNAL('janus_exit') )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_opt" SIGNAL.
+	#-----------------------------------------------------------------------
+
+	def resp_chng_opt( self ) :
+
+		# Regenerate the text in the text area.
+
+		self.load_mfi( )
