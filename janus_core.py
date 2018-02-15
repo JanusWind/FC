@@ -743,6 +743,7 @@ class core( QObject ) :
 		# with this spectrum.
 
 		self.load_mfi( )
+		self.fit_mfi( )
 
 		# If requested, run the moments analysis.
 
@@ -816,8 +817,8 @@ class core( QObject ) :
 		# loaded.
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'mfi' )
-		self.connect( self, SIGNAL('janus_chng_opt'),
-		                                            self.resp_chng_opt )
+#		self.connect( self, SIGNAL('janus_chng_opt'),
+#		                                            self.resp_chng_opt )
 
 		# Load the Wind/MFI magnetic field data of appropriate
 		# resolution associated with this spectrum.
@@ -882,6 +883,51 @@ class core( QObject ) :
 		                        self.mfi_b_z[i] ) /self.mfi_b[i]
 		                           for i in range( len( self.mfi_b ) ) ]
 
+		# Compute the mfi angles.
+
+		mfi_b_rho      = [sqrt( self.mfi_b_x[i]**2.0 
+		                      + self.mfi_b_y[i]**2.0 )
+		                        for i in range( len( self.mfi_b_x ) ) ]
+
+		mfi_b_colat       = arctan2( self.mfi_b_z, mfi_b_rho )
+		mfi_b_lon         = arctan2( self.mfi_b_y, self.mfi_b_x )
+
+		self.mfi_b_colat  = rad2deg( mfi_b_colat )
+		self.mfi_b_lon    = rad2deg( mfi_b_lon )
+
+		self.mfi_amag_ang = array( [ mean( self.mfi_b_colat ),
+		                                   mean( self.mfi_b_lon   )  ] )
+
+		# Calculate the average angular deviation of magnetic field
+
+		self.mfi_psi_b = [ arccos( [ sum ( self.mfi_nrm[i][j] *
+		                                   self.mfi_avg_nrm[j]
+		                         for j in range( 3 )               ) ] )
+	                                 for i in range( len( self.mfi_nrm ) ) ]
+
+                self.mfi_psi_b_avg = rad2deg(sum ( self.mfi_psi_b )/self.n_mfi )
+
+		# Use interpolation to estiamte the magnetic field vector for
+		# each datum in the FC spectrum.
+
+		self.fc_spec.set_mag( self.mfi_t, self.mfi_b_x,
+		                                  self.mfi_b_y, self.mfi_b_z )
+
+		# Message the user that new Wind/MFI data have been loaded.
+
+		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mfi' )
+
+		# Emit a signal that indicates that a new Wind/MFI data have now
+		# been loaded.
+
+		self.emit( SIGNAL('janus_chng_mfi') )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR FITTING THE Wind/MFI MAGNETIC FIELD DATA.
+	#-----------------------------------------------------------------------
+
+	def fit_mfi ( self ) :
+
 		# Fluctuating data fitting algorithm.
 
 		# Defining a coordinate system with 'e1' axis parallel to
@@ -893,6 +939,9 @@ class core( QObject ) :
 		e2 = cross( z, e1 )/ norm( cross( e1, z ) )
 		e3 = cross( e1, e2 )
 		
+		print 'Oh well'
+		print self.mfi_b_vec[0]
+
 		# Computing the components of magnetic filed in the new basis.
 
 		self.mfi_b_x_t = [ sum( [ self.mfi_b_vec[i][j]*e1[j]
@@ -913,11 +962,19 @@ class core( QObject ) :
 		# TODO: Check which of the following is better method of
 		# calculation.
 
+		# TODO: Taking inverse FFT always works, however if the data is
+		# not periodic enough 'curve_fit' fails at times if the fit
+		# doesn't converge within 1000 iteration ( 1000 is the default
+		# iteration length of 'curve_fit' ). Though iteration length can
+		# be increased, try to come with a way so that if 'curve_fit'
+		# fails, it aborts the 'fit_mfi' with just one error, or
+		# defaults back to inverse FFT algorithm.
+
 		if ( self.opt['mfi_fit_fft'] ) :
 
-			########################################################
-			## Method 1
-			########################################################
+			#-------------------------------------------------------
+			# Method 1: Takes the Fourier and then its inverse.
+			#-------------------------------------------------------
 	
 			# Define the time interval between measurements
 			
@@ -1001,9 +1058,9 @@ class core( QObject ) :
 	
 		elif ( self.opt['mfi_fit_crv'] ) :
 
-			########################################################
-			## Method 2
-			########################################################
+			#-------------------------------------------------------
+			# Method 2: Uses the function 'scipy.curve_fit'.
+			#-------------------------------------------------------
 	
 			# Program to compute the fit parameters.
 	
@@ -1060,9 +1117,12 @@ class core( QObject ) :
 	
 			ind = linspace(0, max( self.mfi_s ), len( self.mfi_s ) )
 	
-			self.mfi_b_x_fits = fit_sin( self.mfi_s,self.mfi_b_x_t )
-			self.mfi_b_y_fits = fit_sin( self.mfi_s,self.mfi_b_y_t )
-			self.mfi_b_z_fits = fit_sin( self.mfi_s,self.mfi_b_z_t )
+			self.mfi_b_x_fits = fit_sin( self.mfi_s,
+			                                        self.mfi_b_x_t )
+			self.mfi_b_y_fits = fit_sin( self.mfi_s,
+			                                        self.mfi_b_y_t )
+			self.mfi_b_z_fits = fit_sin( self.mfi_s,
+			                                        self.mfi_b_z_t )
 	
 			self.mfi_b_x_fit = self.mfi_b_x_fits['fitfunc']( ind )
 			self.mfi_b_y_fit = self.mfi_b_y_fits['fitfunc']( ind )
@@ -1096,36 +1156,6 @@ class core( QObject ) :
 			self.mfi_phs_y = rad2deg( mean( phase_y ) )
 			self.mfi_phs_z = rad2deg( mean( phase_z ) )
 
-		# Compute the mfi angles.
-
-		mfi_b_rho      = [sqrt( self.mfi_b_x[i]**2.0 
-		                      + self.mfi_b_y[i]**2.0 )
-		                        for i in range( len( self.mfi_b_x ) ) ]
-
-		mfi_b_colat       = arctan2( self.mfi_b_z, mfi_b_rho )
-		mfi_b_lon         = arctan2( self.mfi_b_y, self.mfi_b_x )
-
-		self.mfi_b_colat  = rad2deg( mfi_b_colat )
-		self.mfi_b_lon    = rad2deg( mfi_b_lon )
-
-		self.mfi_amag_ang = array( [ mean( self.mfi_b_colat ),
-		                                   mean( self.mfi_b_lon   )  ] )
-
-		# Calculate the average angular deviation of magnetic field
-
-		self.mfi_psi_b = [ arccos( [ sum ( self.mfi_nrm[i][j] *
-		                                   self.mfi_avg_nrm[j]
-		                         for j in range( 3 )               ) ] )
-	                                 for i in range( len( self.mfi_nrm ) ) ]
-
-                self.mfi_psi_b_avg = rad2deg(sum ( self.mfi_psi_b )/self.n_mfi )
-
-		# Use interpolation to estiamte the magnetic field vector for
-		# each datum in the FC spectrum.
-
-		self.fc_spec.set_mag( self.mfi_t, self.mfi_b_x,
-		                                  self.mfi_b_y, self.mfi_b_z )
-
 		# Message the user that new Wind/MFI data have been loaded.
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mfi' )
@@ -1134,6 +1164,7 @@ class core( QObject ) :
 		# been loaded.
 
 		self.emit( SIGNAL('janus_chng_mfi') )
+
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CHANGING THE MOM. SELCTION DIRECTION WINDOW.
@@ -3497,3 +3528,4 @@ class core( QObject ) :
 		# Regenerate the text in the text area.
 
 		self.load_mfi( )
+		self.fit_mfi( )
