@@ -915,12 +915,12 @@ class core( QObject ) :
 
 		# Message the user that new Wind/MFI data have been loaded.
 
-		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mfi' )
+#		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mfi' )
 
 		# Emit a signal that indicates that a new Wind/MFI data have now
 		# been loaded.
 
-		self.emit( SIGNAL('janus_chng_mfi') )
+#		self.emit( SIGNAL('janus_chng_mfi') )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR FITTING THE Wind/MFI MAGNETIC FIELD DATA.
