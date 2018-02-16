@@ -109,6 +109,7 @@ data/fc/*.cdf
 data/mfi/*.cdf
 data/pl/*.idl
 data/*.cfg
+*data/*
 .gitignore
 *.cdf
 upload.*
