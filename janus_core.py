@@ -292,14 +292,18 @@ class core( QObject ) :
 			self.mfi_b_z_t     = None
 			self.mfi_b_vec_t   = None
 
-			self.mfi_frq_x     = None
-			self.mfi_frq_y     = None
-			self.mfi_frq_z     = None
-
 			self.mfi_bbx_t     = None
 			self.mfi_bby_t     = None
 			self.mfi_bbz_t     = None
 			self.mfi_b_vec_t   = None
+
+			self.mfi_frq_x     = None
+			self.mfi_frq_y     = None
+			self.mfi_frq_z     = None
+
+			self.mfi_amp_x     = None
+			self.mfi_amp_y     = None
+			self.mfi_amp_z     = None
 
 			self.mfi_b_x_fits  = None
 			self.mfi_b_y_fits  = None
@@ -309,9 +313,11 @@ class core( QObject ) :
 			self.mfi_b_y_fit   = None
 			self.mfi_b_z_fit   = None
 
-			self.mfi_phase_x   = None
-			self.mfi_phase_y   = None
-			self.mfi_phase_z   = None
+			self.mfi_fit_lin   = False
+
+			self.mfi_phs_x     = None
+			self.mfi_phs_y     = None
+			self.mfi_phs_z     = None
 
 			self.mfi_b_colat   = None
 			self.mfi_b_lon     = None
@@ -915,12 +921,14 @@ class core( QObject ) :
 
 		# Message the user that new Wind/MFI data have been loaded.
 
-#		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mfi' )
+		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mfi' )
 
 		# Emit a signal that indicates that a new Wind/MFI data have now
 		# been loaded.
 
-#		self.emit( SIGNAL('janus_chng_mfi') )
+		self.emit( SIGNAL('janus_chng_mfi') )
+
+		self.fit_mfi( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR FITTING THE Wind/MFI MAGNETIC FIELD DATA.
@@ -930,6 +938,8 @@ class core( QObject ) :
 
 		# Fluctuating data fitting algorithm.
 
+		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'fit' )
+
 		# Defining a coordinate system with 'e1' axis parallel to
 		# direction of magnetic field.
 
@@ -938,9 +948,6 @@ class core( QObject ) :
 		e1 = self.mfi_avg_nrm
 		e2 = cross( z, e1 )/ norm( cross( e1, z ) )
 		e3 = cross( e1, e2 )
-		
-		print 'Oh well'
-		print self.mfi_b_vec[0]
 
 		# Computing the components of magnetic filed in the new basis.
 
@@ -962,84 +969,76 @@ class core( QObject ) :
 		# TODO: Check which of the following is better method of
 		# calculation.
 
-		# TODO: Taking inverse FFT always works, however if the data is
-		# not periodic enough 'curve_fit' fails at times if the fit
-		# doesn't converge within 1000 iteration ( 1000 is the default
-		# iteration length of 'curve_fit' ). Though iteration length can
-		# be increased, try to come with a way so that if 'curve_fit'
-		# fails, it aborts the 'fit_mfi' with just one error, or
-		# defaults back to inverse FFT algorithm.
-
 		if ( self.opt['mfi_fit_fft'] ) :
 
 			#-------------------------------------------------------
 			# Method 1: Takes the Fourier and then its inverse.
 			#-------------------------------------------------------
-	
+
 			# Define the time interval between measurements
-			
+
 			dt = self.mfi_s[1] - self.mfi_s[0]
-			
+
 			# Compute all the frequencies.
-			
+
 			fq = rfftfreq( len( self.mfi_s ), d = dt )
-			
+
 			# Compute the Fourier Transform of each component of
 			# magnetic field.
-			
+
 			fbx = rfft( self.mfi_b_x_t )
 			fby = rfft( self.mfi_b_y_t )
 			fbz = rfft( self.mfi_b_z_t )
-			
+
 			# Compute the absolute value of fourier transformed
 			# data.
-			
+
 			afbx = abs( fbx**2 )
 			afby = abs( fby**2 )
 			afbz = abs( fbz**2 )
-			
+
 			# Compute the index at which maximum frequency occurs.
-			
+
 			max_ind_x = argmin( abs( afbx - max( afbx ) ) )
 			max_ind_y = argmin( abs( afby - max( afby ) ) )
 			max_ind_z = argmin( abs( afbz - max( afbz ) ) )
-			
+
 			# Compute the value of maximum frequency.
-			
+
 			self.mfi_frq_x = fq[ max_ind_x ]
 			self.mfi_frq_y = fq[ max_ind_y ]
 			self.mfi_frq_z = fq[ max_ind_z ]
-	
+
 			# Define a new list having same length as the fourier
 			# transformed data.
-	
+
 			ffbx = zeros_like( fbx ) 
 			ffby = zeros_like( fby ) 
 			ffbz = zeros_like( fbz ) 
-	
+
 			# Set the 'maximum index' value same.
-	
+
 			ffbx[ max_ind_x ] = fby[ max_ind_x ]
 			ffby[ max_ind_y ] = fby[ max_ind_y ]
 			ffbz[ max_ind_z ] = fby[ max_ind_z ]
-	
+
 			# Take the inverse transform of the data to get the
 			# sinusoidal solution for the input data.
-			
+
 			self.bbx = irfft( ffbx, n = len( self.mfi_s ) )
 			self.bby = irfft( ffby, n = len( self.mfi_s ) )
 			self.bbz = irfft( ffbz, n = len( self.mfi_s ) )
-	
+
 			self.mfi_b_vec_fit = [ self.bbx, self.bby, self.bbz ]
-	
+
 			# Compute the amplitude of sinusoidal solution.
-	
+
 			self.mfi_amp_x = std( self.bbx ) * 2.**0.5
 			self.mfi_amp_y = std( self.bby ) * 2.**0.5
 			self.mfi_amp_z = std( self.bbz ) * 2.**0.5
-	
+
 			# Compute the phase of the sinusoidal solution.
-	
+
 			phase_x = array( [ arctan2( real( fbx[i]/afbx[i] ),
 			                            imag( fbx[i]/afbx[i] ) )
 			                       for i in range( len( afbx ) ) ] )
@@ -1049,121 +1048,243 @@ class core( QObject ) :
 			phase_z = array( [ arctan2( real( fbz[i]/afbz[i] ),
 			                            imag( fbz[i]/afbz[i] ) )
 			                       for i in range( len( afbx ) ) ] )
-	
+
 			# Compute the mean phase for each direction.
-	
+
 			self.mfi_phs_x = rad2deg( sqrt( mean( phase_x**2 ) ) )
 			self.mfi_phs_y = rad2deg( sqrt( mean( phase_y**2 ) ) )
 			self.mfi_phs_z = rad2deg( sqrt( mean( phase_z**2 ) ) )
-	
+
 		elif ( self.opt['mfi_fit_crv'] ) :
 
 			#-------------------------------------------------------
 			# Method 2: Uses the function 'scipy.curve_fit'.
 			#-------------------------------------------------------
-	
+
 			# Program to compute the fit parameters.
-	
-			def fit_sin( t, b ) :
-	
-				# Compute the all the frequency of the data.
-	
-				f = fftfreq( len( t ), ( t[1] - t[0] ) )
-	
-				# Compute the amplitude of each point in the
-				# fourier spectrum.
-	
-				fb = abs( fft( b ) )
-	
-				# Compute the most dominant frequency, which
-				# will also be the initial guess to the fit
-				#  function.
 
-				gss_f = abs( f[ argmax( fb[1:] ) + 1 ] )
-	
-				# Compute the standard deviation of the magnetic
-				# field and use it as initial guess for the
-				# amplitude of fluctuation.
-	
-				gss_a = std( b ) * 2.**0.5
-	
-				# Compute the mean of the magnetic filed and use
-				# it as the initial guess of off-set of the data.
-	
-				gss_i = mean( b )
-	
-				# Define the list of initial guess for curve
-				# fitting.
+			try :
 
-				gss = [ gss_a, 2.*pi*gss_f, 0., gss_i ]
+				def fit_sin( t, b ) :
+
+					# Compute the all the frequency of the data.
+
+					f = fftfreq( len( t ), ( t[1] - t[0] ) )
+
+					# Compute the amplitude of each point in
+					# the fourier spectrum.
+
+					fb = abs( fft( b ) )
+
+					# Compute the most dominant frequency,
+					# which will also be the initial guess
+					# to the fit function.
+
+					gss_f = abs( f[ argmax( fb[1:] ) + 1 ] )
+
+					# Compute the standard deviation of the
+					# magnetic field and use it as initial
+					# guess for the amplitude of fluctuation
+
+					gss_a = std( b ) * 2.**0.5
+
+					# Compute the mean of the magnetic filed
+					# and use it as the initial guess of
+					# off-set of the data.
+
+					gss_i = mean( b )
+
+					# Define the list of initial guess for
+					# curve fitting.
+
+					gss = [ gss_a, 2.*pi*gss_f, 0., gss_i ]
+
+					# Define the model for curve-fitting and
+					# provide the 'gss' as the initial guess
+					# for fitting.
+
+					def sinfunc( t, A, w, p, c ):
+
+						return A * sin( w*t + p ) + c
+
+					popt, pcov = curve_fit(sinfunc, t, b,
+					                                p0=gss )
+					A, w, p, c = popt
+					af = w/(2.*pi)
+					fitfunc = lambda t: A * sin(w*t + p) + c
+
+					return { "amp"     : A,
+					         "omega"   : w,  "phase": p,
+					         "offset"  : c,  "freq" : f,
+					         "period"  : 1./f,
+					         "fitfunc" : fitfunc,
+					         "maxcov"  : max( pcov ),
+					         "rawres"  : ( gss,popt,pcov ) }
+
+				ind = linspace( 0, max( self.mfi_s ),
+				                   len( self.mfi_s ) )
+
+				self.mfi_b_x_fits = fit_sin( self.mfi_s,
+				                             self.mfi_b_x_t )
+				self.mfi_b_y_fits = fit_sin( self.mfi_s,
+				                             self.mfi_b_y_t )
+				self.mfi_b_z_fits = fit_sin( self.mfi_s,
+				                             self.mfi_b_z_t )
+
+				self.mfi_b_x_fit = \
+				            self.mfi_b_x_fits['fitfunc']( ind )
+				self.mfi_b_y_fit = \
+				            self.mfi_b_y_fits['fitfunc']( ind )
+				self.mfi_b_z_fit = \
+				            self.mfi_b_z_fits['fitfunc']( ind )
+
+				self.mfi_b_vec_fit = [ self.mfi_b_x_fit,
+				                       self.mfi_b_y_fit,
+			 	                       self.mfi_b_z_fit  ]
+
+				# Compute the amplitude of sinusoidal solution.
+
+				self.mfi_amp_x = self.mfi_b_x_fits['amp']
+				self.mfi_amp_y = self.mfi_b_y_fits['amp']
+				self.mfi_amp_z = self.mfi_b_z_fits['amp']
+
+				# Compute the frequency of sinusoidal solution.
 	
-				# Define the model for curve-fitting and provide
-				# the 'gss' as the initial guess for fitting.
+				self.mfi_frq_x = self.mfi_b_x_fits['omega']
+				self.mfi_frq_y = self.mfi_b_y_fits['omega']
+				self.mfi_frq_z = self.mfi_b_z_fits['omega']
+
+				# Compute the phase of the sinusoidal solution.
+
+				phase_x = self.mfi_b_x_fits['phase']
+				phase_y = self.mfi_b_y_fits['phase']
+				phase_z = self.mfi_b_z_fits['phase']
+
+				# Compute the mean phase for each direction.
+
+				self.mfi_phs_x = rad2deg( mean( phase_x ) )
+				self.mfi_phs_y = rad2deg( mean( phase_y ) )
+				self.mfi_phs_z = rad2deg( mean( phase_z ) )
+
+			except :
+
+				self.mfi_fit_lin = True
+
+				def fit_lin( t, b ) :
 	
-				def sinfunc( t, A, w, p, c ):
-	
-					return A * sin( w*t + p ) + c
-			
-				popt, pcov = curve_fit(sinfunc, t, b, p0=gss)
-				A, w, p, c = popt
-				af = w/(2.*pi)
-				fitfunc = lambda t: A * sin(w*t + p) + c
-			
-				return { "amp": A,
-				       "omega": w, "phase": p, "offset": c,
-				       "freq": f, "period":1./f,
-				       "fitfunc": fitfunc, "maxcov": max( pcov ),
-				       "rawres": ( gss,popt,pcov ) }
-	
-			ind = linspace(0, max( self.mfi_s ), len( self.mfi_s ) )
-	
-			self.mfi_b_x_fits = fit_sin( self.mfi_s,
-			                                        self.mfi_b_x_t )
-			self.mfi_b_y_fits = fit_sin( self.mfi_s,
-			                                        self.mfi_b_y_t )
-			self.mfi_b_z_fits = fit_sin( self.mfi_s,
-			                                        self.mfi_b_z_t )
-	
-			self.mfi_b_x_fit = self.mfi_b_x_fits['fitfunc']( ind )
-			self.mfi_b_y_fit = self.mfi_b_y_fits['fitfunc']( ind )
-			self.mfi_b_z_fit = self.mfi_b_z_fits['fitfunc']( ind )
-	
-			self.mfi_b_vec_fit = [ self.mfi_b_x_fit,
-			                       self.mfi_b_y_fit,
-		 	                       self.mfi_b_z_fit  ]
-	
-			# Compute the amplitude of sinusoidal solution.
-	
-			self.mfi_amp_x = self.mfi_b_x_fits['amp']
-			self.mfi_amp_y = self.mfi_b_y_fits['amp']
-			self.mfi_amp_z = self.mfi_b_z_fits['amp']
-	
-			# Compute the frequency of sinusoidal solution.
-	
-			self.mfi_frq_x = self.mfi_b_x_fits['omega']
-			self.mfi_frq_y = self.mfi_b_y_fits['omega']
-			self.mfi_frq_z = self.mfi_b_z_fits['omega']
-	
-			# Compute the phase of the sinusoidal solution.
-	
-			phase_x = self.mfi_b_x_fits['phase']
-			phase_y = self.mfi_b_y_fits['phase'] 
-			phase_z = self.mfi_b_z_fits['phase'] 
-	
-			# Compute the mean phase for each direction.
-	
-			self.mfi_phs_x = rad2deg( mean( phase_x ) )
-			self.mfi_phs_y = rad2deg( mean( phase_y ) )
-			self.mfi_phs_z = rad2deg( mean( phase_z ) )
+					# Compute the all the frequency of the
+					# data.
+
+					f = fftfreq( len( t ), ( t[1] - t[0] ) )
+
+					# Compute the amplitude of each point in
+					# the fourier spectrum.
+
+					fb = abs( fft( b ) )
+
+					# Compute the most dominant frequency,
+					# which will also be the initial guess
+					# to the fit function.
+
+					gss_f = abs( f[ argmax( fb[1:] ) + 1 ] )
+
+					# Compute the standard deviation of thev
+					# magnetic field and use it as initial
+					# guess for the amplitude of fluctuation
+
+					gss_a = std( b ) * 2.**0.5
+
+					# Compute the mean of the magnetic filed
+					# and use it as the initial guess of
+					# off-set of the data.
+
+					gss_i = mean( b )
+
+					# Define the list of initial guess for curve
+					# fitting.
+
+					gss = [ gss_a, 2.*pi*gss_f, 0., gss_i ]
+
+					# Define the model for curve-fitting and
+					# provide the 'gss' as the initial guess
+					# for fitting.
+
+					def linfunc( t, A, w, p, c ):
+
+						return A * ( w*t + p ) + c
+
+					popt, pcov = curve_fit(linfunc,
+					                          t, b, p0=gss )
+					A, w, p, c = popt
+					af = w/(2.*pi)
+					fitfunc = lambda t: A * sin(w*t + p) + c
+
+					return { "amp"     : A,
+					         "omega"   : w,  "phase": p,
+					         "offset"  : c,  "freq" : f,
+					         "period"  : 1./f,
+					         "fitfunc" : fitfunc,
+					         "maxcov"  : max( pcov ),
+					         "rawres"  : ( gss,popt,pcov ) }
+
+				ind = linspace( 0, max( self.mfi_s ),
+				                   len( self.mfi_s ) )
+
+				self.mfi_b_x_fits = fit_lin( self.mfi_s,
+				                                self.mfi_b_x_t )
+				self.mfi_b_y_fits = fit_lin( self.mfi_s,
+				                                self.mfi_b_y_t )
+				self.mfi_b_z_fits = fit_lin( self.mfi_s,
+				                                self.mfi_b_z_t )
+
+				self.mfi_b_x_fit = \
+				             self.mfi_b_x_fits['fitfunc']( ind )
+				self.mfi_b_y_fit = \
+				             self.mfi_b_y_fits['fitfunc']( ind )
+				self.mfi_b_z_fit = \
+				             self.mfi_b_z_fits['fitfunc']( ind )
+
+				self.mfi_b_vec_fit = [ self.mfi_b_x_fit,
+				                       self.mfi_b_y_fit,
+			 	                       self.mfi_b_z_fit  ]
+
+				# Compute the amplitude of sinusoidal solution.
+
+				self.mfi_amp_x = self.mfi_b_x_fits['amp']
+				self.mfi_amp_y = self.mfi_b_y_fits['amp']
+				self.mfi_amp_z = self.mfi_b_z_fits['amp']
+
+				# Compute the frequency of sinusoidal solution.
+
+				self.mfi_frq_x = self.mfi_b_x_fits['omega']
+				self.mfi_frq_y = self.mfi_b_y_fits['omega']
+				self.mfi_frq_z = self.mfi_b_z_fits['omega']
+
+				# Compute the phase of the sinusoidal solution.
+
+				phase_x = self.mfi_b_x_fits['phase']
+				phase_y = self.mfi_b_y_fits['phase']
+				phase_z = self.mfi_b_z_fits['phase']
+
+				# Compute the mean phase for each direction.
+
+				self.mfi_phs_x = rad2deg( mean( phase_x ) )
+				self.mfi_phs_y = rad2deg( mean( phase_y ) )
+				self.mfi_phs_z = rad2deg( mean( phase_z ) )
+
+#				self.emit( SIGNAL('janus_mesg'), 'core', 'norun', 'fit' )
+
+		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'fit' )
+
 
 		# Message the user that new Wind/MFI data have been loaded.
 
-		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mfi' )
+#		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mfi' )
 
 		# Emit a signal that indicates that a new Wind/MFI data have now
 		# been loaded.
 
-		self.emit( SIGNAL('janus_chng_mfi') )
+#		self.emit( SIGNAL('janus_chng_mfi') )
 
 
 	#-----------------------------------------------------------------------
@@ -2958,16 +3079,20 @@ class core( QObject ) :
 
 				if ( key == 'mfi_l' ) :
 					self.opt['mfi_h'] = True
+					self.load_mfi()
 				else :
 					self.opt['mfi_l'] = True
+					self.load_mfi()
 
 			if ( not ( self.opt['mfi_fit_crv'] or
 			           self.opt['mfi_fit_fft'] ) ) :
 
 				if ( key == 'mfi_fit_crv' ) :
 					self.opt['mfi_fit_fft'] = True
+					self.load_mfi( )
 				else :
 					self.opt['mfi_fit_crv'] = True
+					self.load_mfi( )
 
 		elif ( prefix == 'fls' ) :
 
@@ -3518,14 +3643,3 @@ class core( QObject ) :
 
 		if ( exit ) :
 			self.emit( SIGNAL('janus_exit') )
-
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_opt" SIGNAL.
-	#-----------------------------------------------------------------------
-
-	def resp_chng_opt( self ) :
-
-		# Regenerate the text in the text area.
-
-		self.load_mfi( )
-		self.fit_mfi( )

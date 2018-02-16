@@ -143,6 +143,7 @@ class widget_ctrl_info( format_TextEdit ) :
 
 				if ( ( mesg_obj == 'fc'   ) or
 				     ( mesg_obj == 'mfi'  ) or
+				     ( mesg_obj == 'fit'  ) or
 				     ( mesg_obj == 'spin' )    ) :
 					self.prnt_htm( 'Retrieving '    + 
 					               mesg_obj.upper() +
@@ -203,12 +204,17 @@ class widget_ctrl_info( format_TextEdit ) :
 
 				if ( mesg_obj == 'mom' ) :
 					self.prnt_htm( 'ERROR!  Can\'t ' +
-					               'run moments.' , speak=True)
+					            'run moments.' , speak=True)
 
 				if ( mesg_obj == 'nln' ) :
 					self.prnt_htm( 'ERROR!  Can\'t ' +
 					               'run NLN.' , speak=True)
 
+				if ( mesg_obj == 'fit' ) :
+					self.prnt_htm( 'WARNING: Fit curve\
+					can\'t converge for Sine function. \
+					trying to fit a linear function.' , 
+					                            speak=True)
 			if ( mesg_typ == 'fail' ) :
 
 				if ( mesg_obj == 'time' ) :
@@ -223,11 +229,13 @@ class widget_ctrl_info( format_TextEdit ) :
 				if ( mesg_obj == 'nln' ) :
 					self.prnt_tab( 1 )
 					self.prnt_htm( 'ERROR!  NLN ' +
-					               'analysis failed.' , speak=True)
+					               'analysis failed.' ,
+					                             speak=True)
 
 				if ( mesg_obj == 'save' ) :
 					self.prnt_tab( 1 )
-					self.prnt_htm( 'ERROR!  Save failed.' , speak=True)
+					self.prnt_htm( 'ERROR!  Save failed.',
+					                           speak=True)
 					self.clear_for_next_mesg = True
 
 				if ( mesg_obj == 'xprt' ) :
@@ -240,14 +248,16 @@ class widget_ctrl_info( format_TextEdit ) :
 
 				if ( mesg_obj == 'auto' ) :
 					self.prnt_brk( )
-					self.prnt_htm( 'AUTO-RUN ABORTED!' , speak=True)
+					self.prnt_htm( 'AUTO-RUN ABORTED!' ,
+					                             speak=True)
 
 			if ( mesg_typ == 'end' ) :
 
 				if ( mesg_obj == 'auto' ) :
 					self.prnt_brk( )
 					self.prnt_htm( 'Finished ' +
-					               'automated analysis.' , speak=True)
+					               'automated analysis.' ,
+					                             speak=True)
 				else :
 					self.prnt_tab( 1 )
 
