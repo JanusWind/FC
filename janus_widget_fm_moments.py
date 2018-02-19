@@ -298,7 +298,7 @@ class widget_fm_moments( QWidget ) :
 			self.lim_x = [ min( self.core.mfi_s ),
 			               max( self.core.mfi_s ) ]
 
-			self.lim_y = [ -1.1*max( self.core.mfi_b_vec_t[d] ),
+			self.lim_y = [ 1.1*min( self.core.mfi_b_vec_t[d] ),
 			                1.1*max( self.core.mfi_b_vec_t[d] ) ]
 
 	#-----------------------------------------------------------------------
@@ -321,11 +321,11 @@ class widget_fm_moments( QWidget ) :
 
 		# Adjust the individual axes to the new limits.
 
-		for l in range( self.n_plt_x ) :
-			self.axs_x[l].setRange( self.lim_x[0], self.lim_x[1] )
-
-		for m in range( self.n_plt_y ) :
-			self.axs_y[m].setRange( self.lim_y[0], self.lim_y[1] )
+#		for l in range( self.n_plt_x ) :
+#			self.axs_x[l].setRange( self.lim_x[0], self.lim_x[1] )
+#
+#		for m in range( self.n_plt_y ) :
+#			self.axs_y[m].setRange( self.lim_y[0], self.lim_y[1] )
 
 		# For each plot in the grid, generate and display a fit curve
 		# based on the results of the analysis.
