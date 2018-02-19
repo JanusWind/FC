@@ -312,6 +312,7 @@ class core( QObject ) :
 			self.mfi_b_x_fit   = None
 			self.mfi_b_y_fit   = None
 			self.mfi_b_z_fit   = None
+			self.mfi_b_vec_fit = None
 
 			self.mfi_fit_lin   = False
 
@@ -1116,7 +1117,7 @@ class core( QObject ) :
 					return { "amp"     : A,
 					         "omega"   : w,  "phase": p,
 					         "offset"  : c,  "freq" : f,
-					         "period"  : 1./f,
+					         "period"  : [ ( 0 if f[i] == 0 else 1./f[i] ) for i in range( len ( f ) ) ],
 					         "fitfunc" : fitfunc,
 					         "maxcov"  : max( pcov ),
 					         "rawres"  : ( gss,popt,pcov ) }
@@ -1222,7 +1223,7 @@ class core( QObject ) :
 					return { "amp"     : A,
 					         "omega"   : w,  "phase": p,
 					         "offset"  : c,  "freq" : f,
-					         "period"  : 1./f,
+					         "period"  : [ ( 0 if f[i] == 0 else 1./f[i] ) for i in range( len ( f ) ) ],
 					         "fitfunc" : fitfunc,
 					         "maxcov"  : max( pcov ),
 					         "rawres"  : ( gss,popt,pcov ) }
@@ -1272,19 +1273,19 @@ class core( QObject ) :
 				self.mfi_phs_y = rad2deg( mean( phase_y ) )
 				self.mfi_phs_z = rad2deg( mean( phase_z ) )
 
-#				self.emit( SIGNAL('janus_mesg'), 'core', 'norun', 'fit' )
+				self.emit( SIGNAL('janus_mesg'), 'core', 'norun', 'fit' )
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'fit' )
 
 
 		# Message the user that new Wind/MFI data have been loaded.
 
-#		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mfi' )
+		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mfi' )
 
 		# Emit a signal that indicates that a new Wind/MFI data have now
 		# been loaded.
 
-#		self.emit( SIGNAL('janus_chng_mfi') )
+		self.emit( SIGNAL('janus_chng_mfi') )
 
 
 	#-----------------------------------------------------------------------
