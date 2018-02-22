@@ -3095,6 +3095,9 @@ class core( QObject ) :
 					self.opt['mfi_fit_crv'] = True
 					self.load_mfi( )
 
+			if ( key == self.opt['mfi_med_fil'] ) :
+				self.opt['mfi_med_fil'] = 1
+
 		elif ( prefix == 'fls' ) :
 
 			# Assign the provided value to the specified key.
@@ -3223,7 +3226,8 @@ class core( QObject ) :
 		             'fls_n_mfi_l':float('inf'),
 		             'fls_n_mfi_h':float('inf'),
 		             'mfi_fit_crv':True,
-		             'mfi_fit_fft':False         }
+		             'mfi_fit_fft':False,
+ 		             'mfi_med_fil':float('1')    }
 
 		# If requested, propagate any changes.
 

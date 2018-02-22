@@ -30,6 +30,7 @@
 from PyQt4.QtGui import QWidget, QGridLayout, QLabel, QFont
 from PyQt4.QtCore import SIGNAL
 from numpy import inf
+
 # Load the customized push button and one-line text editor.
 
 from janus_event_CheckBox import event_CheckBox, event_RadioBox
@@ -199,6 +200,7 @@ class dialog_opt_fls( QWidget ) :
 			else :
 	
 				self.arr_txt[key].setStyleSheet( 'color: red;' )
+
 			self.arr_txt[key].setTextUpdate( txt )
 
 	#-----------------------------------------------------------------------
@@ -232,7 +234,7 @@ class dialog_opt_fls( QWidget ) :
         
 			# If no threads are running, make the change to the 
 			# option with core.  Otherwise, restore the original
-			#  options settings.
+			# options settings.
         
 			if ( ( n_thread( ) == 0 ) and ( val is not None ) ) :
 		

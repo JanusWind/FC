@@ -33,8 +33,10 @@ from PyQt4.QtCore import SIGNAL
 # Load the customized push button and one-line text editor.
 
 from janus_event_CheckBox import event_CheckBox, event_RadioBox
-
+from janus_event_LineEdit import event_LineEdit
 from janus_event_PushButton import event_PushButton
+
+from janus_helper import str_to_nni
 
 # Load the necessary threading modules.
 
@@ -83,40 +85,58 @@ class dialog_opt_fmo( QWidget ) :
 
 		self.sg.setContentsMargins( 0, 0, 0, 0 )
 
-		self.grd.addLayout( self.sg, 0, 0, 3, 2 )
+		self.grd.addLayout( self.sg, 0, 0, 5, 2 )
 
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
 
-		self.lab = {
-		     'lab_1'       :QLabel( 'Select Algorithm'       , self ),
+		self.lab_hdr1 = QLabel( 'Select Algorithm' )
+		self.lab_hdr2 = QLabel( 'Select the median Filter size' )
+
+		self.lab1 = {
 		     'mfi_fit_crv' :QLabel( 'Use Curve Fit algorithm', self ),
 		     'mfi_fit_fft' :QLabel( 'Use Fourier algorithm'  , self ), }
+
+		self.lab2 = {
+		    'mfi_med_fil':QLabel( 'Assign the size of median filter' ) }
+
+		self.arr_txt = {
+		          'mfi_med_fil': event_LineEdit( self, 'mfi_med_fil' ) }
 
 		self.box = { 
 		        'mfi_fit_crv' :event_RadioBox( self, 'mfi_fit_crv'  ),
 		        'mfi_fit_fft' :event_RadioBox( self, 'mfi_fit_fft'  ), }
 
 
-		self.order = [ 'lab_1', 'mfi_fit_crv', 'mfi_fit_fft' ]
+		self.order1 = [ 'mfi_fit_crv', 'mfi_fit_fft' ]
+
+		self.order2 = [ 'mfi_med_fil' ]
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
-		for i, key in enumerate( self.order ) :
+		self.lab_hdr1.setFont( QFont( "Helvetica", 12, QFont.Bold ) )
+		self.lab_hdr2.setFont( QFont( "Helvetica", 12, QFont.Bold ) )
 
-			if ( key == 'lab_1' ) :
+		self.sg.addWidget( self.lab_hdr1, 0, 0, 1, 3 )
+		self.sg.addWidget( self.lab_hdr2, 3, 0, 1, 3 )
 
-				self.lab[key].setFont(
-				        QFont( "Sans", 12, QFont.Bold ) )
+		for i, key in enumerate( self.order1 ) :
 
-				self.sg.addWidget( self.lab[key], i, 0, 1, 3 )
-			else :
-				self.box[key].setFont( QFont( "Sans", 12 ) )
-				self.lab[key].setFont( QFont( "Sans", 12 ) )
-				self.sg.addWidget( self.box[key], i, 0, 1, 1 )
-				self.sg.addWidget( self.lab[key], i, 1, 1, 1 )
+			self.box[key].setFont( QFont( "Sans", 12 ) )
+			self.lab1[key].setFont( QFont( "Sans", 12 ) )
+			self.sg.addWidget( self.box[key], 1+i, 0, 1, 1 )
+			self.sg.addWidget( self.lab1[key], 1+i, 1, 1, 1 )
 
+		for i, key in enumerate( self.order2 ) :
+
+			self.lab2[key].setFont(    QFont( "Helvetica", 12 ) )
+			self.arr_txt[key].setFont( QFont( "Helvetica", 12 ) )
+
+			self.sg.addWidget( self.lab2[key],  4+i, 1, 1, 1 )
+			self.sg.addWidget( self.arr_txt[key], 4+i, 0, 1, 1 )
+			self.arr_txt[key].setMaximumWidth( 60 )
+	
 		# Populate the menu with the options settings from core.
 
 		self.make_opt( )
@@ -125,12 +145,50 @@ class dialog_opt_fmo( QWidget ) :
 	# DEFINE THE FUNCTION FOR POPULATING MENU.
 	#-----------------------------------------------------------------------
 
-	def make_opt( self ) :
+	def make_opt( self, clear=False ) :
 
 		self.box['mfi_fit_crv' ].setChecked(
 		                                 self.core.opt['mfi_fit_crv' ] )
 		self.box['mfi_fit_fft' ].setChecked(
 		                                 self.core.opt['mfi_fit_fft' ] )
+		# If the clear option has been selected, delete the contents of
+		# all text boxes prior to proceeding.
+
+		if ( clear ) :
+
+			for key in self.arr_txt :
+
+				self.arr_txt[key].clear( )
+
+		# Validate/update the displayed options.
+
+		for key in self.arr_txt :
+
+			val = self.core.opt[key]
+
+			txt = self.arr_txt[key].text( )
+
+			if( txt == '' ) :
+				val = None
+			else :
+				try:
+					val = str_to_nni( txt )
+				except :
+					val = None
+	
+			if( ( ( val is None ) and ( txt == '' ) ) or
+			      ( val == self.core.opt[key]     )   or
+			      ( str_to_nni( txt )%2 != 0       )   ) :
+	
+				self.arr_txt[key].setStyleSheet(
+				                               'color: black;' )
+	
+				txt = str( self.core.opt[key] )
+			else :
+	
+				self.arr_txt[key].setStyleSheet( 'color: red;' )
+
+			self.arr_txt[key].setTextUpdate( txt )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
@@ -138,21 +196,44 @@ class dialog_opt_fmo( QWidget ) :
 
 	def user_event( self, event, fnc ) :
 
-		# If no threads are running, make the change to the option with
-		# core.  Otherwise, restore the original options settings.
+		if( ( fnc == 'mfi_fit_crv' ) or ( fnc == 'mfi_fit_fft' ) ) :
 
-		if ( n_thread( ) == 0 ) :
+			if ( n_thread( ) == 0 ) :
 
 			# Start a new thread that makes the change to the option
 			# with core.
 
-			Thread( target=thread_chng_opt,
-			        args=( self.core, fnc,
-			               self.box[fnc].isChecked( ) ) ).start( )
+				Thread( target=thread_chng_opt,
+				        args=( self.core, fnc,
+				        self.box[fnc].isChecked( ) ) ).start( )
+
+			else :
+
+				self.make_opt( )
 
 		else :
+			txt = self.arr_txt[fnc].text( )
 
-			self.make_opt( )
+			try :
+				val = str_to_nni( txt )
+			except :
+				val = None
+        
+			# If no threads are running, make the change to the 
+			# option with core.  Otherwise, restore the original
+			# options settings.
+        
+			if ( ( n_thread( ) == 0 ) and ( val is not None ) ) :
+		
+				# Start a new thread that makes the change to
+				# the option with core.
+		
+				Thread( target=thread_chng_opt,
+				        args=( self.core, fnc, val ) ).start( )
+		
+			else :
+			
+				self.make_opt( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A CHANGE OF AN OPTION.
@@ -172,4 +253,4 @@ class dialog_opt_fmo( QWidget ) :
 
 		# Regenerate the menu.
 
-		self.make_opt( )
+		self.make_opt( clear=True )
