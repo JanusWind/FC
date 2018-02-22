@@ -73,6 +73,11 @@ class format_TextEdit( QTextEdit ) :
 
 	def prnt_dcm( self, num, dig=2, unt=None ) :
 
+		# If the input is None for some reason, skip it.
+
+		if ( num == None ) :
+			return
+
 		# Convert "dig", the number of digits after the decimal place,
 		# to a string.
 

@@ -50,6 +50,7 @@ from numpy import amax, amin, array, ceil, floor, log10, sqrt, tile, where, mean
 from threading import Thread
 from janus_thread import n_thread, thread_chng_opt
 
+from scipy.signal      import medfilt
 
 
 ################################################################################
@@ -328,8 +329,8 @@ class widget_fm_moments( QWidget ) :
 		x     = array( self.core.mfi_s )
 		y_dat = array( self.core.mfi_b_vec_t )
 
-		if( self.core.mfi_b_vec_fit == None ) :
-			continue
+		if( self.core.mfi_b_vec_fit is None ) :
+			return
 		else :
 			y_fit = array( self.core.mfi_b_vec_fit )
 
@@ -403,10 +404,10 @@ class widget_fm_moments( QWidget ) :
 
 			self.lbl[j,i].setPos( self.lim_x[1], self.lim_y[1] )
 
-			self.crv_dat[j,i] = PlotDataItem( x, y_dat[d],
+			self.crv_dat[j,i] = PlotDataItem( x,medfilt(y_dat[d],11),
 			                                  pen = self.pen_crv_c )
 
-			self.crv_fit[j,i] = PlotDataItem( x, y_fit[d],
+			self.crv_fit[j,i] = PlotDataItem( x,medfilt(y_fit[d],11),
 			                                 pen = self.pen_crv[d] )
 
 			self.plt[j,i].addItem( self.crv_dat[j][i] )
