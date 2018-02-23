@@ -404,10 +404,13 @@ class widget_fm_moments( QWidget ) :
 
 			self.lbl[j,i].setPos( self.lim_x[1], self.lim_y[1] )
 
-			self.crv_dat[j,i] = PlotDataItem( x,medfilt(y_dat[d],11),
-			                                  pen = self.pen_crv_c )
+			self.crv_dat[j,i] = PlotDataItem(
+			                               x, medfilt(y_dat[d], 11 ),
+			                                 pen = self.pen_crv_c )
 
-			self.crv_fit[j,i] = PlotDataItem( x,medfilt(y_fit[d],11),
+			self.crv_fit[j,i] = PlotDataItem(
+			                              x, medfilt(y_fit[d],
+			                         self.core.opt['fit_med_fil']),
 			                                 pen = self.pen_crv[d] )
 
 			self.plt[j,i].addItem( self.crv_dat[j][i] )

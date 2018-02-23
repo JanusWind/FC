@@ -98,10 +98,10 @@ class dialog_opt_fmo( QWidget ) :
 		     'mfi_fit_fft' :QLabel( 'Use Fourier algorithm'  , self ), }
 
 		self.lab2 = {
-		    'mfi_med_fil':QLabel( 'Assign the size of median filter' ) }
+		    'fit_med_fil':QLabel( 'Assign the size of median filter' ) }
 
 		self.arr_txt = {
-		          'mfi_med_fil': event_LineEdit( self, 'mfi_med_fil' ) }
+		          'fit_med_fil': event_LineEdit( self, 'fit_med_fil' ) }
 
 		self.box = { 
 		        'mfi_fit_crv' :event_RadioBox( self, 'mfi_fit_crv'  ),
@@ -110,7 +110,7 @@ class dialog_opt_fmo( QWidget ) :
 
 		self.order1 = [ 'mfi_fit_crv', 'mfi_fit_fft' ]
 
-		self.order2 = [ 'mfi_med_fil' ]
+		self.order2 = [ 'fit_med_fil' ]
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
@@ -133,8 +133,8 @@ class dialog_opt_fmo( QWidget ) :
 			self.lab2[key].setFont(    QFont( "Helvetica", 12 ) )
 			self.arr_txt[key].setFont( QFont( "Helvetica", 12 ) )
 
-			self.sg.addWidget( self.lab2[key],  4+i, 1, 1, 1 )
-			self.sg.addWidget( self.arr_txt[key], 4+i, 0, 1, 1 )
+			self.sg.addWidget( self.lab2[key],  4+i, 0, 1, 1 )
+			self.sg.addWidget( self.arr_txt[key], 4+i, 1, 1, 1 )
 			self.arr_txt[key].setMaximumWidth( 60 )
 	
 		# Populate the menu with the options settings from core.
@@ -147,10 +147,6 @@ class dialog_opt_fmo( QWidget ) :
 
 	def make_opt( self, clear=False ) :
 
-		self.box['mfi_fit_crv' ].setChecked(
-		                                 self.core.opt['mfi_fit_crv' ] )
-		self.box['mfi_fit_fft' ].setChecked(
-		                                 self.core.opt['mfi_fit_fft' ] )
 		# If the clear option has been selected, delete the contents of
 		# all text boxes prior to proceeding.
 
@@ -161,6 +157,11 @@ class dialog_opt_fmo( QWidget ) :
 				self.arr_txt[key].clear( )
 
 		# Validate/update the displayed options.
+
+		self.box['mfi_fit_crv' ].setChecked(
+		                                 self.core.opt['mfi_fit_crv' ] )
+		self.box['mfi_fit_fft' ].setChecked(
+		                                 self.core.opt['mfi_fit_fft' ] )
 
 		for key in self.arr_txt :
 
@@ -178,7 +179,7 @@ class dialog_opt_fmo( QWidget ) :
 	
 			if( ( ( val is None ) and ( txt == '' ) ) or
 			      ( val == self.core.opt[key]     )   or
-			      ( str_to_nni( txt )%2 != 0       )   ) :
+			      ( str_to_nni( txt )%2 != 0      )      ) :
 	
 				self.arr_txt[key].setStyleSheet(
 				                               'color: black;' )
@@ -230,7 +231,7 @@ class dialog_opt_fmo( QWidget ) :
 		
 				Thread( target=thread_chng_opt,
 				        args=( self.core, fnc, val ) ).start( )
-		
+
 			else :
 			
 				self.make_opt( )

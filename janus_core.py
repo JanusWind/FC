@@ -3095,8 +3095,8 @@ class core( QObject ) :
 					self.opt['mfi_fit_crv'] = True
 					self.load_mfi( )
 
-			if ( key == self.opt['mfi_med_fil'] ) :
-				self.opt['mfi_med_fil'] = 1
+			if ( key == self.opt['fit_med_fil'] ) :
+				self.opt['fit_med_fil'] = 1
 
 		elif ( prefix == 'fls' ) :
 
@@ -3227,7 +3227,7 @@ class core( QObject ) :
 		             'fls_n_mfi_h':float('inf'),
 		             'mfi_fit_crv':True,
 		             'mfi_fit_fft':False,
- 		             'mfi_med_fil':float('1')    }
+ 		             'fit_med_fil':int('1')    }
 
 		# If requested, propagate any changes.
 
@@ -3261,6 +3261,8 @@ class core( QObject ) :
 			self.opt['fls_n_spin']  = self.spin_arcv.n_file_max
 			self.opt['fls_n_mfi_l'] = self.mfi_arcv_lres.n_file_max
 			self.opt['fls_n_mfi_h'] = self.mfi_arcv_hres.n_file_max
+
+#			self.opt['fit_med_fil'] = 
 
 		# If requested, save the options dictionary.
 
