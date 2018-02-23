@@ -3095,8 +3095,9 @@ class core( QObject ) :
 					self.opt['mfi_fit_crv'] = True
 					self.load_mfi( )
 
-			if ( key == self.opt['fit_med_fil'] ) :
-				self.opt['fit_med_fil'] = 1
+		elif ( key == self.opt['fit_med_fil'] ) :
+			self.opt['fit_med_fil'] = value
+			self.fit_mfi( )
 
 		elif ( prefix == 'fls' ) :
 
