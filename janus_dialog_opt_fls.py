@@ -93,7 +93,7 @@ class dialog_opt_fls( QWidget ) :
 
 		self.lab_hdr1 = QLabel(
 		                'Maximum number of saved downloaded files'  )
-		self.lab_hdr2 = QLabel( '(Use "inf" for no limit)'          )
+		self.lab_hdr2 = QLabel( '( Use "inf" for no limit )'        )
 		self.lab_hdr3 = QLabel( 'MFI Resolution'                    )
 
 		self.lab1 = { 'fls_n_fc'    :QLabel( 'FC Files'         ),
@@ -125,9 +125,8 @@ class dialog_opt_fls( QWidget ) :
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
-		self.lab_hdr1.setFont( QFont( "Helvetica", 12 ) )
+		self.lab_hdr1.setFont( QFont( "Helvetica", 12, QFont.Bold ) )
 		self.lab_hdr2.setFont( QFont( "Helvetica", 12 ) )
-		self.lab_hdr3.setFont( QFont( "Helvetica", 12 ) )
 
 		self.sg.addWidget( self.lab_hdr1, 0, 0, 1, 3 )
 		self.sg.addWidget( self.lab_hdr2, 1, 0, 1, 3 )

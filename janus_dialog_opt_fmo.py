@@ -133,8 +133,8 @@ class dialog_opt_fmo( QWidget ) :
 			self.lab2[key].setFont(    QFont( "Helvetica", 12 ) )
 			self.arr_txt[key].setFont( QFont( "Helvetica", 12 ) )
 
-			self.sg.addWidget( self.lab2[key],  4+i, 0, 1, 1 )
-			self.sg.addWidget( self.arr_txt[key], 4+i, 1, 1, 1 )
+			self.sg.addWidget( self.arr_txt[key], 4+i, 0, 1, 1 )
+			self.sg.addWidget( self.lab2[key],  4+i, 1, 1, 1 )
 			self.arr_txt[key].setMaximumWidth( 60 )
 	
 		# Populate the menu with the options settings from core.
@@ -179,15 +179,17 @@ class dialog_opt_fmo( QWidget ) :
 	
 			if( ( ( val is None ) and ( txt == '' ) ) or
 			      ( val == self.core.opt[key]     )   or
-			      ( str_to_nni( txt )%2 != 0      )      ) :
+			      ( val%2 != 0                    )      ) :
 	
 				self.arr_txt[key].setStyleSheet(
 				                               'color: black;' )
 	
 				txt = str( self.core.opt[key] )
-			else :
-	
+
+			if( ( val is not None ) and ( val%2 == 0 ) ) :
+
 				self.arr_txt[key].setStyleSheet( 'color: red;' )
+#				raise TypeError('Median filter length must be odd')
 
 			self.arr_txt[key].setTextUpdate( txt )
 

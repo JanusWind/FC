@@ -395,26 +395,33 @@ class widget_fm_moments( QWidget ) :
 
 			# Adjust this plot's limits and then move it's label in
 			# response.
+			try :
 
-			self.make_lim( d )
+				self.make_lim( d )
 
-			self.plt[j,i].setRange( xRange=self.lim_x,
-			                        yRange=self.lim_y,
-			                        padding=0.         )
+				self.plt[j,i].setRange( xRange=self.lim_x,
+				                        yRange=self.lim_y,
+				                        padding=0.         )
 
-			self.lbl[j,i].setPos( self.lim_x[1], self.lim_y[1] )
+				self.lbl[j,i].setPos( self.lim_x[1],
+				                      self.lim_y[1] )
 
-			self.crv_dat[j,i] = PlotDataItem(
-			                               x, medfilt(y_dat[d], 11 ),
-			                                 pen = self.pen_crv_c )
+				self.crv_dat[j,i] = PlotDataItem(
+				                 x, medfilt(y_dat[d],
+				                 self.core.opt['fit_med_fil'] ),
+				                 pen = self.pen_crv_c         )
 
-			self.crv_fit[j,i] = PlotDataItem(
-			                              x, medfilt(y_fit[d],
-			                         self.core.opt['fit_med_fil']),
-			                                 pen = self.pen_crv[d] )
+				self.crv_fit[j,i] = PlotDataItem(
+				                 x, medfilt(y_fit[d],
+				                 self.core.opt['fit_med_fil'] ),
+				                 pen = self.pen_crv[d]        )
+				self.plt[j,i].addItem( self.crv_dat[j][i] )
+				self.plt[j,i].addItem( self.crv_fit[j][i] )
 
-			self.plt[j,i].addItem( self.crv_dat[j][i] )
-			self.plt[j,i].addItem( self.crv_fit[j][i] )
+			except :
+				raise TypeError('Median filter length must be odd')
+	#			pass
+
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESETTING THE PLOTS' FIT CURVES.
