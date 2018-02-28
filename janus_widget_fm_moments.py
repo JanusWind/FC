@@ -419,8 +419,8 @@ class widget_fm_moments( QWidget ) :
 				self.plt[j,i].addItem( self.crv_fit[j][i] )
 
 			except :
-				raise TypeError('Median filter length must be odd')
-	#			pass
+#				raise TypeError('Median filter length must be odd')
+				pass
 
 
 	#-----------------------------------------------------------------------
