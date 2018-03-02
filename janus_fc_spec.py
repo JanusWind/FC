@@ -80,9 +80,9 @@ class fc_spec( ) :
 		                       volt_cen=volt_cen[c][b],
 		                       volt_del=volt_del[c][b],
 		                       curr=curr[c][d][b])
-		               for b in range(self._n_bin) ]
-		               for d in range(self._n_dir) ]
-		               for c in range(self._n_cup) ]
+		                       for b in range(self._n_bin) ]
+		                       for d in range(self._n_dir) ]
+		                       for c in range(self._n_cup) ]
 
 	        # Define the time offsets for the individual data in the
                 # spectrum. 
@@ -426,7 +426,7 @@ class fc_spec( ) :
 	# DEFINE THE FUNCTION TO ASSIGN THE MAGNETIC FIELD TO EACH DATUM. 
 	#-----------------------------------------------------------------------
 
-	def set_mag( self, mfi_t, mfi_b_x, mfi_b_y, mfi_b_z ) :
+	def set_mag( self, mfi_t, mfi_b_x, mfi_b_y, mfi_b_z, key ) :
 
 		mfi_s = [ ( t - mfi_t[0] ).total_seconds( ) for t in mfi_t ]
 

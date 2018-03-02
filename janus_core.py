@@ -917,8 +917,8 @@ class core( QObject ) :
 		# Use interpolation to estiamte the magnetic field vector for
 		# each datum in the FC spectrum.
 
-		self.fc_spec.set_mag( self.mfi_t, self.mfi_b_x,
-		                                  self.mfi_b_y, self.mfi_b_z )
+#		self.fc_spec.set_mag( self.mfi_t, self.mfi_b_x,
+#		                                  self.mfi_b_y, self.mfi_b_z )
 
 		# Message the user that new Wind/MFI data have been loaded.
 
@@ -1029,6 +1029,10 @@ class core( QObject ) :
 			self.bbx = irfft( ffbx, n = len( self.mfi_s ) )
 			self.bby = irfft( ffby, n = len( self.mfi_s ) )
 			self.bbz = irfft( ffbz, n = len( self.mfi_s ) )
+
+			self.mfi_b_x_fit = self.bbx
+			self.mfi_b_y_fit = self.bby
+			self.mfi_b_z_fit = self.bbz
 
 			self.mfi_b_vec_fit = [ self.bbx, self.bby, self.bbz ]
 
@@ -1277,6 +1281,13 @@ class core( QObject ) :
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'fit' )
 
+		# Use interpolation to estiamte the magnetic field vector for
+		# each datum in the FC spectrum.
+
+		#key = self.opt['mfi_set_fit'] if ( self.opt['mfi_set_fit'] )
+		self.fc_spec.set_mag( self.mfi_t,       self.mfi_b_x_fit,
+		                      self.mfi_b_y_fit, self.mfi_b_z_fit,
+		                      self.opt['mfi_set_raw']             )
 
 		# Message the user that new Wind/MFI data have been loaded.
 
@@ -2628,7 +2639,11 @@ class core( QObject ) :
 
 		prm_v0 = ( prm[0], prm[1], prm[2] )
 
-		k = 3
+		prm_fv = prm[3]
+
+		prm_fb = ( prm[4]. prm[5]. prm[6] )
+
+		k = 7
 
 		for p in self.nln_gss_pop :
 
@@ -2673,7 +2688,8 @@ class core( QObject ) :
 				curr[d] += dat[d].calc_curr(
 				                self.nln_plas.arr_pop[p]['m'],
 				                self.nln_plas.arr_pop[p]['q'],
-				                prm_v0, prm_n, prm_dv, prm_w   )
+				                prm_v0, prm_fv, prm_fb,
+				                prm_n,  prm_dv, prm_w          )
 
 		# Return the list of total currents from all modeled ion
 		# species.
@@ -3095,6 +3111,27 @@ class core( QObject ) :
 					self.opt['mfi_fit_crv'] = True
 					self.load_mfi( )
 
+
+			if ( not ( self.opt['mfi_set_raw'] or
+			           self.opt['mfi_set_fit'] or
+			           self.opt['mfi_set_smt'] ) ) :
+
+				if ( ( key == 'mfi_set_fit' ) or
+				     ( key == 'mfi_set_smt' ) ) :
+					self.opt['mfi_set_raw'] = True
+					self.load_mfi( )
+
+				elif ( ( key == 'mfi_set_smt' ) or
+				       ( key == 'mfi_set_raw' ) ) :
+					self.opt['mfi_set_fit'] = True
+					self.load_mfi( )
+
+				elif ( ( key == 'mfi_set_raw' ) or
+				       ( key == 'mfi_set_fit' ) ) :
+					self.opt['mfi_set_smt'] = True
+					self.load_mfi( )
+
+
 		elif ( key == 'fit_med_fil' ) :
 			self.opt['fit_med_fil'] = value
 			self.load_mfi( )
@@ -3228,6 +3265,9 @@ class core( QObject ) :
 		             'fls_n_mfi_h':float('inf'),
 		             'mfi_fit_crv':True,
 		             'mfi_fit_fft':False,
+		             'mfi_set_raw':True,
+		             'mfi_set_fit':False,
+		             'mfi_set_smt':False,
  		             'fit_med_fil':int('1')    }
 
 		# If requested, propagate any changes.
@@ -3262,8 +3302,6 @@ class core( QObject ) :
 			self.opt['fls_n_spin']  = self.spin_arcv.n_file_max
 			self.opt['fls_n_mfi_l'] = self.mfi_arcv_lres.n_file_max
 			self.opt['fls_n_mfi_h'] = self.mfi_arcv_hres.n_file_max
-
-#			self.opt['fit_med_fil'] = 
 
 		# If requested, save the options dictionary.
 

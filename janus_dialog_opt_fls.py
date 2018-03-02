@@ -95,6 +95,7 @@ class dialog_opt_fls( QWidget ) :
 		                'Maximum number of saved downloaded files'  )
 		self.lab_hdr2 = QLabel( '( Use "inf" for no limit )'        )
 		self.lab_hdr3 = QLabel( 'MFI Resolution'                    )
+		self.lab_hdr4 = QLabel( 'MFI Set Style'                     )
 
 		self.lab1 = { 'fls_n_fc'    :QLabel( 'FC Files'         ),
 		              'fls_n_spin'  :QLabel( 'Spin Files'       ),
@@ -107,20 +108,30 @@ class dialog_opt_fls( QWidget ) :
 		          'mfi_l' :QLabel( 'Low Resolution (0.3 Hz) ', self ),
 		          'mfi_h' :QLabel( 'High Resolution (11 Hz)' , self )  }
 
+		self.lab3 = { 'mfi_set_raw' :QLabel( 'Raw Data ',     self ),
+		              'mfi_set_fit' :QLabel( 'Fit Data' ,     self ),
+		              'mfi_set_smt' :QLabel( 'Smoothed Data', self )   }
+
 		self.arr_txt = {
 		          'fls_n_fc'    :event_LineEdit( self, 'fls_n_fc'    ),
 		          'fls_n_spin'  :event_LineEdit( self, 'fls_n_spin'  ),
 		          'fls_n_mfi_l' :event_LineEdit( self, 'fls_n_mfi_l' ),
 		          'fls_n_mfi_h' :event_LineEdit( self, 'fls_n_mfi_h' ) }
 
-		self.box = { 'mfi_l' :event_RadioBox( self, 'mfi_l'  ),
-		             'mfi_h' :event_RadioBox( self, 'mfi_h'  )  }
+		self.box1 = { 'mfi_l' :event_RadioBox( self, 'mfi_l'  ),
+		              'mfi_h' :event_RadioBox( self, 'mfi_h'  )  }
 
+		self.box2 = {
+		         'mfi_set_raw' :event_RadioBox( self, 'mfi_set_raw' ),
+		         'mfi_set_fit' :event_RadioBox( self, 'mfi_set_fit' ),
+		         'mfi_set_smt' :event_RadioBox( self, 'mfi_set_smt' ) }
 
 		self.order1 = [ 'fls_n_fc', 'fls_n_spin', 'fls_n_mfi_l',
 		                'fls_n_mfi_h'                                  ]
 
 		self.order2 = [ 'mfi_l','mfi_h' ]
+
+		self.order3 = [ 'mfi_set_raw', 'mfi_set_fit', 'mfi_set_smt' ]
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
@@ -146,10 +157,21 @@ class dialog_opt_fls( QWidget ) :
 		for i, key in enumerate( self.order2 ) :
 
 			self.lab2[key].setFont( QFont( "Helvetica", 12 ) )
-			self.box[key].setFont(  QFont( "Helvetica", 12 ) )
+			self.box1[key].setFont( QFont( "Helvetica", 12 ) )
 
 			self.sg.addWidget( self.lab2[key], 7+i, 0, 1, 1 )
-			self.sg.addWidget( self.box[key],  7+i, 1, 1, 1 )
+			self.sg.addWidget( self.box1[key],  7+i, 1, 1, 1 )
+
+		self.lab_hdr4.setFont( QFont( "Helvetica", 12, QFont.Bold ) )
+		self.sg.addWidget( self.lab_hdr4, 9, 0, 1, 3 )
+
+		for i, key in enumerate( self.order3 ) :
+
+			self.lab3[key].setFont( QFont( "Helvetica", 12 ) )
+			self.box2[key].setFont( QFont( "Helvetica", 12 ) )
+
+			self.sg.addWidget( self.lab3[key], 10+i, 0, 1, 1 )
+			self.sg.addWidget( self.box2[key], 10+i, 1, 1, 1 )
 
 		# Populate the menu with the options settings from core.
 
@@ -172,8 +194,8 @@ class dialog_opt_fls( QWidget ) :
 
 		# Validate/update the displayed options.
 
-		self.box['mfi_l' ].setChecked( self.core.opt['mfi_l' ] )
-		self.box['mfi_h' ].setChecked( self.core.opt['mfi_h' ] )
+		self.box1['mfi_l' ].setChecked( self.core.opt['mfi_l' ] )
+		self.box1['mfi_h' ].setChecked( self.core.opt['mfi_h' ] )
 
 		for key in self.arr_txt :
 
@@ -217,7 +239,19 @@ class dialog_opt_fls( QWidget ) :
 
 				Thread( target=thread_chng_opt,
 				        args=( self.core, fnc,
-				        self.box[fnc].isChecked( ) ) ).start( )
+				        self.box1[fnc].isChecked( ) ) ).start( )
+
+		elif( ( fnc == 'mfi_set_raw' ) or ( fnc == 'mfi_set_fit' ) or
+		      ( fnc == 'mfi_set_smt' )                               ) :
+
+			if ( n_thread( ) == 0 ) :
+
+			# Start a new thread that makes the change to the option
+			# with core.
+
+				Thread( target=thread_chng_opt,
+				        args=( self.core, fnc,
+				        self.box2[fnc].isChecked( ) ) ).start( )
 
 			else :
 
