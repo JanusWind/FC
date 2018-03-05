@@ -2639,11 +2639,13 @@ class core( QObject ) :
 
 		prm_v0 = ( prm[0], prm[1], prm[2] )
 
+		print dat
+
 		prm_fv = prm[3]
 
-		prm_fb = ( prm[4]. prm[5]. prm[6] )
+#		prm_fb = ( prm[4]. prm[5]. prm[6] )
 
-		k = 7
+		k = 4
 
 		for p in self.nln_gss_pop :
 
