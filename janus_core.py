@@ -1770,6 +1770,7 @@ class core( QObject ) :
 		                                    self.mom_res['m_p'],
 		                                    self.mom_res['q_p'],
 		                                    self.mom_res['v0_vec'],
+		                                    self.mom_res['fv'],
 		                                    self.mom_res['n_p_c'], 0.,
 		                                    self.mom_res['w_p_c']      )
 
@@ -2339,7 +2340,13 @@ class core( QObject ) :
 
 		pop_v0_vec = self.nln_plas['v0_vec']
 
+		fv = 0.1 * self.nln_plas['v0']
+
 		self.nln_gss_prm = list( pop_v0_vec )
+
+		self.nln_gss_prm.append( fv )
+
+		# TODO: Append 'fv' to self.nln_gss_prm here?
 
 		self.nln_gss_curr_ion = [ ]
 
@@ -2394,7 +2401,8 @@ class core( QObject ) :
 			     self.fc_spec.calc_curr(
 			                    self.nln_plas.arr_pop[p]['m'],
 			                    self.nln_plas.arr_pop[p]['q'],
-			                    pop_v0_vec, pop_n, pop_dv, pop_w ) )
+			                    pop_v0_vec, fv, pop_n,
+			                    pop_dv, pop_w                ) )
 
 		# Alter the axis order of the array of currents.
 
@@ -2510,6 +2518,7 @@ class core( QObject ) :
 				# magnitude thereof) of this ion species (based
 				# on the initial guess).
 
+				# TODO: How to add 'fv' to 'vel' here?
 				vel = array( self.nln_plas['vec_v0'] )
 
 				if ( self.nln_plas.arr_pop[i]['drift'] ) :
@@ -2639,8 +2648,6 @@ class core( QObject ) :
 
 		prm_v0 = ( prm[0], prm[1], prm[2] )
 
-		print dat
-
 		prm_fv = prm[3]
 
 #		prm_fb = ( prm[4]. prm[5]. prm[6] )
@@ -2690,7 +2697,7 @@ class core( QObject ) :
 				curr[d] += dat[d].calc_curr(
 				                self.nln_plas.arr_pop[p]['m'],
 				                self.nln_plas.arr_pop[p]['q'],
-				                prm_v0, prm_fv, prm_fb,
+				                prm_v0, prm_fv, 
 				                prm_n,  prm_dv, prm_w          )
 
 		# Return the list of total currents from all modeled ion
@@ -2812,8 +2819,10 @@ class core( QObject ) :
 		self.nln_res_plas['sig_v0_x'] =  sig[0]
 		self.nln_res_plas['sig_v0_y'] =  sig[1]
 		self.nln_res_plas['sig_v0_z'] =  sig[2]
+		fv                            =  fit[3]
+		self.nln_res_plas['fv']       =  fit[3]
 
-		c = 3
+		c = 4
 
 		self.nln_res_curr_ion = []
 
@@ -2884,7 +2893,8 @@ class core( QObject ) :
 			     self.fc_spec.calc_curr ( 
 			                  self.nln_plas.arr_pop[p]['m'],
 			                  self.nln_plas.arr_pop[p]['q'],
-			                  pop_v0_vec, pop_n, pop_dv, pop_w ) )
+			                  pop_v0_vec, fv,  pop_n,
+			                  pop_dv, pop_w                   ) )
 
 		# Save the results of the this non-linear analysis to the
 		# results log.

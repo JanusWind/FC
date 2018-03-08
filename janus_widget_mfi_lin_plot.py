@@ -213,8 +213,7 @@ class widget_mfi_lin_plot( QWidget ) :
 		                           [ -b for b in self.core.mfi_b ],
 		                           pen=self.pen_crv_n )
 		self.crv_x = PlotDataItem( self.core.mfi_s,
-		                           self.core.mfi_b_x,
-		                           pen=self.pen_crv_x )
+		                           self.core.mfi_b_x, pen=self.pen_crv_x )
 		self.crv_y = PlotDataItem( self.core.mfi_s,
 		                           self.core.mfi_b_y,
 		                           pen=self.pen_crv_y )

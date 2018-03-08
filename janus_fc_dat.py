@@ -166,6 +166,8 @@ class fc_dat( ) :
 
 		# Store the components of the normalized magnetic-field vector.
 
+		self.norm_b = list( norm_b )
+
 		self._norm_b_x = norm_b[0]
 		self._norm_b_y = norm_b[1]
 		self._norm_b_z = norm_b[2]
@@ -202,7 +204,7 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION TO CALCULATE EXPECTED MAXWELLIAN CURRENT.
 	#-----------------------------------------------------------------------
 
-	def calc_curr( self, m, q, v0, n, dv, w ) :
+	def calc_curr( self, m, q, v0, fv, n, dv, w ) :
 
 		# Note.  This function is based on Equation 2.34 from Maruca
 		#        (PhD thesis, 2012), but differs by a factor of $2$
@@ -225,10 +227,18 @@ class fc_dat( ) :
 
 		# Calculate the total velocity using drift
 
+		db = [ ( self.norm_b[i] - self.core.mfi_avg_nrm[i] )
+		                  for i in range( len( self.norm_b ) ) ]
+
+		db_nrm = calc_arr_nrm( db )
+
+		fv_vec = [ ( fv * db_nrm[i] ) for i in range( len( db_nrm ) ) ]
+
 		if ( dv is None ) :
-			v_vec = [ v0[i] for i in range( len( v0 ) ) ]
+			v_vec = [ ( v0[i] + fv_vec[i] )
+			                           for i in range( len( v0 ) ) ]
 		else :
-			v_vec = [ v0[i] + dv * self['norm_b'][i]
+			v_vec = [ ( v0[i] + dv * self['norm_b'][i] + fv_vec[i] )
 			                           for i in range( len( v0 ) ) ]
 
 		# Calculate the component of the magnetic field unit vector

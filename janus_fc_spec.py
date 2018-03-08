@@ -346,13 +346,13 @@ class fc_spec( ) :
 	# DEFINE THE FUNCTION FOR CALC'ING EXPECTED CURRENT FROM A POPULATION.
 	#-----------------------------------------------------------------------
 
-	def calc_curr( self, m, q, v0, n, dv, w) :
+	def calc_curr( self, m, q, v0, fv, n, dv, w) :
 
 		# Return a 3-D list with the calculated current for each bin in
 		# the spectrum.
 
 		return [ [ [ self.arr[c][d][b].calc_curr( 
-		                    m, q, v0, n, dv, w      )
+		                    m, q, v0, fv, n, dv, w      )
 		                    for b in range( self['n_bin'] ) ]
 		                    for d in range( self['n_dir'] ) ]
 		                    for c in range( self['n_cup'] ) ]

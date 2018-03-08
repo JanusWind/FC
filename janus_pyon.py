@@ -31,7 +31,7 @@ from janus_const import const
 ## DEFINE THE LIST OF RESERVED NAMES.
 ################################################################################
 
-PARAM = [ 'b0', 'v0', 'n', 'v', 'dv', 'v0', 'w', 'w2', 'r', 't', 'beta',
+PARAM = [ 'b0', 'v0', 'fv', 'n', 'v', 'dv', 'w', 'w2', 'r', 't', 'beta',
           'ac', 'time', 's','m','q', 'k', 'beta_par', 'beta_per'               ]
 
 COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat'  ]
@@ -152,6 +152,8 @@ class plas( object ) :
 		self.v0_x = None
 		self.v0_y = None
 		self.v0_z = None
+
+	# TODO: Define the fluctuating velocity here.
 
 		self.sig_v0_x = None
 		self.sig_v0_y = None
@@ -364,6 +366,12 @@ class plas( object ) :
 					return self.sig_v0_z
 				else :
 					return None
+
+		elif ( elem['param'] == 'fv' ) :
+
+			if ( ( elem['comp'] is None  ) or
+			     ( elem['comp'] == 'mag' )    ) :
+				return 0.1*self.get_v0_mag( )
 
 		# Note.  If this point is reached, the parameter is one to be
 		#        handled by the species or population.
