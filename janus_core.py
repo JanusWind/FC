@@ -2341,7 +2341,7 @@ class core( QObject ) :
 
 		pop_v0_vec = self.nln_plas['v0_vec']
 
-		fv = 0.1 * self.nln_plas['v0']
+		fv = self.nln_plas['fv']
 
 		self.nln_gss_prm = list( pop_v0_vec )
 
@@ -2520,7 +2520,9 @@ class core( QObject ) :
 				# on the initial guess).
 
 				# TODO: How to add 'fv' to 'vel' here?
-				vel = array( self.nln_plas['vec_v0'] )
+
+				vel = array( self.nln_plas['vec_v0'] ) +\
+				      array( self.nln_plas['fv'] )
 
 				if ( self.nln_plas.arr_pop[i]['drift'] ) :
 					vel += self.mfi_avg_nrm * \
@@ -2822,6 +2824,8 @@ class core( QObject ) :
 		self.nln_res_plas['sig_v0_z'] =  sig[2]
 		fv                            =  fit[3]
 		self.nln_res_plas['fv']       =  fit[3]
+
+		print fv
 
 		c = 4
 

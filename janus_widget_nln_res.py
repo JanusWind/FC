@@ -166,6 +166,7 @@ class widget_nln_res( format_TextEdit ) :
 				lab_v_x   = '<i>v<sub>x' + sym + '</sub></i>'
 				lab_v_y   = '<i>v<sub>y' + sym + '</sub></i>'
 				lab_v_z   = '<i>v<sub>z' + sym + '</sub></i>'
+				lab_fv    = '<i>fv<sub>||' + sym + '</sub></i>'
 				lab_dv    = '<i>&Delta;v</i><sub>||<i>' + \
 				                 sym + '</i></sub>'
 				lab_w     = '<i>w<sub>' + sym + '</sub></i>'
@@ -264,6 +265,14 @@ class widget_nln_res( format_TextEdit ) :
 						         self.core.nln_res_plas[
 						               'sig_v0_z'], 0  )
 						self.prnt_htm( 'km/s'          )
+
+						self.prnt_brk( )
+						self.prnt_tab( 3 )
+						self.prnt_htm( lab_fv + ' = ' )
+						self.prnt_dcm(
+						   self.core.nln_res_plas[
+						                    'fv'], 3 )
+
 
 				elif ( pop['drift'] ) :
 

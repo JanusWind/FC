@@ -86,7 +86,7 @@ class dialog_opt_fls( QWidget ) :
 
 		self.sg.setContentsMargins( 0, 0, 0, 0 )
 
-		self.grd.addLayout( self.sg, 0, 0, 13, 3)
+		self.grd.addLayout( self.sg, 4, 4, 13, 3)
 
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
