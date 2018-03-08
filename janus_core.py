@@ -1771,6 +1771,7 @@ class core( QObject ) :
 		                                    self.mom_res['q_p'],
 		                                    self.mom_res['v0_vec'],
 		                                    self.mom_res['fv'],
+		                                    self.mfi_avg_nrm,
 		                                    self.mom_res['n_p_c'], 0.,
 		                                    self.mom_res['w_p_c']      )
 
@@ -2401,8 +2402,8 @@ class core( QObject ) :
 			     self.fc_spec.calc_curr(
 			                    self.nln_plas.arr_pop[p]['m'],
 			                    self.nln_plas.arr_pop[p]['q'],
-			                    pop_v0_vec, fv, pop_n,
-			                    pop_dv, pop_w                ) )
+			                    pop_v0_vec, fv, self.mfi_avg_nrm,
+			                    pop_n, pop_dv, pop_w             ) )
 
 		# Alter the axis order of the array of currents.
 
@@ -2697,7 +2698,7 @@ class core( QObject ) :
 				curr[d] += dat[d].calc_curr(
 				                self.nln_plas.arr_pop[p]['m'],
 				                self.nln_plas.arr_pop[p]['q'],
-				                prm_v0, prm_fv, 
+				                prm_v0, prm_fv, self.mfi_avg_nrm,
 				                prm_n,  prm_dv, prm_w          )
 
 		# Return the list of total currents from all modeled ion
@@ -2893,8 +2894,8 @@ class core( QObject ) :
 			     self.fc_spec.calc_curr ( 
 			                  self.nln_plas.arr_pop[p]['m'],
 			                  self.nln_plas.arr_pop[p]['q'],
-			                  pop_v0_vec, fv,  pop_n,
-			                  pop_dv, pop_w                   ) )
+			                  pop_v0_vec, fv, self.mfi_avg_nrm,
+			                  pop_n, pop_dv, pop_w               ) )
 
 		# Save the results of the this non-linear analysis to the
 		# results log.
