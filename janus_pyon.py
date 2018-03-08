@@ -371,7 +371,7 @@ class plas( object ) :
 
 			if ( ( elem['comp'] is None  ) or
 			     ( elem['comp'] == 'mag' )    ) :
-				return 0.1*self.get_v0_mag( )
+				return 0.05*self.get_v0_mag( )
 
 		# Note.  If this point is reached, the parameter is one to be
 		#        handled by the species or population.
@@ -474,6 +474,14 @@ class plas( object ) :
 					self.v0_y = float( value[1] )
 				if ( value[2] is not None ) :
 					self.v0_z = float( value[2] )
+
+		elif ( key == 'fv' ) :
+
+			self.fv = None
+
+			if ( value is not None ) :
+
+				self.fv = float( value )
 
 		elif ( key == 'sig_v0_x' ) :
 

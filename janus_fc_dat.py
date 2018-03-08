@@ -230,7 +230,7 @@ class fc_dat( ) :
 		db = [ ( self.norm_b[i] - av_b[i] )
 		                  for i in range( len( self.norm_b ) ) ]
 
-		db_nrm = calc_arr_nrm( db )
+		db_nrm = calc_arr_norm( db )
 
 		fv_vec = [ ( fv * db_nrm[i] ) for i in range( len( db_nrm ) ) ]
 
