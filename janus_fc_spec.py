@@ -426,13 +426,13 @@ class fc_spec( ) :
 	# DEFINE THE FUNCTION TO ASSIGN THE MAGNETIC FIELD TO EACH DATUM. 
 	#-----------------------------------------------------------------------
 
-	def set_mag( self, mfi_t, mfi_b_x, mfi_b_y, mfi_b_z, key ) :
+	def set_mag( self, mfi_t, mfi_b ) :
 
 		mfi_s = [ ( t - mfi_t[0] ).total_seconds( ) for t in mfi_t ]
 
-		fnc_b_x = interp1d( mfi_s, mfi_b_x )
-		fnc_b_y = interp1d( mfi_s, mfi_b_y )
-		fnc_b_z = interp1d( mfi_s, mfi_b_z )
+		fnc_b_x = interp1d( mfi_s, mfi_b[0] )
+		fnc_b_y = interp1d( mfi_s, mfi_b[1] )
+		fnc_b_z = interp1d( mfi_s, mfi_b[2] )
 
 		try :
 
@@ -453,9 +453,9 @@ class fc_spec( ) :
 						            b_x, b_y, b_z ) )
 		except :
 
-			avg_b_x = sum( mfi_b_x ) / float( len( mfi_b_x ) )
-			avg_b_y = sum( mfi_b_y ) / float( len( mfi_b_y ) )
-			avg_b_z = sum( mfi_b_z ) / float( len( mfi_b_z ) )
+			avg_b_x = sum( mfi_b[0] ) / float( len( mfi_b[0] ) )
+			avg_b_y = sum( mfi_b[1] ) / float( len( mfi_b[1] ) )
+			avg_b_z = sum( mfi_b[2] ) / float( len( mfi_b[2] ) )
 
 			for c in range( self['n_cup'] ) :
 

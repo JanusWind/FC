@@ -155,6 +155,7 @@ class plas( object ) :
 
 	# TODO: Define the fluctuating velocity here.
 
+		self.fv       = None
 		self.sig_v0_x = None
 		self.sig_v0_y = None
 		self.sig_v0_z = None

@@ -50,7 +50,7 @@ from numpy import amax, amin, array, ceil, floor, log10, sqrt, tile, where, mean
 from threading import Thread
 from janus_thread import n_thread, thread_chng_opt
 
-from scipy.signal      import medfilt
+from scipy.signal import medfilt
 
 
 ################################################################################
@@ -296,7 +296,7 @@ class widget_fm_moments( QWidget ) :
 
 		else :
 
-			data = self.core.mfi_b_vec_t[d]
+			data = self.core.mfi_vec_t[d]
 
 			self.lim_x = [ min( self.core.mfi_s ),
 			               max( self.core.mfi_s ) ]
@@ -305,8 +305,8 @@ class widget_fm_moments( QWidget ) :
 			              1.1*mean( data ) - 2*std( data )*2.**0.5,
 			              1.1*mean( data ) + 2*std( data )*2.**0.5 ]
 
-#			            -1.1*abs( min( self.core.mfi_b_vec_t[d] ) ),
-#			             1.1*max( self.core.mfi_b_vec_t[d] )       ]
+#			            -1.1*abs( min( self.core.mfi_vec_t[d] ) ),
+#			             1.1*max( self.core.mfi_vec_t[d] )       ]
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CREATING THE PLOTS' FIT CURVES.
@@ -327,12 +327,12 @@ class widget_fm_moments( QWidget ) :
 		text = [ 'X-component', 'Y-component', 'Z-component' ]
 
 		x     = array( self.core.mfi_s )
-		y_dat = array( self.core.mfi_b_vec_t )
+		y_dat = array( self.core.mfi_vec_smt )
 
-		if( self.core.mfi_b_vec_fit is None ) :
+		if( self.core.mfi_vec_fit is None ) :
 			return
 		else :
-			y_fit = array( self.core.mfi_b_vec_fit )
+			y_fit = array( self.core.mfi_vec_fit )
 
 		# Adjust the individual axes to the new limits.
 
@@ -386,12 +386,12 @@ class widget_fm_moments( QWidget ) :
 			# contributions to the modeled current to the plot.
 
 #			x     = array( self.core.mfi_s )
-#			y_dat = array( self.core.mfi_b_vec_t[d] )
+#			y_dat = array( self.core.mfi_vec_t[d] )
 #
-#			if( self.core.mfi_b_vec_fit == None ) :
+#			if( self.core.mfi_vec_fit == None ) :
 #				continue
 #			else :
-#				y_fit = array( self.core.mfi_b_vec_fit[d] )
+#				y_fit = array( self.core.mfi_vec_fit[d] )
 
 			# Adjust this plot's limits and then move it's label in
 			# response.
@@ -406,15 +406,11 @@ class widget_fm_moments( QWidget ) :
 				self.lbl[j,i].setPos( self.lim_x[1],
 				                      self.lim_y[1] )
 
-				self.crv_dat[j,i] = PlotDataItem(
-				                 x, medfilt(y_dat[d],
-				                 self.core.opt['fit_med_fil'] ),
-				                 pen = self.pen_crv_c         )
+				self.crv_dat[j,i] = PlotDataItem( x, y_dat[d],
+				                         pen = self.pen_crv_c )
 
-				self.crv_fit[j,i] = PlotDataItem(
-				                 x, medfilt(y_fit[d],
-				                 self.core.opt['fit_med_fil'] ),
-				                 pen = self.pen_crv[d]        )
+				self.crv_fit[j,i] = PlotDataItem( x, y_fit[d],
+				                        pen = self.pen_crv[d] )
 				self.plt[j,i].addItem( self.crv_dat[j][i] )
 				self.plt[j,i].addItem( self.crv_fit[j][i] )
 

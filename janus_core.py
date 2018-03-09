@@ -287,15 +287,14 @@ class core( QObject ) :
 			self.mfi_avg_vec   = None
 			self.mfi_avg_nrm   = None
 
-			self.mfi_b_x_t     = None
-			self.mfi_b_y_t     = None
-			self.mfi_b_z_t     = None
-			self.mfi_b_vec_t   = None
+			self.mfi_x_t       = None
+			self.mfi_y_t       = None
+			self.mfi_z_t       = None
+			self.mfi_vec_t     = None
 
 			self.mfi_bbx_t     = None
 			self.mfi_bby_t     = None
 			self.mfi_bbz_t     = None
-			self.mfi_b_vec_t   = None
 
 			self.mfi_frq_x     = None
 			self.mfi_frq_y     = None
@@ -304,18 +303,25 @@ class core( QObject ) :
 			self.mfi_amp_x     = None
 			self.mfi_amp_y     = None
 			self.mfi_amp_z     = None
+			self.mfi_amp_vec   = None
+
+			self.mfi_x_smt     = None
+			self.mfi_y_smt     = None
+			self.mfi_z_smt     = None
+			self.mfi_vec_smt   = None
 
 			self.mfi_b_x_fits  = None
 			self.mfi_b_y_fits  = None
 			self.mfi_b_z_fits  = None
 
-			self.mfi_b_x_fit   = None
-			self.mfi_b_y_fit   = None
-			self.mfi_b_z_fit   = None
-			self.mfi_b_vec_fit = None
+			self.mfi_x_fit     = None
+			self.mfi_y_fit     = None
+			self.mfi_z_fit     = None
+			self.mfi_vec_fit   = None
 
 			self.mfi_fit_lin   = False
 
+			self.mfi_fields    = None
 			self.mfi_phs_x     = None
 			self.mfi_phs_y     = None
 			self.mfi_phs_z     = None
@@ -750,7 +756,6 @@ class core( QObject ) :
 		# with this spectrum.
 
 		self.load_mfi( )
-		self.fit_mfi( )
 
 		# If requested, run the moments analysis.
 
@@ -862,10 +867,7 @@ class core( QObject ) :
 
 		# Compute the vector magnetic field.
 
-		self.mfi_b_vec = [ [ self.mfi_b_x[i],
-		                     self.mfi_b_y[i],
-		                     self.mfi_b_z[i]                     ]
-		                     for i in range( len( self.mfi_s ) ) ]
+		self.mfi_b_vec = [ self.mfi_b_x, self.mfi_b_y, self.mfi_b_z ]
 
 		# Compute the magnetic field magnitude.
 
@@ -952,20 +954,19 @@ class core( QObject ) :
 
 		# Computing the components of magnetic filed in the new basis.
 
-		self.mfi_b_x_t = [ sum( [ self.mfi_b_vec[i][j]*e1[j]
+		self.mfi_x_t = [ sum( [ self.mfi_b_vec[j][i]*e1[j] 
 		                           for j in range( 3 ) ]             )
 		                           for i in range( len( self.mfi_s ) ) ]
-		self.mfi_b_y_t = [ sum( [ self.mfi_b_vec[i][j]*e2[j]
+		self.mfi_y_t = [ sum( [ self.mfi_b_vec[j][i]*e2[j] 
 		                           for j in range( 3 ) ]             )
 		                           for i in range( len( self.mfi_s ) ) ]
-		self.mfi_b_z_t = [ sum( [ self.mfi_b_vec[i][j]*e3[j]
+		self.mfi_z_t = [ sum( [ self.mfi_b_vec[j][i]*e3[j] 
 		                           for j in range( 3 ) ]             )
 		                           for i in range( len( self.mfi_s ) ) ]
 
 		# Vector magnetic field in the new basis.
 
-		self.mfi_b_vec_t = [ self.mfi_b_x_t, self.mfi_b_y_t,
-		                                                self.mfi_b_z_t ]
+		self.mfi_vec_t = [ self.mfi_x_t, self.mfi_y_t, self.mfi_z_t ]
 
 		# TODO: Check which of the following is better method of
 		# calculation.
@@ -987,9 +988,9 @@ class core( QObject ) :
 			# Compute the Fourier Transform of each component of
 			# magnetic field.
 
-			fbx = rfft( self.mfi_b_x_t )
-			fby = rfft( self.mfi_b_y_t )
-			fbz = rfft( self.mfi_b_z_t )
+			fbx = rfft( self.mfi_x_t )
+			fby = rfft( self.mfi_y_t )
+			fbz = rfft( self.mfi_z_t )
 
 			# Compute the absolute value of fourier transformed
 			# data.
@@ -1026,21 +1027,18 @@ class core( QObject ) :
 			# Take the inverse transform of the data to get the
 			# sinusoidal solution for the input data.
 
-			self.bbx = irfft( ffbx, n = len( self.mfi_s ) )
-			self.bby = irfft( ffby, n = len( self.mfi_s ) )
-			self.bbz = irfft( ffbz, n = len( self.mfi_s ) )
+			self.mfi_x_fit = irfft( ffbx, n = len( self.mfi_s ) )
+			self.mfi_y_fit = irfft( ffby, n = len( self.mfi_s ) ) 
+			self.mfi_z_fit = irfft( ffbz, n = len( self.mfi_s ) ) 
 
-			self.mfi_b_x_fit = self.bbx
-			self.mfi_b_y_fit = self.bby
-			self.mfi_b_z_fit = self.bbz
-
-			self.mfi_b_vec_fit = [ self.bbx, self.bby, self.bbz ]
+			self.mfi_vec_fit = [ self.mfi_x_fit, self.mfi_y_fit,
+			                     self.mfi_z_fit                  ]
 
 			# Compute the amplitude of sinusoidal solution.
 
-			self.mfi_amp_x = std( self.bbx ) * 2.**0.5
-			self.mfi_amp_y = std( self.bby ) * 2.**0.5
-			self.mfi_amp_z = std( self.bbz ) * 2.**0.5
+			self.mfi_amp_x = std( self.mfi_x_fit ) * 2.**0.5
+			self.mfi_amp_y = std( self.mfi_y_fit ) * 2.**0.5
+			self.mfi_amp_z = std( self.mfi_z_fit ) * 2.**0.5
 
 			# Compute the phase of the sinusoidal solution.
 
@@ -1130,22 +1128,22 @@ class core( QObject ) :
 				                   len( self.mfi_s ) )
 
 				self.mfi_b_x_fits = fit_sin( self.mfi_s,
-				                             self.mfi_b_x_t )
+				                             self.mfi_x_t )
 				self.mfi_b_y_fits = fit_sin( self.mfi_s,
-				                             self.mfi_b_y_t )
+				                             self.mfi_y_t )
 				self.mfi_b_z_fits = fit_sin( self.mfi_s,
-				                             self.mfi_b_z_t )
+				                             self.mfi_z_t )
 
-				self.mfi_b_x_fit = \
-				            self.mfi_b_x_fits['fitfunc']( ind )
-				self.mfi_b_y_fit = \
-				            self.mfi_b_y_fits['fitfunc']( ind )
-				self.mfi_b_z_fit = \
-				            self.mfi_b_z_fits['fitfunc']( ind )
+				self.mfi_x_fit = \
+				             self.mfi_b_x_fits['fitfunc']( ind )
+				self.mfi_y_fit = \
+				             self.mfi_b_y_fits['fitfunc']( ind )
+				self.mfi_z_fit = \
+				             self.mfi_b_z_fits['fitfunc']( ind )
 
-				self.mfi_b_vec_fit = [ self.mfi_b_x_fit,
-				                       self.mfi_b_y_fit,
-			 	                       self.mfi_b_z_fit  ]
+				self.mfi_vec_fit = [ self.mfi_x_fit,
+				                     self.mfi_y_fit,
+			 	                     self.mfi_z_fit  ]
 
 				# Compute the amplitude of sinusoidal solution.
 
@@ -1236,22 +1234,22 @@ class core( QObject ) :
 				                   len( self.mfi_s ) )
 
 				self.mfi_b_x_fits = fit_lin( self.mfi_s,
-				                                self.mfi_b_x_t )
+				                             self.mfi_x_t )
 				self.mfi_b_y_fits = fit_lin( self.mfi_s,
-				                                self.mfi_b_y_t )
+				                             self.mfi_y_t )
 				self.mfi_b_z_fits = fit_lin( self.mfi_s,
-				                                self.mfi_b_z_t )
+				                             self.mfi_z_t )
 
-				self.mfi_b_x_fit = \
+				self.mfi_x_fit = \
 				             self.mfi_b_x_fits['fitfunc']( ind )
-				self.mfi_b_y_fit = \
+				self.mfi_y_fit = \
 				             self.mfi_b_y_fits['fitfunc']( ind )
-				self.mfi_b_z_fit = \
+				self.mfi_z_fit = \
 				             self.mfi_b_z_fits['fitfunc']( ind )
 
-				self.mfi_b_vec_fit = [ self.mfi_b_x_fit,
-				                       self.mfi_b_y_fit,
-			 	                       self.mfi_b_z_fit  ]
+				self.mfi_vec_fit = [ self.mfi_x_fit,
+				                     self.mfi_y_fit,
+			 	                     self.mfi_z_fit  ]
 
 				# Compute the amplitude of sinusoidal solution.
 
@@ -1279,19 +1277,43 @@ class core( QObject ) :
 
 				self.emit( SIGNAL('janus_mesg'), 'core', 'norun', 'fit' )
 
-		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'fit' )
+#		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'fit' )
+
+		# Smooth the rotated raw magnetic field data using the median
+		# filter of given window size.
+
+		self.mfi_x_smt = medfilt(
+		                         self.mfi_x_t, self.opt['fit_med_fil'] )
+		self.mfi_y_smt = medfilt(
+		                         self.mfi_y_t, self.opt['fit_med_fil'] )
+		self.mfi_z_smt = medfilt(
+		                         self.mfi_z_t, self.opt['fit_med_fil'] )
+
+		self.mfi_vec_smt = [ self.mfi_x_smt, self.mfi_y_smt,
+		                     self.mfi_z_smt                   ]
+		# Assign all the magnetic fields to a dictionary
+
+		if( any ( x is None for x in self.mfi_b_vec   ) or
+		    any ( x is None for x in self.mfi_vec_fit ) or
+		    any ( x is None for x in self.mfi_vec_smt )     ) :
+
+			self.mfi_fields = None
+		else :
+
+			self.mfi_fields = { "mfi_raw": self.mfi_b_vec,
+			                    "mfi_fit": self.mfi_vec_fit,
+			                    "mfi_smt": self.mfi_vec_smt   }
 
 		# Use interpolation to estiamte the magnetic field vector for
 		# each datum in the FC spectrum.
 
 		#key = self.opt['mfi_set_fit'] if ( self.opt['mfi_set_fit'] )
-		self.fc_spec.set_mag( self.mfi_t,       self.mfi_b_x_fit,
-		                      self.mfi_b_y_fit, self.mfi_b_z_fit,
-		                      self.opt['mfi_set_raw']             )
+		key = 'mfi_smt'
+		self.fc_spec.set_mag( self.mfi_t, self.mfi_fields[key] )
 
 		# Message the user that new Wind/MFI data have been loaded.
 
-		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mfi' )
+		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'fit' )
 
 		# Emit a signal that indicates that a new Wind/MFI data have now
 		# been loaded.

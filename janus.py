@@ -57,7 +57,7 @@ class janus( object ) :
 	# DEFINE THE INITIALIZATION FUNCTION.
 	#-----------------------------------------------------------------------
 
-	def __init__( self, time=None ) :
+	def __init__( self, time='2008-11-04-12-00-41' ) :
 
 		# If the necessary subdirectories do not exist, create them.
 
