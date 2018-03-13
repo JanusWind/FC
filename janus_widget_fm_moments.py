@@ -123,7 +123,7 @@ class widget_fm_moments( QWidget ) :
 		self.pen_crv_r = mkPen( color='r' )
 		self.pen_crv_g = mkPen( color='g' )
 		self.pen_crv_b = mkPen( color='b' )
-		self.pen_crv_gr = mkPen( color='#C3C3C3' )
+		self.pen_crv_gr = mkPen( color='#d7d1cf' )
 		self.pen_crv_br = mkPen( color='#4D2619' )
 #		self.pen_crv_gr = mkPen( color='#342C2B' )
 #		self.pen_crv_gr = mkPen( color='#342C2B' )
@@ -302,15 +302,25 @@ class widget_fm_moments( QWidget ) :
 
 		else :
 
-			data = self.core.mfi_vec_t[d]
+			if( d == 0) :
+
+				data1 = self.core.mfi_vec_fit[d]
+				data2 = self.core.mfi_vec_t[d]
+
+				self.lim_y = [
+				             max( max( data1 ), max( data2 ) ),
+				             min( min( data1 ), min( data2 ) ) ]
+			else :
+
+				data = self.core.mfi_vec_t[d]
+
+				self.lim_y = [
+				     1.1*mean( data ) - 2*std( data )*2.**0.5,
+				     1.1*mean( data ) + 2*std( data )*2.**0.5 ]
+
 
 			self.lim_x = [ min( self.core.mfi_s ),
 			               max( self.core.mfi_s ) ]
-
-			self.lim_y = [
-			              1.1*mean( data ) - 2*std( data )*2.**0.5,
-			              1.1*mean( data ) + 2*std( data )*2.**0.5 ]
-
 #			            -1.1*abs( min( self.core.mfi_vec_t[d] ) ),
 #			             1.1*max( self.core.mfi_vec_t[d] )       ]
 
