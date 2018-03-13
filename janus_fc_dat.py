@@ -74,11 +74,14 @@ class fc_dat( ) :
 		self._dir_y     = sin( self._the ) * sin( self._phi )
 		self._dir_z     = cos( self._the )
 
-		self._norm_b_x  = None
-		self._norm_b_y  = None
-		self._norm_b_z  = None
+		self._norm_b_x  = None  #TODO: Remove
+		self._norm_b_y  = None  #TODO: Remove
+		self._norm_b_z  = None  #TODO: Remove
 
-		self._maglook   = None
+		self._maglook   = None  #TODO: Remove
+
+		self._dict_maglook = { }
+		self._dict_norm_b  = { }
 
 		if ( ( self._azim     is None ) or ( self._elev     is None ) or
 		     ( self._volt_cen is None ) or ( self._volt_del is None ) or
@@ -153,6 +156,24 @@ class fc_dat( ) :
 
 		raise KeyError('Reassignment not allowed after initialization.')
 
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR SETIING THE MAGNETIC FIELD DIRECTION.
+	#-----------------------------------------------------------------------
+
+	def set_mag_key( self, b_vec, key ) :     #TODO: Rename to "set_mag".
+
+		# Normalize the magnetic-field vector and calcualte the magnetic
+		# look direction.
+
+		norm_b = list( calc_arr_norm( b_vec ) )
+
+		maglook = calc_arr_dot( norm_b, self['dir'] )
+
+		# Store the normalized magnetic-field vector and the magnetic
+		# look direction.
+
+		self._dict_norm_b[ key] = norm_b
+		self._dict_maglook[key] = maglook
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR SETIING THE MAGNETIC FIELD DIRECTION.
@@ -204,7 +225,7 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION TO CALCULATE EXPECTED MAXWELLIAN CURRENT.
 	#-----------------------------------------------------------------------
 
-	def calc_curr( self, m, q, v0, fv, av_b, n, dv, w ) :
+	def calc_curr( self, m, q, v0, fv, av_b, n, dv, w, key=None ) :
 
 		# Note.  This function is based on Equation 2.34 from Maruca
 		#        (PhD thesis, 2012), but differs by a factor of $2$
