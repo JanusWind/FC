@@ -433,7 +433,10 @@ class widget_fm_moments( QWidget ) :
 				                         pen = self.pen_crv[4] )
 
 				self.plt[j,i].addItem( self.crv_raw[j][i] )
-				self.plt[j,i].addItem( self.crv_fit[j][i] )
+				try :
+					self.plt[j,i].addItem( self.crv_fit[j][i] )
+				except:
+					pass
 				self.plt[j,i].addItem( self.crv_smt[j][i] )
 
 			except :
