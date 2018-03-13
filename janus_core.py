@@ -1777,7 +1777,7 @@ class core( QObject ) :
 		self.mom_res = plas( )
 
 		self.mom_res['v0_vec'] = mom_v_vec
-
+		self.mom_res['fv']     = 0.05*norm(mom_v_vec)
 		self.mom_res.add_spec( name='Proton', sym='p', m=1., q=1. )
 
 		self.mom_res.add_pop( 'p',
@@ -2151,6 +2151,7 @@ class core( QObject ) :
 		try :
 			self.nln_plas['v0_vec'] = [
 			         round( v, 1 ) for v in self.mom_res['v0_vec'] ]
+			self.nln_plas['fv'] = 0.05*norm( self.nln_plas['v0_vec'])
 		except :
 			pass
 
@@ -2847,7 +2848,10 @@ class core( QObject ) :
 		fv                            =  fit[3]
 		self.nln_res_plas['fv']       =  fit[3]
 
+		print self.nln_res_plas['v0_x']
+		print fit[0]
 		print fv
+		print self.nln_res_plas['fv']
 
 		c = 4
 
@@ -3114,10 +3118,11 @@ class core( QObject ) :
 				else :
 					self.opt['res_dw'] = True
 
-			if ( self.opt['res_n'] or self.opt['res_v'] or
-			     self.opt['res_d'] or self.opt['res_w'] or
-        	             self.opt['res_r'] or self.opt['res_b'] or
-        	             self.opt['res_s'] or self.opt['res_k']     ) :
+			if ( self.opt['res_n']  or self.opt['res_v'] or
+			     self.opt['res_fv'] or self.opt['res_d'] or
+			     self.opt['res_w']  or self.opt['res_r'] or
+        	             self.opt['res_b']  or self.opt['res_s'] or 
+        	             self.opt['res_k']                           ) :
 				self.opt['res'] = True
 			else :
 				self.opt['res'] = False
@@ -3290,6 +3295,7 @@ class core( QObject ) :
 		             'res_u'      :True,
 		             'res_n'      :True,
 		             'res_v'      :True,
+		             'res_fv'     :True,
 		             'res_d'      :True,
 		             'res_w'      :True,
 		             'res_r'      :True,

@@ -218,7 +218,7 @@ class widget_nln_res( format_TextEdit ) :
 						self.prnt_htm( lab_v + ' = '   )
 						self.prnt_dcm(
 						   self.core.nln_res_plas[
-						        'v0'], 0, 'km/s'       )
+						        'v0'], 0, ' km/s'      )
 						self.prnt_brk( )
 						self.prnt_tab( 3 )
 						self.prnt_htm( lab_v_x + ' = ' )
@@ -233,7 +233,7 @@ class widget_nln_res( format_TextEdit ) :
 							self.prnt_dcm(
 						        self.core.nln_res_plas[
 						               'sig_v0_x'], 0  )
-						self.prnt_htm( 'km/s'          )
+						self.prnt_htm( ' km/s'         )
 
 						self.prnt_brk( )
 						self.prnt_tab( 3 )
@@ -249,7 +249,7 @@ class widget_nln_res( format_TextEdit ) :
 							self.prnt_dcm(
 						         self.core.nln_res_plas[
 						               'sig_v0_y'], 0  )
-						self.prnt_htm( 'km/s'          )
+						self.prnt_htm( ' km/s'         )
 
 						self.prnt_brk( )
 						self.prnt_tab( 3 )
@@ -264,15 +264,17 @@ class widget_nln_res( format_TextEdit ) :
 							self.prnt_dcm(
 						         self.core.nln_res_plas[
 						               'sig_v0_z'], 0  )
-						self.prnt_htm( 'km/s'          )
+						self.prnt_htm( ' km/s'         )
 
-						self.prnt_brk( )
-						self.prnt_tab( 3 )
-						self.prnt_htm( lab_fv + ' = ' )
-						self.prnt_dcm(
-						   self.core.nln_res_plas[
-						                    'fv'], 3 )
-
+						if ( self.core.opt['res_fv'] ):
+							self.prnt_brk( )
+							self.prnt_tab( 3 )
+							self.prnt_htm( lab_fv +
+							                 ' = ' )
+							self.prnt_dcm(
+							self.core.nln_res_plas[
+							              'fv'], 3 )
+						self.prnt_htm( ' km/s'         )
 
 				elif ( pop['drift'] ) :
 
@@ -286,7 +288,7 @@ class widget_nln_res( format_TextEdit ) :
 							'&nbsp;&plusmn;&nbsp;' )
 							self.prnt_dcm(
 							pop['sig_dv'], 1       )
-						self.prnt_htm( 'km/s')
+						self.prnt_htm( ' km/s'         )
 
 				# Print the population's thermal speed(s).
 
@@ -301,7 +303,7 @@ class widget_nln_res( format_TextEdit ) :
 							self.prnt_htm(
 							         lab_w + ' = ' )
 							self.prnt_dcm(
-							   pop['w'], 1, 'km/s' )
+							   pop['w'], 1, ' km/s')
 							self.prnt_brk( )
 							self.prnt_tab( 3 )
 							self.prnt_htm(
@@ -317,7 +319,7 @@ class widget_nln_res( format_TextEdit ) :
 								self.prnt_dcm(
 								pop[
 								'sig_w_per'] ,1)
-							self.prnt_htm( 'km/s' )
+							self.prnt_htm( ' km/s' )
 
 							self.prnt_brk( )
 							self.prnt_tab( 3 )
@@ -334,7 +336,7 @@ class widget_nln_res( format_TextEdit ) :
 								self.prnt_dcm(
 								pop[
 								'sig_w_par'] ,1)
-							self.prnt_htm( 'km/s' )
+							self.prnt_htm( ' km/s' )
 
 					else :
 	
@@ -355,7 +357,7 @@ class widget_nln_res( format_TextEdit ) :
 								self.prnt_dcm(
 								pop[
 							        'sig_w'],1     )
-							self.prnt_htm( 'km/s'  ) 
+							self.prnt_htm( ' km/s' ) 
 
 				# Print the population's temperature(s).
 

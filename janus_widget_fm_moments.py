@@ -123,8 +123,13 @@ class widget_fm_moments( QWidget ) :
 		self.pen_crv_r = mkPen( color='r' )
 		self.pen_crv_g = mkPen( color='g' )
 		self.pen_crv_b = mkPen( color='b' )
+		self.pen_crv_gr = mkPen( color='#C3C3C3' )
+		self.pen_crv_br = mkPen( color='#4D2619' )
+#		self.pen_crv_gr = mkPen( color='#342C2B' )
+#		self.pen_crv_gr = mkPen( color='#342C2B' )
 
-		self.pen_crv = [self.pen_crv_r, self.pen_crv_g, self.pen_crv_b]    
+		self.pen_crv = [self.pen_crv_r, self.pen_crv_g, self.pen_crv_b,
+		                self.pen_crv_gr, self.pen_crv_br ]    
 		self.bsh_pnt_c = mkBrush( color='c' )
 		self.bsh_pnt_y = mkBrush( color='y' )
 		self.bsh_pnt_r = mkBrush( color='r' )
@@ -197,8 +202,9 @@ class widget_fm_moments( QWidget ) :
 		self.tsp = tile( None, [ self.n_plt_y, self.n_plt_x ] )
 		self.lbl = tile( None, [ self.n_plt_y, self.n_plt_x ] )
 
-		self.crv_dat = tile( None, [ self.n_plt_y, self.n_plt_x ] )
+		self.crv_raw = tile( None, [ self.n_plt_y, self.n_plt_x ] )
 		self.crv_fit = tile( None, [ self.n_plt_y, self.n_plt_x ] )
+		self.crv_smt = tile( None, [ self.n_plt_y, self.n_plt_x ] )
 
 		# Initialize the scale-type for each axis, then generate the
 		# (default) axis-limits and adjusted axis-limits.
@@ -206,7 +212,7 @@ class widget_fm_moments( QWidget ) :
 		self.log_x = False
 		self.log_y = False
 
-		self.make_lim( 0 )
+		self.make_lim( None )
 
 		# Create, store, and add to the grid the individual axes: first
 		# the horizontal and then the vertical.
@@ -289,7 +295,7 @@ class widget_fm_moments( QWidget ) :
 		# If no spectrum has been loaded, use the default limits;
 		# otherwise, use the spectral data to compute axis limits.
 
-		if ( self.core.fc_spec is None ) :
+		if ( d ==  None ) :
 
 			self.lim_x = [ 0., 90. ]
 			self.lim_y = [ -3., 3. ]
@@ -326,22 +332,24 @@ class widget_fm_moments( QWidget ) :
 
 		text = [ 'X-component', 'Y-component', 'Z-component' ]
 
-		x     = array( self.core.mfi_s )
-		y_dat = array( self.core.mfi_vec_smt )
+		x     = self.core.mfi_s
+		y_raw = self.core.mfi_vec_t
+		y_smt = self.core.mfi_vec_smt
 
 		if( self.core.mfi_vec_fit is None ) :
 			return
 		else :
-			y_fit = array( self.core.mfi_vec_fit )
+			y_fit = self.core.mfi_vec_fit
 
 		# Adjust the individual axes to the new limits.
 
-		for l in range( self.n_plt_x ) :
-			self.axs_x[l].setRange( self.lim_x[0], self.lim_x[1] )
-
-		for m in range( self.n_plt_y ) :
-			self.axs_y[m].setRange( self.lim_y[0], self.lim_y[1] )
-
+#		for l in range( self.n_plt_x ) :
+#			self.axs_x[l].setRange( self.lim_x[0], self.lim_x[1] )
+#
+#		for m in range( self.n_plt_y ) :
+#			self.axs_y[m].setRange( self.lim_y[0], self.lim_y[1] )
+#
+#			print self.lim_y[0], self.lim_y[1]
 		# For each plot in the grid, generate and display a fit curve
 		# based on the results of the analysis.
 
@@ -353,6 +361,9 @@ class widget_fm_moments( QWidget ) :
 			j = self.calc_ind_j( d )
 			i = self.calc_ind_i( d )
 
+#			self.axs_x[i].setRange( self.lim_x[0], self.lim_x[1] )
+#			self.axs_y[j].setRange( self.lim_y[0], self.lim_y[1] )
+
 			# If this plot does not exist, move onto the next grid
 			# element.
 
@@ -362,13 +373,18 @@ class widget_fm_moments( QWidget ) :
 			# If any curves already exist for this plot, remove and
 			# delete them.
 
-			if ( self.crv_dat[j,i] is not None ) :
-				self.plt[j,i].removeItem( self.crv_dat[j,i] )
-				self.crv_dat[j,i] = None
+			if ( self.crv_raw[j,i] is not None ) :
+				self.plt[j,i].removeItem( self.crv_raw[j,i] )
+				self.crv_raw[j,i] = None
 
 			if ( self.crv_fit[j,i] is not None ) :
 				self.plt[j,i].removeItem( self.crv_fit[j,i] )
 				self.crv_fit[j,i] = None
+
+			if ( self.crv_smt[j,i] is not None ) :
+				self.plt[j,i].removeItem( self.crv_smt[j,i] )
+				self.crv_smt[j,i] = None
+
 
 			# Clear this plot's label of text.
 
@@ -379,22 +395,15 @@ class widget_fm_moments( QWidget ) :
 
 			txt = text[d]
 
-			self.lbl[j,i].setText( txt, color=(0,0,0) )
+			self.lbl[j,i].setText( txt, color=(1,1,1) )
 			self.lbl[j,i].setFont( self.fnt           )
 
 			# Create and add the curve of the individual
 			# contributions to the modeled current to the plot.
 
-#			x     = array( self.core.mfi_s )
-#			y_dat = array( self.core.mfi_vec_t[d] )
-#
-#			if( self.core.mfi_vec_fit == None ) :
-#				continue
-#			else :
-#				y_fit = array( self.core.mfi_vec_fit[d] )
-
 			# Adjust this plot's limits and then move it's label in
 			# response.
+
 			try :
 
 				self.make_lim( d )
@@ -403,16 +412,29 @@ class widget_fm_moments( QWidget ) :
 				                        yRange=self.lim_y,
 				                        padding=0.         )
 
+				self.axs_x[i].setRange( self.lim_x[0],
+				                        self.lim_x[1] )
+				self.axs_y[j].setRange( self.lim_y[0],
+				                        self.lim_y[1] )
+
 				self.lbl[j,i].setPos( self.lim_x[1],
 				                      self.lim_y[1] )
 
-				self.crv_dat[j,i] = PlotDataItem( x, y_dat[d],
-				                         pen = self.pen_crv_c )
+				self.crv_raw[j,i] = PlotDataItem( x, y_raw[d],
+				                         pen = self.pen_crv[3] )
 
-				self.crv_fit[j,i] = PlotDataItem( x, y_fit[d],
-				                        pen = self.pen_crv[d] )
-				self.plt[j,i].addItem( self.crv_dat[j][i] )
+				try:
+					self.crv_fit[j,i] = PlotDataItem( x, y_fit[d],
+					                        pen = self.pen_crv[0] )
+				except:
+					pass
+
+				self.crv_smt[j,i] = PlotDataItem( x, y_smt[d],
+				                         pen = self.pen_crv[4] )
+
+				self.plt[j,i].addItem( self.crv_raw[j][i] )
 				self.plt[j,i].addItem( self.crv_fit[j][i] )
+				self.plt[j,i].addItem( self.crv_smt[j][i] )
 
 			except :
 #				raise TypeError('Median filter length must be odd')
@@ -440,15 +462,20 @@ class widget_fm_moments( QWidget ) :
 
 				# Remove and delete this plot's fit curve.
 
-				if ( self.crv_dat[j,i] is not None ) :
+				if ( self.crv_raw[j,i] is not None ) :
 					self.plt[j,i].removeItem(
-					                     self.crv_dat[j,i] )
-					self.crv_dat[j,i] = None
+					                     self.crv_raw[j,i] )
+					self.crv_raw[j,i] = None
 
 				if ( self.crv_fit[j,i] is not None ) :
 					self.plt[j,i].removeItem(
 					                     self.crv_fit[j,i] )
 					self.crv_fit[j,i] = None
+
+				if ( self.crv_smt[j,i] is not None ) :
+					self.plt[j,i].removeItem(
+					                     self.crv_smt[j,i] )
+					self.crv_smt[j,i] = None
 				# If requested, reset this plot's label text to
 				# the empty string.
 

@@ -95,6 +95,7 @@ class dialog_opt_par( QWidget ) :
                        'lab_2'  :QLabel( 'Species NLN Parameters'    , self ),
                        'res_n'  :QLabel( 'Number density (n)'        , self ),
                        'res_v'  :QLabel( 'Velocity (v)'              , self ),
+                       'res_fv' :QLabel( 'Fluctuating Velocity'      , self ),
                        'res_d'  :QLabel( 'Drift (dv)'                , self ),
                        'res_w'  :QLabel( 'Therm. Speed/Temp. (W/T)'  , self ),
                        'res_r'  :QLabel( 'Anisotropy (R)'            , self ),
@@ -113,13 +114,14 @@ class dialog_opt_par( QWidget ) :
 		             'res_r' :event_CheckBox( self, 'res_r'  ),
 		             'res_b' :event_CheckBox( self, 'res_b'  ),
 		             'res_s' :event_CheckBox( self, 'res_s'  ),
+		             'res_fv':event_CheckBox( self, 'res_fv' ),
 		             'res_k' :event_CheckBox( self, 'res_k'  ),
 		             'res_u' :event_CheckBox( self, 'res_u'  )   }
 
 
 		self.order = [ 'lab_1', 'res_dt', 'res_dw', 'lab_2', 'res_n',
-		               'res_v', 'res_d' , 'res_w' , 'res_r', 'res_b',
-		               'res_s', 'res_k' , 'lab_3' , 'res_u'            ]
+		               'res_v', 'res_fv', 'res_d' , 'res_w', 'res_r',
+		               'res_b', 'res_s' , 'res_k' , 'lab_3', 'res_u'  ]
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
@@ -153,6 +155,7 @@ class dialog_opt_par( QWidget ) :
 		self.box['res_dw'].setChecked( self.core.opt['res_dw'] )
 		self.box['res_n' ].setChecked( self.core.opt['res_n' ] )
 		self.box['res_v' ].setChecked( self.core.opt['res_v' ] )
+		self.box['res_fv'].setChecked( self.core.opt['res_fv'] )
 		self.box['res_d' ].setChecked( self.core.opt['res_d' ] )
 		self.box['res_w' ].setChecked( self.core.opt['res_w' ] )
 		self.box['res_r' ].setChecked( self.core.opt['res_r' ] )

@@ -155,7 +155,7 @@ class plas( object ) :
 
 	# TODO: Define the fluctuating velocity here.
 
-		self.fv       = None
+#		self.fv       = None
 		self.sig_v0_x = None
 		self.sig_v0_y = None
 		self.sig_v0_z = None
@@ -372,7 +372,7 @@ class plas( object ) :
 
 			if ( ( elem['comp'] is None  ) or
 			     ( elem['comp'] == 'mag' )    ) :
-				return 0.05*self.get_v0_mag( )
+				return self.fv
 
 		# Note.  If this point is reached, the parameter is one to be
 		#        handled by the species or population.

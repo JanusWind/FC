@@ -445,7 +445,7 @@ class widget_fc_cup( QWidget ) :
 			                                          r_alt, r_dir )
 
 			self.lbl[j,i].setText( txt, color=(0,0,0) )
-			#self.lbl[j,i].setFont( self.fnt           )
+			self.lbl[j,i].setFont( self.fnt           )
 
 			# Generate the histogram for the data from this look
 			# direction and display it in the plot.
