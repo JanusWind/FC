@@ -308,8 +308,8 @@ class widget_fm_moments( QWidget ) :
 				data2 = self.core.mfi_vec_t[d]
 
 				self.lim_y = [
-				        1.1* max( max( data1 ), max( data2 ) ),
-				        0.9* min( min( data1 ), min( data2 ) ) ]
+				       0.97* min( min( data1 ), min( data2 ) ),
+				       1.01* max( max( data1 ), max( data2 ) ) ]
 			else :
 
 				data = self.core.mfi_vec_t[d]

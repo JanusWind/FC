@@ -2848,9 +2848,6 @@ class core( QObject ) :
 		fv                            =  fit[3]
 		self.nln_res_plas['fv']       =  fit[3]
 
-		print self.nln_res_plas['v0_x']
-		print fit[0]
-		print fv
 		print self.nln_res_plas['fv']
 
 		c = 4
