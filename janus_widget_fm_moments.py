@@ -308,8 +308,8 @@ class widget_fm_moments( QWidget ) :
 				data2 = self.core.mfi_vec_t[d]
 
 				self.lim_y = [
-				             max( max( data1 ), max( data2 ) ),
-				             min( min( data1 ), min( data2 ) ) ]
+				        1.1* max( max( data1 ), max( data2 ) ),
+				        0.9* min( min( data1 ), min( data2 ) ) ]
 			else :
 
 				data = self.core.mfi_vec_t[d]
@@ -434,8 +434,8 @@ class widget_fm_moments( QWidget ) :
 				                         pen = self.pen_crv[3] )
 
 				try:
-					self.crv_fit[j,i] = PlotDataItem( x, y_fit[d],
-					                        pen = self.pen_crv[0] )
+					self.crv_fit[j,i] = PlotDataItem( x,
+					       y_fit[d], pen = self.pen_crv[0] )
 				except:
 					pass
 
@@ -444,7 +444,8 @@ class widget_fm_moments( QWidget ) :
 
 				self.plt[j,i].addItem( self.crv_raw[j][i] )
 				try :
-					self.plt[j,i].addItem( self.crv_fit[j][i] )
+					self.plt[j,i].addItem(
+					                    self.crv_fit[j][i] )
 				except:
 					pass
 				self.plt[j,i].addItem( self.crv_smt[j][i] )
