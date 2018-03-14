@@ -302,17 +302,16 @@ class widget_fm_moments( QWidget ) :
 
 		else :
 
+			data = self.core.mfi_vec_t[d]
+
 			if( d == 0) :
 
-				data1 = self.core.mfi_vec_fit[d]
-				data2 = self.core.mfi_vec_t[d]
-
 				self.lim_y = [
-				       0.97* min( min( data1 ), min( data2 ) ),
-				       1.01* max( max( data1 ), max( data2 ) ) ]
+				         mean( data ) - 2*std( data )*2.**0.5,
+				          mean( data ) + 2*std( data )*2.**0.5 ]
+
 			else :
 
-				data = self.core.mfi_vec_t[d]
 
 				self.lim_y = [
 				     1.1*mean( data ) - 2*std( data )*2.**0.5,
@@ -321,8 +320,6 @@ class widget_fm_moments( QWidget ) :
 
 			self.lim_x = [ min( self.core.mfi_s ),
 			               max( self.core.mfi_s ) ]
-#			            -1.1*abs( min( self.core.mfi_vec_t[d] ) ),
-#			             1.1*max( self.core.mfi_vec_t[d] )       ]
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CREATING THE PLOTS' FIT CURVES.
@@ -351,15 +348,6 @@ class widget_fm_moments( QWidget ) :
 		else :
 			y_fit = self.core.mfi_vec_fit
 
-		# Adjust the individual axes to the new limits.
-
-#		for l in range( self.n_plt_x ) :
-#			self.axs_x[l].setRange( self.lim_x[0], self.lim_x[1] )
-#
-#		for m in range( self.n_plt_y ) :
-#			self.axs_y[m].setRange( self.lim_y[0], self.lim_y[1] )
-#
-#			print self.lim_y[0], self.lim_y[1]
 		# For each plot in the grid, generate and display a fit curve
 		# based on the results of the analysis.
 
@@ -370,9 +358,6 @@ class widget_fm_moments( QWidget ) :
 
 			j = self.calc_ind_j( d )
 			i = self.calc_ind_i( d )
-
-#			self.axs_x[i].setRange( self.lim_x[0], self.lim_x[1] )
-#			self.axs_y[j].setRange( self.lim_y[0], self.lim_y[1] )
 
 			# If this plot does not exist, move onto the next grid
 			# element.
@@ -415,6 +400,8 @@ class widget_fm_moments( QWidget ) :
 			# response.
 
 			try :
+
+				# Adjust the individual axes to the new limits.
 
 				self.make_lim( d )
 
