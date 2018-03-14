@@ -74,14 +74,14 @@ class fc_dat( ) :
 		self._dir_y     = sin( self._the ) * sin( self._phi )
 		self._dir_z     = cos( self._the )
 
-		self._norm_b_x  = None  #TODO: Remove
-		self._norm_b_y  = None  #TODO: Remove
-		self._norm_b_z  = None  #TODO: Remove
+#		self._norm_b_x  = None  #TODO: Remove
+#		self._norm_b_y  = None  #TODO: Remove
+#		self._norm_b_z  = None  #TODO: Remove
+#
+#		self._maglook   = None  #TODO: Remove
 
-		self._maglook   = None  #TODO: Remove
-
-		self._dict_maglook = { }
-		self._dict_norm_b  = { }
+		self._maglook = { }
+		self._norm_b  = { }
 
 		if ( ( self._azim     is None ) or ( self._elev     is None ) or
 		     ( self._volt_cen is None ) or ( self._volt_del is None ) or
@@ -139,16 +139,16 @@ class fc_dat( ) :
 			return self._dir_z
 		elif ( key == 'dir' ) :
 			return ( self._dir_x, self._dir_y, self._dir_z )
-		elif ( key == 'norm_b_x' ) :
-			return self._norm_b_x
-		elif ( key == 'norm_b_y' ) :
-			return self._norm_b_y
-		elif ( key == 'norm_b_z' ) :
-			return self._norm_b_z
-		elif ( key == 'norm_b' ) :
-			return ( self._norm_b_x,self._norm_b_y,self._norm_b_z )
-		elif ( key == 'maglook' ) :
-			return ( self._maglook )
+#		elif ( key == 'norm_b_x' ) :
+#			return self._norm_b_x
+#		elif ( key == 'norm_b_y' ) :
+#			return self._norm_b_y
+#		elif ( key == 'norm_b_z' ) :
+#			return self._norm_b_z
+#		elif ( key == 'norm_b' ) :
+#			return ( self._norm_b_x,self._norm_b_y,self._norm_b_z )
+#		elif ( key == 'maglook' ) :
+#			return ( self._maglook )
 		else :
 			raise KeyError( 'Invalid key for "fc_dat ".' )
 
@@ -160,7 +160,7 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION FOR SETIING THE MAGNETIC FIELD DIRECTION.
 	#-----------------------------------------------------------------------
 
-	def set_mag_key( self, b_vec, key ) :     #TODO: Rename to "set_mag".
+	def set_mag( self, b_vec, key ) :     #TODO: Rename to "set_mag".
 
 		# Normalize the magnetic-field vector and calcualte the magnetic
 		# look direction.
@@ -172,28 +172,28 @@ class fc_dat( ) :
 		# Store the normalized magnetic-field vector and the magnetic
 		# look direction.
 
-		self._dict_norm_b[ key] = norm_b
-		self._dict_maglook[key] = maglook
+		self._norm_b[ key] = norm_b
+		self._maglook[key] = maglook
 
-	#-----------------------------------------------------------------------
-	# DEFINE THE FUNCTION FOR SETIING THE MAGNETIC FIELD DIRECTION.
-	#-----------------------------------------------------------------------
-
-	def set_mag( self, b_vec ) :
-
-		# Normalize the magnetic-field vector.
-
-		norm_b = calc_arr_norm( b_vec )
-
-		# Store the components of the normalized magnetic-field vector.
-
-		self.norm_b = list( norm_b )
-
-		self._norm_b_x = norm_b[0]
-		self._norm_b_y = norm_b[1]
-		self._norm_b_z = norm_b[2]
-
-		self._maglook = calc_arr_dot( self['norm_b'], self['dir'] )
+#	#-----------------------------------------------------------------------
+#	# DEFINE THE FUNCTION FOR SETIING THE MAGNETIC FIELD DIRECTION.
+#	#-----------------------------------------------------------------------
+#
+#	def set_mag( self, b_vec ) :
+#
+#		# Normalize the magnetic-field vector.
+#
+#		norm_b = calc_arr_norm( b_vec )
+#
+#		# Store the components of the normalized magnetic-field vector.
+#
+#		self.norm_b = list( norm_b )
+#
+#		self._norm_b_x = norm_b[0]
+#		self._norm_b_y = norm_b[1]
+#		self._norm_b_z = norm_b[2]
+#
+#		self._maglook = calc_arr_dot( self['norm_b'], self['dir'] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CALCULATING THE EFFECTIVE AREA OF THE CUP.
@@ -239,7 +239,7 @@ class fc_dat( ) :
 		if ( hasattr( w, '__len__' ) and ( w is not None ) ) :
 
 			if ( w is not None ) :
-				ml2 = ( self['maglook'] )**2
+				ml2 = ( self._maglook['key'] )**2
 
 				w_eff = sqrt( ( ( 1. - ml2 ) * w[0]**2 ) +
 			                    (          ml2   * w[1]**2 )   )
@@ -256,10 +256,10 @@ class fc_dat( ) :
 		fv_vec = [ ( fv * db_nrm[i] ) for i in range( len( db_nrm ) ) ]
 
 		if ( dv is None ) :
-			v_vec = [ ( v0[i] + fv_vec[i] )
+			v_vec = [ ( v0[i] - fv_vec[i] )
 			                           for i in range( len( v0 ) ) ]
 		else :
-			v_vec = [ ( v0[i] + dv * self['norm_b'][i] + fv_vec[i] )
+			v_vec = [ ( v0[i] + dv * self['norm_b'][i] - fv_vec[i] )
 			                           for i in range( len( v0 ) ) ]
 
 		# Calculate the component of the magnetic field unit vector

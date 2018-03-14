@@ -426,7 +426,7 @@ class fc_spec( ) :
 	# DEFINE THE FUNCTION TO ASSIGN THE MAGNETIC FIELD TO EACH DATUM. 
 	#-----------------------------------------------------------------------
 
-	def set_mag( self, mfi_t, mfi_b ) :
+	def set_mag( self, mfi_t, mfi_b, key ) :
 
 		mfi_s = [ ( t - mfi_t[0] ).total_seconds( ) for t in mfi_t ]
 
@@ -450,7 +450,7 @@ class fc_spec( ) :
 						b_z = fnc_b_z( s )
 
 						self.arr[c][d][b].set_mag( (
-						            b_x, b_y, b_z ) )
+						          b_x, b_y, b_z, key ) )
 		except :
 
 			avg_b_x = sum( mfi_b[0] ) / float( len( mfi_b[0] ) )
@@ -464,4 +464,5 @@ class fc_spec( ) :
                                         for b in range( self['n_bin'] ) :
 
                                                 self.arr[c][d][b].set_mag( (
-						avg_b_x, avg_b_y, avg_b_z ) )
+						avg_b_x, avg_b_y, avg_b_z, key
+						                             ) )
