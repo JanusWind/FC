@@ -114,22 +114,22 @@ class widget_fm_moments( QWidget ) :
 
 		# Initizalize the pens, brushes, and fonts used by this widget.
 
-		self.pen_plt   = mkPen( color='k' )
-		self.pen_plt   = mkPen( color='k' )
-		self.pen_pnt_c = mkPen( color='k' )
-		self.pen_pnt_y = mkPen( color='k' )
-		self.pen_pnt_r = mkPen( color='k' )
-		self.pen_crv_c = mkPen( color='c' )
-		self.pen_crv_r = mkPen( color='r' )
-		self.pen_crv_g = mkPen( color='g' )
-		self.pen_crv_b = mkPen( color='b' )
+		self.pen_plt    = mkPen( color='k' )
+		self.pen_plt    = mkPen( color='k' )
+		self.pen_pnt_c  = mkPen( color='k' )
+		self.pen_pnt_y  = mkPen( color='k' )
+		self.pen_pnt_r  = mkPen( color='k' )
+		self.pen_crv_c  = mkPen( color='c' )
+		self.pen_crv_r  = mkPen( color='r' )
+		self.pen_crv_g  = mkPen( color='g' )
+		self.pen_crv_b  = mkPen( color='b' )
 		self.pen_crv_gr = mkPen( color='#d7d1cf' )
 		self.pen_crv_br = mkPen( color='#4D2619' )
 #		self.pen_crv_gr = mkPen( color='#342C2B' )
 #		self.pen_crv_gr = mkPen( color='#342C2B' )
 
-		self.pen_crv = [self.pen_crv_r, self.pen_crv_g, self.pen_crv_b,
-		                self.pen_crv_gr, self.pen_crv_br ]    
+		self.pen_crv = [ self.pen_crv_r, self.pen_crv_g, self.pen_crv_b,
+		                 self.pen_crv_gr, self.pen_crv_br              ]    
 		self.bsh_pnt_c = mkBrush( color='c' )
 		self.bsh_pnt_y = mkBrush( color='y' )
 		self.bsh_pnt_r = mkBrush( color='r' )

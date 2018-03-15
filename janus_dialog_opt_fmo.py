@@ -123,10 +123,11 @@ class dialog_opt_fmo( QWidget ) :
 
 		for i, key in enumerate( self.order1 ) :
 
-			self.box[key].setFont( QFont( "Sans", 12 ) )
-			self.lab1[key].setFont( QFont( "Sans", 12 ) )
+			self.box[key].setFont( QFont( "Helvetica", 12 ) )
+			self.lab1[key].setFont( QFont( "Helvetica", 12 ) )
 			self.sg.addWidget( self.box[key], 1+i, 0, 1, 1 )
 			self.sg.addWidget( self.lab1[key], 1+i, 1, 1, 1 )
+			self.box[key].setMaximumWidth( 40 )
 
 		for i, key in enumerate( self.order2 ) :
 
@@ -136,7 +137,8 @@ class dialog_opt_fmo( QWidget ) :
 			self.sg.addWidget( self.arr_txt[key], 4+i, 0, 1, 1 )
 			self.sg.addWidget( self.lab2[key],  4+i, 1, 1, 1 )
 			self.arr_txt[key].setMaximumWidth( 60 )
-	
+			self.arr_txt[key].setMaximumWidth( 40 )
+
 		# Populate the menu with the options settings from core.
 
 		self.make_opt( )

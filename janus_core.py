@@ -322,6 +322,9 @@ class core( QObject ) :
 			self.mfi_fit_lin   = False
 
 			self.mfi_fields    = None
+
+			self.mfi_set_key   = None
+
 			self.mfi_phs_x     = None
 			self.mfi_phs_y     = None
 			self.mfi_phs_z     = None
@@ -1307,15 +1310,15 @@ class core( QObject ) :
 		# Use interpolation to estiamte the magnetic field vector for
 		# each datum in the FC spectrum.
 
-#		self.mfi_set_key = [self.opt[key] for key in self.mfi_fields.keys()]
+		for i in range( len( self.mfi_fields.keys() ) ) :
 
-		self.mfi_set_key =[ key if( self.opt[key] for key in
-self.mfi_fields.keys())]
+			if( self.opt[ self.mfi_fields.keys()[i] ] ) :
 
-		print self.mfi_set_key
-		#key = self.opt['mfi_set_fit'] if ( self.opt['mfi_set_fit'] )
-		key = 'mfi_set_smt'
-		self.fc_spec.set_mag( self.mfi_t, self.mfi_fields[key], key )
+				self.mfi_set_key = self.mfi_fields.keys()[i]
+
+		self.fc_spec.set_mag( self.mfi_t,
+		                      self.mfi_fields[self.mfi_set_key],
+		                      self.mfi_set_key                  )
 
 		# Message the user that new Wind/MFI data have been loaded.
 
@@ -1802,7 +1805,7 @@ self.mfi_fields.keys())]
 		                                    self.mfi_avg_nrm,
 		                                    self.mom_res['n_p_c'], 0.,
 		                                    self.mom_res['w_p_c'],
-		                                    'mfi_set_smt'      )
+		                                    self.mfi_set_key   )
 
 		# Message the user that the moments analysis has completed.
 
@@ -2433,7 +2436,8 @@ self.mfi_fields.keys())]
 			                    self.nln_plas.arr_pop[p]['m'],
 			                    self.nln_plas.arr_pop[p]['q'],
 			                    pop_v0_vec, fv, self.mfi_avg_nrm,
-			                    pop_n, pop_dv, pop_w, 'mfi_set_smt'  ) )
+			                    pop_n, pop_dv, pop_w,
+			                    self.mfi_set_key                 ) )
 
 		# Alter the axis order of the array of currents.
 
@@ -2732,7 +2736,7 @@ self.mfi_fields.keys())]
 				                self.nln_plas.arr_pop[p]['q'],
 				                prm_v0, prm_fv,self.mfi_avg_nrm,
 				                prm_n,  prm_dv, prm_w,
-				                'mfi_set_smt'                  )
+				                self.mfi_set_key               )
 
 		# Return the list of total currents from all modeled ion
 		# species.
@@ -2930,7 +2934,8 @@ self.mfi_fields.keys())]
 			                  self.nln_plas.arr_pop[p]['m'],
 			                  self.nln_plas.arr_pop[p]['q'],
 			                  pop_v0_vec, fv, self.mfi_avg_nrm,
-			                  pop_n, pop_dv, pop_w, 'mfi_set_smt' ))
+			                  pop_n, pop_dv, pop_w,
+			                  self.mfi_set_key                   ) )
 
 		# Save the results of the this non-linear analysis to the
 		# results log.
@@ -3160,25 +3165,24 @@ self.mfi_fields.keys())]
 					self.opt['mfi_fit_crv'] = True
 					self.load_mfi( )
 
-#
-#			if ( not ( self.opt['mfi_set_raw'] or
-#			           self.opt['mfi_set_fit'] or
-#			           self.opt['mfi_set_smt'] ) ) :
-#
-#				if ( ( key == 'mfi_set_fit' ) or
-#				     ( key == 'mfi_set_smt' ) ) :
-#					self.opt['mfi_set_raw'] = True
-#					self.load_mfi( )
-#
-#				elif ( ( key == 'mfi_set_smt' ) or
-#				       ( key == 'mfi_set_raw' ) ) :
-#					self.opt['mfi_set_fit'] = True
-#					self.load_mfi( )
-#
-#				elif ( ( key == 'mfi_set_raw' ) or
-#				       ( key == 'mfi_set_fit' ) ) :
-#					self.opt['mfi_set_smt'] = True
-#					self.load_mfi( )
+			if ( not ( self.opt['mfi_set_raw'] or
+			           self.opt['mfi_set_fit'] or
+			           self.opt['mfi_set_smt'] ) ) :
+
+				if ( ( key == 'mfi_set_fit' ) or
+				     ( key == 'mfi_set_smt' ) ) :
+					self.opt['mfi_set_raw'] = True
+					self.load_mfi( )
+
+				elif ( ( key == 'mfi_set_smt' ) or
+				       ( key == 'mfi_set_raw' ) ) :
+					self.opt['mfi_set_fit'] = True
+					self.load_mfi( )
+
+				elif ( ( key == 'mfi_set_raw' ) or
+				       ( key == 'mfi_set_fit' ) ) :
+					self.opt['mfi_set_smt'] = True
+					self.load_mfi( )
 
 
 		elif ( key == 'fit_med_fil' ) :

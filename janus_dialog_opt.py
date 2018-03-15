@@ -32,6 +32,8 @@ from PyQt4.QtGui import QDialog, QGridLayout, QTabWidget
 from janus_dialog_opt_par import dialog_opt_par
 from janus_dialog_opt_fls import dialog_opt_fls
 from janus_dialog_opt_fmo import dialog_opt_fmo
+from janus_dialog_opt_mfi import dialog_opt_mfi
+
 from janus_event_PushButton import event_PushButton
 
 # Load the necessary threading modules.
@@ -87,10 +89,12 @@ class dialog_opt( QDialog ) :
 		self.wdg_opt_par   = dialog_opt_par( self.core   )
 		self.wdg_opt_fls   = dialog_opt_fls( self.core   )
 		self.wdg_opt_fmo   = dialog_opt_fmo( self.core   )
+		self.wdg_opt_mfi   = dialog_opt_mfi( self.core   )
 
 		self.wdg.addTab( self.wdg_opt_par, 'Results'   )
 		self.wdg.addTab( self.wdg_opt_fls, 'File Options' )
 		self.wdg.addTab( self.wdg_opt_fmo, 'Moments'   )
+		self.wdg.addTab( self.wdg_opt_mfi, 'MFI Options' )
 
 		self.btn_rstr  = event_PushButton(
 		                          self, 'rstr', 'Restore Default' )

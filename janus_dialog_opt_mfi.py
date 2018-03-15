@@ -49,7 +49,7 @@ from janus_thread import n_thread, thread_chng_opt
 ## DEFINE CLASS "dialog_opt" TO CUSTOMIZE "QDialog" FOR OPTION CONTROL.
 ################################################################################
 
-class dialog_opt_fls( QWidget ) :
+class dialog_opt_mfi( QWidget ) :
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE INITIALIZATION FUNCTION.
@@ -59,7 +59,7 @@ class dialog_opt_fls( QWidget ) :
 
 		# Inherit all attributes of an instance of "QDialog".
 
-		super( dialog_opt_fls, self ).__init__( )
+		super( dialog_opt_mfi, self ).__init__( )
 
 		# Store the Janus core.
 
@@ -86,70 +86,39 @@ class dialog_opt_fls( QWidget ) :
 
 		self.sg.setContentsMargins( 0, 0, 0, 0 )
 
-		self.grd.addLayout( self.sg, 4, 3, 8, 3)
+		self.grd.addLayout( self.sg, 4, 3, 4, 3)
 
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
 
-		self.lab_hdr1 = QLabel(
-		                'Maximum number of saved downloaded files'  )
-		self.lab_hdr2 = QLabel( '( Use "inf" for no limit )'        )
-		self.lab_hdr3 = QLabel( 'MFI Resolution'                    )
+		self.lab_hdr = QLabel( 'MFI Set Style'                     )
 
-		self.lab1 = { 'fls_n_fc'    :QLabel( 'FC Files'         ),
-		              'fls_n_spin'  :QLabel( 'Spin Files'       ),
-		              'fls_n_mfi_l' :QLabel(
-		                            'Low Resolution MFI Files'  ),
-		              'fls_n_mfi_h' :QLabel(
-		                            'High Resolution MFI Files' )    }
+		self.lab = { 'mfi_set_raw' :QLabel( 'Raw Data ',     self ),
+		             'mfi_set_fit' :QLabel( 'Fit Data' ,     self ),
+		             'mfi_set_smt' :QLabel( 'Smoothed Data', self )   }
 
-		self.lab2 = {
-		          'mfi_l' :QLabel( 'Low Resolution (0.3 Hz) ', self ),
-		          'mfi_h' :QLabel( 'High Resolution (11 Hz)' , self )  }
+		self.box = {
+		         'mfi_set_raw' :event_RadioBox( self, 'mfi_set_raw' ),
+		         'mfi_set_fit' :event_RadioBox( self, 'mfi_set_fit' ),
+		         'mfi_set_smt' :event_RadioBox( self, 'mfi_set_smt' ) }
 
-		self.arr_txt = {
-		          'fls_n_fc'    :event_LineEdit( self, 'fls_n_fc'    ),
-		          'fls_n_spin'  :event_LineEdit( self, 'fls_n_spin'  ),
-		          'fls_n_mfi_l' :event_LineEdit( self, 'fls_n_mfi_l' ),
-		          'fls_n_mfi_h' :event_LineEdit( self, 'fls_n_mfi_h' ) }
-
-		self.box1 = { 'mfi_l' :event_RadioBox( self, 'mfi_l'  ),
-		              'mfi_h' :event_RadioBox( self, 'mfi_h'  )  }
-
-		self.order1 = [ 'fls_n_fc', 'fls_n_spin', 'fls_n_mfi_l',
-		                'fls_n_mfi_h'                                  ]
-
-		self.order2 = [ 'mfi_l','mfi_h' ]
+		self.order = [ 'mfi_set_raw', 'mfi_set_fit', 'mfi_set_smt' ]
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
-		self.lab_hdr1.setFont( QFont( "Helvetica", 12, QFont.Bold ) )
-		self.lab_hdr2.setFont( QFont( "Helvetica", 12 ) )
+		self.lab_hdr.setFont( QFont( "Helvetica", 12, QFont.Bold ) )
 
-		self.sg.addWidget( self.lab_hdr1, 0, 0, 1, 3 )
-		self.sg.addWidget( self.lab_hdr2, 1, 0, 1, 3 )
+		self.sg.addWidget( self.lab_hdr, 0, 0, 1, 3 )
 
-		for i, key in enumerate( self.order1 ) :
+		for i, key in enumerate( self.order ) :
 
-			self.lab1[key].setFont( QFont(    "Helvetica", 12 ) )
-			self.arr_txt[key].setFont( QFont( "Helvetica", 12 ) )
+			self.lab[key].setFont( QFont( "Helvetica", 12 ) )
+			self.box[key].setFont( QFont( "Helvetica", 12 ) )
 
-			self.sg.addWidget( self.arr_txt[key], 2+i, 0, 1, 1 )
-			self.sg.addWidget( self.lab1[key],    2+i, 1, 1, 1 )
-			self.arr_txt[key].setMaximumWidth( 40 )
-
-		self.lab_hdr3.setFont( QFont( "Helvetica", 12, QFont.Bold ) )
-		self.sg.addWidget( self.lab_hdr3, 6, 0, 1, 3 )
-
-		for i, key in enumerate( self.order2 ) :
-
-			self.lab2[key].setFont( QFont( "Helvetica", 12 ) )
-			self.box1[key].setFont( QFont( "Helvetica", 12 ) )
-
-			self.sg.addWidget( self.box1[key], 7+i, 0, 1, 1 )
-			self.sg.addWidget( self.lab2[key], 7+i, 1, 1, 1 )
-			self.box1[key].setMaximumWidth( 40 )
+			self.sg.addWidget( self.box[key], 1+i, 0, 1, 1 )
+			self.sg.addWidget( self.lab[key], 1+i, 1, 1, 1 )
+			self.box[key].setMaximumWidth( 40 )
 
 		# Populate the menu with the options settings from core.
 
@@ -161,46 +130,9 @@ class dialog_opt_fls( QWidget ) :
 
 	def make_opt( self, clear=False ) :
 
-		# If the clear option has been selected, delete the contents of
-		# all text boxes prior to proceeding.
-
-		if ( clear ) :
-
-			for key in self.arr_txt :
-
-				self.arr_txt[key].clear( )
-
-		# Validate/update the displayed options.
-
-		self.box1['mfi_l' ].setChecked( self.core.opt['mfi_l' ] )
-		self.box1['mfi_h' ].setChecked( self.core.opt['mfi_h' ] )
-
-		for key in self.arr_txt :
-
-			val = self.core.opt[key]
-
-			txt = self.arr_txt[key].text( )
-
-			if( txt == '' ) :
-				val = None
-			else :
-				try:
-					val = str_to_nni( txt )
-				except :
-					val = None
-	
-			if( ( ( val is None ) and ( txt == '' ) ) or
-			      ( val == self.core.opt[key]     ) )   :
-	
-				self.arr_txt[key].setStyleSheet(
-				                               'color: black;' )
-	
-				txt = str( self.core.opt[key] )
-			else :
-	
-				self.arr_txt[key].setStyleSheet( 'color: red;' )
-
-			self.arr_txt[key].setTextUpdate( txt )
+		self.box['mfi_set_raw'].setChecked( self.core.opt['mfi_set_raw'] )
+		self.box['mfi_set_fit'].setChecked( self.core.opt['mfi_set_fit'] )
+		self.box['mfi_set_smt'].setChecked( self.core.opt['mfi_set_smt'] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
@@ -208,40 +140,18 @@ class dialog_opt_fls( QWidget ) :
 
 	def user_event( self, event, fnc ) :
 
-		if( ( fnc == 'mfi_l' ) or ( fnc == 'mfi_h' ) ) :
-
-			if ( n_thread( ) == 0 ) :
+		if ( n_thread( ) == 0 ) :
 
 			# Start a new thread that makes the change to the option
 			# with core.
 
-				Thread( target=thread_chng_opt,
-				        args=( self.core, fnc,
-				        self.box1[fnc].isChecked( ) ) ).start( )
+			Thread( target=thread_chng_opt,
+			        args=( self.core, fnc,
+			        self.box[fnc].isChecked( ) ) ).start( )
 
 		else :
-			txt = self.arr_txt[fnc].text( )
 
-			try :
-				val = str_to_nni( txt )
-			except :
-				val = None
-        
-			# If no threads are running, make the change to the 
-			# option with core.  Otherwise, restore the original
-			# options settings.
-        
-			if ( ( n_thread( ) == 0 ) and ( val is not None ) ) :
-		
-				# Start a new thread that makes the change to
-				# the option with core.
-		
-				Thread( target=thread_chng_opt,
-				        args=( self.core, fnc, val ) ).start( )
-		
-			else :
-			
-				self.make_opt( )
+			self.make_opt( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A CHANGE OF AN OPTION.
@@ -262,4 +172,4 @@ class dialog_opt_fls( QWidget ) :
 
 		# Clear the menu contents and regenerate it.
 
-		self.make_opt( clear=True )
+		self.make_opt( )

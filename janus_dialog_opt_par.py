@@ -132,12 +132,12 @@ class dialog_opt_par( QWidget ) :
 			     ( key == 'lab_3' )                          ) :
 
 				self.lab[key].setFont(
-				        QFont( "Sans", 12, QFont.Bold ) )
+				        QFont( "Helvetica", 12, QFont.Bold ) )
 
 				self.sg.addWidget( self.lab[key], i, 0, 1, 3 )
 			else :
-				self.box[key].setFont( QFont( "Sans", 12 ) )
-				self.lab[key].setFont( QFont( "Sans", 12 ) )
+				self.box[key].setFont( QFont( "Helvetica", 12 ) )
+				self.lab[key].setFont( QFont( "Helvetica", 12 ) )
 				self.sg.addWidget( self.box[key], i, 0, 1, 1 )
 				self.sg.addWidget( self.lab[key], i, 1, 1, 1 )
 
