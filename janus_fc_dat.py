@@ -259,8 +259,8 @@ class fc_dat( ) :
 			v_vec = [ ( v0[i] - fv_vec[i] )
 			                           for i in range( len( v0 ) ) ]
 		else :
-			v_vec = [ ( v0[i] + dv * self._norm_b[key][i] - fv_vec[i] )
-			                           for i in range( len( v0 ) ) ]
+			v_vec = [ ( v0[i] + dv * self._norm_b[key][i] -
+			            fv_vec[i] )    for i in range( len( v0 ) ) ]
 
 		# Calculate the component of the magnetic field unit vector
 		# along that lies along the look direction.
