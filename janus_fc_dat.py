@@ -239,7 +239,7 @@ class fc_dat( ) :
 		if ( hasattr( w, '__len__' ) and ( w is not None ) ) :
 
 			if ( w is not None ) :
-				ml2 = ( self._maglook['key'] )**2
+				ml2 = ( self._maglook[key] )**2
 
 				w_eff = sqrt( ( ( 1. - ml2 ) * w[0]**2 ) +
 			                    (          ml2   * w[1]**2 )   )
@@ -248,8 +248,8 @@ class fc_dat( ) :
 
 		# Calculate the total velocity using drift
 
-		db = [ ( self.norm_b[i] - av_b[i] )
-		                  for i in range( len( self.norm_b ) ) ]
+		db = [ ( self._norm_b[key][i] - av_b[i] )
+		                  for i in range( len( self._norm_b[key] ) ) ]
 
 		db_nrm = calc_arr_norm( db )
 
@@ -259,7 +259,7 @@ class fc_dat( ) :
 			v_vec = [ ( v0[i] - fv_vec[i] )
 			                           for i in range( len( v0 ) ) ]
 		else :
-			v_vec = [ ( v0[i] + dv * self['norm_b'][i] - fv_vec[i] )
+			v_vec = [ ( v0[i] + dv * self._norm_b[key][i] - fv_vec[i] )
 			                           for i in range( len( v0 ) ) ]
 
 		# Calculate the component of the magnetic field unit vector

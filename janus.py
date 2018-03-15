@@ -58,6 +58,7 @@ class janus( object ) :
 	#-----------------------------------------------------------------------
 
 	def __init__( self, time='2008-11-04-12-00-41' ) :
+	#def __init__( self, time = None ) :
 
 		# If the necessary subdirectories do not exist, create them.
 

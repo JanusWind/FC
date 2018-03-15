@@ -122,9 +122,9 @@ class dialog_opt_fls( QWidget ) :
 		              'mfi_h' :event_RadioBox( self, 'mfi_h'  )  }
 
 		self.box2 = {
-		         'mfi_set_raw' :event_RadioBox( self, 'mfi_set_raw' ),
-		         'mfi_set_fit' :event_RadioBox( self, 'mfi_set_fit' ),
-		         'mfi_set_smt' :event_RadioBox( self, 'mfi_set_smt' ) }
+		         'mfi_set_raw' :event_CheckBox( self, 'mfi_set_raw' ),
+		         'mfi_set_fit' :event_CheckBox( self, 'mfi_set_fit' ),
+		         'mfi_set_smt' :event_CheckBox( self, 'mfi_set_smt' ) }
 
 		self.order1 = [ 'fls_n_fc', 'fls_n_spin', 'fls_n_mfi_l',
 		                'fls_n_mfi_h'                                  ]

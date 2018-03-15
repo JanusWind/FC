@@ -1309,7 +1309,7 @@ class core( QObject ) :
 
 		#key = self.opt['mfi_set_fit'] if ( self.opt['mfi_set_fit'] )
 		key = 'mfi_smt'
-		self.fc_spec.set_mag( self.mfi_t, self.mfi_fields[key] )
+		self.fc_spec.set_mag( self.mfi_t, self.mfi_fields[key], key )
 
 		# Message the user that new Wind/MFI data have been loaded.
 
@@ -1777,7 +1777,7 @@ class core( QObject ) :
 		self.mom_res = plas( )
 
 		self.mom_res['v0_vec'] = mom_v_vec
-		self.mom_res['fv']     = 0.05*norm(mom_v_vec)
+		self.mom_res['fv']     = 0.0
 		self.mom_res.add_spec( name='Proton', sym='p', m=1., q=1. )
 
 		self.mom_res.add_pop( 'p',
@@ -1795,7 +1795,8 @@ class core( QObject ) :
 		                                    self.mom_res['fv'],
 		                                    self.mfi_avg_nrm,
 		                                    self.mom_res['n_p_c'], 0.,
-		                                    self.mom_res['w_p_c']      )
+		                                    self.mom_res['w_p_c'],
+		                                    'mfi_smt'      )
 
 		# Message the user that the moments analysis has completed.
 
@@ -2426,7 +2427,7 @@ class core( QObject ) :
 			                    self.nln_plas.arr_pop[p]['m'],
 			                    self.nln_plas.arr_pop[p]['q'],
 			                    pop_v0_vec, fv, self.mfi_avg_nrm,
-			                    pop_n, pop_dv, pop_w             ) )
+			                    pop_n, pop_dv, pop_w, 'mfi_smt'  ) )
 
 		# Alter the axis order of the array of currents.
 
@@ -2724,7 +2725,7 @@ class core( QObject ) :
 				                self.nln_plas.arr_pop[p]['m'],
 				                self.nln_plas.arr_pop[p]['q'],
 				                prm_v0, prm_fv, self.mfi_avg_nrm,
-				                prm_n,  prm_dv, prm_w          )
+				                prm_n,  prm_dv, prm_w, 'mfi_smt')
 
 		# Return the list of total currents from all modeled ion
 		# species.
@@ -2922,7 +2923,7 @@ class core( QObject ) :
 			                  self.nln_plas.arr_pop[p]['m'],
 			                  self.nln_plas.arr_pop[p]['q'],
 			                  pop_v0_vec, fv, self.mfi_avg_nrm,
-			                  pop_n, pop_dv, pop_w               ) )
+			                  pop_n, pop_dv, pop_w, 'mfi_smt'   ) )
 
 		# Save the results of the this non-linear analysis to the
 		# results log.

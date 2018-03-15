@@ -346,13 +346,13 @@ class fc_spec( ) :
 	# DEFINE THE FUNCTION FOR CALC'ING EXPECTED CURRENT FROM A POPULATION.
 	#-----------------------------------------------------------------------
 
-	def calc_curr( self, m, q, v0, fv, av_b, n, dv, w) :
+	def calc_curr( self, m, q, v0, fv, av_b, n, dv, w, key ) :
 
 		# Return a 3-D list with the calculated current for each bin in
 		# the spectrum.
 
 		return [ [ [ self.arr[c][d][b].calc_curr( 
-		                    m, q, v0, fv, av_b, n, dv, w    )
+		                    m, q, v0, fv, av_b, n, dv, w, key )
 		                    for b in range( self['n_bin'] ) ]
 		                    for d in range( self['n_dir'] ) ]
 		                    for c in range( self['n_cup'] ) ]
@@ -430,9 +430,9 @@ class fc_spec( ) :
 
 		mfi_s = [ ( t - mfi_t[0] ).total_seconds( ) for t in mfi_t ]
 
-		fnc_b_x = interp1d( mfi_s, mfi_b[0] )
-		fnc_b_y = interp1d( mfi_s, mfi_b[1] )
-		fnc_b_z = interp1d( mfi_s, mfi_b[2] )
+		fnc_b = [ interp1d( mfi_s, mfi_b[0] ),
+		          interp1d( mfi_s, mfi_b[1] ), 
+		          interp1d( mfi_s, mfi_b[2] ) ]
 
 		try :
 
@@ -445,24 +445,25 @@ class fc_spec( ) :
 						s = ( self.arr[c][d][b]['time']
                                                    - mfi_t[0] ).total_seconds( )
 
-						b_x = fnc_b_x( s )
-						b_y = fnc_b_y( s )
-						b_z = fnc_b_z( s )
+						b_vec = [ fnc_b[0]( s ),
+						          fnc_b[1]( s ),
+						          fnc_b[2]( s )  ]
 
-						self.arr[c][d][b].set_mag( (
-						          b_x, b_y, b_z, key ) )
+						self.arr[c][d][b].set_mag(
+						            b_vec, key )
+
 		except :
 
 			avg_b_x = sum( mfi_b[0] ) / float( len( mfi_b[0] ) )
 			avg_b_y = sum( mfi_b[1] ) / float( len( mfi_b[1] ) )
 			avg_b_z = sum( mfi_b[2] ) / float( len( mfi_b[2] ) )
 
+			avg_b_vec = [ avg_b_x, avg_b_y, avg_b_z ]
 			for c in range( self['n_cup'] ) :
 
                                 for d in range( self['n_dir'] ) :
 
                                         for b in range( self['n_bin'] ) :
 
-                                                self.arr[c][d][b].set_mag( (
-						avg_b_x, avg_b_y, avg_b_z, key
-						                             ) )
+                                                self.arr[c][d][b].set_mag( 
+						                avg_b_vec, key )
