@@ -1307,6 +1307,7 @@ class core( QObject ) :
 		# Use interpolation to estiamte the magnetic field vector for
 		# each datum in the FC spectrum.
 
+		print self.opt
 		#key = self.opt['mfi_set_fit'] if ( self.opt['mfi_set_fit'] )
 		key = 'mfi_smt'
 		self.fc_spec.set_mag( self.mfi_t, self.mfi_fields[key], key )
