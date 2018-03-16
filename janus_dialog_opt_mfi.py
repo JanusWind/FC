@@ -130,9 +130,9 @@ class dialog_opt_mfi( QWidget ) :
 
 	def make_opt( self ) :
 
-		self.box['mfi_set_raw'].setChecked( self.core.opt['mfi_set_raw'] )
-		self.box['mfi_set_fit'].setChecked( self.core.opt['mfi_set_fit'] )
-		self.box['mfi_set_smt'].setChecked( self.core.opt['mfi_set_smt'] )
+		self.box['mfi_set_raw'].setCheckedSilent( self.core.opt['mfi_set_raw'] )
+		self.box['mfi_set_fit'].setCheckedSilent( self.core.opt['mfi_set_fit'] )
+		self.box['mfi_set_smt'].setCheckedSilent( self.core.opt['mfi_set_smt'] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
@@ -145,11 +145,8 @@ class dialog_opt_mfi( QWidget ) :
 			# Start a new thread that makes the change to the option
 			# with core.
 
-			print fnc, self.box[fnc].isChecked( )
-
 			Thread( target=thread_chng_opt,
-			        args=( self.core, fnc,
-			        self.box[fnc].isChecked( ) ) ).start( )
+			        args=( self.core, fnc, True ) ).start( )
 
 		else :
 

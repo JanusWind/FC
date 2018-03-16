@@ -73,7 +73,7 @@ from scipy.optimize    import curve_fit
 from scipy.stats       import pearsonr, spearmanr
 from scipy.signal      import medfilt
 
-from janus_helper import round_sig
+from janus_helper import round_sig, srch_dict_keys_strt
 
 from janus_fc_spec import fc_spec
 
@@ -3139,51 +3139,48 @@ class core( QObject ) :
 
 		elif ( prefix == 'mfi' ) :
 
-			# Assign the provided value to the specified key.
+			if ( len( key ) < 7 ) :
 
-			self.opt[key] = bool( value )
+				self.opt[key] = bool( value )
 
-			# Validate the other keys' values.
+				if ( not ( self.opt['mfi_l'] or 
+				           self.opt['mfi_h'] ) ) :
 
-			if ( not ( self.opt['mfi_l'] or 
-			           self.opt['mfi_h'] ) ) :
+					if ( key == 'mfi_l' ) :
+						self.opt['mfi_h'] = True
+						self.load_mfi()
+					else :
+						self.opt['mfi_l'] = True
+						self.load_mfi()
 
-				if ( key == 'mfi_l' ) :
-					self.opt['mfi_h'] = True
-					self.load_mfi()
-				else :
-					self.opt['mfi_l'] = True
-					self.load_mfi()
+			else :
 
-			if ( not ( self.opt['mfi_fit_crv'] or
-			           self.opt['mfi_fit_fft'] ) ) :
+				sub = key[4:7]
 
-				if ( key == 'mfi_fit_crv' ) :
-					self.opt['mfi_fit_fft'] = True
-					self.load_mfi( )
-				else :
-					self.opt['mfi_fit_crv'] = True
-					self.load_mfi( )
+				if ( sub == 'fit' ) :
 
-			if ( not ( self.opt['mfi_set_raw'] or
-			           self.opt['mfi_set_fit'] or
-			           self.opt['mfi_set_smt'] ) ) :
+					self.opt[key] = bool( value )
 
-				if ( ( key == 'mfi_set_fit' ) or
-				     ( key == 'mfi_set_smt' ) ) :
-					self.opt['mfi_set_raw'] = True
-					self.load_mfi( )
+					if ( not ( self.opt['mfi_fit_crv'] or
+						   self.opt['mfi_fit_fft'] ) ) :
 
-				elif ( ( key == 'mfi_set_smt' ) or
-				       ( key == 'mfi_set_raw' ) ) :
-					self.opt['mfi_set_fit'] = True
-					self.load_mfi( )
+						if ( key == 'mfi_fit_crv' ) :
+							self.opt['mfi_fit_fft'] = True
+							self.load_mfi( )
+						else :
+							self.opt['mfi_fit_crv'] = True
+							self.load_mfi( )
 
-				elif ( ( key == 'mfi_set_raw' ) or
-				       ( key == 'mfi_set_fit' ) ) :
-					self.opt['mfi_set_smt'] = True
-					self.load_mfi( )
+				elif ( sub == 'set' ) :
 
+					if ( value ) :
+
+						for k in srch_dict_keys_strt( self.opt, 'mfi_set' ) :
+							self.opt[k] = False
+
+						self.opt[key] = True
+
+						self.emit( SIGNAL('janus_chng_mfi') )
 
 		elif ( key == 'fit_med_fil' ) :
 			self.opt['fit_med_fil'] = value

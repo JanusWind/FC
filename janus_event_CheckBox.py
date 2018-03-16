@@ -112,6 +112,10 @@ class event_RadioBox( QRadioButton ) :
 
 		self.fnc = fnc
 
+		# Initialize the "silence" variable.
+
+		self.silence = False
+
 		# If the 'stateChanged()' signal is emitted (i.e., if the user
 		# clicks on this check box), notify "self.owner".
 
@@ -119,10 +123,31 @@ class event_RadioBox( QRadioButton ) :
 		              self.signal_toggled            )
 
 	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR SILENTLY TOGGLING.
+	#-----------------------------------------------------------------------
+
+	def setCheckedSilent( self, state ) :
+
+		if ( bool( state ) == self.isChecked( ) ) :
+
+			return
+
+		self.silence = True
+
+		self.setChecked( not self.isChecked( ) )
+
+	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "toggled" SIGNAL.
 	#-----------------------------------------------------------------------
 
 	def signal_toggled( self ) :
+
+		if ( self.silence ) :
+			self.silence = False
+			return
+
+		if ( not self.isChecked( ) ) :
+			return
 
 		# Alert the object that initialized this widget (i.e., its
 		# "owner") that the check box has been toggled.

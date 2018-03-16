@@ -114,6 +114,31 @@ def str_to_nni( v ) :
 		else :
 			return ret
 
+################################################################################
+## DEFINE THE FUNCTION FOR SEARCHING THE KEYS OF A DICTIONARY
+################################################################################
+
+# Define the function for searching for all keys in a dictionary that begin with
+# a specified string.
+
+def srch_dict_keys_strt( d, s ) :
+
+	l = len( s )
+
+	if ( l == 0  ) :
+		return d.keys( )
+
+	ret = [ ]
+
+	for key in d.keys( ) :
+
+		if ( ( len( key ) >= l ) and
+		     ( key[0:l] == s   )     ) :
+
+			ret.append( key )
+
+	return ret
+
 """
 # Define the function for converting a numerical value to a string with a
 # specified number of significant digits.
