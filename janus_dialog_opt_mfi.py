@@ -128,7 +128,7 @@ class dialog_opt_mfi( QWidget ) :
 	# DEFINE THE FUNCTION FOR POPULATING MENU.
 	#-----------------------------------------------------------------------
 
-	def make_opt( self, clear=False ) :
+	def make_opt( self ) :
 
 		self.box['mfi_set_raw'].setChecked( self.core.opt['mfi_set_raw'] )
 		self.box['mfi_set_fit'].setChecked( self.core.opt['mfi_set_fit'] )
@@ -145,6 +145,8 @@ class dialog_opt_mfi( QWidget ) :
 			# Start a new thread that makes the change to the option
 			# with core.
 
+			print fnc, self.box[fnc].isChecked( )
+
 			Thread( target=thread_chng_opt,
 			        args=( self.core, fnc,
 			        self.box[fnc].isChecked( ) ) ).start( )
@@ -159,10 +161,9 @@ class dialog_opt_mfi( QWidget ) :
 
 	def resp_chng_opt( self ) :
 
-		# Regenerate the menu (without clearing any contents already
-		# therein).
+		# Regenerate the menu.
 
-		self.make_opt( clear=False )
+		self.make_opt( )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A RESTORE OF OPTIONS.
@@ -170,6 +171,6 @@ class dialog_opt_mfi( QWidget ) :
 
 	def resp_rstr_opt( self ) :
 
-		# Clear the menu contents and regenerate it.
+		# Regenerate the menu.
 
 		self.make_opt( )
