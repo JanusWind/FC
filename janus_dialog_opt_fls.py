@@ -96,30 +96,31 @@ class dialog_opt_fls( QWidget ) :
 		self.lab_hdr2 = QLabel( '( Use "inf" for no limit )'        )
 		self.lab_hdr3 = QLabel( 'MFI Resolution'                    )
 
-		self.lab1 = { 'fls_n_fc'    :QLabel( 'FC Files'         ),
-		              'fls_n_spin'  :QLabel( 'Spin Files'       ),
-		              'fls_n_mfi_l' :QLabel(
-		                            'Low Resolution MFI Files'  ),
-		              'fls_n_mfi_h' :QLabel(
-		                            'High Resolution MFI Files' )    }
+		self.lab1 = { 'fls_max_fc'    :QLabel( 'FC Files'         ),
+		              'fls_max_spin'  :QLabel( 'Spin Files'       ),
+		              'fls_max_mfi_l' :QLabel(
+		                              'Low Resolution MFI Files'  ),
+		              'fls_max_mfi_h' :QLabel(
+		                              'High Resolution MFI Files' )    }
 
 		self.lab2 = {
-		          'mfi_l' :QLabel( 'Low Resolution (0.3 Hz) ', self ),
-		          'mfi_h' :QLabel( 'High Resolution (11 Hz)' , self )  }
+		   'fls_src_low'  :QLabel( 'Low Resolution (0.3 Hz) ', self ),
+		   'fls_src_high' :QLabel( 'High Resolution (11 Hz)' , self )  }
 
 		self.arr_txt = {
-		          'fls_n_fc'    :event_LineEdit( self, 'fls_n_fc'    ),
-		          'fls_n_spin'  :event_LineEdit( self, 'fls_n_spin'  ),
-		          'fls_n_mfi_l' :event_LineEdit( self, 'fls_n_mfi_l' ),
-		          'fls_n_mfi_h' :event_LineEdit( self, 'fls_n_mfi_h' ) }
+		      'fls_max_fc'    :event_LineEdit( self, 'fls_max_fc'    ),
+		      'fls_max_spin'  :event_LineEdit( self, 'fls_max_spin'  ),
+		      'fls_max_mfi_l' :event_LineEdit( self, 'fls_max_mfi_l' ),
+		      'fls_max_mfi_h' :event_LineEdit( self, 'fls_max_mfi_h' ) }
 
-		self.box1 = { 'mfi_l' :event_RadioBox( self, 'mfi_l'  ),
-		              'mfi_h' :event_RadioBox( self, 'mfi_h'  )  }
+		self.box1 = {
+		      'fls_src_low'  :event_RadioBox( self, 'fls_src_low'  ),
+		      'fls_src_high' :event_RadioBox( self, 'fls_src_high'  )  }
 
-		self.order1 = [ 'fls_n_fc', 'fls_n_spin', 'fls_n_mfi_l',
-		                'fls_n_mfi_h'                                  ]
+		self.order1 = [ 'fls_max_fc', 'fls_max_spin', 'fls_max_mfi_l',
+		                'fls_max_mfi_h'                                ]
 
-		self.order2 = [ 'mfi_l','mfi_h' ]
+		self.order2 = [ 'fls_src_low','fls_src_high' ]
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
@@ -172,8 +173,10 @@ class dialog_opt_fls( QWidget ) :
 
 		# Validate/update the displayed options.
 
-		self.box1['mfi_l' ].setChecked( self.core.opt['mfi_l' ] )
-		self.box1['mfi_h' ].setChecked( self.core.opt['mfi_h' ] )
+		self.box1['fls_src_low' ].setCheckedSilent(
+		                                 self.core.opt['fls_src_low' ] )
+		self.box1['fls_src_high' ].setCheckedSilent(
+		                                 self.core.opt['fls_src_high'] )
 
 		for key in self.arr_txt :
 
@@ -208,7 +211,7 @@ class dialog_opt_fls( QWidget ) :
 
 	def user_event( self, event, fnc ) :
 
-		if( ( fnc == 'mfi_l' ) or ( fnc == 'mfi_h' ) ) :
+		if( ( fnc == 'fls_src_low' ) or ( fnc == 'fls_src_high' ) ) :
 
 			if ( n_thread( ) == 0 ) :
 

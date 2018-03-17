@@ -94,23 +94,23 @@ class dialog_opt_fmo( QWidget ) :
 		self.lab_hdr2 = QLabel( 'Select the median Filter size' )
 
 		self.lab1 = {
-		     'mfi_fit_crv' :QLabel( 'Use Curve Fit algorithm', self ),
-		     'mfi_fit_fft' :QLabel( 'Use Fourier algorithm'  , self ), }
+		     'mom_fit_crv' :QLabel( 'Use Curve Fit algorithm', self ),
+		     'mom_fit_fft' :QLabel( 'Use Fourier algorithm'  , self ), }
 
 		self.lab2 = {
-		    'fit_med_fil':QLabel( 'Assign the size of median filter' ) }
+		    'mom_med_fil':QLabel( 'Assign the size of median filter' ) }
 
 		self.arr_txt = {
-		          'fit_med_fil': event_LineEdit( self, 'fit_med_fil' ) }
+		          'mom_med_fil': event_LineEdit( self, 'mom_med_fil' ) }
 
 		self.box = { 
-		        'mfi_fit_crv' :event_RadioBox( self, 'mfi_fit_crv'  ),
-		        'mfi_fit_fft' :event_RadioBox( self, 'mfi_fit_fft'  ), }
+		        'mom_fit_crv' :event_RadioBox( self, 'mom_fit_crv'  ),
+		        'mom_fit_fft' :event_RadioBox( self, 'mom_fit_fft'  ), }
 
 
-		self.order1 = [ 'mfi_fit_crv', 'mfi_fit_fft' ]
+		self.order1 = [ 'mom_fit_crv', 'mom_fit_fft' ]
 
-		self.order2 = [ 'fit_med_fil' ]
+		self.order2 = [ 'mom_med_fil' ]
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
@@ -160,10 +160,10 @@ class dialog_opt_fmo( QWidget ) :
 
 		# Validate/update the displayed options.
 
-		self.box['mfi_fit_crv' ].setChecked(
-		                                 self.core.opt['mfi_fit_crv' ] )
-		self.box['mfi_fit_fft' ].setChecked(
-		                                 self.core.opt['mfi_fit_fft' ] )
+		self.box['mom_fit_crv' ].setCheckedSilent(
+		                                 self.core.opt['mom_fit_crv' ] )
+		self.box['mom_fit_fft' ].setCheckedSilent(
+		                                 self.core.opt['mom_fit_fft' ] )
 
 		for key in self.arr_txt :
 
@@ -201,7 +201,7 @@ class dialog_opt_fmo( QWidget ) :
 
 	def user_event( self, event, fnc ) :
 
-		if( ( fnc == 'mfi_fit_crv' ) or ( fnc == 'mfi_fit_fft' ) ) :
+		if( ( fnc == 'mom_fit_crv' ) or ( fnc == 'mom_fit_fft' ) ) :
 
 			if ( n_thread( ) == 0 ) :
 

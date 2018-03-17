@@ -89,39 +89,41 @@ class dialog_opt_par( QWidget ) :
 		# this dialog box.
 
 		self.lab = {
-		       'lab_1'  :QLabel( 'NLN 2nd Moment Paramters'  , self ),
-                       'res_dt' :QLabel( 'Temperature (T)'           , self ),
-                       'res_dw' :QLabel( 'Thermal Speed (W)'         , self ),
-                       'lab_2'  :QLabel( 'Species NLN Parameters'    , self ),
-                       'res_n'  :QLabel( 'Number density (n)'        , self ),
-                       'res_v'  :QLabel( 'Velocity (v)'              , self ),
-                       'res_fv' :QLabel( 'Fluctuating Velocity'      , self ),
-                       'res_d'  :QLabel( 'Drift (dv)'                , self ),
-                       'res_w'  :QLabel( 'Therm. Speed/Temp. (W/T)'  , self ),
-                       'res_r'  :QLabel( 'Anisotropy (R)'            , self ),
-                       'res_b'  :QLabel( 'Beta ( parallel )'         , self ),
-                       'res_s'  :QLabel( 'Skewness (S)'              , self ),
-                       'res_k'  :QLabel( 'Kurtosis (K)'              , self ),
-                       'lab_3'  :QLabel( 'Uncertainties'             , self ),
-                       'res_u'  :QLabel( 'NLN Uncertainties'         , self ), }
+		       'lab_1'     :QLabel( 'NLN 2nd Moment Paramters' , self ),
+                       'res_par_dt':QLabel( 'Temperature (T)'          , self ),
+                       'res_par_dw':QLabel( 'Thermal Speed (W)'        , self ),
+                       'lab_2'     :QLabel( 'Species NLN Parameters'   , self ),
+                       'res_par_n' :QLabel( 'Number density (n)'       , self ),
+                       'res_par_v' :QLabel( 'Velocity (v)'             , self ),
+                       'res_par_fv':QLabel( 'Fluctuating Velocity'     , self ),
+                       'res_par_d' :QLabel( 'Drift (dv)'               , self ),
+                       'res_par_w' :QLabel( 'Therm. Speed/Temp. (W/T)' , self ),
+                       'res_par_r' :QLabel( 'Anisotropy (R)'           , self ),
+                       'res_par_b' :QLabel( 'Beta ( parallel )'        , self ),
+                       'res_par_s' :QLabel( 'Skewness (S)'             , self ),
+                       'res_par_k' :QLabel( 'Kurtosis (K)'             , self ),
+                       'lab_3'     :QLabel( 'Uncertainties'            , self ),
+                       'res_par_u' :QLabel( 'NLN Uncertainties'        , self ), }
 
-		self.box = { 'res_dt':event_CheckBox( self, 'res_dt' ),
-		             'res_dw':event_CheckBox( self, 'res_dw' ),
-		             'res_n' :event_CheckBox( self, 'res_n'  ),
-		             'res_v' :event_CheckBox( self, 'res_v'  ),
-		             'res_d' :event_CheckBox( self, 'res_d'  ),
-		             'res_w' :event_CheckBox( self, 'res_w'  ),
-		             'res_r' :event_CheckBox( self, 'res_r'  ),
-		             'res_b' :event_CheckBox( self, 'res_b'  ),
-		             'res_s' :event_CheckBox( self, 'res_s'  ),
-		             'res_fv':event_CheckBox( self, 'res_fv' ),
-		             'res_k' :event_CheckBox( self, 'res_k'  ),
-		             'res_u' :event_CheckBox( self, 'res_u'  )   }
+		self.box = { 'res_par_dt':event_CheckBox( self, 'res_par_dt' ),
+		             'res_par_dw':event_CheckBox( self, 'res_par_dw' ),
+		             'res_par_n' :event_CheckBox( self, 'res_par_n'  ),
+		             'res_par_v' :event_CheckBox( self, 'res_par_v'  ),
+		             'res_par_d' :event_CheckBox( self, 'res_par_d'  ),
+		             'res_par_w' :event_CheckBox( self, 'res_par_w'  ),
+		             'res_par_r' :event_CheckBox( self, 'res_par_r'  ),
+		             'res_par_b' :event_CheckBox( self, 'res_par_b'  ),
+		             'res_par_s' :event_CheckBox( self, 'res_par_s'  ),
+		             'res_par_fv':event_CheckBox( self, 'res_par_fv' ),
+		             'res_par_k' :event_CheckBox( self, 'res_par_k'  ),
+		             'res_par_u' :event_CheckBox( self, 'res_par_u'  ) }
 
 
-		self.order = [ 'lab_1', 'res_dt', 'res_dw', 'lab_2', 'res_n',
-		               'res_v', 'res_fv', 'res_d' , 'res_w', 'res_r',
-		               'res_b', 'res_s' , 'res_k' , 'lab_3', 'res_u'  ]
+		self.order = [ 'lab_1',     'res_par_dt', 'res_par_dw', 'lab_2',
+		               'res_par_n', 'res_par_v', 'res_par_fv',
+		               'res_par_d' ,'res_par_w', 'res_par_r',
+		               'res_par_b', 'res_par_s', 'res_par_k',
+		               'lab_3',     'res_par_u'                        ]
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
@@ -151,18 +153,18 @@ class dialog_opt_par( QWidget ) :
 
 	def make_opt( self ) :
 
-		self.box['res_dt'].setChecked( self.core.opt['res_dt'] )
-		self.box['res_dw'].setChecked( self.core.opt['res_dw'] )
-		self.box['res_n' ].setChecked( self.core.opt['res_n' ] )
-		self.box['res_v' ].setChecked( self.core.opt['res_v' ] )
-		self.box['res_fv'].setChecked( self.core.opt['res_fv'] )
-		self.box['res_d' ].setChecked( self.core.opt['res_d' ] )
-		self.box['res_w' ].setChecked( self.core.opt['res_w' ] )
-		self.box['res_r' ].setChecked( self.core.opt['res_r' ] )
-		self.box['res_b' ].setChecked( self.core.opt['res_b' ] )
-		self.box['res_s' ].setChecked( self.core.opt['res_s' ] )
-		self.box['res_k' ].setChecked( self.core.opt['res_k' ] )
-		self.box['res_u' ].setChecked( self.core.opt['res_u' ] )
+		self.box['res_par_dt'].setChecked( self.core.opt['res_par_dt'] )
+		self.box['res_par_dw'].setChecked( self.core.opt['res_par_dw'] )
+		self.box['res_par_n' ].setChecked( self.core.opt['res_par_n' ] )
+		self.box['res_par_v' ].setChecked( self.core.opt['res_par_v' ] )
+		self.box['res_par_fv'].setChecked( self.core.opt['res_par_fv'] )
+		self.box['res_par_d' ].setChecked( self.core.opt['res_par_d' ] )
+		self.box['res_par_w' ].setChecked( self.core.opt['res_par_w' ] )
+		self.box['res_par_r' ].setChecked( self.core.opt['res_par_r' ] )
+		self.box['res_par_b' ].setChecked( self.core.opt['res_par_b' ] )
+		self.box['res_par_s' ].setChecked( self.core.opt['res_par_s' ] )
+		self.box['res_par_k' ].setChecked( self.core.opt['res_par_k' ] )
+		self.box['res_par_u' ].setChecked( self.core.opt['res_par_u' ] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.

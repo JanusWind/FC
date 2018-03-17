@@ -171,16 +171,16 @@ class core( QObject ) :
 		# and managing data files.
 
 		self.fc_arcv = fc_arcv( core=self,
-		                            n_file_max=self.opt['fls_n_fc'  ]  )
+		                            n_file_max=self.opt['fls_max_fc'  ]  )
 
 		self.spin_arcv = spin_arcv( core=self,
-		                            n_file_max=self.opt['fls_n_spin']  ) 
+		                            n_file_max=self.opt['fls_max_spin']  ) 
 
 		self.mfi_arcv_lres  = mfi_arcv_lres( core=self,
-		                          n_file_max=self.opt['fls_n_mfi_l' ]  )
+		                          n_file_max=self.opt['fls_max_mfi_l' ]  )
 
 		self.mfi_arcv_hres = mfi_arcv_hres( core=self,
-		                          n_file_max=self.opt['fls_n_mfi_h' ]  )
+		                          n_file_max=self.opt['fls_max_mfi_h' ]  )
 
 		# Initialize a log of the analysis results.
 
@@ -832,20 +832,19 @@ class core( QObject ) :
 		# loaded.
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'begin', 'mfi' )
-#		self.connect( self, SIGNAL('janus_chng_opt'),
-#		                                            self.resp_chng_opt )
 
 		# Load the Wind/MFI magnetic field data of appropriate
 		# resolution associated with this spectrum.
 
-		if ( self.opt['mfi_l'] ) :
+		if ( self.opt['fls_src_low'] ) :
 
 			( self.mfi_t, self.mfi_b_x, self.mfi_b_y,
 			  self.mfi_b_z ) = self.mfi_arcv_lres.load_rang(
 			( self.time_val       - ( 2. * self.fc_spec['rot'] ) ),
+
 			( self.fc_spec['dur'] + ( 4. * self.fc_spec['rot'] ) ) )
 
-		elif ( self.opt['mfi_h'] ) :
+		elif ( self.opt['fls_src_high'] ) :
 
 			( self.mfi_t, self.mfi_b_x, self.mfi_b_y,
 			  self.mfi_b_z ) = self.mfi_arcv_hres.load_rang(
@@ -919,14 +918,6 @@ class core( QObject ) :
 
                 self.mfi_psi_b_avg = rad2deg(sum ( self.mfi_psi_b )/self.n_mfi )
 
-		# Use interpolation to estiamte the magnetic field vector for
-		# each datum in the FC spectrum.
-
-#		self.fc_spec.set_mag( self.mfi_t, self.mfi_b_x,
-#		                                  self.mfi_b_y, self.mfi_b_z )
-
-		# Message the user that new Wind/MFI data have been loaded.
-
 		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mfi' )
 
 		# Emit a signal that indicates that a new Wind/MFI data have now
@@ -974,7 +965,7 @@ class core( QObject ) :
 		# TODO: Check which of the following is better method of
 		# calculation.
 
-		if ( self.opt['mfi_fit_fft'] ) :
+		if ( self.opt['mom_fit_fft'] ) :
 
 			#-------------------------------------------------------
 			# Method 1: Takes the Fourier and then its inverse.
@@ -1061,7 +1052,7 @@ class core( QObject ) :
 			self.mfi_phs_y = rad2deg( sqrt( mean( phase_y**2 ) ) )
 			self.mfi_phs_z = rad2deg( sqrt( mean( phase_z**2 ) ) )
 
-		elif ( self.opt['mfi_fit_crv'] ) :
+		elif ( self.opt['mom_fit_crv'] ) :
 
 			#-------------------------------------------------------
 			# Method 2: Uses the function 'scipy.curve_fit'.
@@ -1073,7 +1064,8 @@ class core( QObject ) :
 
 				def fit_sin( t, b ) :
 
-					# Compute the all the frequency of the data.
+					# Compute the all the frequency of the
+					# data.
 
 					f = fftfreq( len( t ), ( t[1] - t[0] ) )
 
@@ -1194,7 +1186,7 @@ class core( QObject ) :
 
 					gss_f = abs( f[ argmax( fb[1:] ) + 1 ] )
 
-					# Compute the standard deviation of thev
+					# Compute the standard deviation of the
 					# magnetic field and use it as initial
 					# guess for the amplitude of fluctuation
 
@@ -1206,8 +1198,8 @@ class core( QObject ) :
 
 					gss_i = mean( b )
 
-					# Define the list of initial guess for curve
-					# fitting.
+					# Define the list of initial guess for
+					# curve fitting.
 
 					gss = [ gss_a, 2.*pi*gss_f, 0., gss_i ]
 
@@ -1286,11 +1278,11 @@ class core( QObject ) :
 		# filter of given window size.
 
 		self.mfi_x_smt = medfilt(
-		                         self.mfi_x_t, self.opt['fit_med_fil'] )
+		                         self.mfi_x_t, self.opt['mom_med_fil'] )
 		self.mfi_y_smt = medfilt(
-		                         self.mfi_y_t, self.opt['fit_med_fil'] )
+		                         self.mfi_y_t, self.opt['mom_med_fil'] )
 		self.mfi_z_smt = medfilt(
-		                         self.mfi_z_t, self.opt['fit_med_fil'] )
+		                         self.mfi_z_t, self.opt['mom_med_fil'] )
 
 		self.mfi_vec_smt = [ self.mfi_x_smt, self.mfi_y_smt,
 		                     self.mfi_z_smt                   ]
@@ -1328,7 +1320,6 @@ class core( QObject ) :
 		# been loaded.
 
 		self.emit( SIGNAL('janus_chng_mfi') )
-
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CHANGING THE MOM. SELCTION DIRECTION WINDOW.
@@ -3105,131 +3096,138 @@ class core( QObject ) :
 
 		if ( key in self.opt ) :
 			prefix = key[0:3]
+			sub    = key[4:7]
 		else :
 			self.emit( SIGNAL('janus_chng_opt') )
 			return
 
-		# Take the appropriate actions based on the prefix
-		# provided.
+		# Take the appropriate actions based on the group (prefix) and
+		# the subgroup (sub)  of the key provided.
 
 		if ( prefix == 'res' ) :
-
-			# Assign the provided value to the specified key.
 
 			self.opt[key] = bool( value )
 
 			# Validate the other keys' values.
 
-			if ( not ( self.opt['res_dw'] or 
-			           self.opt['res_dt'] ) ) :
+			if ( not ( self.opt['res_par_dw'] or 
+			           self.opt['res_par_dt'] ) ) :
 
-				if ( key == 'res_dw' ) :
-					self.opt['res_dt'] = True
+				if ( key == 'res_par_dw' ) :
+					self.opt['res_par_dt'] = True
 				else :
-					self.opt['res_dw'] = True
+					self.opt['res_par_dw'] = True
 
-			if ( self.opt['res_n']  or self.opt['res_v'] or
-			     self.opt['res_fv'] or self.opt['res_d'] or
-			     self.opt['res_w']  or self.opt['res_r'] or
-        	             self.opt['res_b']  or self.opt['res_s'] or 
-        	             self.opt['res_k']                           ) :
-				self.opt['res'] = True
+			if ( self.opt['res_par_n']  or self.opt['res_par_v'] or
+			     self.opt['res_par_fv'] or self.opt['res_par_d'] or
+			     self.opt['res_par_w']  or self.opt['res_par_r'] or
+        	             self.opt['res_par_b']  or self.opt['res_par_s'] or 
+        	             self.opt['res_par_k']                           ) :
+				self.opt['res_par'] = True
 			else :
-				self.opt['res'] = False
-
-		elif ( prefix == 'mfi' ) :
-
-			if ( len( key ) < 7 ) :
-
-				self.opt[key] = bool( value )
-
-				if ( not ( self.opt['mfi_l'] or 
-				           self.opt['mfi_h'] ) ) :
-
-					if ( key == 'mfi_l' ) :
-						self.opt['mfi_h'] = True
-						self.load_mfi()
-					else :
-						self.opt['mfi_l'] = True
-						self.load_mfi()
-
-			else :
-
-				sub = key[4:7]
-
-				if ( sub == 'fit' ) :
-
-					self.opt[key] = bool( value )
-
-					if ( not ( self.opt['mfi_fit_crv'] or
-						   self.opt['mfi_fit_fft'] ) ) :
-
-						if ( key == 'mfi_fit_crv' ) :
-							self.opt['mfi_fit_fft'] = True
-							self.load_mfi( )
-						else :
-							self.opt['mfi_fit_crv'] = True
-							self.load_mfi( )
-
-				elif ( sub == 'set' ) :
-
-					if ( value ) :
-
-						for k in srch_dict_keys_strt( self.opt, 'mfi_set' ) :
-							self.opt[k] = False
-
-						self.opt[key] = True
-
-						self.emit( SIGNAL('janus_chng_mfi') )
-
-		elif ( key == 'fit_med_fil' ) :
-			self.opt['fit_med_fil'] = value
-			self.load_mfi( )
+				self.opt['res_par'] = False
 
 		elif ( prefix == 'fls' ) :
 
-			# Assign the provided value to the specified key.
+			if ( sub == 'src') :
 
-			if ( key == 'fls_n_fc' ) :
+				self.opt[key] = bool( value )
 
-				try :
-					self.fc_arcv.chng_n_file_max( value )
-				except :
-					pass
+				if ( value ) :
 
-				self.opt['fls_n_fc'] = self.fc_arcv.n_file_max
+					for k in srch_dict_keys_strt(
+					                 self.opt, 'fls_src' ) :
+						self.opt[k] = False
 
-			if ( key == 'fls_n_spin' ) :
+					self.opt[key] = True
 
-				try :
-					self.spin_arcv.chng_n_file_max( value )
-				except :
-					pass
+					self.load_mfi( )
 
-				self.opt['fls_n_spin'] =\
-				                       self.spin_arcv.n_file_max
+			elif ( sub == 'max') :
 
-			if ( key == 'fls_n_mfi_l' ) :
+				if ( key == 'fls_max_fc' ) :
+	
+					try :
+						self.fc_arcv.chng_n_file_max(
+						                         value )
+					except :
+						pass
+	
+					self.opt['fls_max_fc'] =\
+					                 self.fc_arcv.n_file_max
+	
+				if ( key == 'fls_max_spin' ) :
+	
+					try :
+						self.spin_arcv.chng_n_file_max(
+						                         value )
+					except :
+						pass
+	
+					self.opt['fls_max_spin'] =\
+					               self.spin_arcv.n_file_max
+	
+				if ( key == 'fls_max_mfi_l' ) :
+	
+					try :
+						self.mfi_arcv_lres.chng_n_file_max(
+						                         value )
+					except :
+						pass
+	
+					self.opt['fls_max_mfi_l'] =\
+					           self.mfi_arcv_lres.n_file_max
+	
+				if ( key == 'fls_max_mfi_h' ) :
+	
+					try :
+						self.mfi_arcv_hres.chng_n_file_max(
+						                         value )
+					except :
+						pass
+	
+					self.opt['fls_max_mfi_h'] =\
+					           self.mfi_arcv_hres.n_file_max
 
-				try :
-					self.mfi_arcv_lres.chng_n_file_max(
-					                                 value )
-				except :
-					pass
+		elif ( prefix == 'mom' ) :
 
-				self.opt['fls_n_mfi_l'] =\
-				                    self.mfi_arcv_lres.n_file_max
+			if ( sub == 'fit' ) :
 
-			if ( key == 'fls_n_mfi_h' ) :
+				if ( value ) :
 
-				try :
-					self.mfi_arcv_hres.chng_n_file_max(
-					                                 value )
-				except :
-					pass
+					for k in srch_dict_keys_strt(
+					                 self.opt, 'mom_fit' ) :
+						self.opt[k] = False
 
-				self.opt['fls_n_mfi_h'] =\
-				                   self.mfi_arcv_hres.n_file_max
+					self.opt[key] = True
+
+#					self.emit( SIGNAL('janus_chng_mfi') )
+					self.fit_mfi( )
+
+			elif ( sub == 'med' ) :
+
+				self.opt['mom_med_fil'] = value
+				self.fit_mfi( )
+
+		elif ( prefix == 'mfi' ) :
+
+			if ( sub == 'set' ) :
+
+				if ( value ) :
+
+					for k in srch_dict_keys_strt(
+					                 self.opt, 'mfi_set' ) :
+						self.opt[k] = False
+
+					self.opt[key] = True
+
+					self.fit_mfi( )
+
+					if ( self.dyn_nln ) :
+
+						self.anls_nln()
+
+						self.emit( SIGNAL('janus_chng_mfi') )
 
 		# Save updated options to the config file.
 
@@ -3271,11 +3269,15 @@ class core( QObject ) :
 		for key in keys :
 
 			prefix = key[0:3]
+			sub    = key[4:7]
 
 			fl.write( '\n' )
 			fl.write( key + ' ' )
 
-			if ( ( prefix == 'res' ) or ( prefix == 'mfi' ) ) :
+			if ( ( ( prefix == 'res' ) or ( prefix == 'fls' )   or
+			       ( prefix == 'mom' ) or ( prefix == 'mfi' ) ) and 
+			     ( ( sub == 'par' ) or ( sub == 'src' ) or
+			       ( sub == 'fit' ) or ( sub == 'set' )     ) ) :
 
 				if ( self.opt[key] ) :
 					fl.write('1')
@@ -3295,31 +3297,31 @@ class core( QObject ) :
 
 		# Reset the options dictionary to its default values.
 
-		self.opt = { 'res_dw'     :True,
-		             'res_dt'     :True,
-		             'res'        :True,
-		             'res_u'      :True,
-		             'res_n'      :True,
-		             'res_v'      :True,
-		             'res_fv'     :True,
-		             'res_d'      :True,
-		             'res_w'      :True,
-		             'res_r'      :True,
-		             'res_b'      :True,
-		             'res_s'      :True,
-		             'res_k'      :True,
-		             'mfi_l'      :True,
-		             'mfi_h'      :False,
-		             'fls_n_fc'   :float('inf'),
-		             'fls_n_spin' :float('inf'),
-		             'fls_n_mfi_l':float('inf'),
-		             'fls_n_mfi_h':float('inf'),
-		             'mfi_fit_crv':True,
-		             'mfi_fit_fft':False,
-		             'mfi_set_raw':True,
-		             'mfi_set_fit':False,
-		             'mfi_set_smt':False,
- 		             'fit_med_fil':int('1')    }
+		self.opt = { 'res_par'       :True,
+		             'res_par_dw'    :True,
+		             'res_par_dt'    :True,
+		             'res_par_n'     :True,
+		             'res_par_v'     :True,
+		             'res_par_fv'    :True,
+		             'res_par_d'     :True,
+		             'res_par_w'     :True,
+		             'res_par_r'     :True,
+		             'res_par_b'     :True,
+		             'res_par_s'     :True,
+		             'res_par_k'     :True,
+		             'res_par_u'     :True,
+		             'fls_max_fc'    :float('inf'),
+		             'fls_max_spin'  :float('inf'),
+		             'fls_max_mfi_l' :float('inf'),
+		             'fls_max_mfi_h' :float('inf'),
+		             'fls_src_low'   :True,
+		             'fls_src_high'  :False,
+		             'mom_fit_crv'   :True,
+		             'mom_fit_fft'   :False,
+ 		             'mom_med_fil'   :int('1'),
+		             'mfi_set_raw'   :True,
+		             'mfi_set_fit'   :False,
+		             'mfi_set_smt'   :False    }
 
 		# If requested, propagate any changes.
 
@@ -3327,32 +3329,32 @@ class core( QObject ) :
 
 			try :
 				self.fc_arcv.chng_n_file_max(
-				                       self.opt['fls_n_fc'] )
+				                        self.opt['fls_max_fc'] )
 			except :
 				pass
 
 			try :
 				self.spin_arcv.chng_n_file_max(
-				                       self.opt['fls_n_spin'] )
+				                     self.opt['fls_max_spin'] )
 			except :
 				pass
 
 			try :
 				self.mfi_arcv_lres.chng_n_file_max(
-				                       self.opt['fls_n_mfi_l'] )
+				                     self.opt['fls_max_mfi_l'] )
 			except :
 				pass
 
 			try :
 				self.mfi_arcv_hres.chng_n_file_max(
-				                       self.opt['fls_n_mfi_h'] )
+				                     self.opt['fls_max_mfi_h'] )
 			except :
 				pass
 
-			self.opt['fls_n_fc']    = self.fc_arcv.n_file_max
-			self.opt['fls_n_spin']  = self.spin_arcv.n_file_max
-			self.opt['fls_n_mfi_l'] = self.mfi_arcv_lres.n_file_max
-			self.opt['fls_n_mfi_h'] = self.mfi_arcv_hres.n_file_max
+			self.opt['fls_max_fc']    = self.fc_arcv.n_file_max
+			self.opt['fls_max_spin']  = self.spin_arcv.n_file_max
+			self.opt['fls_max_mfi_l'] = self.mfi_arcv_lres.n_file_max
+			self.opt['fls_max_mfi_h'] = self.mfi_arcv_hres.n_file_max
 
 		# If requested, save the options dictionary.
 

@@ -130,9 +130,12 @@ class dialog_opt_mfi( QWidget ) :
 
 	def make_opt( self ) :
 
-		self.box['mfi_set_raw'].setCheckedSilent( self.core.opt['mfi_set_raw'] )
-		self.box['mfi_set_fit'].setCheckedSilent( self.core.opt['mfi_set_fit'] )
-		self.box['mfi_set_smt'].setCheckedSilent( self.core.opt['mfi_set_smt'] )
+		self.box['mfi_set_raw'].setCheckedSilent(
+		                                  self.core.opt['mfi_set_raw'] )
+		self.box['mfi_set_fit'].setCheckedSilent(
+		                                  self.core.opt['mfi_set_fit'] )
+		self.box['mfi_set_smt'].setCheckedSilent(
+		                                  self.core.opt['mfi_set_smt'] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.
