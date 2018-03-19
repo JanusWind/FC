@@ -21,7 +21,7 @@
 ################################################################################
 
 
-#################################################################################
+################################################################################
 ## LOAD THE NECESSARY MODULES.
 ################################################################################
 
@@ -170,7 +170,7 @@ class core( QObject ) :
 		                            n_file_max=self.opt['fls_n_fc'  ]  )
 
 		self.spin_arcv = spin_arcv( core=self,
-		                            n_file_max=self.opt['fls_n_spin']  ) 
+		                            n_file_max=self.opt['fls_n_spin']  )
 
 		self.mfi_arcv_lres  = mfi_arcv_lres( core=self,
 		                          n_file_max=self.opt['fls_n_mfi_l' ]  )
@@ -521,7 +521,8 @@ class core( QObject ) :
 				# configuration information, add it to the
 				# options dictionary.
 
-				for ln in open( self.opt_flnm, 'r' ).readlines( ) :
+				for ln in open(
+				             self.opt_flnm, 'r' ).readlines( ) :
 
 					# If the line is blank or is a comment,
 					# skip it.
@@ -1148,7 +1149,7 @@ class core( QObject ) :
 		#        in "self.mom_sel_bin[c,d,:]" are "True".  However, if
 		#        fewer than "self.mom_min_sel_dir" sets of "c"- and
 		#        "d"-values satisfy this criterion, all elements of
-		#        "self.mom_sel_dir" are given the value "False".		
+		#        "self.mom_sel_dir" are given the value "False".
 		#
 		#        Additionally, this functions serves to update the
 		#        "self.mom_n_sel_???" counters.
@@ -1303,7 +1304,7 @@ class core( QObject ) :
 			# look direction.
 
                         b = [i for i, x in enumerate( self.mom_sel_bin[c][d] )
-                                                                  if x==True    ]
+                                                                  if x==True   ]
 
 			eta_v[k] = - sum( [ self.fc_spec['curr'][c][d][i] 
                                                 for i in b] ) / \
@@ -2757,7 +2758,7 @@ class core( QObject ) :
 					pass
 
 				self.opt['fls_n_mfi_l'] =\
-				                    self.mfi_arcv_lres.n_file_max
+				                   self.mfi_arcv_lres.n_file_max
 
 			if ( key == 'fls_n_mfi_h' ) :
 
@@ -2847,7 +2848,6 @@ class core( QObject ) :
 		# If requested, emit the signal that the options have changed.
 
 		if ( signal ) :
-			#FIXME
 			self.emit( SIGNAL('janus_rstr_opt') )
 
 	#-----------------------------------------------------------------------
@@ -3157,7 +3157,8 @@ class core( QObject ) :
 					fl.write( txt_spc )
 					fl.write( txt_spc )
 					fl.write( '  ' )
-					fl.write( txt_num.format( pop['sig_n'] ) )
+					fl.write(
+					        txt_num.format( pop['sig_n'] ) )
 
 					# If applicable, write the populations's
 					# drift (and uncertainty therin).
@@ -3176,7 +3177,7 @@ class core( QObject ) :
 						fl.write( txt_spc )
 						fl.write( '  ' )
 						fl.write( txt_num.format(
-						                 pop['sig_dv'] ) )
+						               pop['sig_dv'] ) )
 
 					# Write the population's thermal
 					# speed(s) (and uncertainty therin).
@@ -3201,12 +3202,12 @@ class core( QObject ) :
 					fl.write( '  ' )
 					if ( pop.aniso ) :
 						fl.write( txt_num.format(
-						              pop['sig_w_per'] ) )
+						            pop['sig_w_per'] ) )
 						fl.write( txt_num.format(
-						              pop['sig_w_par'] ) )
+						            pop['sig_w_par'] ) )
 					else :
 						fl.write( txt_num.format(
-						                  pop['sig_w'] ) )
+						                pop['sig_w'] ) )
 
 			# Write a seperator.
 
