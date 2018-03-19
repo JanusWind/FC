@@ -233,7 +233,8 @@ class fc_dat( ) :
 
 		db_nrm = calc_arr_norm( db )
 
-		fv_vec = [ ( fv * db_nrm[i] ) for i in range( len( db_nrm ) ) ]
+#		fv_vec = [ ( fv * db_nrm[i] ) for i in range( len( db_nrm ) ) ]
+		fv_vec = fv
 
 		if ( dv is None ) :
 			v_vec = [ ( v0[i] - fv_vec[i] )
