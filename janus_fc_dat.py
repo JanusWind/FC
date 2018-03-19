@@ -160,7 +160,7 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION FOR SETIING THE MAGNETIC FIELD DIRECTION.
 	#-----------------------------------------------------------------------
 
-	def set_mag( self, b_vec, key ) :     #TODO: Rename to "set_mag".
+	def set_mag( self, b_vec, key ) :
 
 		# Normalize the magnetic-field vector and calcualte the magnetic
 		# look direction.
@@ -174,26 +174,6 @@ class fc_dat( ) :
 
 		self._norm_b[ key] = norm_b
 		self._maglook[key] = maglook
-
-#	#-----------------------------------------------------------------------
-#	# DEFINE THE FUNCTION FOR SETIING THE MAGNETIC FIELD DIRECTION.
-#	#-----------------------------------------------------------------------
-#
-#	def set_mag( self, b_vec ) :
-#
-#		# Normalize the magnetic-field vector.
-#
-#		norm_b = calc_arr_norm( b_vec )
-#
-#		# Store the components of the normalized magnetic-field vector.
-#
-#		self.norm_b = list( norm_b )
-#
-#		self._norm_b_x = norm_b[0]
-#		self._norm_b_y = norm_b[1]
-#		self._norm_b_z = norm_b[2]
-#
-#		self._maglook = calc_arr_dot( self['norm_b'], self['dir'] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CALCULATING THE EFFECTIVE AREA OF THE CUP.

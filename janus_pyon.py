@@ -153,12 +153,20 @@ class plas( object ) :
 		self.v0_y = None
 		self.v0_z = None
 
+		self.fv_x = None
+		self.fv_y = None
+		self.fv_z = None
+
 	# TODO: Define the fluctuating velocity here.
 
 #		self.fv       = None
 		self.sig_v0_x = None
 		self.sig_v0_y = None
 		self.sig_v0_z = None
+
+		self.sig_fv_x = None
+		self.sig_fv_y = None
+		self.sig_fv_z = None
 
 		self.b0_x = None
 		self.b0_y = None
@@ -370,9 +378,37 @@ class plas( object ) :
 
 		elif ( elem['param'] == 'fv' ) :
 
-			if ( ( elem['comp'] is None  ) or
-			     ( elem['comp'] == 'mag' )    ) :
-				return self.fv
+			if ( elem['sigma'] is None ) :
+
+				if ( ( elem['comp'] is None  ) or
+				     ( elem['comp'] == 'mag' )    ) :
+					return self.get_fv_mag( )
+				elif ( elem['comp'] == 'vec' ) :
+					return self.get_fv_vec( )
+				elif ( elem['comp'] == 'x' ) :
+					return self.fv_x
+				elif ( elem['comp'] == 'y' ) :
+					return self.fv_y
+				elif ( elem['comp'] == 'z' ) :
+					return self.fv_z
+				else :
+					return None
+
+			else :
+
+				if   ( elem['comp'] == 'x' ) :
+					return self.sig_fv_x
+				elif ( elem['comp'] == 'y' ) :
+					return self.sig_fv_y
+				elif ( elem['comp'] == 'z' ) :
+					return self.sig_fv_z
+				else :
+					return None
+
+
+#			if ( ( elem['comp'] is None  ) or
+#			     ( elem['comp'] == 'mag' )    ) :
+#				return self.fv
 
 		# Note.  If this point is reached, the parameter is one to be
 		#        handled by the species or population.
@@ -476,14 +512,6 @@ class plas( object ) :
 				if ( value[2] is not None ) :
 					self.v0_z = float( value[2] )
 
-		elif ( key == 'fv' ) :
-
-			self.fv = None
-
-			if ( value is not None ) :
-
-				self.fv = float( value )
-
 		elif ( key == 'sig_v0_x' ) :
 
 			self.sig_v0_x = None
@@ -507,6 +535,55 @@ class plas( object ) :
 			if ( value is not None ) :
 
 				self.sig_v0_z = float( value )
+
+#		elif ( key == 'fv' ) :
+#
+#			self.fv = None
+#
+#			if ( value is not None ) :
+#
+#				self.fv = float( value )
+
+		elif ( key == 'fv_vec' ) :
+
+			try :
+				l = len( value )
+			except :
+				l = 0
+
+			if ( l != 3 ) :
+				raise TypeError( 'Array of length 3 required.' )
+			else :
+				if ( value[0] is not None ) :
+					self.fv_x = float( value[0] )
+				if ( value[1] is not None ) :
+					self.fv_y = float( value[1] )
+				if ( value[2] is not None ) :
+					self.fv_z = float( value[2] )
+
+		elif ( key == 'sig_fv_x' ) :
+
+			self.sig_fv_x = None
+
+			if ( value is not None ) :
+
+				self.sig_fv_x = float( value )
+
+		elif ( key == 'sig_fv_y' ) :
+
+			self.sig_fv_y = None
+
+			if ( value is not None ) :
+
+				self.sig_fv_y = float( value )
+
+		elif ( key == 'sig_fv_z' ) :
+
+			self.sig_fv_z = None
+
+			if ( value is not None ) :
+
+				self.sig_fv_z = float( value )
 
 		elif   ( key == 'b0_x' ) :
 
@@ -646,6 +723,42 @@ class plas( object ) :
 		return ( self.v0_x, self.v0_y, self.v0_z )
 
 	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR GETTING THE MAGNITUDE OF FLUCTUATING VELOCITY.
+	#-----------------------------------------------------------------------
+
+	def get_fv_mag( self ) :
+
+		# If any of the components of the velocity are undefined, abort
+		# (returning "None").
+
+		if ( ( self.fv_x is None ) or ( self.fv_y is None ) or
+		     ( self.fv_z is None )                             ) :
+
+			return None
+
+		# Calculate and return the magnitude.
+
+		return sqrt( self.fv_x**2 + self.fv_y**2 + self.fv_z**2 )
+
+	#-----------------------------------------------------------------------
+	# DEFINE THE FUNCTION FOR GETTING THE VECTOR OF FLUCTUATING VELOCITY.
+	#-----------------------------------------------------------------------
+
+	def get_fv_vec( self ) :
+
+		# If any of the components of the velocity are undefined, abort
+		# (returning "None").
+
+		if ( ( self.fv_x is None ) or ( self.fv_y is None ) or
+		     ( self.fv_z is None )                             ) :
+
+			return None
+
+		# Return the vector.
+
+		return ( self.fv_x, self.fv_y, self.fv_z )
+
+	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR ADDING A NEW SPECIES.
 	#-----------------------------------------------------------------------
 
@@ -673,8 +786,9 @@ class plas( object ) :
 		                          name=name, sym=sym,
 		                          n=n, dv=dv, w=w,
 		                          w_per=w_per, w_par=w_par,
-		                          sig_n=sig_n, sig_dv=sig_dv, sig_w=sig_w,
-		                          sig_w_per=sig_w_per, sig_w_par=sig_w_par ) )
+		                          sig_n=sig_n, sig_dv=sig_dv,
+		                          sig_w=sig_w, sig_w_per=sig_w_per,
+		                          sig_w_par=sig_w_par ) )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RETREIVING A SPECIES.
@@ -755,10 +869,6 @@ class plas( object ) :
 
 		# TODO: Special handling of populations that still reference
 		#       this species.
-
-
-
-
 
 		# Attempt to retrieve the species.  If this fails, abort.
 

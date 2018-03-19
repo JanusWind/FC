@@ -21,7 +21,7 @@
 ################################################################################
 
 
-#################################################################################
+################################################################################
 ## LOAD THE NECESSARY MODULES.
 ################################################################################
 
@@ -2546,9 +2546,10 @@ class core( QObject ) :
 
 				# TODO: How to add 'fv' to 'vel' here?
 
-				vel = array( self.nln_plas['vec_v0'] ) +\
-				      array( self.nln_plas['fv'] )
+				vel = array( self.nln_plas['v0_vec'] ) +\
+				      array( self.nln_plas['fv_vec'] )
 
+				print self.nln_plas['fv']
 				if ( self.nln_plas.arr_pop[i]['drift'] ) :
 					vel += self.mfi_avg_nrm * \
 					          self.nln_plas.arr_pop[i]['dv']
@@ -2677,8 +2678,6 @@ class core( QObject ) :
 		prm_v0 = ( prm[0], prm[1], prm[2] )
 
 		prm_fv = prm[3]
-
-#		prm_fb = ( prm[4]. prm[5]. prm[6] )
 
 		k = 4
 
@@ -2841,15 +2840,15 @@ class core( QObject ) :
 		self.nln_res_plas['b0_y']     = self.mfi_avg_vec[1]
 		self.nln_res_plas['b0_z']     = self.mfi_avg_vec[2]
 
-		pop_v0_vec                    = [fit[0], fit[1], fit[2]]
-		self.nln_res_plas['v0_x']     =  fit[0]
-		self.nln_res_plas['v0_y']     =  fit[1]
-		self.nln_res_plas['v0_z']     =  fit[2]
-		self.nln_res_plas['sig_v0_x'] =  sig[0]
-		self.nln_res_plas['sig_v0_y'] =  sig[1]
-		self.nln_res_plas['sig_v0_z'] =  sig[2]
-		fv                            =  fit[3]
-		self.nln_res_plas['fv']       =  fit[3]
+		pop_v0_vec                    = [ fit[0], fit[1], fit[2] ]
+		self.nln_res_plas['v0_x']     =   fit[0]
+		self.nln_res_plas['v0_y']     =   fit[1]
+		self.nln_res_plas['v0_z']     =   fit[2]
+		self.nln_res_plas['sig_v0_x'] =   sig[0]
+		self.nln_res_plas['sig_v0_y'] =   sig[1]
+		self.nln_res_plas['sig_v0_z'] =   sig[2]
+		fv                            =   fit[3]
+		self.nln_res_plas['fv']       =   fit[3]
 
 		print self.nln_res_plas['fv']
 
@@ -3227,7 +3226,8 @@ class core( QObject ) :
 
 						self.anls_nln()
 
-						self.emit( SIGNAL('janus_chng_mfi') )
+						self.emit( 
+						      SIGNAL('janus_chng_mfi') )
 
 		# Save updated options to the config file.
 

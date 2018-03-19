@@ -89,6 +89,10 @@ class widget_fm_moments( QWidget ) :
 		self.n_painted     = 0
 		self.n_painted_max = 3
 
+		# Disable the mouse click for this widget.
+
+		self.setDisabled( True )
+
 		# Store the Janus core.
 
 		self.core = core
