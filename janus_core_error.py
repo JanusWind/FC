@@ -1777,7 +1777,8 @@ class core( QObject ) :
 		self.mom_res = plas( )
 
 		self.mom_res['v0_vec'] = mom_v_vec
-		self.mom_res['fv']     = 0.0
+		self.mom_res['fv_vec'] = 0.00*array( mom_v_vec )
+
 		self.mom_res.add_spec( name='Proton', sym='p', m=1., q=1. )
 
 		self.mom_res.add_pop( 'p',
@@ -1792,7 +1793,7 @@ class core( QObject ) :
 		                                    self.mom_res['m_p'],
 		                                    self.mom_res['q_p'],
 		                                    self.mom_res['v0_vec'],
-		                                    self.mom_res['fv'],
+		                                    self.mom_res['fv_vec'],
 		                                    self.mfi_avg_nrm,
 		                                    self.mom_res['n_p_c'], 0.,
 		                                    self.mom_res['w_p_c'],
@@ -2152,7 +2153,8 @@ class core( QObject ) :
 		try :
 			self.nln_plas['v0_vec'] = [
 			         round( v, 1 ) for v in self.mom_res['v0_vec'] ]
-			self.nln_plas['fv'] = 0.05*norm( self.nln_plas['v0_vec'])
+			self.nln_plas['fv_vec'] =\
+			                   0.05*array( self.nln_plas['v0_vec'] )
 		except :
 			pass
 
@@ -2353,6 +2355,7 @@ class core( QObject ) :
 		if ( ( self.nln_gss_n_pop == 0         ) or
 		     ( 0 not in self.nln_gss_pop       ) or
 		     ( None in self.nln_plas['v0_vec'] ) or
+		     ( None in self.nln_plas['fv_vec'] ) or
 		     ( self.n_mfi == 0                 )    ) :
 
 			self.emit( SIGNAL('janus_chng_nln_gss') )
@@ -2365,11 +2368,11 @@ class core( QObject ) :
 
 		pop_v0_vec = self.nln_plas['v0_vec']
 
-		fv = self.nln_plas['fv']
+		pop_fv_vec = self.nln_plas['fv_vec']
 
-		self.nln_gss_prm = list( pop_v0_vec )
+#		self.nln_gss_prm = list( pop_v0_vec )
 
-		self.nln_gss_prm.append( fv )
+		self.nln_gss_prm =  list( pop_v0_vec + pop_fv_vec )
 
 		# TODO: Append 'fv' to self.nln_gss_prm here?
 
@@ -2426,7 +2429,8 @@ class core( QObject ) :
 			     self.fc_spec.calc_curr(
 			                    self.nln_plas.arr_pop[p]['m'],
 			                    self.nln_plas.arr_pop[p]['q'],
-			                    pop_v0_vec, fv, self.mfi_avg_nrm,
+			                    pop_v0_vec, pop_fv_vec,
+			                    self.mfi_avg_nrm,
 			                    pop_n, pop_dv, pop_w,
 			                    self.mfi_set_key                 ) )
 
@@ -2549,7 +2553,6 @@ class core( QObject ) :
 				vel = array( self.nln_plas['v0_vec'] ) +\
 				      array( self.nln_plas['fv_vec'] )
 
-				print self.nln_plas['fv']
 				if ( self.nln_plas.arr_pop[i]['drift'] ) :
 					vel += self.mfi_avg_nrm * \
 					          self.nln_plas.arr_pop[i]['dv']
@@ -2677,9 +2680,10 @@ class core( QObject ) :
 
 		prm_v0 = ( prm[0], prm[1], prm[2] )
 
-		prm_fv = prm[3]
+		prm_fv = ( prm[3], prm[4], prm[5] ) 
 
-		k = 4
+		print prm_v0
+		k = 6
 
 		for p in self.nln_gss_pop :
 
@@ -2847,12 +2851,18 @@ class core( QObject ) :
 		self.nln_res_plas['sig_v0_x'] =   sig[0]
 		self.nln_res_plas['sig_v0_y'] =   sig[1]
 		self.nln_res_plas['sig_v0_z'] =   sig[2]
-		fv                            =   fit[3]
-		self.nln_res_plas['fv']       =   fit[3]
+
+		pop_fv_vec                    = [ fit[3], fit[4], fit[5] ]
+		self.nln_res_plas['fv_x']     =   fit[3]
+		self.nln_res_plas['fv_y']     =   fit[4]
+		self.nln_res_plas['fv_z']     =   fit[5]
+		self.nln_res_plas['sig_fv_x'] =   sig[3]
+		self.nln_res_plas['sig_fv_y'] =   sig[4]
+		self.nln_res_plas['sig_fv_z'] =   sig[5]
 
 		print self.nln_res_plas['fv']
 
-		c = 4
+		c = 6
 
 		self.nln_res_curr_ion = []
 
@@ -2923,7 +2933,8 @@ class core( QObject ) :
 			     self.fc_spec.calc_curr ( 
 			                  self.nln_plas.arr_pop[p]['m'],
 			                  self.nln_plas.arr_pop[p]['q'],
-			                  pop_v0_vec, fv, self.mfi_avg_nrm,
+			                  pop_v0_vec, pop_fv_vec,
+			                  self.mfi_avg_nrm,
 			                  pop_n, pop_dv, pop_w,
 			                  self.mfi_set_key                   ) )
 
@@ -3316,8 +3327,8 @@ class core( QObject ) :
 		             'fls_max_mfi_h' :float('inf'),
 		             'fls_src_low'   :True,
 		             'fls_src_high'  :False,
-		             'mom_fit_crv'   :True,
-		             'mom_fit_fft'   :False,
+		             'mom_fit_crv'   :False,
+		             'mom_fit_fft'   :True,
  		             'mom_med_fil'   :int('1'),
 		             'mfi_set_raw'   :True,
 		             'mfi_set_fit'   :False,
