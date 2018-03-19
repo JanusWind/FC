@@ -2365,11 +2365,11 @@ class core( QObject ) :
 
 		pop_v0_vec = self.nln_plas['v0_vec']
 
-		fv = self.nln_plas['fv']
+		pop_fv_vec = self.nln_plas['fv_vec']
 
 		self.nln_gss_prm = list( pop_v0_vec )
 
-		self.nln_gss_prm.append( fv )
+		self.nln_gss_prm.append( pop_fv_vec )
 
 		# TODO: Append 'fv' to self.nln_gss_prm here?
 
@@ -2426,7 +2426,8 @@ class core( QObject ) :
 			     self.fc_spec.calc_curr(
 			                    self.nln_plas.arr_pop[p]['m'],
 			                    self.nln_plas.arr_pop[p]['q'],
-			                    pop_v0_vec, fv, self.mfi_avg_nrm,
+			                    pop_v0_vec, pop_fv_vec,
+			                    self.mfi_avg_nrm,
 			                    pop_n, pop_dv, pop_w,
 			                    self.mfi_set_key                 ) )
 
@@ -2549,7 +2550,7 @@ class core( QObject ) :
 				vel = array( self.nln_plas['v0_vec'] ) +\
 				      array( self.nln_plas['fv_vec'] )
 
-				print self.nln_plas['fv']
+				print self.nln_plas['fv_vec']
 				if ( self.nln_plas.arr_pop[i]['drift'] ) :
 					vel += self.mfi_avg_nrm * \
 					          self.nln_plas.arr_pop[i]['dv']
