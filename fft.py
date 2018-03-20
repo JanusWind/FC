@@ -124,6 +124,10 @@ bz = [ sum( [ mfi_b_vec[i][j]*e3[j] for j in range(3)] )
 
 b_vec = [ [ bx[i], by[i], bz[i] ] for i in range( len( mfi_s ) ) ]
 
+bx = medfilt( bx, 11 )
+by = medfilt( by, 11 )
+bz = medfilt( bz, 11 )
+
 # Define the time interval between measurements
 
 dt = mfi_s[1] - mfi_s[0]
@@ -224,11 +228,60 @@ rms_res2_x = std( res2_fft_x )
 rms_res2_y = std( res2_fft_y )
 rms_res2_z = std( res2_fft_z )
 
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+# Compute the Fourier Transform of residue of each component of magnetic field.
+
+fb3_x = rfft( res2_fft_x )
+fb3_y = rfft( res2_fft_y )
+fb3_z = rfft( res2_fft_z )
+
+# Compute the absolute value of fourier residual transformed data.
+
+afb3_x = abs( fb3_x**2 )
+afb3_y = abs( fb3_y**2 )
+afb3_z = abs( fb3_z**2 )
+
+# Compute the index at which maximum frequency occurs.
+
+max_ind3_x = argmin( abs( afb3_x - max( afb3_x ) ) )
+max_ind3_y = argmin( abs( afb3_y - max( afb3_y ) ) )
+max_ind3_z = argmin( abs( afb3_z - max( afb3_z ) ) )
+
+# Compute the value of maximum frequency.
+
+fq3_x = fq1[ max_ind3_x ]
+fq3_y = fq1[ max_ind3_y ]
+fq3_z = fq1[ max_ind3_z ]
+
+ffb3_x = zeros_like( fb3_x ) 
+ffb3_y = zeros_like( fb3_y ) 
+ffb3_z = zeros_like( fb3_z ) 
+
+ffb3_x[ max_ind3_x ] = fb3_x[ max_ind3_x ]
+ffb3_y[ max_ind3_y ] = fb3_y[ max_ind3_y ]
+ffb3_z[ max_ind3_z ] = fb3_z[ max_ind3_z ]
+
+bb3_x = irfft( ffb3_x )
+bb3_y = irfft( ffb3_y )
+bb3_z = irfft( ffb3_z )
+
+# Calculate the residue and its rms value from fft.
+
+res3_fft_x = [ ( res2_fft_x[i] - bb3_x[i] ) for i in range( len( mfi_s ) ) ]
+res3_fft_y = [ ( res2_fft_y[i] - bb3_y[i] ) for i in range( len( mfi_s ) ) ]
+res3_fft_z = [ ( res2_fft_z[i] - bb3_z[i] ) for i in range( len( mfi_s ) ) ]
+
+rms_res3_x = std( res3_fft_x )
+rms_res3_y = std( res3_fft_y )
+rms_res3_z = std( res3_fft_z )
+
+
 # Calculate the final fft value from summing for all modes.
 
-bbf_x = bb1_x + bb2_x
-bbf_y = bb1_y + bb2_y
-bbf_z = bb1_z + bb2_z
+bbf_x = bb1_x + bb2_x + bb3_x
+bbf_y = bb1_y + bb2_y + bb3_y
+bbf_z = bb1_z + bb2_z + bb3_z
 
 # Calculate the residue and its rms value from fft.
 
@@ -354,6 +407,7 @@ axs[0].plot(mfi_s, by, "#868886", label="Data_y", linewidth=0.3)
 #axs[0].plot( mfi_s, fit1_y["fitfunc"](ts), "r-", label="curve_fit", linewidth=0.5)
 axs[0].plot( mfi_s, bb1_y,  'b-', label = 'FFT 1', linewidth = 0.3)
 axs[0].plot( mfi_s, bb2_y,  'g-', label = 'FFT 2', linewidth = 0.3)
+axs[0].plot( mfi_s, bb3_y,  'c-', label = 'FFT 3', linewidth = 0.3)
 axs[0].plot( mfi_s, bbf_y,  'r-', label = 'FFT F', linewidth = 0.5)
 #axs[0].plot( mfi_s, res1_fft_y, 'g-', label = 'RES 1', linewidth = 0.5)
 #axs[0].plot( mfi_s, res2_fft_y, 'm-', label = 'RES 2', linewidth = 0.5)
@@ -363,8 +417,9 @@ axs[0].title.set_text('Magnetic field in y and z-direction (FFT)')
 
 axs[1].plot(mfi_s, bz, "#868886", label="Data_z", linewidth=0.5)
 #axs[0].plot( mfi_s, fit1_y["fitfunc"](ts), "r-", label="curve_fit", linewidth=0.5)
-axs[1].plot( mfi_s, bb1_z,  'b-', label = 'FFT 1', linewidth = 0.5)
-axs[1].plot( mfi_s, bb2_z,  'g-', label = 'FFT 2', linewidth = 0.5)
+axs[1].plot( mfi_s, bb1_z,  'b-', label = 'FFT 1', linewidth = 0.3)
+axs[1].plot( mfi_s, bb2_z,  'g-', label = 'FFT 2', linewidth = 0.3)
+axs[1].plot( mfi_s, bb3_z,  'c-', label = 'FFT 3', linewidth = 0.3)
 axs[1].plot( mfi_s, bbf_z,  'r-', label = 'FFT F', linewidth = 0.5)
 #axs[0].plot( mfi_s, res1_fft_y, 'g-', label = 'RES 1', linewidth = 0.5)
 #axs[0].plot( mfi_s, res2_fft_y, 'm-', label = 'RES 2', linewidth = 0.5)
@@ -380,52 +435,54 @@ fig.subplots_adjust(hspace=0)
 ##raxs[0].plot( mfi_s, res2_x, 'k-', linestyle =  '-', label = 'Residue2', linewidth = 0.5)
 #raxs[0].legend(loc="upper right")
 
-raxs[0].plot( mfi_s, res1_fft_y, "r-", label="Residue1", linewidth=0.5)
-raxs[0].plot( mfi_s, res2_fft_y, "b-", label="Residue2", linewidth=0.5)
+raxs[0].plot( mfi_s, res1_fft_y, "r-", label="Residue1", linewidth=0.3)
+raxs[0].plot( mfi_s, res2_fft_y, "b-", label="Residue2", linewidth=0.3)
+raxs[0].plot( mfi_s, res3_fft_y, "c-", label="Residue3", linewidth=0.3)
 raxs[0].plot( mfi_s, resf_fft_y, "g-", label="Residuef", linewidth=0.5)
 #raxs[0].plot( mfi_s, res2_y, 'k-', linestyle =  '-', label = 'Residue2', linewidth = 0.5)
 raxs[0].legend(loc="upper right")
 raxs[0].title.set_text('Residual of Magnetic field in y and z-direction (FFT)')
 
-raxs[1].plot( mfi_s, res1_fft_z, "r-", label="Residue1", linewidth=0.5)
-raxs[1].plot( mfi_s, res2_fft_z, "b-", label="Residue2", linewidth=0.5)
+raxs[1].plot( mfi_s, res1_fft_z, "r-", label="Residue1", linewidth=0.3)
+raxs[1].plot( mfi_s, res2_fft_z, "b-", label="Residue2", linewidth=0.3)
+raxs[1].plot( mfi_s, res3_fft_z, "c-", label="Residue3", linewidth=0.3)
 raxs[1].plot( mfi_s, resf_fft_z, "g-", label="Residuef", linewidth=0.5)
 #raxs[1].plot( mfi_s, res2_z, 'k-', linestyle =  '-', label = 'Residue2', linewidth = 0.5)
 raxs[1].legend(loc="upper right")
 raxs[1].set_xlabel('Linear Frequency (Hz) ')
 
-fig, faxs = plt.subplots( 2, 1, sharex = True )
-fig.subplots_adjust(hspace=0)
-
-faxs[0].plot(mfi_s, by,                "#868886", label="Data_y", linewidth=0.5)
-faxs[0].plot( mfi_s, fit1_y["fitfunc"](ts), "b-", label="FIT 1",  linewidth=0.5)
-faxs[0].plot( mfi_s, fit2_y["fitfunc"](ts), "g-", label="FIT 2",  linewidth=0.5)
-faxs[0].plot( mfi_s, fitf_y,                "r-", label="FIT F",  linewidth=0.5)
-faxs[0].legend(loc="upper right")
-faxs[0].title.set_text('Magnetic field in y and z-direction (Curve Fit)')
-
-faxs[1].plot(mfi_s, bz,                "#868886", label="Data_z", linewidth=0.5)
-faxs[1].plot( mfi_s, fit1_z["fitfunc"](ts), "b-", label="FIT 1",  linewidth=0.5)
-faxs[1].plot( mfi_s, fit2_z["fitfunc"](ts), "g-", label="FIT 2",  linewidth=0.5)
-faxs[1].plot( mfi_s, fitf_z,                "r-", label="FIT F",  linewidth=0.5)
-faxs[1].legend(loc="upper right")
-
-fig, rfaxs = plt.subplots( 2, 1, sharex = True )
-fig.subplots_adjust(hspace=0)
-
-rfaxs[0].plot( mfi_s, res1_fit_y, "r-", label="Residue1", linewidth=0.5)
-rfaxs[0].plot( mfi_s, res2_fit_y, "b-", label="Residue2", linewidth=0.5)
-rfaxs[0].plot( mfi_s, resf_fit_y, "g-", label="Residuef", linewidth=0.5)
-#rfaxs[0].plot( mfi_s, res2_y, 'k-', linestyle =  '-', label = 'Residue2', linewidth = 0.5)
-rfaxs[0].legend(loc="upper right")
-rfaxs[0].title.set_text('Residual of Magnetic field in y and z-direction (Curve Fit)')
-
-
-rfaxs[1].plot( mfi_s, res1_fit_z, "r-", label="Residue1", linewidth=0.5)
-rfaxs[1].plot( mfi_s, res2_fit_z, "b-", label="Residue2", linewidth=0.5)
-rfaxs[1].plot( mfi_s, resf_fit_z, "g-", label="Residuef", linewidth=0.5)
-#rfaxs[1].plot( mfi_s, res2_y, 'k-', linestyle =  '-', label = 'Residue2', linewidth = 0.5)
-rfaxs[1].legend(loc="upper right")
+#fig, faxs = plt.subplots( 2, 1, sharex = True )
+#fig.subplots_adjust(hspace=0)
+#
+#faxs[0].plot(mfi_s, by,                "#868886", label="Data_y", linewidth=0.5)
+#faxs[0].plot( mfi_s, fit1_y["fitfunc"](ts), "b-", label="FIT 1",  linewidth=0.5)
+#faxs[0].plot( mfi_s, fit2_y["fitfunc"](ts), "g-", label="FIT 2",  linewidth=0.5)
+#faxs[0].plot( mfi_s, fitf_y,                "r-", label="FIT F",  linewidth=0.5)
+#faxs[0].legend(loc="upper right")
+#faxs[0].title.set_text('Magnetic field in y and z-direction (Curve Fit)')
+#
+#faxs[1].plot(mfi_s, bz,                "#868886", label="Data_z", linewidth=0.5)
+#faxs[1].plot( mfi_s, fit1_z["fitfunc"](ts), "b-", label="FIT 1",  linewidth=0.5)
+#faxs[1].plot( mfi_s, fit2_z["fitfunc"](ts), "g-", label="FIT 2",  linewidth=0.5)
+#faxs[1].plot( mfi_s, fitf_z,                "r-", label="FIT F",  linewidth=0.5)
+#faxs[1].legend(loc="upper right")
+#
+#fig, rfaxs = plt.subplots( 2, 1, sharex = True )
+#fig.subplots_adjust(hspace=0)
+#
+#rfaxs[0].plot( mfi_s, res1_fit_y, "r-", label="Residue1", linewidth=0.5)
+#rfaxs[0].plot( mfi_s, res2_fit_y, "b-", label="Residue2", linewidth=0.5)
+#rfaxs[0].plot( mfi_s, resf_fit_y, "g-", label="Residuef", linewidth=0.5)
+##rfaxs[0].plot( mfi_s, res2_y, 'k-', linestyle =  '-', label = 'Residue2', linewidth = 0.5)
+#rfaxs[0].legend(loc="upper right")
+#rfaxs[0].title.set_text('Residual of Magnetic field in y and z-direction (Curve Fit)')
+#
+#
+#rfaxs[1].plot( mfi_s, res1_fit_z, "r-", label="Residue1", linewidth=0.5)
+#rfaxs[1].plot( mfi_s, res2_fit_z, "b-", label="Residue2", linewidth=0.5)
+#rfaxs[1].plot( mfi_s, resf_fit_z, "g-", label="Residuef", linewidth=0.5)
+##rfaxs[1].plot( mfi_s, res2_y, 'k-', linestyle =  '-', label = 'Residue2', linewidth = 0.5)
+#rfaxs[1].legend(loc="upper right")
 
 plt.show( )
 
