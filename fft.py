@@ -160,9 +160,9 @@ ffb1_x = zeros_like( fb1_x )
 ffb1_y = zeros_like( fb1_y ) 
 ffb1_z = zeros_like( fb1_z ) 
 
-ffb1_x[ max_ind_x ] = fb1_x[ max_ind1_x ]
-ffb1_y[ max_ind_y ] = fb1_y[ max_ind1_y ]
-ffb1_z[ max_ind_z ] = fb1_z[ max_ind1_z ]
+ffb1_x[ max_ind1_x ] = fb1_x[ max_ind1_x ]
+ffb1_y[ max_ind1_y ] = fb1_y[ max_ind1_y ]
+ffb1_z[ max_ind1_z ] = fb1_z[ max_ind1_z ]
 
 bb1_x = irfft( ffb1_x )
 bb1_y = irfft( ffb1_y )
@@ -206,9 +206,9 @@ ffb2_x = zeros_like( fb2_x )
 ffb2_y = zeros_like( fb2_y ) 
 ffb2_z = zeros_like( fb2_z ) 
 
-ffb2_x[ max_ind_x ] = fb2_x[ max_ind2_x ]
-ffb2_y[ max_ind_y ] = fb2_y[ max_ind2_y ]
-ffb2_z[ max_ind_z ] = fb2_z[ max_ind2_z ]
+ffb2_x[ max_ind2_x ] = fb2_x[ max_ind2_x ]
+ffb2_y[ max_ind2_y ] = fb2_y[ max_ind2_y ]
+ffb2_z[ max_ind2_z ] = fb2_z[ max_ind2_z ]
 
 bb2_x = irfft( ffb2_x )
 bb2_y = irfft( ffb2_y )
