@@ -74,12 +74,6 @@ class fc_dat( ) :
 		self._dir_y     = sin( self._the ) * sin( self._phi )
 		self._dir_z     = cos( self._the )
 
-#		self._norm_b_x  = None  #TODO: Remove
-#		self._norm_b_y  = None  #TODO: Remove
-#		self._norm_b_z  = None  #TODO: Remove
-#
-#		self._maglook   = None  #TODO: Remove
-
 		self._maglook = { }
 		self._norm_b  = { }
 
@@ -91,9 +85,9 @@ class fc_dat( ) :
 			self._valid = True
 
 	def __getitem__( self, key ) :
-#
+
 #               return self.__dict__['_'+key]
-#
+
 		if ( key == 'spec' ) :
 			return self._spec
 		elif ( key == 'valid' ) :
@@ -139,16 +133,6 @@ class fc_dat( ) :
 			return self._dir_z
 		elif ( key == 'dir' ) :
 			return ( self._dir_x, self._dir_y, self._dir_z )
-#		elif ( key == 'norm_b_x' ) :
-#			return self._norm_b_x
-#		elif ( key == 'norm_b_y' ) :
-#			return self._norm_b_y
-#		elif ( key == 'norm_b_z' ) :
-#			return self._norm_b_z
-#		elif ( key == 'norm_b' ) :
-#			return ( self._norm_b_x,self._norm_b_y,self._norm_b_z )
-#		elif ( key == 'maglook' ) :
-#			return ( self._maglook )
 		else :
 			raise KeyError( 'Invalid key for "fc_dat ".' )
 

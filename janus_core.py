@@ -171,16 +171,16 @@ class core( QObject ) :
 		# and managing data files.
 
 		self.fc_arcv = fc_arcv( core=self,
-		                            n_file_max=self.opt['fls_max_fc'  ]  )
+		                           n_file_max=self.opt['fls_max_fc'  ] )
 
 		self.spin_arcv = spin_arcv( core=self,
-		                            n_file_max=self.opt['fls_max_spin']  ) 
+		                          n_file_max=self.opt['fls_max_spin'] )
 
 		self.mfi_arcv_lres  = mfi_arcv_lres( core=self,
-		                          n_file_max=self.opt['fls_max_mfi_l' ]  )
+		                        n_file_max=self.opt['fls_max_mfi_l' ]  )
 
 		self.mfi_arcv_hres = mfi_arcv_hres( core=self,
-		                          n_file_max=self.opt['fls_max_mfi_h' ]  )
+		                        n_file_max=self.opt['fls_max_mfi_h' ]  )
 
 		# Initialize a log of the analysis results.
 
@@ -568,7 +568,8 @@ class core( QObject ) :
 				# configuration information, add it to the
 				# options dictionary.
 
-				for ln in open( self.opt_flnm, 'r' ).readlines( ) :
+				for ln in open(
+				             self.opt_flnm, 'r' ).readlines( ) :
 
 					# If the line is blank or is a comment,
 					# skip it.
@@ -1540,7 +1541,7 @@ class core( QObject ) :
 		#        in "self.mom_sel_bin[c,d,:]" are "True".  However, if
 		#        fewer than "self.mom_min_sel_dir" sets of "c"- and
 		#        "d"-values satisfy this criterion, all elements of
-		#        "self.mom_sel_dir" are given the value "False".		
+		#        "self.mom_sel_dir" are given the value "False".
 		#
 		#        Additionally, this functions serves to update the
 		#        "self.mom_n_sel_???" counters.
@@ -1695,7 +1696,7 @@ class core( QObject ) :
 			# look direction.
 
                         b = [i for i, x in enumerate( self.mom_sel_bin[c][d] )
-                                                                  if x==True    ]
+                                                                 if x==True    ]
 
 			eta_v[k] = - sum( [ self.fc_spec['curr'][c][d][i] 
                                                 for i in b] ) / \
@@ -2544,12 +2545,9 @@ class core( QObject ) :
 				# magnitude thereof) of this ion species (based
 				# on the initial guess).
 
-				# TODO: How to add 'fv' to 'vel' here?
+				vel = array( self.nln_plas['vec_v0'] ) +\
+				      array( self.nln_plas['fv'] )
 
-				vel = array( self.nln_plas['v0_vec'] ) +\
-				      array( self.nln_plas['fv_vec'] )
-
-				print self.nln_plas['fv']
 				if ( self.nln_plas.arr_pop[i]['drift'] ) :
 					vel += self.mfi_avg_nrm * \
 					          self.nln_plas.arr_pop[i]['dv']
@@ -2678,6 +2676,8 @@ class core( QObject ) :
 		prm_v0 = ( prm[0], prm[1], prm[2] )
 
 		prm_fv = prm[3]
+
+#		prm_fb = ( prm[4]. prm[5]. prm[6] )
 
 		k = 4
 
@@ -2840,18 +2840,17 @@ class core( QObject ) :
 		self.nln_res_plas['b0_y']     = self.mfi_avg_vec[1]
 		self.nln_res_plas['b0_z']     = self.mfi_avg_vec[2]
 
-		pop_v0_vec                    = [ fit[0], fit[1], fit[2] ]
-		self.nln_res_plas['v0_x']     =   fit[0]
-		self.nln_res_plas['v0_y']     =   fit[1]
-		self.nln_res_plas['v0_z']     =   fit[2]
-		self.nln_res_plas['sig_v0_x'] =   sig[0]
-		self.nln_res_plas['sig_v0_y'] =   sig[1]
-		self.nln_res_plas['sig_v0_z'] =   sig[2]
-		fv                            =   fit[3]
-		self.nln_res_plas['fv']       =   fit[3]
+		pop_v0_vec                    = [fit[0], fit[1], fit[2]]
+		self.nln_res_plas['v0_x']     =  fit[0]
+		self.nln_res_plas['v0_y']     =  fit[1]
+		self.nln_res_plas['v0_z']     =  fit[2]
+		self.nln_res_plas['sig_v0_x'] =  sig[0]
+		self.nln_res_plas['sig_v0_y'] =  sig[1]
+		self.nln_res_plas['sig_v0_z'] =  sig[2]
+		fv                            =  fit[3]
+		self.nln_res_plas['fv']       =  fit[3]
 
 		print self.nln_res_plas['fv']
-
 		c = 4
 
 		self.nln_res_curr_ion = []
@@ -3693,7 +3692,7 @@ class core( QObject ) :
 						fl.write( txt_spc )
 						fl.write( '  ' )
 						fl.write( txt_num.format(
-						                 pop['sig_dv'] ) )
+						               pop['sig_dv'] ) )
 
 					# Write the population's thermal
 					# speed(s) (and uncertainty therin).
@@ -3718,12 +3717,12 @@ class core( QObject ) :
 					fl.write( '  ' )
 					if ( pop.aniso ) :
 						fl.write( txt_num.format(
-						              pop['sig_w_per'] ) )
+						            pop['sig_w_per'] ) )
 						fl.write( txt_num.format(
-						              pop['sig_w_par'] ) )
+						            pop['sig_w_par'] ) )
 					else :
 						fl.write( txt_num.format(
-						                  pop['sig_w'] ) )
+						                pop['sig_w'] ) )
 
 			# Write a seperator.
 

@@ -71,7 +71,7 @@ start = time.time( )
 arcv = mfi_arcv_hres( )
 
 ( mfi_t, mfi_b_x, mfi_b_y,
-  mfi_b_z ) = arcv.load_rang('2008-11-04-12-00-00', 100 )
+  mfi_b_z ) = arcv.load_rang('2008-11-04-12-00-00', 300 )
 
 # Establish the number of data.
 
@@ -122,56 +122,6 @@ bz = [ sum( [ mfi_b_vec[i][j]*e3[j] for j in range(3)] )
                         for i in range( len( mfi_s ) ) ]
 
 b_vec = [ [ bx[i], by[i], bz[i] ] for i in range( len( mfi_s ) ) ]
-#
-#f_x = rfft( bx )
-#f_y = rfft( by )
-#f_z = rfft( bz )
-#
-# Compute the standard deviation of magnetic field.
-
-#davb = [ std( array( [ mfi_b_vec[i][j]
-#         for i in range( len( mfi_b_vec ) ) ] ) )
-#         for j in range( 3 )                         ]
-#
-#N = len( mfi_s )
-# w = [ i / ( max( mfi_s ) ) for i in range( len( mfi_s ) ) ]
-#w = rfftfreq( N, 1/11. )
-#
-#af_x = fft(bx)
-#af_y = fft(by)
-#af_z = fft(bz)
-#
-#pf_x = [ degrees( angle(af_x[i] ) ) for i in range( len( mfi_s ) ) ]
-#pf_y = [ degrees( angle(af_y[i] ) ) for i in range( len( mfi_s ) ) ]
-#pf_z = [ degrees( angle(af_z[i] ) ) for i in range( len( mfi_s ) ) ]
-#
-#saf_x = [af_x[i]**2 for i in range( len( f_x ) ) ]
-#saf_y = [af_y[i]**2 for i in range( len( f_x ) ) ]
-#saf_z = [af_z[i]**2 for i in range( len( f_x ) ) ]
-#
-#sf_x = [f_x[i]**2 for i in range( len( f_x ) ) ]
-#sf_y = [f_y[i]**2 for i in range( len( f_x ) ) ]
-#sf_z = [f_z[i]**2 for i in range( len( f_x ) ) ]
-#
-#gss_y = [ mean( mfi_b_y), 3*std( mfi_b_y )/sqrt( 2 ), 0.13, 0 ]
-#
-#def model( t, bt, db, omega, p ) :
-##
-#	return bt+db*cos( 2*pi*omega*t + p )
-##
-##( fitx, covarx ) = curve_fit( model, mfi_s, bx)
-#( fity, covary ) = curve_fit( model, mfi_s, by, p0 = gss_y)
-##( fitz, covarz ) = curve_fit( model, mfi_s, bz)
-##
-##bx_m = [ fitx[0]*mfi_s[i] + fitx[1]*cos( omega * mfi_s[i] + fitx[2] )
-##                                     for i in range( len( mfi_s ) ) ]
-#by_m = [ fity[0] + fity[1] * cos( 2*pi*fity[2] * mfi_s[i] + fity[3] )
-#                                     for i in range( len( mfi_s ) ) ]
-##bz_m = [ fity[0]*mfi_s[i] + 0.16*cos( omega * mfi_s[i] + fitz[2] )
-##                                     for i in range( len( mfi_s ) ) ]
-#
-#byy = [ gss_y[0] + gss_y[1]*cos( 2*pi*gss_y[2]*mfi_s[i] + gss_y[3] )
-#                                for i in range( len( mfi_s ) ) ]
 
 # Define the time interval between measurements
 
@@ -179,44 +129,121 @@ dt = mfi_s[1] - mfi_s[0]
 
 # Compute all the frequencies.
 
-fq = rfftfreq( len( mfi_s ), d = dt )
+fq1 = rfftfreq( len( mfi_s ), d = dt )
 
 # Compute the Fourier Transform of each component of magnetic field.
 
-fbx = rfft( bx )
-fby = rfft( by )
-fbz = rfft( bz )
+fb1_x = rfft( bx )
+fb1_y = rfft( by )
+fb1_z = rfft( bz )
 
 # Compute the absolute value of fourier transformed data.
 
-afbx = abs( fbx**2 )
-afby = abs( fby**2 )
-afbz = abs( fbz**2 )
+afb1_x = abs( fb1_x**2 )
+afb1_y = abs( fb1_y**2 )
+afb1_z = abs( fb1_z**2 )
 
 # Compute the index at which maximum frequency occurs.
 
-max_ind_x = argmin( abs( afbx - max( afbx ) ) )
-max_ind_y = argmin( abs( afby - max( afby ) ) )
-max_ind_z = argmin( abs( afbz - max( afbz ) ) )
+max_ind1_x = argmin( abs( afb1_x - max( afb1_x ) ) )
+max_ind1_y = argmin( abs( afb1_y - max( afb1_y ) ) )
+max_ind1_z = argmin( abs( afb1_z - max( afb1_z ) ) )
 
 # Compute the value of maximum frequency.
 
-fq_x = fq[ max_ind_x ]
-fq_y = fq[ max_ind_y ]
-fq_z = fq[ max_ind_z ]
+fq1_x = fq1[ max_ind1_x ]
+fq1_y = fq1[ max_ind1_y ]
+fq1_z = fq1[ max_ind1_z ]
 
-ffbx = zeros_like( fbx ) 
-ffby = zeros_like( fby ) 
-ffbz = zeros_like( fbz ) 
+ffb1_x = zeros_like( fb1_x ) 
+ffb1_y = zeros_like( fb1_y ) 
+ffb1_z = zeros_like( fb1_z ) 
 
-ffbx[ max_ind_x ] = fby[ max_ind_x ]
-ffby[ max_ind_y ] = fby[ max_ind_y ]
-ffbz[ max_ind_z ] = fby[ max_ind_z ]
+ffb1_x[ max_ind_x ] = fb1_x[ max_ind1_x ]
+ffb1_y[ max_ind_y ] = fb1_y[ max_ind1_y ]
+ffb1_z[ max_ind_z ] = fb1_z[ max_ind1_z ]
 
-bbx = irfft( ffbx )
-bby = irfft( ffby )
-bbz = irfft( ffbz )
+bb1_x = irfft( ffb1_x )
+bb1_y = irfft( ffb1_y )
+bb1_z = irfft( ffb1_z )
 
+# Calculate the residue and its rms value from fft.
+
+res1_fft_x = [ ( bx[i] - bb1_x[i] ) for i in range( len( mfi_s ) ) ]
+res1_fft_y = [ ( by[i] - bb1_y[i] ) for i in range( len( mfi_s ) ) ]
+res1_fft_z = [ ( bz[i] - bb1_z[i] ) for i in range( len( mfi_s ) ) ]
+
+rms_res1_x = std( res1_fft_x )
+rms_res1_y = std( res1_fft_y )
+rms_res1_z = std( res1_fft_z )
+
+# Compute the Fourier Transform of residue of each component of magnetic field.
+
+fb2_x = rfft( res1_fft_x )
+fb2_y = rfft( res1_fft_y )
+fb2_z = rfft( res1_fft_z )
+
+# Compute the absolute value of fourier residual transformed data.
+
+afb2_x = abs( fb2_x**2 )
+afb2_y = abs( fb2_y**2 )
+afb2_z = abs( fb2_z**2 )
+
+# Compute the index at which maximum frequency occurs.
+
+max_ind2_x = argmin( abs( afb2_x - max( afb2_x ) ) )
+max_ind2_y = argmin( abs( afb2_y - max( afb2_y ) ) )
+max_ind2_z = argmin( abs( afb2_z - max( afb2_z ) ) )
+
+# Compute the value of maximum frequency.
+
+fq2_x = fq1[ max_ind2_x ]
+fq2_y = fq1[ max_ind2_y ]
+fq2_z = fq1[ max_ind2_z ]
+
+ffb2_x = zeros_like( fb2_x ) 
+ffb2_y = zeros_like( fb2_y ) 
+ffb2_z = zeros_like( fb2_z ) 
+
+ffb2_x[ max_ind_x ] = fb2_x[ max_ind2_x ]
+ffb2_y[ max_ind_y ] = fb2_y[ max_ind2_y ]
+ffb2_z[ max_ind_z ] = fb2_z[ max_ind2_z ]
+
+bb2_x = irfft( ffb2_x )
+bb2_y = irfft( ffb2_y )
+bb2_z = irfft( ffb2_z )
+
+# Calculate the residue and its rms value from fft.
+
+res2_fft_x = [ ( res1_fft_x[i] - bb2_x[i] ) for i in range( len( mfi_s ) ) ]
+res2_fft_y = [ ( res1_fft_y[i] - bb2_y[i] ) for i in range( len( mfi_s ) ) ]
+res2_fft_z = [ ( res1_fft_z[i] - bb2_z[i] ) for i in range( len( mfi_s ) ) ]
+
+rms_res2_x = std( res2_fft_x )
+rms_res2_y = std( res2_fft_y )
+rms_res2_z = std( res2_fft_z )
+
+# Calculate the final fft value from summing for all modes.
+
+bbf_x = bb1_x + bb2_x
+bbf_y = bb1_y + bb2_y
+bbf_z = bb1_z + bb2_z
+
+# Calculate the residue and its rms value from fft.
+
+resf_fft_x = [ ( bx[i] - bbf_x[i] ) for i in range( len( mfi_s ) ) ]
+resf_fft_y = [ ( by[i] - bbf_y[i] ) for i in range( len( mfi_s ) ) ]
+resf_fft_z = [ ( bz[i] - bbf_z[i] ) for i in range( len( mfi_s ) ) ]
+
+rms_resf_x = std( resf_fft_x )
+rms_resf_y = std( resf_fft_y )
+rms_resf_z = std( resf_fft_z )
+
+print rms_res1_y, rms_res2_y, rms_resf_y
+print rms_res1_z, rms_res2_z, rms_resf_z
+
+
+# Model the curve-fit sine function.
 def fit_sin( t, b ) :
 
 	f = fftfreq( len( t ), ( t[1] - t[0] ) )
@@ -233,20 +260,15 @@ def fit_sin( t, b ) :
 	af = w/(2.*pi)
 	fitfunc = lambda t: A * sin(w*t + p) + c
 
-	return { "amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
-	     "fitfunc": fitfunc, "maxcov": max(pcov), "rawres": (gss,popt,pcov)}
+	return { "amp"     : A,
+	         "omega"   : w,  "phase": p,
+	         "offset"  : c,  "freq" : f,
+	         "period"  : [ ( 0 if f[i] == 0 else 1./f[i] ) for i in range( len ( f ) ) ],
+	         "fitfunc" : fitfunc,
+	         "maxcov"  : max( pcov ),
+	         "rawres"  : ( gss,popt,pcov ) }
 
-#	if( axes == 0 ) :
-#		return res_x == {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
-#		     "fitfunc": fitfunc, "maxcov": max(pcov), "rawres": (gss,popt,pcov)}
-#
-#	if( axes == 1 ) :
-#		return res_y == {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
-#		     "fitfunc": fitfunc, "maxcov": max(pcov), "rawres": (gss,popt,pcov)}
-#
-#	if( axes == 2 ) :
-#		return res_z == {"amp": A, "omega": w, "phase": p, "offset": c, "freq": f, "period":1./f,
-#		     "fitfunc": fitfunc, "maxcov": max(pcov), "rawres": (gss,popt,pcov)}
+# Fit the given data to a sine function.
 
 fit1_x = fit_sin( mfi_s, bx )
 fit1_y = fit_sin( mfi_s, by )
@@ -254,148 +276,85 @@ fit1_z = fit_sin( mfi_s, bz )
 
 ts = linspace(0, max( mfi_s ), len( mfi_s ) )
 
-res1_x = [ ( bx[i] - fit1_x['fitfunc'](ts)[i] ) for i in range( len( mfi_s ) ) ]
-res1_y = [ ( by[i] - fit1_y['fitfunc'](ts)[i] ) for i in range( len( mfi_s ) ) ]
-res1_z = [ ( bz[i] - fit1_z['fitfunc'](ts)[i] ) for i in range( len( mfi_s ) ) ]
+# Calculate residue from fit-function.
 
-fit2_x = fit_sin( mfi_s, res1_x )
-fit2_y = fit_sin( mfi_s, res1_y )
-fit2_z = fit_sin( mfi_s, res1_z )
+res1_fit_x = [ ( bx[i] - fit1_x['fitfunc'](ts)[i] ) for i in range( len( mfi_s ) ) ]
+res1_fit_y = [ ( by[i] - fit1_y['fitfunc'](ts)[i] ) for i in range( len( mfi_s ) ) ]
+res1_fit_z = [ ( bz[i] - fit1_z['fitfunc'](ts)[i] ) for i in range( len( mfi_s ) ) ]
 
-#res2_x = [ ( bx[i] - ( fit1_x['fitfunc'](ts)[i] + fit2_x['fitfunc'](ts)[i] ) ) for i in range( len( mfi_s ) ) ]
-#res2_y = [ ( by[i] - ( fit1_y['fitfunc'](ts)[i] + fit2_y['fitfunc'](ts)[i] ) ) for i in range( len( mfi_s ) ) ]
-#res2_z = [ ( bz[i] - ( fit1_z['fitfunc'](ts)[i] + fit2_z['fitfunc'](ts)[i] ) ) for i in range( len( mfi_s ) ) ]
+# Fit the residue with a sin function.
 
-#ffit_x = [ ( fit1_x['fitfunc'](ts)[i] + fit2_x['fitfunc'](ts)[i] ) for i in range( len( mfi_s ) ) ]
-#ffit_y = [ ( fit1_y['fitfunc'](ts)[i] + fit2_y['fitfunc'](ts)[i] ) for i in range( len( mfi_s ) ) ]
-#ffit_z = [ ( fit1_z['fitfunc'](ts)[i] + fit2_z['fitfunc'](ts)[i] ) for i in range( len( mfi_s ) ) ]
+fit2_x = fit_sin( mfi_s, res1_fit_x )
+fit2_y = fit_sin( mfi_s, res1_fit_y )
+fit2_z = fit_sin( mfi_s, res1_fit_z )
 
-#ffit_x = [  ( fit1_x['fitfunc'](ts)[i] +
-#              0.25*fit1_x['amp']*sin( 3*fit1_x['omega']*mfi_s[i] +
-#              fit1_x['phase'] ) ) 
-#                                                for i in range( len( mfi_s ) ) ]
-#ffit_y = [  ( fit1_y['fitfunc'](ts)[i] +
-#              0.5*fit1_y['amp']*sin( 3*fit1_y['omega']*mfi_s[i] +
-#              fit1_y['phase'] ) + fit1_y['offset'] ) 
-#                                                for i in range( len( mfi_s ) ) ]
-#ffit_z = [  ( fit1_z['fitfunc'](ts)[i] +
-#              0.5*fit1_z['amp']*sin( 3*fit1_z['omega']*mfi_s[i] +
-#              fit1_z['phase'] ) + fit1_z['offset'] ) 
-#                                                for i in range( len( mfi_s ) ) ]
+# Calculate residue from fit-function.
 
-#y2 = [ (0.5**1)*fit1_y['amp']*sin( 2*fit1_y['omega']*mfi_s[i] )
-#              for i in range( len( mfi_s ) ) ]
-#
-#z2 = [ (0.5**1)*fit1_z['amp']*sin( 2*fit1_z['omega']*mfi_s[i] +
-#              fit1_z['phase'] ) + fit1_z['offset']
-#              for i in range( len( mfi_s ) ) ]
-#
-#y3 = [ (0.5**2)*fit1_y['amp']*sin( 3*fit1_y['omega']*mfi_s[i] )
-#              for i in range( len( mfi_s ) ) ]
-#
-#z3 = [ (0.5**2)*fit1_z['amp']*sin( 3*fit1_z['omega']*mfi_s[i] +
-#              fit1_z['phase'] ) + fit1_z['offset']
-#              for i in range( len( mfi_s ) ) ]
-#
-#y4 = [ (0.5**3)*fit1_y['amp']*sin( 4*fit1_y['omega']*mfi_s[i] )
-#              for i in range( len( mfi_s ) ) ]
-#
-#z4 = [ (0.5**3)*fit1_z['amp']*sin( 4*fit1_y['omega']*mfi_s[i] +
-#              fit1_z['phase'] ) + fit1_y['offset']
-#              for i in range( len( mfi_s ) ) ]
-#
-#ay_1 = map( add, fit1_y['fitfunc'](ts), y2 )
-#az_1 = map( add, fit1_z['fitfunc'](ts), z2 )
-#
-#ay_2 = map( add, ay_1, y3 )
-#az_2 = map( add, az_1, z3 )
-#
-#ffit_y = map( add, ay_2, y4 )
-#ffit_z = map( add, az_2, z4 )
+res1_fit_x = [ ( bx[i] - fit1_x['fitfunc'](ts)[i] ) for i in range( len( mfi_s ) ) ]
+res1_fit_y = [ ( by[i] - fit1_y['fitfunc'](ts)[i] ) for i in range( len( mfi_s ) ) ]
+res1_fit_z = [ ( bz[i] - fit1_z['fitfunc'](ts)[i] ) for i in range( len( mfi_s ) ) ]
 
-print fit1_x['phase']
-print fit1_y['phase']
-print fit1_z['phase']
+# Fit the residue with a sin function.
+
+fit2_x = fit_sin( mfi_s, res1_fit_x )
+fit2_y = fit_sin( mfi_s, res1_fit_y )
+fit2_z = fit_sin( mfi_s, res1_fit_z )
+
+#print fit1_x['phase']
+#print fit1_y['phase']
+#print fit1_z['phase']
 
 plt.close('all')
 
-fig, axs = plt.subplots( 3, 1, sharex = True )
+fig, axs = plt.subplots( 2, 1, sharex = True )
 fig.subplots_adjust(hspace=0)
 
 #plt.figure( )
-axs[0].plot(mfi_s, bx, "-b", label="Data_x", linewidth=0.5)
-axs[0].plot( mfi_s, fit1_x["fitfunc"](ts), "r-", label="curve_fit", linewidth=0.5)
-axs[0].plot( mfi_s, bbx)
+#axs[0].plot(mfi_s, bx, "-b", label="Data_x", linewidth=0.5)
+#axs[0].plot( mfi_s, fit1_x["fitfunc"](ts), "r-", label="curve_fit", linewidth=0.5)
+#axs[0].plot( mfi_s, bb1_x)
 #axs[0].plot( mfi_s, ffit_x, 'k-', linestyle =  '-', label = 'Residue', linewidth = 0.5)
+#axs[0].legend(loc="upper right")
+
+axs[0].plot(mfi_s, by, "-b", label="Data_y", linewidth=0.5)
+axs[0].plot( mfi_s, fit1_y["fitfunc"](ts), "r-", label="curve_fit", linewidth=0.5)
+axs[0].plot( mfi_s, bb1_y,  'k-', label = 'FFT 1', linewidth = 0.5)
+axs[0].plot( mfi_s, bbf_y,  'b-', label = 'FFT F', linewidth = 0.5)
+axs[0].plot( mfi_s, res1_fft_y, 'g-', label = 'RES 1', linewidth = 0.5)
+axs[0].plot( mfi_s, res2_fft_y, 'm-', label = 'RES 2', linewidth = 0.5)
+#axs[0].plot( mfi_s, ffit_y, 'k-', linestyle =  '-', label = 'Residue', linewidth = 0.5)
 axs[0].legend(loc="upper right")
 
-axs[1].plot(mfi_s, by, "-b", label="Data_y", linewidth=0.5)
-axs[1].plot( mfi_s, fit1_y["fitfunc"](ts), "r-", label="curve_fit", linewidth=0.5)
-axs[1].plot( mfi_s, bby, 'k-', label = 'New Data', linewidth = 0.5)
-#axs[1].plot( mfi_s, ffit_y, 'k-', linestyle =  '-', label = 'Residue', linewidth = 0.5)
+axs[1].plot(mfi_s, bz, "-b", label="Data_z", linewidth=0.5)
+axs[1].plot( mfi_s, fit1_z["fitfunc"](ts), "r-", label="curve_fit", linewidth=0.5)
+axs[1].plot( mfi_s, bb1_z, 'k-', label = 'New Data', linewidth = 0.5)
+axs[1].plot( mfi_s, bbf_z, 'b-', label = 'New data', linewidth = 0.5)
+#axs[1].plot( mfi_s, ffit_z, 'k-', linestyle =  '-', label = 'Residue', linewidth = 0.5)
 axs[1].legend(loc="upper right")
-
-axs[2].plot(mfi_s, bz, "-b", label="Data_z", linewidth=0.5)
-axs[2].plot( mfi_s, fit1_z["fitfunc"](ts), "r-", label="curve_fit", linewidth=0.5)
-axs[2].plot( mfi_s, bbz, 'k-', label = 'New Data', linewidth = 0.5)
-#axs[2].plot( mfi_s, ffit_z, 'k-', linestyle =  '-', label = 'Residue', linewidth = 0.5)
-axs[2].legend(loc="upper right")
-axs[2].set_xlabel('Linear Frequency (Hz) ')
+axs[1].set_xlabel('Linear Frequency (Hz) ')
 #plt.figure( )
 
-fig, raxs = plt.subplots( 3, 1, sharex = True )
+fig, raxs = plt.subplots( 2, 1, sharex = True )
 fig.subplots_adjust(hspace=0)
 
-raxs[0].plot( mfi_s, res1_x, "r-", label="Residue1", linewidth=0.5)
-#raxs[0].plot( mfi_s, res2_x, 'k-', linestyle =  '-', label = 'Residue2', linewidth = 0.5)
+#raxs[0].plot( mfi_s, res1_fit_x, "r-", label="Residue1", linewidth=0.5)
+#raxs[0].plot( mfi_s, res1_fit_x, "r-", label="Residue1", linewidth=0.5)
+#raxs[0].plot( mfi_s, res1_fit_x, "r-", label="Residue1", linewidth=0.5)
+##raxs[0].plot( mfi_s, res2_x, 'k-', linestyle =  '-', label = 'Residue2', linewidth = 0.5)
+#raxs[0].legend(loc="upper right")
+
+raxs[0].plot( mfi_s, res1_fft_y, "r-", label="Residue1", linewidth=0.5)
+raxs[0].plot( mfi_s, res2_fft_y, "b-", label="Residue2", linewidth=0.5)
+raxs[0].plot( mfi_s, resf_fft_y, "g-", label="Residuef", linewidth=0.5)
+#raxs[0].plot( mfi_s, res2_y, 'k-', linestyle =  '-', label = 'Residue2', linewidth = 0.5)
 raxs[0].legend(loc="upper right")
 
-raxs[1].plot( mfi_s, res1_y, "r-", label="Residue1", linewidth=0.5)
-#raxs[1].plot( mfi_s, res2_y, 'k-', linestyle =  '-', label = 'Residue2', linewidth = 0.5)
+raxs[1].plot( mfi_s, res1_fft_z, "r-", label="Residue1", linewidth=0.5)
+raxs[1].plot( mfi_s, res2_fft_z, "b-", label="Residue2", linewidth=0.5)
+raxs[1].plot( mfi_s, resf_fft_z, "g-", label="Residuef", linewidth=0.5)
+#raxs[1].plot( mfi_s, res2_z, 'k-', linestyle =  '-', label = 'Residue2', linewidth = 0.5)
 raxs[1].legend(loc="upper right")
-
-raxs[2].plot( mfi_s, res1_z, "r-", label="Residue1", linewidth=0.5)
-#raxs[2].plot( mfi_s, res2_z, 'k-', linestyle =  '-', label = 'Residue2', linewidth = 0.5)
-raxs[2].legend(loc="upper right")
-raxs[2].set_xlabel('Linear Frequency (Hz) ')
-
-#plt.plot( mfi_s, by, 'r' )
-#plt.plot( mfi_s, by_m, 'b' )
-
-#plt.figure( )
-#plt.plot( mfi_s, mfi_b_y, 'r' )
-#plt.plot( mfi_s, by_m, 'b' )
-#plt.plot( mfi_s, byy, 'k')
-#plt.show( )
-
-#fig, axs = plt.subplots( 3, 2, sharex = 'col' )
-#fig.subplots_adjust(hspace=0)
-#
-#axs[0,0].loglog( w[5:N//2], medfilt( abs( af_x[5:N//2] ), 5 ), 'r', label = 'f(x)' )
-#axs[0,0].set_ylim( 10**(-1), 2*10**1 )
-#axs[0,0].legend(loc="upper right")
-#
-#axs[1,0].loglog( w[5:N//2], medfilt( abs( af_y[5:N//2] ), 5 ), 'b', label = 'f(y)' )
-##plt.loglog( w[5:N//2], saf_y[5:N//2], label = 'saf_y' )
-#axs[1,0].set_ylim(10**(-1), 2*10**1)
-#axs[1,0].legend(loc="upper right")
-#
-#axs[2,0].loglog( w[5:N//2], medfilt( abs( af_z[5:N//2] ), 5 ), 'k', label = 'f(z)' )
-##plt.loglog( w[5:N//2], saf_z[5:N//2], label = 'saf_z' )
-#axs[2,0].set_ylim(10**(-1), 2*10**1)
-#axs[2,0].legend(loc="upper right")
-#
-#axs[0,1].semilogx( w[5:N//2], angle( af_x[5:N//2] ) )
-#axs[1,1].semilogx( w[5:N//2], angle( af_y[5:N//2] ) )
-#axs[2,1].semilogx( w[5:N//2], angle( af_z[5:N//2] ) )
-#
-#[ axs[j,0].axvline( 0.05, linestyle=':' ) for j in range( 3 ) ]
-#[ axs[j,1].axvline( 0.05, linestyle=':' ) for j in range( 3 ) ]
-
-#plt.figure( )
-#plt.plot( mfi_s[0:20], mfi_b_y[0:20], label = 'mfi_b_y' )
-#plt.plot( mfi_s[0:20], mfi_b_z[0:20], label = 'mfi_b_z' )
-
+raxs[1].set_xlabel('Linear Frequency (Hz) ')
 
 plt.show( )
 
