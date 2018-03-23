@@ -1435,7 +1435,7 @@ class pop( object ) :
 	def __init__( self, my_plas, my_spec,
 	              drift=False, aniso=False,
 	              name=None, sym=None,
-	              n=None, dv=None, w=None,
+	              n=None, fv=None, dv=None, w=None,
 	              w_per=None, w_par=None,
 	              sig_n=None, sig_dv=None, sig_w=None,
 	              sig_w_per=None, sig_w_par=None       ) :
@@ -1444,10 +1444,13 @@ class pop( object ) :
 		self.my_spec = my_spec
 		self.drift   = bool( drift )
 		self.aniso   = bool( aniso )
+		self.fvel    = bool( fvel  )
 
 		self.name      = None
 		self.sym       = None
+		self.fvel      = None
 		self.n         = None
+		self.fv        = None
 		self.dv        = None
 		self.w         = None
 		self.w_per     = None
@@ -1462,8 +1465,12 @@ class pop( object ) :
 			self['name'] = name
 		if ( sym is not None ) :
 			self['sym'] = sym
+		if ( fvel is not None ) :
+			self['fvel'] = fvel
 		if ( n is not None ) :
 			self['n'] = n
+		if ( fv is not None ) :
+			self['fv'] = dv
 		if ( dv is not None ) :
 			self['dv'] = dv
 		if ( w is not None ) :
@@ -1585,6 +1592,10 @@ class pop( object ) :
 		elif ( key == 'n' ) :
 
 			return self.n
+
+		elif ( key == 'fv' ) :
+
+			return self.fv
 
 		elif ( ( key == 'dv' ) or ( key == 'dv_mag' )
 		                       or ( key == 'dv_per' ) ) :
@@ -1765,6 +1776,10 @@ class pop( object ) :
 		elif ( key == 'sig_n' ) :
 
 			return self.sig_n
+
+		elif ( key == 'sig_fv' ) :
+
+			return self.sig_fv
 
 		elif ( key == 'sig_dv' ) :
 
@@ -2033,6 +2048,16 @@ class pop( object ) :
 
 			self.n = value
 
+		elif ( key == 'fv' ) :
+
+			if ( value is None ) :
+
+				self.fv = None
+
+				return
+
+			self.fv = float( value )
+
 		elif ( key == 'dv' ) :
 
 			if ( value is None ) :
@@ -2156,6 +2181,16 @@ class pop( object ) :
 				self.sig_n = None
 			else :
 				self.sig_n = float( value )
+
+		elif ( key == 'sig_fv' ) :
+
+			if ( value is None ) :
+
+				self.sig_fv = None
+
+				return
+
+			self.sig_fv = float( value )
 
 		elif ( key == 'sig_dv' ) :
 

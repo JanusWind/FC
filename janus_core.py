@@ -434,6 +434,7 @@ class core( QObject ) :
 		if ( var_nln_set ) :
 
 			self.nln_set_gss_n   = tile( None , self.nln_n_pop )
+			self.nln_set_gss_f   = tile( None , self.nln_n_pop )
 			self.nln_set_gss_d   = tile( None , self.nln_n_pop )
 			self.nln_set_gss_w   = tile( None , self.nln_n_pop )
 			self.nln_set_gss_vld = tile( False, self.nln_n_pop )
@@ -446,6 +447,11 @@ class core( QObject ) :
 			self.nln_set_gss_n[1]   =  0.20
 			self.nln_set_gss_n[2]   =  0.02
 			self.nln_set_gss_n[3]   =  0.01
+
+			self.nln_set_gss_f[0]   =  5.00
+			self.nln_set_gss_f[1]   =  5.00
+			self.nln_set_gss_f[2]   =  0.00
+			self.nln_set_gss_f[3]   =  0.00
 
 			self.nln_set_gss_d[1]   =  0.03
 			self.nln_set_gss_d[2]   =  0.01
@@ -1957,6 +1963,13 @@ class core( QObject ) :
 			except :
 				self.nln_plas.arr_pop[i]['sym'] = None
 
+		if ( param == 'fvel' ) :
+
+			try :
+				self.nln_plas.arr_pop[i]['fvel'] = bool( val )
+			except :
+				self.nln_plas.arr_pop[i]['fvel'] = None
+
 		if ( param == 'drift' ) :
 
 			try :
@@ -2027,6 +2040,13 @@ class core( QObject ) :
 			     ( self.nln_set_gss_n[i] <= 0        )     ) :
 				self.nln_set_gss_n[i] = None
 
+		elif ( param == 'gss_f' ) :
+
+			try :
+				self.nln_set_gss_f[i] = float( val )
+			except :
+				self.nln_set_gss_f[i] = None
+
 		elif ( param == 'gss_d' ) :
 
 			try :
@@ -2072,6 +2092,9 @@ class core( QObject ) :
 		       ( self.nln_set_gss_w[i] is None )    ) :
 			self.nln_set_gss_vld[i] = False
 
+		elif ( self.nln_set_gss_n[i] is None ) :
+			self.nln_set_gss_vld[i] = False
+			
 		elif ( ( self.nln_plas.arr_pop[i]['drift'] ) and
 		       ( self.nln_set_gss_d[i] is None     )     ) :
 			self.nln_set_gss_vld[i] = False
@@ -2180,6 +2203,16 @@ class core( QObject ) :
 				                      * self.mom_res['n_p'], 4 )
 			except :
 				self.nln_plas.arr_pop[i]['n'] = None
+
+			# Generate the initial guess for this population's
+			# fluctuating velocity.
+
+			try :
+				self.nln_plas.arr_pop[i]['fv'] = round_sig(
+				                      self.nln_set_gss_f[i]
+				                      * self.mom_res['fv'], 4 )
+			except :
+				self.nln_plas.arr_pop[i]['fv'] = None
 
 			# Generate (if necessary) the initial guess for this
 			# population's differential flow.
