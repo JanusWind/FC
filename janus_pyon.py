@@ -153,9 +153,9 @@ class plas( object ) :
 		self.v0_y = None
 		self.v0_z = None
 
-	# TODO: Define the fluctuating velocity here.
+		self.fv   = None
 
-#		self.fv       = None
+		self.sig_fv   = None
 		self.sig_v0_x = None
 		self.sig_v0_y = None
 		self.sig_v0_z = None
@@ -370,11 +370,16 @@ class plas( object ) :
 
 		elif ( elem['param'] == 'fv' ) :
 
-			if ( ( elem['comp'] is None  ) or
-			     ( elem['comp'] == 'mag' )    ) :
-				return self.fv
+			if ( elem['sigma'] is None ) :
+
+				if ( ( elem['comp'] is None  ) or
+				     ( elem['comp'] == 'mag' )    ) :
+					return self.fv
+				else :
+					return None
+
 			else :
-				return None
+				return self.sig_fv
 
 		# Note.  If this point is reached, the parameter is one to be
 		#        handled by the species or population.
@@ -509,6 +514,14 @@ class plas( object ) :
 			if ( value is not None ) :
 
 				self.sig_v0_z = float( value )
+
+		elif ( key == 'sig_fv' ) :
+
+			self.sig_fv = None
+
+			if ( value is not None ) :
+
+				self.sig_f = float( value )
 
 		elif   ( key == 'b0_x' ) :
 
@@ -663,19 +676,19 @@ class plas( object ) :
 	#-----------------------------------------------------------------------
 
 	def add_pop( self, spc,
-	             fvel=False, drift=False, aniso=False,
-	             name=None, sym=None, n=None, dv=None,
+	             fvel=True, drift=False, aniso=False,
+	             name=None, sym=None, n=None, fv=None, dv=None,
 	             w=None, w_per=None, w_par=None,
-	             sig_n=None, sig_dv=None, sig_w=None,
+	             sig_n=None, sig_fv=None, sig_dv=None, sig_w=None,
 	             sig_w_per=None, sig_w_par=None       ) :
 
 		self.arr_pop.append( pop( self,
 		                          self.get_spec( spc ),
 		                          fvel=fvel, drift=drift, aniso=aniso,
 		                          name=name, sym=sym,
-		                          n=n, dv=dv, w=w,
+		                          n=n, fv=fv, dv=dv, w=w,
 		                          w_per=w_per, w_par=w_par,
-		                          sig_n=sig_n, sig_dv=sig_dv,
+		                          sig_n=sig_n, sig_fv=sig_fv, sig_dv=sig_dv,
 		                          sig_w=sig_w, sig_w_per=sig_w_per,
 		                          sig_w_par=sig_w_par ) )
 
@@ -758,10 +771,6 @@ class plas( object ) :
 
 		# TODO: Special handling of populations that still reference
 		#       this species.
-
-
-
-
 
 		# Attempt to retrieve the species.  If this fails, abort.
 
@@ -870,6 +879,22 @@ class spec( object ) :
 				return None
 
 			return sum( arr_n )
+
+		elif ( ( key == 'fv' ) or ( key == 'fv_mag' )
+		                       or ( key == 'fv_par' ) ) :
+
+			arr_pop = self.my_plas.lst_pop( self )
+
+			if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+				return None
+
+			arr_n  = [ p['n' ] for p in arr_pop ]
+			arr_fv = [ p['fv'] for p in arr_pop ]
+
+			if ( ( None in arr_n ) or ( None in arr_fv ) ) :
+				return None
+
+			return sum( arr_fv )
 
 		elif ( ( key == 'dv' ) or ( key == 'dv_mag' )
 		                       or ( key == 'dv_par' ) ) :
@@ -1435,11 +1460,11 @@ class pop( object ) :
 	#-----------------------------------------------------------------------
 
 	def __init__( self, my_plas, my_spec,
-	              fvel=False, drift=False, aniso=False,
+	              fvel=True, drift=False, aniso=False,
 	              name=None, sym=None,
 	              n=None, fv=None, dv=None, w=None,
 	              w_per=None, w_par=None,
-	              sig_n=None, sig_dv=None, sig_w=None,
+	              sig_n=None, sig_fv=None, sig_dv=None, sig_w=None,
 	              sig_w_per=None, sig_w_par=None       ) :
 
 		self.my_plas = my_plas
@@ -1458,6 +1483,7 @@ class pop( object ) :
 		self.w_per     = None
 		self.w_par     = None
 		self.sig_n     = None
+		self.sig_fv    = None
 		self.sig_dv    = None
 		self.sig_w     = None
 		self.sig_w_per = None
@@ -1472,7 +1498,7 @@ class pop( object ) :
 		if ( n is not None ) :
 			self['n'] = n
 		if ( fv is not None ) :
-			self['fv'] = dv
+			self['fv'] = fv
 		if ( dv is not None ) :
 			self['dv'] = dv
 		if ( w is not None ) :
@@ -1483,6 +1509,8 @@ class pop( object ) :
 			self['w_par'] = w_par
 		if ( sig_n is not None ) :
 			self['sig_n'] = sig_n
+		if ( sig_fv is not None ) :
+			self['sig_fv'] = sig_fv
 		if ( sig_dv is not None ) :
 			self['sig_dv'] = sig_dv
 		if ( sig_w is not None ) :

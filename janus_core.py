@@ -403,25 +403,25 @@ class core( QObject ) :
 					self.nln_pop_vld[p] = True
 					self.nln_plas.add_pop(
 					   'p', name='Core', sym='c',
-					   fvel=False, drift=False, aniso=True )
+					   fvel=True, drift=False, aniso=True )
 				elif ( p == 1 ) :
 					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = True
 					self.nln_plas.add_pop(
 					   'p', name='Beam', sym='b',
-					   fvel=False, drift=True, aniso=False )
+					   fvel=True, drift=True, aniso=False )
 				elif ( p == 2 ) :
 					self.nln_pop_use[p] = True
 					self.nln_pop_vld[p] = True
 					self.nln_plas.add_pop(
 					    'a', name='Core', sym='c',
-					    fvel=False, drift=True, aniso=True )
+					    fvel=True, drift=True, aniso=True )
 				elif ( p == 3 ) :
 					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = True
 					self.nln_plas.add_pop(
 					   'a', name='Beam', sym='b',
-					   fvel=False, drift=True, aniso=False )
+					   fvel=True, drift=True, aniso=False )
 				else :
 					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = False
@@ -448,10 +448,10 @@ class core( QObject ) :
 			self.nln_set_gss_n[2]   =  0.02
 			self.nln_set_gss_n[3]   =  0.01
 
-			self.nln_set_gss_f[0]   =  5.00
-			self.nln_set_gss_f[1]   =  5.00
-			self.nln_set_gss_f[2]   =  0.00
-			self.nln_set_gss_f[3]   =  0.00
+			self.nln_set_gss_f[0]   =  0.05
+			self.nln_set_gss_f[1]   =  0.05
+			self.nln_set_gss_f[2]   =  0.05
+			self.nln_set_gss_f[3]   =  0.05
 
 			self.nln_set_gss_d[1]   =  0.03
 			self.nln_set_gss_d[2]   =  0.01
@@ -1787,7 +1787,7 @@ class core( QObject ) :
 		self.mom_res['fv']     = 0.0
 		self.mom_res.add_spec( name='Proton', sym='p', m=1., q=1. )
 
-		self.mom_res.add_pop( 'p', fvel=False, drift=False, aniso=False,
+		self.mom_res.add_pop( 'p', fvel=True, drift=False, aniso=False,
 		                      name='Core', sym='c', n=mom_n, w=mom_w )
 
 		# Calculate the expected currents based on the results of the
@@ -2101,11 +2101,6 @@ class core( QObject ) :
 		else :
 			self.nln_set_gss_vld[i] = True
 
-		if  :
-			self.nln_set_gss_vld[i] = False
-		else :
-			self.nln_set_gss_vld[i] = True
-
 		if ( ( self.nln_set_sel_a[i] is None ) or
 		     ( self.nln_set_sel_b[i] is None )    ) :
 			self.nln_set_sel_vld[i] = False
@@ -2181,7 +2176,7 @@ class core( QObject ) :
 		try :
 			self.nln_plas['v0_vec'] = [
 			         round( v, 1 ) for v in self.mom_res['v0_vec'] ]
-			self.nln_plas['fv'] = 0.05*norm( self.nln_plas['v0_vec'])
+#			self.nln_plas['fv'] =  self.mom_res['fv']
 		except :
 			pass
 
@@ -2213,10 +2208,11 @@ class core( QObject ) :
 			# fluctuating velocity.
 
 			if ( self.nln_plas.arr_pop[i]['fvel'] ) :
+
 				try :
-					self.nln_plas.arr_pop[i]['fv'] =
-					round_sig(       self.nln_set_gss_f[i]
-					               * self.mom_res['fv'], 4 )
+					self.nln_plas.arr_pop[i]['fv'] =\
+					round_sig(   self.nln_set_gss_f[i]
+					           * self.mom_res['v0_mag'], 4 )
 				except :
 					self.nln_plas.arr_pop[i]['fv'] = None
 
@@ -2315,6 +2311,13 @@ class core( QObject ) :
 			except :
 				self.nln_plas.arr_pop[i]['n'] = None
 
+		elif ( param == 'fv' ) :
+
+			try :
+				self.nln_plas.arr_pop[i]['fv'] = val
+			except :
+				self.nln_plas.arr_pop[i]['fv'] = None
+
 		elif ( param == 'dv' ) :
 
 			try :
@@ -2405,11 +2408,11 @@ class core( QObject ) :
 
 		pop_v0_vec = self.nln_plas['v0_vec']
 
-		fv = self.nln_plas['fv']
+#		fv = self.nln_plas['fv']
 
 		self.nln_gss_prm = list( pop_v0_vec )
 
-		self.nln_gss_prm.append( fv )
+#		self.nln_gss_prm.append( fv )
 
 		# TODO: Append 'fv' to self.nln_gss_prm here?
 
@@ -2424,13 +2427,6 @@ class core( QObject ) :
 			pop_drift = self.nln_plas.arr_pop[p]['drift']
 			pop_aniso = self.nln_plas.arr_pop[p]['aniso']
 
-			# Extract the population's density and add it to the
-			# parameter array.
-
-			pop_n = self.nln_plas.arr_pop[p]['n']
-
-			self.nln_gss_prm.append( pop_n )
-
 			# If the population is fluctuating, extract its
 			# fluctuation and add it to the parameter array.
 			# Otherwise, set the the fluctuation as zero.
@@ -2442,6 +2438,13 @@ class core( QObject ) :
 				self.nln_gss_prm.append( pop_fv )
 			else :
 				pop_fv = 0.
+
+			# Extract the population's density and add it to the
+			# parameter array.
+
+			pop_n = self.nln_plas.arr_pop[p]['n']
+
+			self.nln_gss_prm.append( pop_n )
 
 			# If the population is drifting, extract its drift and
 			# add it to the parameter array.  Otherwise, set the
@@ -2479,7 +2482,7 @@ class core( QObject ) :
 			     self.fc_spec.calc_curr(
 			                    self.nln_plas.arr_pop[p]['m'],
 			                    self.nln_plas.arr_pop[p]['q'],
-			                    pop_v0_vec, fv, self.mfi_avg_nrm,
+			                    pop_v0_vec, pop_fv, self.mfi_avg_nrm,
 			                    pop_n, pop_dv, pop_w,
 			                    self.mfi_set_key                 ) )
 
@@ -2601,7 +2604,8 @@ class core( QObject ) :
 #				      array( self.nln_plas['fv'] )
 
 				if ( self.nln_plas.arr_pop[i]['fvel'] ) :
-					vel += self.nln_plas.arr_pop[i]['fv']
+					vel += self.mfi_avg_nrm * \
+					          self.nln_plas.arr_pop[i]['fv']
 
 				if ( self.nln_plas.arr_pop[i]['drift'] ) :
 					vel += self.mfi_avg_nrm * \
@@ -2730,19 +2734,9 @@ class core( QObject ) :
 
 		prm_v0 = ( prm[0], prm[1], prm[2] )
 
-		prm_fv = prm[3]
-
-#		prm_fb = ( prm[4]. prm[5]. prm[6] )
-
-		k = 4
+		k = 3
 
 		for p in self.nln_gss_pop :
-
-			# Extract the density of population "p".
-
-			prm_n = prm[k]
-
-			k += 1
 
 			# Determine the fluctuating velocity of population "p",
 			# extracting (if necessary) the population's fluctuation
@@ -2757,6 +2751,12 @@ class core( QObject ) :
 			else :
 
 				prm_fv = 0.
+
+			# Extract the density of population "p".
+
+			prm_n = prm[k+1]
+
+			k += 1
 
 			# Determine the bulk velocity of population "p",
 			# extracting (if necessary) the population's drift.
@@ -2916,11 +2916,12 @@ class core( QObject ) :
 		self.nln_res_plas['sig_v0_x'] =  sig[0]
 		self.nln_res_plas['sig_v0_y'] =  sig[1]
 		self.nln_res_plas['sig_v0_z'] =  sig[2]
-		fv                            =  fit[3]
-		self.nln_res_plas['fv']       =  fit[3]
-
-		print self.nln_res_plas['fv'], sig[3]
-		c = 4
+#		fv                            =  fit[3]
+#		self.nln_res_plas['fv']       =  fit[3]
+#		self.nln_res_plas['sig_fv']   =  sig[3]
+#
+#		print self.nln_res_plas['fv'], sig[3]
+		c = 3
 
 		self.nln_res_curr_ion = []
 
@@ -2952,10 +2953,6 @@ class core( QObject ) :
 			pop_name  = self.nln_plas.arr_pop[p]['name' ]
 			pop_sym   = self.nln_plas.arr_pop[p]['sym'  ]
 
-			pop_n     = fit[c]
-			pop_sig_n = sig[c]
-			c += 1
-
 			if ( pop_fvel ) :
 				pop_fv     = fit[c]
 				pop_sig_fv = sig[c]
@@ -2963,6 +2960,10 @@ class core( QObject ) :
 			else :
 				pop_fv     = None
 				pop_sig_fv = None
+
+			pop_n     = fit[c]
+			pop_sig_n = sig[c]
+			c += 1
 
 			if ( pop_drift ) :
 				pop_dv     = fit[c]
@@ -2986,10 +2987,12 @@ class core( QObject ) :
 				c += 1
 
 			self.nln_res_plas.add_pop(
-			       spc=spc_name, fvel=fvel,  drift=pop_drift,
+			       spc=spc_name, fvel=pop_fvel, drift=pop_drift,
 			       aniso=pop_aniso, name=pop_name,
-			       sym=pop_sym, n=pop_n, dv=pop_dv, w=pop_w,
-			       sig_n=pop_sig_n, sig_dv=pop_sig_dv, 
+			       sym=pop_sym, n=pop_n, fv=pop_fv, dv=pop_dv,
+			       w=pop_w,
+			       sig_n=pop_sig_n, sig_fv=pop_sig_fv,
+			       sig_dv=pop_sig_dv, 
 			       sig_w=pop_sig_w, sig_w_per=pop_sig_w_per,
 			       sig_w_par=pop_sig_w_par                    )
 
@@ -3000,9 +3003,11 @@ class core( QObject ) :
 			     self.fc_spec.calc_curr ( 
 			                  self.nln_plas.arr_pop[p]['m'],
 			                  self.nln_plas.arr_pop[p]['q'],
-			                  pop_v0_vec, fv, self.mfi_avg_nrm,
+			                  pop_v0_vec, pop_fv, self.mfi_avg_nrm,
 			                  pop_n, pop_dv, pop_w,
 			                  self.mfi_set_key                   ) )
+
+			print pop_fv, pop_sig_fv
 
 		# Save the results of the this non-linear analysis to the
 		# results log.

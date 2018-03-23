@@ -194,7 +194,7 @@ class widget_nln_pop( QWidget ) :
 			tmp_ion   = self.core.nln_plas.arr_pop[i]['spec']
 			tmp_name  = self.core.nln_plas.arr_pop[i]['name']
 			tmp_sym   = self.core.nln_plas.arr_pop[i]['sym']
-			tmp_fvel  = self.core.nln_plas.arr_pop[i]['fv']
+			tmp_fvel  = self.core.nln_plas.arr_pop[i]['fvel']
 			tmp_drift = self.core.nln_plas.arr_pop[i]['drift']
 			tmp_aniso = self.core.nln_plas.arr_pop[i]['aniso']
 
