@@ -373,6 +373,8 @@ class plas( object ) :
 			if ( ( elem['comp'] is None  ) or
 			     ( elem['comp'] == 'mag' )    ) :
 				return self.fv
+			else :
+				return None
 
 		# Note.  If this point is reached, the parameter is one to be
 		#        handled by the species or population.
@@ -661,7 +663,7 @@ class plas( object ) :
 	#-----------------------------------------------------------------------
 
 	def add_pop( self, spc,
-	             drift=False, aniso=False,
+	             fvel=False, drift=False, aniso=False,
 	             name=None, sym=None, n=None, dv=None,
 	             w=None, w_per=None, w_par=None,
 	             sig_n=None, sig_dv=None, sig_w=None,
@@ -669,7 +671,7 @@ class plas( object ) :
 
 		self.arr_pop.append( pop( self,
 		                          self.get_spec( spc ),
-		                          drift=drift, aniso=aniso,
+		                          fvel=fvel, drift=drift, aniso=aniso,
 		                          name=name, sym=sym,
 		                          n=n, dv=dv, w=w,
 		                          w_per=w_per, w_par=w_par,
@@ -1433,7 +1435,7 @@ class pop( object ) :
 	#-----------------------------------------------------------------------
 
 	def __init__( self, my_plas, my_spec,
-	              drift=False, aniso=False,
+	              fvel=False, drift=False, aniso=False,
 	              name=None, sym=None,
 	              n=None, fv=None, dv=None, w=None,
 	              w_per=None, w_par=None,
@@ -1442,9 +1444,9 @@ class pop( object ) :
 
 		self.my_plas = my_plas
 		self.my_spec = my_spec
+		self.fvel    = bool( fvel  )
 		self.drift   = bool( drift )
 		self.aniso   = bool( aniso )
-		self.fvel    = bool( fvel  )
 
 		self.name      = None
 		self.sym       = None
@@ -1523,6 +1525,10 @@ class pop( object ) :
 
 			return self.sym
 
+		elif ( key == 'fvel' ) :
+
+			return self.fvel
+
 		elif ( key == 'drift' ) :
 
 			return self.drift
@@ -1595,7 +1601,10 @@ class pop( object ) :
 
 		elif ( key == 'fv' ) :
 
-			return self.fv
+			if ( self.fvel ) :
+				return self.fv
+			else :
+				return 0.
 
 		elif ( ( key == 'dv' ) or ( key == 'dv_mag' )
 		                       or ( key == 'dv_per' ) ) :
@@ -1779,7 +1788,10 @@ class pop( object ) :
 
 		elif ( key == 'sig_fv' ) :
 
-			return self.sig_fv
+			if ( self.fvel ) :
+				return self.sig_fv
+			else :
+				return None
 
 		elif ( key == 'sig_dv' ) :
 
@@ -1902,6 +1914,17 @@ class pop( object ) :
 
 			if ( val_err ) :
 				raise ValueError( 'Name/symbol in use.' )
+
+		elif ( key == 'fvel' ) :
+
+			value = bool( value )
+
+			if ( self.fvel == value ) :
+				return
+
+			self.fvel = value
+
+			self.fv = 0. if ( self.fvel ) else None
 
 		elif ( key == 'drift' ) :
 
@@ -2056,6 +2079,13 @@ class pop( object ) :
 
 				return
 
+			if ( not self.fvel ) :
+
+				raise KeyError(
+				     'Population has no velocity fluctuation.' )
+
+				return
+
 			self.fv = float( value )
 
 		elif ( key == 'dv' ) :
@@ -2190,6 +2220,13 @@ class pop( object ) :
 
 				return
 
+			if ( not self.fvel ) :
+
+				raise KeyError(
+				     'Population has no velocity fluctuation.' )
+
+				return
+
 			self.sig_fv = float( value )
 
 		elif ( key == 'sig_dv' ) :
@@ -2300,6 +2337,11 @@ class pop( object ) :
 		# "False".
 
 		if ( self.n is None ) :
+
+			return False
+
+		if ( ( self.fvel      ) and
+		     ( self.fv is None )     ) :
 
 			return False
 
