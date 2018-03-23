@@ -91,7 +91,6 @@ class widget_nln_pop( QWidget ) :
 		self.hdr_ion   = QLabel( 'Species'   )
 		self.hdr_name  = QLabel( 'Pop. Name' )
 		self.hdr_sym   = QLabel( 'Symbol'    )
-		self.hdr_fvel  = QLabel( 'FVel'      )
 		self.hdr_drift = QLabel( 'Drift'     )
 		self.hdr_aniso = QLabel( 'Aniso'     )
 
@@ -99,7 +98,6 @@ class widget_nln_pop( QWidget ) :
 		self.arr_ion   = tile( None, self.core.nln_n_pop )
 		self.arr_name  = tile( None, self.core.nln_n_pop )
 		self.arr_sym   = tile( None, self.core.nln_n_pop )
-		self.arr_fvel  = tile( None, self.core.nln_n_pop )
 		self.arr_drift = tile( None, self.core.nln_n_pop )
 		self.arr_aniso = tile( None, self.core.nln_n_pop )
 
@@ -110,7 +108,6 @@ class widget_nln_pop( QWidget ) :
 			self.arr_ion[i]   = event_ComboBox( self, 'i'+txt_i )
 			self.arr_name[i]  = event_LineEdit( self, 'n'+txt_i )
 			self.arr_sym[i]   = event_LineEdit( self, 's'+txt_i )
-			self.arr_fvel[i]  = event_CheckBox( self, 'f'+txt_i )
 			self.arr_aniso[i] = event_CheckBox( self, 'a'+txt_i )
 
 			if ( i == 0 ) :
@@ -126,9 +123,8 @@ class widget_nln_pop( QWidget ) :
 		self.grd.addWidget( self.hdr_ion  , 0, 1, 1, 2 )
 		self.grd.addWidget( self.hdr_name , 0, 3, 1, 2 )
 		self.grd.addWidget( self.hdr_sym  , 0, 5, 1, 1, Qt.AlignCenter )
-		self.grd.addWidget( self.hdr_fvel , 0, 7, 1, 1, Qt.AlignCenter )
-		self.grd.addWidget( self.hdr_drift, 0, 8, 1, 1, Qt.AlignCenter )
-		self.grd.addWidget( self.hdr_aniso, 0, 9, 1, 1, Qt.AlignCenter )
+		self.grd.addWidget( self.hdr_drift, 0, 6, 1, 1, Qt.AlignCenter )
+		self.grd.addWidget( self.hdr_aniso, 0, 7, 1, 1, Qt.AlignCenter )
 
 		for i in range( self.core.nln_n_pop ) :
 
@@ -150,19 +146,14 @@ class widget_nln_pop( QWidget ) :
 				                    i+1, 5, 1, 1,
 				                    Qt.AlignCenter   )
 
-			if ( self.arr_fvel[i] is not None ) :
-				self.grd.addWidget( self.arr_fvel[i],
-				                    i+1, 7, 1, 1,
-				                    Qt.AlignCenter     )
-
 			if ( self.arr_drift[i] is not None ) :
 				self.grd.addWidget( self.arr_drift[i],
-				                    i+1, 8, 1, 1,
+				                    i+1, 6, 1, 1,
 				                    Qt.AlignCenter     )
 
 			if ( self.arr_aniso[i] is not None ) :
 				self.grd.addWidget( self.arr_aniso[i],
-				                    i+1, 9, 1, 1,
+				                    i+1, 7, 1, 1,
 				                    Qt.AlignCenter     )
 
 		# Regularize the grid spacing.
@@ -194,7 +185,6 @@ class widget_nln_pop( QWidget ) :
 			tmp_ion   = self.core.nln_plas.arr_pop[i]['spec']
 			tmp_name  = self.core.nln_plas.arr_pop[i]['name']
 			tmp_sym   = self.core.nln_plas.arr_pop[i]['sym']
-			tmp_fvel  = self.core.nln_plas.arr_pop[i]['fvel']
 			tmp_drift = self.core.nln_plas.arr_pop[i]['drift']
 			tmp_aniso = self.core.nln_plas.arr_pop[i]['aniso']
 
@@ -234,9 +224,6 @@ class widget_nln_pop( QWidget ) :
 			if ( ( self.arr_sym[i] is not None ) and
 			     ( tmp_sym         is not None )     ) :
 				self.arr_sym[i].setTextUpdate( tmp_sym )
-
-			if ( self.arr_fvel[i] is not None ) :
-				self.arr_fvel[i].setChecked( tmp_fvel )
 
 			if ( self.arr_drift[i] is not None ) :
 				self.arr_drift[i].setChecked( tmp_drift )
@@ -360,11 +347,6 @@ class widget_nln_pop( QWidget ) :
 
 			param = 'sym'
 			val   = str( self.arr_sym[i].text( ) )
-
-		elif ( fnc[0] == 'f' ) :
-
-			param = 'fvel'
-			val   = self.arr_fvel[i].isChecked( )
 
 		elif ( fnc[0] == 'd' ) :
 
