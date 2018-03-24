@@ -124,6 +124,10 @@ class widget_nln_res( format_TextEdit ) :
 
 		first_spc = True
 
+		# Define a short keyword for displaying uncertainty.
+
+		sig_disp = self.core.opt['res_par_u']
+
 		for spc in self.core.nln_res_plas.arr_spec :
 
 			# Unless this is the first species, skip a line.
@@ -198,7 +202,7 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_tab( 2 )
 					self.prnt_htm( lab_n + ' = ' )
 					self.prnt_dcm( pop['n'], dcm )
-					if ( self.core.opt['res_par_u'] ) :
+					if ( sig_disp ) :
 						self.prnt_htm(
 						        '&nbsp;&plusmn;&nbsp;' )
 						self.prnt_dcm( pop['sig_n'],dcm)
@@ -218,22 +222,21 @@ class widget_nln_res( format_TextEdit ) :
 						self.prnt_htm( lab_v + ' = '   )
 						self.prnt_dcm(
 						   self.core.nln_res_plas[
-						        'v0'], 0, ' km/s'      )
+						        'v0'], 3, ' km/s'      )
 						self.prnt_brk( )
 						self.prnt_tab( 3 )
 						self.prnt_htm( lab_v_x + ' = ' )
 						self.prnt_dcm(
 						   self.core.nln_res_plas[
-						                    'v0_x'], 0 )
+						                    'v0_x'], 3 )
 
-						if (
-						  self.core.opt['res_par_u'] ) :
+						if ( sig_disp ) :
 
 							self.prnt_htm( 
 						        '&nbsp;&plusmn;&nbsp;' )
 							self.prnt_dcm(
 						        self.core.nln_res_plas[
-						               'sig_v0_x'], 0  )
+						               'sig_v0_x'], 3  )
 						self.prnt_htm( ' km/s'         )
 
 						self.prnt_brk( )
@@ -241,16 +244,15 @@ class widget_nln_res( format_TextEdit ) :
 						self.prnt_htm( lab_v_y + ' = ' )
 						self.prnt_dcm(
 						   self.core.nln_res_plas[
-						                    'v0_y'], 0 )
+						                    'v0_y'], 3 )
 
-						if (
-						  self.core.opt['res_par_u'] ) :
+						if ( sig_disp ) :
 
 							self.prnt_htm(
 						        '&nbsp;&plusmn;&nbsp;' )
 							self.prnt_dcm(
 						         self.core.nln_res_plas[
-						               'sig_v0_y'], 0  )
+						               'sig_v0_y'], 3  )
 						self.prnt_htm( ' km/s'         )
 
 						self.prnt_brk( )
@@ -258,15 +260,14 @@ class widget_nln_res( format_TextEdit ) :
 						self.prnt_htm( lab_v_z + ' = ' )
 						self.prnt_dcm(
 						   self.core.nln_res_plas[
-						                    'v0_z'], 0 )
+						                    'v0_z'], 3 )
 
-						if (
-						  self.core.opt['res_par_u'] ) :
+						if ( sig_disp ) :
 							self.prnt_htm(
 						        '&nbsp;&plusmn;&nbsp;' )
 							self.prnt_dcm(
 						         self.core.nln_res_plas[
-						               'sig_v0_z'], 0  )
+						               'sig_v0_z'], 3  )
 						self.prnt_htm( ' km/s'         )
 
 						if (
@@ -278,6 +279,13 @@ class widget_nln_res( format_TextEdit ) :
 							self.prnt_dcm(
 							self.core.nln_res_plas[
 							              'fv'], 3 )
+						if ( sig_disp ) :
+
+							self.prnt_htm(
+						        '&nbsp;&plusmn;&nbsp;' )
+							self.prnt_dcm(
+						        self.core.nln_res_plas[
+						                 'sig_fv'], 3  )
 						self.prnt_htm( ' km/s'         )
 
 				elif ( pop['drift'] ) :
@@ -286,13 +294,12 @@ class widget_nln_res( format_TextEdit ) :
 						self.prnt_brk( )
 						self.prnt_tab( 2 )
 						self.prnt_htm( lab_dv + ' = ' )
-						self.prnt_dcm( pop['dv'], 1 )
-						if(
-						  self.core.opt['res_par_u'] ) :
+						self.prnt_dcm( pop['dv'], 3 )
+						if ( sig_disp ) :
 							self.prnt_htm(
 							'&nbsp;&plusmn;&nbsp;' )
 							self.prnt_dcm(
-							pop['sig_dv'], 1       )
+							pop['sig_dv'], 3       )
 						self.prnt_htm( ' km/s'         )
 
 				# Print the population's thermal speed(s).
@@ -316,8 +323,7 @@ class widget_nln_res( format_TextEdit ) :
 							     lab_w_per + ' = ' )
 							self.prnt_dcm(
 							       pop['w_per'], 1 )
-							if ( self.core.opt[
-							       'res_par_u'] ) :
+							if ( sig_disp ) :
 								self.prnt_htm(
 								'&nbsp;&plusmn;\
 							         &nbsp;'       )
@@ -332,8 +338,7 @@ class widget_nln_res( format_TextEdit ) :
 							     lab_w_par + ' = ' )
 							self.prnt_dcm(
 							       pop['w_par'], 1 )
-							if ( self.core.opt[
-							        'res_par_u'] ) :
+							if ( sig_disp ) :
 								self.prnt_htm(
 								'&nbsp;&plusmn;\
 							         &nbsp;'       )
@@ -353,8 +358,7 @@ class widget_nln_res( format_TextEdit ) :
 							         lab_w + ' = ' )
 							self.prnt_dcm(
 							           pop['w'], 1 )
-							if ( self.core.opt[
-							        'res_par_u'] ) :
+							if ( sig_disp ) :
 								self.prnt_htm(
 								'&nbsp;&plusmn;\
 								 &nbsp;'       )

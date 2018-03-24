@@ -155,7 +155,7 @@ class plas( object ) :
 
 	# TODO: Define the fluctuating velocity here.
 
-#		self.fv       = None
+		self.sig_fv   = None
 		self.sig_v0_x = None
 		self.sig_v0_y = None
 		self.sig_v0_z = None
@@ -370,9 +370,16 @@ class plas( object ) :
 
 		elif ( elem['param'] == 'fv' ) :
 
-			if ( ( elem['comp'] is None  ) or
-			     ( elem['comp'] == 'mag' )    ) :
-				return self.fv
+			if ( elem['sigma'] is None ) :
+
+				if ( ( elem['comp'] is None  ) or
+				     ( elem['comp'] == 'mag' )    ) :
+					return self.fv
+				else :
+					return None
+
+			else :
+				return self.sig_fv
 
 		# Note.  If this point is reached, the parameter is one to be
 		#        handled by the species or population.
@@ -507,6 +514,14 @@ class plas( object ) :
 			if ( value is not None ) :
 
 				self.sig_v0_z = float( value )
+
+		elif ( key == 'sig_fv' ) :
+
+			self.sig_fv = None
+
+			if ( value is not None ) :
+
+				self.sig_fv = float( value )
 
 		elif   ( key == 'b0_x' ) :
 
@@ -1431,9 +1446,9 @@ class pop( object ) :
 	def __init__( self, my_plas, my_spec,
 	              drift=False, aniso=False,
 	              name=None, sym=None,
-	              n=None, dv=None, w=None,
+	              n=None, fv=None, dv=None, w=None,
 	              w_per=None, w_par=None,
-	              sig_n=None, sig_dv=None, sig_w=None,
+	              sig_n=None, sig_fv=None, sig_dv=None, sig_w=None,
 	              sig_w_per=None, sig_w_par=None       ) :
 
 		self.my_plas = my_plas
