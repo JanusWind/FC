@@ -311,15 +311,15 @@ class widget_fm_moments( QWidget ) :
 			if( d == 0) :
 
 				self.lim_y = [
-				         mean( data ) - 2*std( data )*2.**0.5,
+				          mean( data ) - 2*std( data )*2.**0.5,
 				          mean( data ) + 2*std( data )*2.**0.5 ]
 
 			else :
 
 
 				self.lim_y = [
-				     1.1*mean( data ) - 2*std( data )*2.**0.5,
-				     1.1*mean( data ) + 2*std( data )*2.**0.5 ]
+				      1.1*mean( data ) - 2*std( data )*2.**0.5,
+				      1.1*mean( data ) + 2*std( data )*2.**0.5 ]
 
 
 			self.lim_x = [ min( self.core.mfi_s ),
