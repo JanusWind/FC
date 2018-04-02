@@ -345,7 +345,7 @@ class widget_fm_moments( QWidget ) :
 
 		x     = self.core.mfi_s
 		y_raw = self.core.mfi_vec_t
-		y_smt = self.core.mfi_vec_smt
+		y_smt = self.core.plt_vec_smt
 
 		if( self.core.mfi_vec_fit is None ) :
 			return

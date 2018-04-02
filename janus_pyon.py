@@ -153,8 +153,6 @@ class plas( object ) :
 		self.v0_y = None
 		self.v0_z = None
 
-	# TODO: Define the fluctuating velocity here.
-
 		self.sig_fv   = None
 		self.sig_v0_x = None
 		self.sig_v0_y = None
@@ -163,6 +161,11 @@ class plas( object ) :
 		self.b0_x = None
 		self.b0_y = None
 		self.b0_z = None
+
+		self.sig_b0   = None
+		self.sig_b0_x = None
+		self.sig_b0_y = None
+		self.sig_b0_z = None
 
 		self.enforce = bool( enforce )
 
@@ -336,8 +339,17 @@ class plas( object ) :
 					return None
 
 			else :
+				if   ( elem['comp'] is None ) :
+					return self.sig_b0
+				elif ( elem['comp'] == 'x' ) :
+					return self.sig_b0_x
+				elif ( elem['comp'] == 'y' ) :
+					return self.sig_b0_y
+				elif ( elem['comp'] == 'z' ) :
+					return self.sig_b0_z
+				else :
 
-				return None
+					return None
 
 		elif ( elem['param'] == 'v0' ) :
 
@@ -563,6 +575,38 @@ class plas( object ) :
 					self.b0_y = float( value[1] )
 				if ( value[2] is not None ) :
 					self.b0_z = float( value[2] )
+
+		elif ( key == 'sig_b0' ) :
+
+			self.sig_b0 = None
+
+			if ( value is not None ) :
+
+				self.sig_b0 = float( value )
+
+		elif ( key == 'sig_b0_x' ) :
+
+			self.sig_b0_x = None
+
+			if ( value is not None ) :
+
+				self.sig_b0_x = float( value )
+
+		elif ( key == 'sig_b0_y' ) :
+
+			self.sig_b0_y = None
+
+			if ( value is not None ) :
+
+				self.sig_b0_y = float( value )
+
+		elif ( key == 'sig_b0_z' ) :
+
+			self.sig_b0_z = None
+
+			if ( value is not None ) :
+
+				self.sig_b0_z = float( value )
 
 		else :
 

@@ -292,6 +292,11 @@ class core( QObject ) :
 			self.mfi_z_t       = None
 			self.mfi_vec_t     = None
 
+			self.plt_x_t       = None
+			self.plt_y_t       = None
+			self.plt_z_t       = None
+			self.plt_vec_t     = None
+
 			self.mfi_bbx_t     = None
 			self.mfi_bby_t     = None
 			self.mfi_bbz_t     = None
@@ -878,12 +883,23 @@ class core( QObject ) :
                                      self.mfi_b_y[i]**2 +
                                      self.mfi_b_z[i]**2 )
                                      for i in range( len( self.mfi_b_x ) ) ]
-    
+
 		# Compute the average magetic field and its norm.
 
 		self.mfi_avg_vec = array( [ mean( self.mfi_b_x ),
 		                            mean( self.mfi_b_y ),
 		                            mean( self.mfi_b_z ) ] )
+
+		# TODO: Check which is the correct way to calculate the error in
+		# the magnitude of B.
+
+		self.mfi_b_sig = std( self.mfi_b )
+
+		self.mfi_b_x_sig = std( self.mfi_b_x )
+		self.mfi_b_y_sig = std( self.mfi_b_y )
+		self.mfi_b_z_sig = std( self.mfi_b_z )
+#		self.mfi_b_sig   = sqrt( self.sig_b_x**2 +  self.sig_b_y**2 +
+#		                         self.sig_b_z**2 )
 
 		self.mfi_avg_mag = sqrt( self.mfi_avg_vec[0]**2 +
 		                         self.mfi_avg_vec[1]**2 +
@@ -1278,15 +1294,48 @@ class core( QObject ) :
 		# Smooth the rotated raw magnetic field data using the median
 		# filter of given window size.
 
-		self.mfi_x_smt = medfilt(
+		self.plt_x_smt = medfilt(
 		                         self.mfi_x_t, self.opt['mom_med_fil'] )
-		self.mfi_y_smt = medfilt(
+		self.plt_y_smt = medfilt(
 		                         self.mfi_y_t, self.opt['mom_med_fil'] )
-		self.mfi_z_smt = medfilt(
+		self.plt_z_smt = medfilt(
 		                         self.mfi_z_t, self.opt['mom_med_fil'] )
+
+		self.plt_vec_smt = [ self.plt_x_smt, self.plt_y_smt,
+		                     self.plt_z_smt                   ]
+
+		# Smooth the non-rotated magnetic filed data using the median
+		# filter of given windows size.
+
+		# NOTE: We have two smoothed data because we are using the
+		# rotated one to plot the graph and look at the periodic
+		# behaviour of the data whereas the non-rotated one is used to
+		# carry out the non-linear analysis.
+
+		# TODO: Need to do the same thing for fit data as well. As of
+		# now, the algorithm only fits the rotated data.
+
+		self.mfi_x_smt = medfilt(
+		                         self.mfi_b_x, self.opt['mom_med_fil'] )
+		self.mfi_y_smt = medfilt(
+		                         self.mfi_b_y, self.opt['mom_med_fil'] )
+		self.mfi_z_smt = medfilt(
+		                         self.mfi_b_z, self.opt['mom_med_fil'] )
 
 		self.mfi_vec_smt = [ self.mfi_x_smt, self.mfi_y_smt,
 		                     self.mfi_z_smt                   ]
+
+		self.mfi_avg_vec_smt = array( [ mean( self.mfi_x_smt),
+		                                mean( self.mfi_y_smt),
+		                                mean( self.mfi_z_smt)  ] )
+
+		self.mfi_avg_mag_smt = sqrt( self.mfi_avg_vec_smt[0]**2 +
+		                             self.mfi_avg_vec_smt[1]**2 +
+		                             self.mfi_avg_vec_smt[2]**2   )
+
+		self.mfi_avg_nrm_smt =\
+		                     self.mfi_avg_vec_smt / self.mfi_avg_mag_smt
+
 		# Assign all the magnetic fields to a dictionary
 
 		if( any ( x is None for x in self.mfi_b_vec   ) or
@@ -2841,6 +2890,15 @@ class core( QObject ) :
 		self.nln_res_plas['b0_y']     = self.mfi_avg_vec[1]
 		self.nln_res_plas['b0_z']     = self.mfi_avg_vec[2]
 
+		self.nln_res_plas['sig_b0_x'] = self.mfi_b_x_sig
+		self.nln_res_plas['sig_b0_y'] = self.mfi_b_y_sig
+		self.nln_res_plas['sig_b0_z'] = self.mfi_b_z_sig
+
+		self.nln_res_plas['sig_b0']   = self.mfi_b_sig
+
+		print self.nln_res_plas['sig_b0_z']
+
+
 		pop_v0_vec                    = [fit[0], fit[1], fit[2]]
 		self.nln_res_plas['v0_x']     =  fit[0]
 		self.nln_res_plas['v0_y']     =  fit[1]
@@ -2852,7 +2910,7 @@ class core( QObject ) :
 		self.nln_res_plas['fv']       =  fit[3]
 		self.nln_res_plas['sig_fv']   =  sig[3]
 
-		print self.nln_res_plas['fv'], sig[3]
+#		print self.nln_res_plas['fv'], sig[3]
 		c = 4
 
 		self.nln_res_curr_ion = []

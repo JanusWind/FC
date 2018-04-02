@@ -30,71 +30,84 @@ else:
 fname=[]
 i = 0
 
-for file in glob.glob("janus_2008-11-04-12-00-41_2008-11-04-12-52-53.jns"):
+#for file in glob.glob("janus_2008-11-04-12-00-41_2008-11-04-12-52-53.jns"):
+for file in glob.glob("test.jns"):
         fname.append( file )
 
 dat    = [0]*len(fname)
 
-t_b0      = [0]*28
-t_rp      = [0]*28
-t_rb      = [0]*28
-t_rc      = [0]*28
-t_np      = [0]*28
-t_nc      = [0]*28
-t_nb      = [0]*28
-t_fvpc    = [0]*28
-t_fvpb    = [0]*28
-t_dvpc    = [0]*28
-t_dvpb    = [0]*28
-t_wparc   = [0]*28
-t_wparb   = [0]*28
-t_wperc   = [0]*28
-t_wperb   = [0]*28
-t_wp      = [0]*28
-t_dvvecpc = [0]*28
-t_dvvecpb = [0]*28
-t_s       = [0]*28
-t_k       = [0]*28
-t_tpc     = [0]*28
-t_tpb     = [0]*28
-t_nf      = [0]*28
-t_wparp   = [0]*28
-
-count  = 0
+# Find the total number of data points in all the files being analyzed.
 
 for i in range (len(fname)):
         dat[i] = pickle.load(open(fname[i],'rb'))
 
-        dat_b_hat      = np.array(dat[i]['b0_hat'])
-        dat_r_p        = np.array(dat[i]['r_p'])
-        dat_r_p_c      = np.array(dat[i]['r_p_c'])
-        dat_r_p_b      = np.array(dat[i]['r_p_b'])
-        dat_n_p        = np.array(dat[i]['n_p'])
-        dat_n_p_c      = np.array(dat[i]['n_p_c'])
-        dat_n_p_b      = np.array(dat[i]['n_p_b'])
-        dat_fv_p_c     = np.array(dat[i]['fv_p_c'])
-        dat_fv_p_b     = np.array(dat[i]['fv_p_b'])
-        dat_dv_p_c     = np.array(dat[i]['dv_p_c'])
-        dat_dv_p_b     = np.array(dat[i]['dv_p_b'])
-        dat_w_par_c    = np.array(dat[i]['w_par_p_c'])
-        dat_w_per_c    = np.array(dat[i]['w_per_p_c'])
-        dat_w_par_b    = np.array(dat[i]['w_par_p_b'])
-        dat_w_per_b    = np.array(dat[i]['w_per_p_b'])
-	dat_w_p        = np.array(dat[i]['w_p'])
-        dat_dv_vec_p_c = np.array(dat[i]['dv_p_c_vec'])
-        dat_dv_vec_p_b = np.array(dat[i]['dv_p_b_vec'])
-        dat_s_p        = np.array(dat[i]['p_s'])
-        dat_k_p        = np.array(dat[i]['p_k'])
-        dat_t_p_c      = np.array(dat[i]['t_par_p_c'])
-        dat_t_p_b      = np.array(dat[i]['t_par_p_b'])
-	dat_w_par_p    = np.array(dat[i]['w_par_p'])
+nd = sum( [ len(dat[i]['b0'] ) for i in range ( len( fname ) ) ] )
 
-        inc = [ ( ( dat_n_p_b[j] is not None ) and ( dat_n_p_b[j] >  0 ) and
-                  ( dat_n_p[j]   is not None ) and ( dat_n_p[j]   >  0 ) and
-                  ( dat_s_p[j]   is not None ) and ( dat_s_p[j]   != 0 ) and
-                  ( dat_s_p[j]   is not None ) and ( dat_dv_p_b[j] is not None) and
-                  ( dat_r_p_c[j] > .1        ) and ( dat_r_p_b[j] > .1 ) and
-                  ( dat_r_p_c[j] < 10        ) and ( dat_r_p_b[j] < 10 )       )
+t_b0      = [0]*nd # Magnetic field
+t_bs      = [0]*nd # Error in Magnetic field
+t_br      = [0]*nd # Ratio of standard deviation and magnitude of Magnetic field
+t_rp      = [0]*nd # Anisotropy in proton temperature
+t_rb      = [0]*nd # Anisotropy in proton beam temperature
+t_rc      = [0]*nd # Anisotropy in proton core temperature
+t_np      = [0]*nd # Proton number density
+t_nc      = [0]*nd # Proton core number density
+t_nb      = [0]*nd # Proton beam number density
+t_fvpc    = [0]*nd # Fluctuating velocity of proton core
+t_fvpb    = [0]*nd # Fluctuating velocity of proton beam
+t_dvpc    = [0]*nd # Drift velocity of proton core
+t_dvpb    = [0]*nd # Drift velocity of proton beam
+t_wparc   = [0]*nd # Parallel thermal velocity of proton core
+t_wparb   = [0]*nd # Prallel thermal velocity of proton beam
+t_wperc   = [0]*nd # Perpendicular thermal speed of proton core
+t_wperb   = [0]*nd # Perpendicular thermal speed of proton beam
+t_wp      = [0]*nd # Total thermal speed of proton
+t_dvvecpc = [0]*nd # Vector drift velocity of proton core
+t_dvvecpb = [0]*nd # Vector drift velocity of proton beam
+t_s       = [0]*nd # Skewness
+t_k       = [0]*nd # Kurtosis
+t_tpc     = [0]*nd # Proton core temperature
+t_tpb     = [0]*nd # Proton beam temperature
+t_nf      = [0]*nd # Total number density
+t_wparp   = [0]*nd # Total thermal speed of proton
+
+count  = 0
+
+for i in range (len(fname)):
+
+        dat_b_hat      = np.array( dat[i]['b0_hat']       )
+        dat_b_sig      = np.array( dat[i]['b0_sig']       )
+	dat_b_r        = dat_b_sig/np.array( dat[i]['b0'] )
+        dat_r_p        = np.array( dat[i]['r_p']          )
+        dat_r_p_c      = np.array( dat[i]['r_p_c']        )
+        dat_r_p_b      = np.array( dat[i]['r_p_b']        )
+        dat_n_p        = np.array( dat[i]['n_p']          )
+        dat_n_p_c      = np.array( dat[i]['n_p_c']        )
+        dat_n_p_b      = np.array( dat[i]['n_p_b']        )
+        dat_fv_p_c     = np.array( dat[i]['fv_p_c']       )
+        dat_fv_p_b     = np.array( dat[i]['fv_p_b']       )
+        dat_dv_p_c     = np.array( dat[i]['dv_p_c']       )
+        dat_dv_p_b     = np.array( dat[i]['dv_p_b']       )
+        dat_w_par_c    = np.array( dat[i]['w_par_p_c']    )
+        dat_w_per_c    = np.array( dat[i]['w_per_p_c']    )
+        dat_w_par_b    = np.array( dat[i]['w_par_p_b']    )
+        dat_w_per_b    = np.array( dat[i]['w_per_p_b']    )
+	dat_w_p        = np.array( dat[i]['w_p']          )
+        dat_dv_vec_p_c = np.array( dat[i]['dv_p_c_vec']   )
+        dat_dv_vec_p_b = np.array( dat[i]['dv_p_b_vec']   )
+        dat_s_p        = np.array( dat[i]['p_s']          )
+        dat_k_p        = np.array( dat[i]['p_k']          )
+        dat_t_p_c      = np.array( dat[i]['t_par_p_c']    )
+        dat_t_p_b      = np.array( dat[i]['t_par_p_b']    )
+	dat_w_par_p    = np.array( dat[i]['w_par_p']      )
+
+        inc = [ ( ( dat_n_p_b[j]  is not None ) and ( dat_n_p_b[j] >  0 ) and
+                  ( dat_n_p[j]    is not None ) and ( dat_n_p[j]   >  0 ) and
+                  ( dat_s_p[j]    is not None ) and ( dat_s_p[j]   != 0 ) and
+                  ( dat_s_p[j]    is not None ) and
+	          ( dat_dv_p_b[j] is not None ) and ( dat_r_p_c[j] > .1 ) and 
+                  ( dat_r_p_b[j] > .1 )         and ( dat_r_p_c[j] < 10 ) and 
+                  ( dat_r_p_b[j] < 10 )                                      )
+
                 for j in range( len( dat_n_p_b ) ) ]
 
         tk = np.where( inc )[0]
@@ -103,6 +116,8 @@ for i in range (len(fname)):
                 continue
 
         sel_b0      = dat_b_hat[tk]
+        sel_bs      = dat_b_sig[tk]
+        sel_br      = dat_b_r[tk]
         sel_rp      = dat_r_p[tk]
         sel_rc      = dat_r_p_c[tk]
         sel_rb      = dat_r_p_b[tk]
@@ -130,6 +145,8 @@ for i in range (len(fname)):
         for k in range(len(sel_np)):
 
                 t_b0[count]      = sel_b0[k]
+                t_bs[count]      = sel_bs[k]
+                t_br[count]      = sel_br[k]
                 t_rp[count]      = sel_rp[k]
                 t_rc[count]      = sel_rc[k]
                 t_rb[count]      = sel_rb[k]

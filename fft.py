@@ -72,7 +72,7 @@ start = time.time( )
 arcv = mfi_arcv_hres( )
 
 ( mfi_t, mfi_b_x, mfi_b_y,
-  mfi_b_z ) = arcv.load_rang('2008-11-04-12-00-00', 100 )
+  mfi_b_z ) = arcv.load_rang('2008-11-04-12-00-00', 500 )
 
 # Establish the number of data.
 
@@ -95,6 +95,14 @@ mfi_b = [ sqrt( mfi_b_x[i]**2 +
                      mfi_b_z[i]**2 )
                      for i in range( len( mfi_b_x ) ) ]
 
+mfi_b_std = std( mfi_b )
+
+sig_b_x = std( mfi_b_x )
+sig_b_y = std( mfi_b_y )
+sig_b_z = std( mfi_b_z )
+
+sig_b = sqrt( sig_b_x**2 +  sig_b_y**2 + sig_b_z**2 )
+
 # Compute the average magetic field and its norm.
 
 mfi_avg_vec = array( [ mean( mfi_b_x ),
@@ -110,6 +118,7 @@ mfi_avg_nrm = mfi_avg_vec / mfi_avg_mag
 mfi_nrm     = [ ( mfi_b_x[i], mfi_b_y[i],
                   mfi_b_z[i] ) /mfi_b[i]
                   for i in range( len( mfi_b ) ) ]
+'''
 z  = [0., 0., 1.]
 e1 = mfi_avg_nrm
 e2 = cross( z, e1 )/ norm( cross( e1, z ) )
@@ -485,5 +494,5 @@ raxs[1].set_xlabel('Linear Frequency (Hz) ')
 #rfaxs[1].legend(loc="upper right")
 
 plt.show( )
-
+'''
 print 'Computation time = ','%.6f'% (time.time()-start), 'seconds.'
