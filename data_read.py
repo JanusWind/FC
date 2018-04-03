@@ -250,13 +250,14 @@ if Place == 'w' :
 else:
         os.chdir("/home/ramiz/Dropbox/Studies/Research/Janus_Research")
 
-plt.errorbar(dat_fv_p_c, sig_bb, xerr=sig_b, yerr=dat_b_sig, fmt='o')
+plt.errorbar( dat_fv_p_c, sig_bb, xerr=sig_b, yerr=dat_b_sig, fmt='o', ecolor='g' )
 #plt.scatter( dat_fv_p_c, sig_bb )
 #plt.scatter( t_fvpc, t_b_r )
 plt.ylim((min(sig_bb)-0.1*min(sig_bb), ( max(sig_bb)+ 0.1*max(sig_bb))))
 plt.xlim((min(dat_fv_p_c)+0.1*min(dat_fv_p_c), ( max(dat_fv_p_c)+ 0.1*max(dat_fv_p_c))))
-plt.xlabel('Fluctuating Velocity (km/sec) ')
-plt.ylabel(r'$\frac{\sigma_B}{| \vec B|}$')
+plt.xlabel('Fluctuating Velocity (km/sec) ', fontsize = 14 )
+plt.ylabel(r'$\frac{\sigma_B}{| \vec B|}$', fontsize = 18 )
+plt.title(r'$\frac{\sigma_B}{| \vec B|}$ vs Fluctuating Velocity with error bars', fontsize = 18 )
 plt.show( )
 
 '''
