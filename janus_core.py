@@ -350,7 +350,7 @@ class core( QObject ) :
 
 			self.mfi_fit_lin         = False
 
-			self.mfi_fields          = None
+			self.b0_fields           = None
 
 			self.mfi_set_key         = None
 
@@ -1426,10 +1426,10 @@ class core( QObject ) :
 		    any ( x is None for x in self.mfi_vec_rot ) or
 		    any ( x is None for x in self.mfi_vec_fit )     ) :
 
-			self.mfi_fields = None
+			self.b0_fields = None
 		else :
 
-			self.mfi_fields = {
+			self.b0_fields = {
 			               "mfi_set_raw"    : self.mfi_vec_raw,
 			               "mfi_set_rot"    : self.mfi_vec_rot,
 			               "mfi_set_fit"    : self.mfi_vec_fit,
@@ -1440,14 +1440,14 @@ class core( QObject ) :
 		# Use interpolation to estiamte the magnetic field vector for
 		# each datum in the FC spectrum.
 
-		for i in range( len( self.mfi_fields.keys() ) ) :
+		for i in range( len( self.b0_fields.keys() ) ) :
 
-			if( self.opt[ self.mfi_fields.keys()[i] ] ) :
+			if( self.opt[ self.b0_fields.keys()[i] ] ) :
 
-				self.mfi_set_key = self.mfi_fields.keys()[i]
+				self.mfi_set_key = self.b0_fields.keys()[i]
 
 		self.fc_spec.set_mag( self.mfi_t,
-		                      self.mfi_fields[self.mfi_set_key],
+		                      self.b0_fields[self.mfi_set_key],
 		                      self.mfi_set_key                  )
 
 		# Message the user that new Wind/MFI data have been loaded.
@@ -2974,17 +2974,17 @@ class core( QObject ) :
 
 		self.nln_res_plas['time']     = self.time_epc
 
-		self.nln_res_plas['b0_x']     = self.mfi_avg_vec[0]
-		self.nln_res_plas['b0_y']     = self.mfi_avg_vec[1]
-		self.nln_res_plas['b0_z']     = self.mfi_avg_vec[2]
+		self.nln_res_plas['b0_x']     = self.mfi_avg_vec_rot_smt[0]
+		self.nln_res_plas['b0_y']     = self.mfi_avg_vec_rot_smt[1]
+		self.nln_res_plas['b0_z']     = self.mfi_avg_vec_rot_smt[2]
 
-		self.nln_res_plas['sig_b0_x'] = self.mfi_vec_raw_sig[0]
-		self.nln_res_plas['sig_b0_y'] = self.mfi_vec_raw_sig[1]
-		self.nln_res_plas['sig_b0_z'] = self.mfi_vec_raw_sig[2]
+		self.nln_res_plas['sig_b0_x'] = self.mfi_vec_rot_sig[0]
+		self.nln_res_plas['sig_b0_y'] = self.mfi_vec_rot_sig[1]
+		self.nln_res_plas['sig_b0_z'] = self.mfi_vec_rot_sig[2]
 
 		self.nln_res_plas['sig_b0']   = self.mfi_b_sig
 
-		self.nln_res_plas['mfi_fields'] = {
+		self.nln_res_plas['b0_fields'] = {
 		                               'raw'    : self.mfi_vec_raw,
 		                               'rot'    : self.mfi_vec_rot,
 		                               'fit'    : self.mfi_vec_fit,
@@ -2992,7 +2992,7 @@ class core( QObject ) :
 		                               'rot_smt': self.mfi_vec_rot_smt,
 		                               'fit_smt': self.mfi_vec_fit_smt }
 
-		self.nln_res_plas[ 'sig_mfi_fields'] = {
+		self.nln_res_plas[ 'sig_b0_fields'] = {
 		                       'sig_raw'    : self.mfi_vec_raw_sig,
 		                       'sig_smt'    : self.mfi_vec_rot_sig,
 		                       'sig_fit'    : self.mfi_vec_fit_sig,
@@ -3475,15 +3475,15 @@ class core( QObject ) :
 		             'fls_max_spin'    :float('inf'),
 		             'fls_max_mfi_l'   :float('inf'),
 		             'fls_max_mfi_h'   :float('inf'),
-		             'fls_src_low'     :True,
-		             'fls_src_high'    :False,
-		             'mom_fit_crv'     :True,
-		             'mom_fit_fft'     :False,
- 		             'mom_med_fil'     :int('1'),
-		             'mfi_set_raw'     :True,
+		             'fls_src_low'     :False,
+		             'fls_src_high'    :True,
+		             'mom_fit_crv'     :False,
+		             'mom_fit_fft'     :True,
+ 		             'mom_med_fil'     :int('11'),
+		             'mfi_set_raw'     :False,
 		             'mfi_set_rot'     :False,
 		             'mfi_set_fit'     :False,
-		             'mfi_set_raw_smt' :False,
+		             'mfi_set_raw_smt' :True,
 		             'mfi_set_rot_smt' :False,
 		             'mfi_set_fit_smt' :False           }
 

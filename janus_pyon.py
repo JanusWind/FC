@@ -167,9 +167,14 @@ class plas( object ) :
 		self.sig_b0_y = None
 		self.sig_b0_z = None
 
-		self.mfi_fields     = dict.fromkeys( [ 'raw', 'smt', 'fit'   ] )
-		self.sig_mfi_fields = dict.fromkeys( [ 'sig_raw', 'sig_smt',
-		                                                  'sig_fit'  ] )
+		self.b0_fields     = dict.fromkeys( [ 'raw', 'rot', 'fit',
+		                                       'raw_smt', 'rot_smt',
+		                                       'fit_smt'             ] )
+
+		self.sig_b0_fields = dict.fromkeys( [ 'sig_raw', 'sig_rot',
+		                                       'sig_fit', 'sig_raw_smt',
+		                                       'sig_rot_smt',
+		                                       'sig_fit_smt'         ] )
 
 		self.enforce = bool( enforce )
 
@@ -584,21 +589,21 @@ class plas( object ) :
 				if ( value[2] is not None ) :
 					self.b0_z = float( value[2] )
 
-		elif ( key == 'mfi_fields' ) :
+		elif ( key == 'b0_fields' ) :
 
-			self.mfi_fields = None
-
-			if ( value is not None ) :
-
-				self.mfi_fields =  value
-
-		elif ( key == 'sig_mfi_fields' ) :
-
-			self.sig_mfi_fields = None
+			self.b0_fields = None
 
 			if ( value is not None ) :
 
-				self.sig_mfi_fields = value
+				self.b0_fields =  value
+
+		elif ( key == 'sig_b0_fields' ) :
+
+			self.sig_b0_fields = None
+
+			if ( value is not None ) :
+
+				self.sig_b0_fields = value
 
 		elif ( key == 'sig_b0' ) :
 

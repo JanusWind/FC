@@ -7,6 +7,7 @@ os.system('cls' if os.name == 'nt' else 'clear') # Clear the screen
 import glob
 import pickle
 import numpy as np
+from numpy import mean, sqrt
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 from pylab import rcParams
@@ -31,7 +32,7 @@ fname=[]
 i = 0
 
 #for file in glob.glob("janus_2008-11-04-12-00-41_2008-11-04-12-52-53.jns"):
-for file in glob.glob("test1.jns"):
+for file in glob.glob("janus_2008-11-04-10-45-35_2008-11-04-12-33-18.jns"):
         fname.append( file )
 
 dat    = [0]*len(fname)
@@ -69,166 +70,194 @@ t_tpc     = [0]*nd # Proton core temperature
 t_tpb     = [0]*nd # Proton beam temperature
 t_nf      = [0]*nd # Total number density
 t_wparp   = [0]*nd # Total thermal speed of proton
+t_b_r     = [0]*nd
+sig_b     = [0]*nd
+sig_bb    = [0]*nd
+
+dat_b_x_sig_raw = [0]*nd
+dat_b_y_sig_raw = [0]*nd
+dat_b_z_sig_raw = [0]*nd
+               
+dat_b_x_sig_rot = [0]*nd
+dat_b_y_sig_rot = [0]*nd
+dat_b_z_sig_rot = [0]*nd
+               
+dat_b_x_sig_fit = [0]*nd
+dat_b_y_sig_fit = [0]*nd
+dat_b_z_sig_fit = [0]*nd
 
 count  = 0
 
-for i in range (len(fname)):
+for i in range ( len( fname ) ) :
+
+	for j in range( nd ) :
 
 	# Extract/compute everything related to magnetic field.
 
-	dat_b_fields_raw = np.array( dat[i]['b0_fields'][i]['raw'] )
-	dat_b_fields_smt = np.array( dat[i]['b0_fields'][i]['smt'] )
-	dat_b_fields_fit = np.array( dat[i]['b0_fields'][i]['fit'] )
+		dat_b_fields_raw = np.array( dat[i]['b0_fields'][j]['raw_smt'] )
+		dat_b_fields_rot = np.array( dat[i]['b0_fields'][j]['rot_smt'] )
+		dat_b_fields_fit = np.array( dat[i]['b0_fields'][j]['fit_smt'] )
+	
+		dat_b_fields_sig_raw = np.array( dat[i]['sig_b0_fields'][j]['sig_raw_smt'] )
+		dat_b_fields_sig_rot = np.array( dat[i]['sig_b0_fields'][j]['sig_rot_smt'] )
+		dat_b_fields_sig_fit = np.array( dat[i]['sig_b0_fields'][j]['sig_fit_smt'] )
+	
+		dat_b_x_raw = dat_b_fields_raw[0]
+	
+		dat_b_y_raw = dat_b_fields_raw[1]
+	
+		dat_b_z_raw = dat_b_fields_raw[2]
+	
+		dat_b_x_rot = dat_b_fields_rot[0]
+	
+		dat_b_y_rot = dat_b_fields_rot[1]
+	
+		dat_b_z_rot = dat_b_fields_rot[2]
+	
+		dat_b_x_fit = dat_b_fields_fit[0]
+	
+		dat_b_y_fit = dat_b_fields_fit[1]
+	
+		dat_b_z_fit = dat_b_fields_fit[2]
+	
+		dat_b_x_sig_raw[j] = dat_b_fields_sig_raw[0]
+		dat_b_y_sig_raw[j] = dat_b_fields_sig_raw[1]
+		dat_b_z_sig_raw[j] = dat_b_fields_sig_raw[2]
+	
+		dat_b_x_sig_rot[j] = dat_b_fields_sig_rot[0]
+		dat_b_y_sig_rot[j] = dat_b_fields_sig_rot[1]
+		dat_b_z_sig_rot[j] = dat_b_fields_sig_rot[2]
+	
+		dat_b_x_sig_fit[j] = dat_b_fields_sig_fit[0]
+		dat_b_y_sig_fit[j] = dat_b_fields_sig_fit[1]
+		dat_b_z_sig_fit[j] = dat_b_fields_sig_fit[2]
+	
+		sig_b[j] = sqrt ( dat_b_y_sig_rot[j]**2 + dat_b_z_sig_rot[j]**2 )
 
-	dat_b_fields_sig_raw = np.array( dat[i]['sig_b0_fields'][i]['sig_raw'] )
-	dat_b_fields_sig_smt = np.array( dat[i]['sig_b0_fields'][i]['sig_smt'] )
-	dat_b_fields_sig_fit = np.array( dat[i]['sig_b0_fields'][i]['sig_fit'] )
-
-	dat_b_x_raw = [ dat_b_fields_raw[0][j]
-	                for j in range( len( dat_b_fields_raw[0] ) ) ]
-
-	dat_b_y_raw = [ dat_b_fields_raw[1][j]
-	                for j in range( len( dat_b_fields_raw[1] ) ) ]
-
-	dat_b_z_raw = [ dat_b_fields_raw[2][j]
-	                for j in range( len( dat_b_fields_raw[2] ) ) ]
-
-	dat_b_x_smt = [ dat_b_fields_smt[0][j]
-	                for j in range( len( dat_b_fields_smt[0] ) ) ]
-
-	dat_b_y_smt = [ dat_b_fields_smt[1][j]
-	                for j in range( len( dat_b_fields_smt[1] ) ) ]
-
-	dat_b_z_smt = [ dat_b_fields_smt[2][j]
-	                for j in range( len( dat_b_fields_smt[2] ) ) ]
-
-	dat_b_x_fit = [ dat_b_fields_fit[0][j]
-	                for j in range( len( dat_b_fields_fit[0] ) ) ]
-
-	dat_b_y_fit = [ dat_b_fields_fit[1][j]
-	                for j in range( len( dat_b_fields_fit[1] ) ) ]
-
-	dat_b_z_fit = [ dat_b_fields_fit[2][j]
-	                for j in range( len( dat_b_fields_fit[2] ) ) ]
-
-	dat_b_x_sig_raw = dat_b_fields_sig_raw[0]
-	dat_b_y_sig_raw = dat_b_fields_sig_raw[1]
-	dat_b_z_sig_raw = dat_b_fields_sig_raw[2]
-
-	dat_b_x_sig_smt = dat_b_fields_sig_smt[0]
-	dat_b_y_sig_smt = dat_b_fields_sig_smt[1]
-	dat_b_z_sig_smt = dat_b_fields_sig_smt[2]
-
-	dat_b_x_sig_fit = dat_b_fields_sig_fit[0]
-	dat_b_y_sig_fit = dat_b_fields_sig_fit[1]
-	dat_b_z_sig_fit = dat_b_fields_sig_fit[2]
-
-        dat_b_hat      = np.array( dat[i]['b0_hat']       )
-        dat_b_sig      = np.array( dat[i]['b0_sig']       )
-	dat_b_r        = dat_b_sig/np.array( dat[i]['b0'] )
-
-	# Extract other parameters computed in 'janus_pyon'.
-
-        dat_r_p        = np.array( dat[i]['r_p']          )
-        dat_r_p_c      = np.array( dat[i]['r_p_c']        )
-        dat_r_p_b      = np.array( dat[i]['r_p_b']        )
-        dat_n_p        = np.array( dat[i]['n_p']          )
-        dat_n_p_c      = np.array( dat[i]['n_p_c']        )
-        dat_n_p_b      = np.array( dat[i]['n_p_b']        )
-        dat_fv_p_c     = np.array( dat[i]['fv_p_c']       )
-        dat_fv_p_b     = np.array( dat[i]['fv_p_b']       )
-        dat_dv_p_c     = np.array( dat[i]['dv_p_c']       )
-        dat_dv_p_b     = np.array( dat[i]['dv_p_b']       )
-        dat_w_par_c    = np.array( dat[i]['w_par_p_c']    )
-        dat_w_per_c    = np.array( dat[i]['w_per_p_c']    )
-        dat_w_par_b    = np.array( dat[i]['w_par_p_b']    )
-        dat_w_per_b    = np.array( dat[i]['w_per_p_b']    )
-	dat_w_p        = np.array( dat[i]['w_p']          )
-        dat_dv_vec_p_c = np.array( dat[i]['dv_p_c_vec']   )
-        dat_dv_vec_p_b = np.array( dat[i]['dv_p_b_vec']   )
-        dat_s_p        = np.array( dat[i]['p_s']          )
-        dat_k_p        = np.array( dat[i]['p_k']          )
-        dat_t_p_c      = np.array( dat[i]['t_par_p_c']    )
-        dat_t_p_b      = np.array( dat[i]['t_par_p_b']    )
-	dat_w_par_p    = np.array( dat[i]['w_par_p']      )
-
-        inc = [ ( ( dat_n_p_b[j]  is not None ) and ( dat_n_p_b[j] >  0 ) and
-                  ( dat_n_p[j]    is not None ) and ( dat_n_p[j]   >  0 ) and
-                  ( dat_s_p[j]    is not None ) and ( dat_s_p[j]   != 0 ) and
-                  ( dat_s_p[j]    is not None ) and
-	          ( dat_dv_p_b[j] is not None ) and ( dat_r_p_c[j] > .1 ) and 
-                  ( dat_r_p_b[j] > .1 )         and ( dat_r_p_c[j] < 10 ) and 
-                  ( dat_r_p_b[j] < 10 )                                      )
-
-                for j in range( len( dat_n_p_b ) ) ]
-
-        tk = np.where( inc )[0]
-
-        if ( len( tk ) <= 1 ) :
-                continue
-
-        sel_b0      = dat_b_hat[tk]
-        sel_bs      = dat_b_sig[tk]
-        sel_br      = dat_b_r[tk]
-        sel_rp      = dat_r_p[tk]
-        sel_rc      = dat_r_p_c[tk]
-        sel_rb      = dat_r_p_b[tk]
-        sel_np      = dat_n_p[tk]
-        sel_nc      = dat_n_p_c[tk]
-        sel_nb      = dat_n_p_b[tk]
-        sel_fvpc    = dat_fv_p_c[tk]
-        sel_fvpb    = dat_fv_p_b[tk]
-        sel_dvpc    = dat_dv_p_c[tk]
-        sel_dvpb    = dat_dv_p_b[tk]
-        sel_wparc   = dat_w_par_c[tk]
-        sel_wparb   = dat_w_par_b[tk]
-        sel_wperc   = dat_w_per_c[tk]
-        sel_wperb   = dat_w_per_b[tk]
-	sel_wp      = dat_w_p[tk]
-        sel_dvvecpc = dat_dv_vec_p_c[tk]
-        sel_dvvecpb = dat_dv_vec_p_b[tk]
-        sel_s       = dat_s_p[tk]
-        sel_k       = dat_k_p[tk]
-        sel_nf      = dat_n_p_b[tk] / dat_n_p[tk]
-        sel_tpc     = dat_t_p_c[tk]
-        sel_tpb     = dat_t_p_b[tk]
-	sel_wparp   = dat_w_par_p[tk]
-
-        for k in range(len(sel_np)):
-
-                t_b0[count]      = sel_b0[k]
-                t_bs[count]      = sel_bs[k]
-                t_br[count]      = sel_br[k]
-                t_rp[count]      = sel_rp[k]
-                t_rc[count]      = sel_rc[k]
-                t_rb[count]      = sel_rb[k]
-                t_np[count]      = sel_np[k]
-                t_nc[count]      = sel_nc[k]
-                t_nb[count]      = sel_nb[k]
-                t_fvpc[count]    = sel_fvpc[k]
-                t_fvpb[count]    = sel_fvpb[k]
-                t_dvpc[count]    = sel_dvpc[k]
-                t_dvpb[count]    = sel_dvpb[k]
-                t_wparc[count]   = sel_wparc[k]
-                t_wparb[count]   = sel_wparb[k]
-                t_wperc[count]   = sel_wperc[k]
-                t_wperb[count]   = sel_wperb[k]
-		t_wp[count]      = sel_wp[k]
-                t_dvvecpc[count] = sel_dvvecpc[k]
-                t_dvvecpb[count] = sel_dvvecpb[k]
-		t_wparp[count]   = sel_wparp[k]
-                t_s[count]       = sel_s[k]
-                t_k[count]       = sel_k[k]
-                t_nf[count]      = sel_nf[k]
-                t_tpc[count]     = sel_tpc[k]
-                t_tpb[count]     = sel_tpb[k]
-
+#		sig_b2[j]      = sqrt( sum( dat_b_y_rot**2 + dat_b_z_rot**2 ) /
+#		                                       ( len( dat_b_x_rot    ) ) )
+	
+		sig_bb[j] = sig_b[j] / mean( dat_b_x_rot )
+	
+	        dat_b_hat      = np.array( dat[i]['b0_hat']       )
+	        dat_b_sig      = np.array( dat[i]['b0_sig']       )
+	
+		dat_b_r        = dat_b_sig/np.array( dat[i]['b0'] )
+	
+		# Extract other parameters computed in 'janus_pyon'.
+	
+		dat_r_p        = np.array( dat[i]['r_p']          )
+		dat_r_p_c      = np.array( dat[i]['r_p_c']        )
+		dat_r_p_b      = np.array( dat[i]['r_p_b']        )
+		dat_n_p        = np.array( dat[i]['n_p']          )
+		dat_n_p_c      = np.array( dat[i]['n_p_c']        )
+		dat_n_p_b      = np.array( dat[i]['n_p_b']        )
+		dat_fv_p_c     = np.array( dat[i]['fv_p_c']       )
+		dat_fv_p_b     = np.array( dat[i]['fv_p_b']       )
+		dat_dv_p_c     = np.array( dat[i]['dv_p_c']       )
+		dat_dv_p_b     = np.array( dat[i]['dv_p_b']       )
+		dat_w_par_c    = np.array( dat[i]['w_par_p_c']    )
+		dat_w_per_c    = np.array( dat[i]['w_per_p_c']    )
+		dat_w_par_b    = np.array( dat[i]['w_par_p_b']    )
+		dat_w_per_b    = np.array( dat[i]['w_per_p_b']    )
+		dat_w_p        = np.array( dat[i]['w_p']          )
+		dat_dv_vec_p_c = np.array( dat[i]['dv_p_c_vec']   )
+		dat_dv_vec_p_b = np.array( dat[i]['dv_p_b_vec']   )
+		dat_s_p        = np.array( dat[i]['p_s']          )
+		dat_k_p        = np.array( dat[i]['p_k']          )
+		dat_t_p_c      = np.array( dat[i]['t_par_p_c']    )
+		dat_t_p_b      = np.array( dat[i]['t_par_p_b']    )
+		dat_w_par_p    = np.array( dat[i]['w_par_p']      )
+	
+	        inc = [ ( ( dat_n_p_b[j]  is not None ) and ( dat_n_p_b[j] >  0 ) and
+	                  ( dat_n_p[j]    is not None ) and ( dat_n_p[j]   >  0 ) and
+	                  ( dat_s_p[j]    is not None ) and ( dat_s_p[j]   != 0 ) and
+	                  ( dat_s_p[j]    is not None ) and
+		          ( dat_dv_p_b[j] is not None ) and ( dat_r_p_c[j] > .1 ) and 
+	                  ( dat_r_p_b[j] > .1 )         and ( dat_r_p_c[j] < 10 ) and 
+	                  ( dat_r_p_b[j] < 10 )                                      )
+	
+	                for j in range( len( dat_n_p_b ) ) ]
+	
+	        tk = np.where( inc )[0]
+	
+	        if ( len( tk ) <= 1 ) :
+	                continue
+	
+	        sel_b0      = dat_b_hat[tk]
+	        sel_bs      = dat_b_sig[tk]
+	        sel_br      = dat_b_r[tk]
+	        sel_rp      = dat_r_p[tk]
+	        sel_rc      = dat_r_p_c[tk]
+	        sel_rb      = dat_r_p_b[tk]
+	        sel_np      = dat_n_p[tk]
+	        sel_nc      = dat_n_p_c[tk]
+	        sel_nb      = dat_n_p_b[tk]
+	        sel_fvpc    = dat_fv_p_c[tk]
+	        sel_fvpb    = dat_fv_p_b[tk]
+	        sel_dvpc    = dat_dv_p_c[tk]
+	        sel_dvpb    = dat_dv_p_b[tk]
+	        sel_wparc   = dat_w_par_c[tk]
+	        sel_wparb   = dat_w_par_b[tk]
+	        sel_wperc   = dat_w_per_c[tk]
+	        sel_wperb   = dat_w_per_b[tk]
+		sel_wp      = dat_w_p[tk]
+	        sel_dvvecpc = dat_dv_vec_p_c[tk]
+	        sel_dvvecpb = dat_dv_vec_p_b[tk]
+	        sel_s       = dat_s_p[tk]
+	        sel_k       = dat_k_p[tk]
+	        sel_nf      = dat_n_p_b[tk] / dat_n_p[tk]
+	        sel_tpc     = dat_t_p_c[tk]
+	        sel_tpb     = dat_t_p_b[tk]
+		sel_wparp   = dat_w_par_p[tk]
+		sel_b_r     = dat_b_r[tk]
+#		sel_sig_b   = dat_sig_b[tk]
+	
+	        for k in range(len(sel_np)):
+	
+	                t_b0[count]      = sel_b0[k]
+	                t_bs[count]      = sel_bs[k]
+	                t_br[count]      = sel_br[k]
+	                t_rp[count]      = sel_rp[k]
+	                t_rc[count]      = sel_rc[k]
+	                t_rb[count]      = sel_rb[k]
+	                t_np[count]      = sel_np[k]
+	                t_nc[count]      = sel_nc[k]
+	                t_nb[count]      = sel_nb[k]
+	                t_fvpc[count]    = sel_fvpc[k]
+	                t_fvpb[count]    = sel_fvpb[k]
+	                t_dvpc[count]    = sel_dvpc[k]
+	                t_dvpb[count]    = sel_dvpb[k]
+	                t_wparc[count]   = sel_wparc[k]
+	                t_wparb[count]   = sel_wparb[k]
+	                t_wperc[count]   = sel_wperc[k]
+	                t_wperb[count]   = sel_wperb[k]
+			t_wp[count]      = sel_wp[k]
+	                t_dvvecpc[count] = sel_dvvecpc[k]
+	                t_dvvecpb[count] = sel_dvvecpb[k]
+			t_wparp[count]   = sel_wparp[k]
+	                t_s[count]       = sel_s[k]
+	                t_k[count]       = sel_k[k]
+	                t_nf[count]      = sel_nf[k]
+	                t_tpc[count]     = sel_tpc[k]
+	                t_tpb[count]     = sel_tpb[k]
+			t_b_r[count]     = sel_b_r[k]
+	
                 count           += 1
 
 if Place == 'w' :
         os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
 else:
         os.chdir("/home/ramiz/Dropbox/Studies/Research/Janus_Research")
+
+plt.errorbar(dat_fv_p_c, sig_bb, xerr=sig_b, yerr=dat_b_sig, fmt='o')
+#plt.scatter( dat_fv_p_c, sig_bb )
+#plt.scatter( t_fvpc, t_b_r )
+plt.ylim((min(sig_bb)-0.1*min(sig_bb), ( max(sig_bb)+ 0.1*max(sig_bb))))
+plt.xlim((min(dat_fv_p_c)+0.1*min(dat_fv_p_c), ( max(dat_fv_p_c)+ 0.1*max(dat_fv_p_c))))
+plt.xlabel('Fluctuating Velocity (km/sec) ')
+plt.ylabel(r'$\frac{\sigma_B}{| \vec B|}$')
+plt.show( )
 
 '''
 u1 = linspace(-125,175,201)
