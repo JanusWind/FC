@@ -34,7 +34,7 @@ from janus_const import const
 PARAM = [ 'b0', 'v0', 'fv', 'n', 'v', 'dv', 'w', 'w2', 'r', 't', 'beta',
           'ac', 'time', 's','m','q', 'k', 'beta_par', 'beta_per'               ]
 
-COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat'  ]
+COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat', 'fields' ]
 
 SIGMA = [ 'sig', 'sigma' ]
 
@@ -166,6 +166,10 @@ class plas( object ) :
 		self.sig_b0_x = None
 		self.sig_b0_y = None
 		self.sig_b0_z = None
+
+		self.mfi_fields     = dict.fromkeys( [ 'raw', 'smt', 'fit'   ] )
+		self.sig_mfi_fields = dict.fromkeys( [ 'sig_raw', 'sig_smt',
+		                                                  'sig_fit'  ] )
 
 		self.enforce = bool( enforce )
 
@@ -335,6 +339,8 @@ class plas( object ) :
 					return self.b0_y
 				elif ( elem['comp'] == 'z' ) :
 					return self.b0_z
+				elif ( elem['comp'] == 'fields' ) :
+					return self.b0_fields
 				else :
 					return None
 
@@ -347,6 +353,8 @@ class plas( object ) :
 					return self.sig_b0_y
 				elif ( elem['comp'] == 'z' ) :
 					return self.sig_b0_z
+				elif ( elem['comp'] == 'fields' ) :
+					return self.sig_b0_fields
 				else :
 
 					return None
@@ -575,6 +583,22 @@ class plas( object ) :
 					self.b0_y = float( value[1] )
 				if ( value[2] is not None ) :
 					self.b0_z = float( value[2] )
+
+		elif ( key == 'mfi_fields' ) :
+
+			self.mfi_fields = None
+
+			if ( value is not None ) :
+
+				self.mfi_fields =  value
+
+		elif ( key == 'sig_mfi_fields' ) :
+
+			self.sig_mfi_fields = None
+
+			if ( value is not None ) :
+
+				self.sig_mfi_fields = value
 
 		elif ( key == 'sig_b0' ) :
 

@@ -93,16 +93,26 @@ class dialog_opt_mfi( QWidget ) :
 
 		self.lab_hdr = QLabel( 'MFI Set Style'                     )
 
-		self.lab = { 'mfi_set_raw' :QLabel( 'Raw Data ',     self ),
-		             'mfi_set_fit' :QLabel( 'Fit Data' ,     self ),
-		             'mfi_set_smt' :QLabel( 'Smoothed Data', self )   }
+		self.lab = {
+		     'mfi_set_raw'    :QLabel( 'Raw Data ',             self ),
+		     'mfi_set_rot'    :QLabel( 'Rotated Data' ,         self ),
+		     'mfi_set_fit'    :QLabel( 'Fit Data',              self ),
+		     'mfi_set_raw_smt':QLabel( 'Raw smoothed Data ',    self ),
+		     'mfi_set_rot_smt':QLabel( 'Rotated Smoothed Data', self ),
+		     'mfi_set_fit_smt':QLabel( 'Fit Smoothed Data',     self ) }
+
 
 		self.box = {
-		         'mfi_set_raw' :event_RadioBox( self, 'mfi_set_raw' ),
-		         'mfi_set_fit' :event_RadioBox( self, 'mfi_set_fit' ),
-		         'mfi_set_smt' :event_RadioBox( self, 'mfi_set_smt' ) }
+		  'mfi_set_raw'    :event_RadioBox( self, 'mfi_set_raw'     ),
+		  'mfi_set_rot'    :event_RadioBox( self, 'mfi_set_rot'     ),
+		  'mfi_set_fit'    :event_RadioBox( self, 'mfi_set_fit'     ),
+		  'mfi_set_raw_smt':event_RadioBox( self, 'mfi_set_raw_smt' ),
+		  'mfi_set_rot_smt':event_RadioBox( self, 'mfi_set_rot_smt' ),
+		  'mfi_set_fit_smt':event_RadioBox( self, 'mfi_set_fit_smt' ) }
 
-		self.order = [ 'mfi_set_raw', 'mfi_set_fit', 'mfi_set_smt' ]
+		self.order = [
+		       'mfi_set_raw',     'mfi_set_rot',    'mfi_set_fit',
+		       'mfi_set_raw_smt', 'mfi_set_rot_smt','mfi_set_fit_smt' ]
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
@@ -132,10 +142,17 @@ class dialog_opt_mfi( QWidget ) :
 
 		self.box['mfi_set_raw'].setCheckedSilent(
 		                                  self.core.opt['mfi_set_raw'] )
+		self.box['mfi_set_rot'].setCheckedSilent(
+		                                  self.core.opt['mfi_set_rot'] )
 		self.box['mfi_set_fit'].setCheckedSilent(
 		                                  self.core.opt['mfi_set_fit'] )
-		self.box['mfi_set_smt'].setCheckedSilent(
-		                                  self.core.opt['mfi_set_smt'] )
+
+		self.box['mfi_set_raw_smt'].setCheckedSilent(
+		                              self.core.opt['mfi_set_raw_smt'] )
+		self.box['mfi_set_rot_smt'].setCheckedSilent(
+		                              self.core.opt['mfi_set_rot_smt'] )
+		self.box['mfi_set_fit_smt'].setCheckedSilent(
+		                              self.core.opt['mfi_set_fit_smt'] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.

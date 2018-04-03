@@ -270,76 +270,100 @@ class core( QObject ) :
 
 		if ( var_mfi ) :
 
-			self.n_mfi         = 0
+			self.n_mfi               = 0
 
-			self.mfi_dur       = 0.
+			self.mfi_dur             = 0.
 
-			self.mfi_t         = None
-			self.mfi_s         = None
-			self.mfi_b         = None
-			self.mfi_b_x       = None
-			self.mfi_b_y       = None
-			self.mfi_b_z       = None
-			self.mfi_b_vec     = None
+			self.mfi_t               = None
+			self.mfi_s               = None
+			self.mfi_b               = None
+			self.mfi_b_x             = None
+			self.mfi_b_y             = None
+			self.mfi_b_z             = None
+			self.mfi_b_vec           = None
 
-			self.mfi_nrm       = None
-			self.mfi_avg_mag   = None
-			self.mfi_avg_vec   = None
-			self.mfi_avg_nrm   = None
+			self.mfi_nrm             = None
+			self.mfi_avg_mag         = None
+			self.mfi_avg_vec         = None
+			self.mfi_avg_nrm         = None
 
-			self.mfi_x_t       = None
-			self.mfi_y_t       = None
-			self.mfi_z_t       = None
-			self.mfi_vec_t     = None
+			self.mfi_x_rot           = None
+			self.mfi_y_rot           = None
+			self.mfi_z_rot           = None
+			self.mfi_vec_ro          = None
 
-			self.plt_x_t       = None
-			self.plt_y_t       = None
-			self.plt_z_t       = None
-			self.plt_vec_t     = None
+			self.mfi_vec_raw         = None
+			self.mfi_vec_rot         = None
+			self.mfi_vec_fit         = None
+			self.mfi_vec_raw_sig     = None
+			self.mfi_vec_rot_sig     = None
+			self.mfi_vec_fit_sig     = None
 
-			self.mfi_bbx_t     = None
-			self.mfi_bby_t     = None
-			self.mfi_bbz_t     = None
+			self.mfi_x_raw_smt       = None
+			self.mfi_y_raw_smt       = None
+			self.mfi_z_raw_smt       = None
+			self.mfi_vec_raw_smt     = None
+			self.mfi_avg_vec_raw_smt = None
+			self.mfi_avg_mag_raw_smt = None
+			self.mfi_avg_nrm_raw_smt = None
+			self.mfi_vec_raw_smt_sig = None
 
-			self.mfi_frq_x     = None
-			self.mfi_frq_y     = None
-			self.mfi_frq_z     = None
+			self.mfi_x_rot_smt       = None
+			self.mfi_y_rot_smt       = None
+			self.mfi_z_rot_smt       = None
+			self.mfi_vec_rot_smt     = None
+			self.mfi_avg_vec_rot_smt = None
+			self.mfi_avg_mag_rot_smt = None
+			self.mfi_avg_nrm_rot_smt = None
+			self.mfi_vec_rot_smt_sig = None
 
-			self.mfi_amp_x     = None
-			self.mfi_amp_y     = None
-			self.mfi_amp_z     = None
-			self.mfi_amp_vec   = None
+			self.mfi_x_fit_smt       = None
+			self.mfi_y_fit_smt       = None
+			self.mfi_z_fit_smt       = None
+			self.mfi_vec_fit_smt     = None
+			self.mfi_avg_vec_fit_smt = None
+			self.mfi_avg_mag_fit_smt = None
+			self.mfi_avg_nrm_fit_smt = None
+			self.mfi_vec_fit_smt_sig = None
 
-			self.mfi_x_smt     = None
-			self.mfi_y_smt     = None
-			self.mfi_z_smt     = None
-			self.mfi_vec_smt   = None
+			self.mfi_bbx_t           = None
+			self.mfi_bby_t           = None
+			self.mfi_bbz_t           = None
 
-			self.mfi_b_x_fits  = None
-			self.mfi_b_y_fits  = None
-			self.mfi_b_z_fits  = None
+			self.mfi_frq_x           = None
+			self.mfi_frq_y           = None
+			self.mfi_frq_z           = None
 
-			self.mfi_x_fit     = None
-			self.mfi_y_fit     = None
-			self.mfi_z_fit     = None
-			self.mfi_vec_fit   = None
+			self.mfi_amp_x           = None
+			self.mfi_amp_y           = None
+			self.mfi_amp_z           = None
+			self.mfi_amp_vec         = None
 
-			self.mfi_fit_lin   = False
+			self.mfi_b_x_fits        = None
+			self.mfi_b_y_fits        = None
+			self.mfi_b_z_fits        = None
 
-			self.mfi_fields    = None
+			self.mfi_x_fit           = None
+			self.mfi_y_fit           = None
+			self.mfi_z_fit           = None
+			self.mfi_vec_fit         = None
 
-			self.mfi_set_key   = None
+			self.mfi_fit_lin         = False
 
-			self.mfi_phs_x     = None
-			self.mfi_phs_y     = None
-			self.mfi_phs_z     = None
+			self.mfi_fields          = None
 
-			self.mfi_b_colat   = None
-			self.mfi_b_lon     = None
-			self.mfi_psi_b     = None
-			self.mfi_psi_b_avg = None
+			self.mfi_set_key         = None
 
-			self.mfi_amag_ang  = None
+			self.mfi_phs_x           = None
+			self.mfi_phs_y           = None
+			self.mfi_phs_z           = None
+
+			self.mfi_b_colat         = None
+			self.mfi_b_lon           = None
+			self.mfi_psi_b           = None
+			self.mfi_psi_b_avg       = None
+
+			self.mfi_amag_ang        = None
 
 		# If requested, (re-)initialize the varaibles for the windows
 		# associated with automatic data selection for the moments
@@ -877,6 +901,8 @@ class core( QObject ) :
 
 		self.mfi_b_vec = [ self.mfi_b_x, self.mfi_b_y, self.mfi_b_z ]
 
+		self.mfi_vec_raw = self.mfi_b_vec
+
 		# Compute the magnetic field magnitude.
 
 		self.mfi_b = [ sqrt( self.mfi_b_x[i]**2 +
@@ -895,11 +921,9 @@ class core( QObject ) :
 
 		self.mfi_b_sig = std( self.mfi_b )
 
-		self.mfi_b_x_sig = std( self.mfi_b_x )
-		self.mfi_b_y_sig = std( self.mfi_b_y )
-		self.mfi_b_z_sig = std( self.mfi_b_z )
-#		self.mfi_b_sig   = sqrt( self.sig_b_x**2 +  self.sig_b_y**2 +
-#		                         self.sig_b_z**2 )
+		self.mfi_vec_raw_sig = [ std( self.mfi_b_x ),
+		                         std( self.mfi_b_y ),
+                                         std( self.mfi_b_z ) ]
 
 		self.mfi_avg_mag = sqrt( self.mfi_avg_vec[0]**2 +
 		                         self.mfi_avg_vec[1]**2 +
@@ -965,19 +989,20 @@ class core( QObject ) :
 
 		# Computing the components of magnetic filed in the new basis.
 
-		self.mfi_x_t = [ sum( [ self.mfi_b_vec[j][i]*e1[j] 
+		self.mfi_x_rot = [ sum( [ self.mfi_b_vec[j][i]*e1[j] 
 		                           for j in range( 3 ) ]             )
 		                           for i in range( len( self.mfi_s ) ) ]
-		self.mfi_y_t = [ sum( [ self.mfi_b_vec[j][i]*e2[j] 
+		self.mfi_y_rot = [ sum( [ self.mfi_b_vec[j][i]*e2[j] 
 		                           for j in range( 3 ) ]             )
 		                           for i in range( len( self.mfi_s ) ) ]
-		self.mfi_z_t = [ sum( [ self.mfi_b_vec[j][i]*e3[j] 
+		self.mfi_z_rot = [ sum( [ self.mfi_b_vec[j][i]*e3[j] 
 		                           for j in range( 3 ) ]             )
 		                           for i in range( len( self.mfi_s ) ) ]
 
 		# Vector magnetic field in the new basis.
 
-		self.mfi_vec_t = [ self.mfi_x_t, self.mfi_y_t, self.mfi_z_t ]
+		self.mfi_vec_rot = [
+		                self.mfi_x_rot, self.mfi_y_rot, self.mfi_z_rot ]
 
 		# TODO: Check which of the following is better method of
 		# calculation.
@@ -999,9 +1024,9 @@ class core( QObject ) :
 			# Compute the Fourier Transform of each component of
 			# magnetic field.
 
-			fbx = rfft( self.mfi_x_t )
-			fby = rfft( self.mfi_y_t )
-			fbz = rfft( self.mfi_z_t )
+			fbx = rfft( self.mfi_x_rot )
+			fby = rfft( self.mfi_y_rot )
+			fbz = rfft( self.mfi_z_rot )
 
 			# Compute the absolute value of fourier transformed
 			# data.
@@ -1140,11 +1165,11 @@ class core( QObject ) :
 				                   len( self.mfi_s ) )
 
 				self.mfi_b_x_fits = fit_sin( self.mfi_s,
-				                             self.mfi_x_t )
+				                             self.mfi_x_rot )
 				self.mfi_b_y_fits = fit_sin( self.mfi_s,
-				                             self.mfi_y_t )
+				                             self.mfi_y_rot )
 				self.mfi_b_z_fits = fit_sin( self.mfi_s,
-				                             self.mfi_z_t )
+				                             self.mfi_z_rot )
 
 				self.mfi_x_fit = \
 				             self.mfi_b_x_fits['fitfunc']( ind )
@@ -1246,11 +1271,11 @@ class core( QObject ) :
 				                   len( self.mfi_s ) )
 
 				self.mfi_b_x_fits = fit_lin( self.mfi_s,
-				                             self.mfi_x_t )
+				                             self.mfi_x_rot )
 				self.mfi_b_y_fits = fit_lin( self.mfi_s,
-				                             self.mfi_y_t )
+				                             self.mfi_y_rot )
 				self.mfi_b_z_fits = fit_lin( self.mfi_s,
-				                             self.mfi_z_t )
+				                             self.mfi_z_rot )
 
 				self.mfi_x_fit = \
 				             self.mfi_b_x_fits['fitfunc']( ind )
@@ -1291,23 +1316,7 @@ class core( QObject ) :
 
 #		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'fit' )
 
-		# Smooth the rotated raw magnetic field data using the median
-		# filter of given window size.
-
-		self.plt_x_smt = medfilt(
-		                         self.mfi_x_t, self.opt['mom_med_fil'] )
-		self.plt_y_smt = medfilt(
-		                         self.mfi_y_t, self.opt['mom_med_fil'] )
-		self.plt_z_smt = medfilt(
-		                         self.mfi_z_t, self.opt['mom_med_fil'] )
-
-		self.plt_vec_smt = [ self.plt_x_smt, self.plt_y_smt,
-		                     self.plt_z_smt                   ]
-
-		# Smooth the non-rotated magnetic filed data using the median
-		# filter of given windows size.
-
-		# NOTE: We have two smoothed data because we are using the
+		# NOTE: We have three smoothed data because we are using the
 		# rotated one to plot the graph and look at the periodic
 		# behaviour of the data whereas the non-rotated one is used to
 		# carry out the non-linear analysis.
@@ -1315,39 +1324,118 @@ class core( QObject ) :
 		# TODO: Need to do the same thing for fit data as well. As of
 		# now, the algorithm only fits the rotated data.
 
-		self.mfi_x_smt = medfilt(
+		# Smooth the raw magnetic field data using the median filter of
+		# given window size and calculate its standard deviation.
+
+		self.mfi_x_raw_smt = medfilt(
 		                         self.mfi_b_x, self.opt['mom_med_fil'] )
-		self.mfi_y_smt = medfilt(
+		self.mfi_y_raw_smt = medfilt(
 		                         self.mfi_b_y, self.opt['mom_med_fil'] )
-		self.mfi_z_smt = medfilt(
+		self.mfi_z_raw_smt = medfilt(
 		                         self.mfi_b_z, self.opt['mom_med_fil'] )
 
-		self.mfi_vec_smt = [ self.mfi_x_smt, self.mfi_y_smt,
-		                     self.mfi_z_smt                   ]
+		self.mfi_vec_raw_smt = [ self.mfi_x_raw_smt, self.mfi_y_raw_smt,
+		                         self.mfi_z_raw_smt                    ]
 
-		self.mfi_avg_vec_smt = array( [ mean( self.mfi_x_smt),
-		                                mean( self.mfi_y_smt),
-		                                mean( self.mfi_z_smt)  ] )
+		self.mfi_vec_raw_smt_sig = [ std( self.mfi_x_raw_smt ),
+		                             std( self.mfi_y_raw_smt ),
+		                             std( self.mfi_z_raw_smt ) ]
 
-		self.mfi_avg_mag_smt = sqrt( self.mfi_avg_vec_smt[0]**2 +
-		                             self.mfi_avg_vec_smt[1]**2 +
-		                             self.mfi_avg_vec_smt[2]**2   )
+		self.mfi_vec_raw_sig = [ std( self.mfi_b_x ),
+		                         std( self.mfi_b_y ),
+		                         std( self.mfi_b_z ) ]
 
-		self.mfi_avg_nrm_smt =\
-		                     self.mfi_avg_vec_smt / self.mfi_avg_mag_smt
+		self.mfi_avg_vec_raw_smt = array( [ mean( self.mfi_x_raw_smt),
+		                                    mean( self.mfi_y_raw_smt),
+		                                    mean( self.mfi_z_raw_smt) ])
+
+		self.mfi_avg_mag_raw_smt = sqrt( self.mfi_avg_vec_raw_smt[0]**2+
+		                                 self.mfi_avg_vec_raw_smt[1]**2+
+		                                 self.mfi_avg_vec_raw_smt[2]**2)
+
+		self.mfi_avg_nrm_raw_smt =\
+		             self.mfi_avg_vec_raw_smt / self.mfi_avg_mag_raw_smt
+
+		# Smooth the rotated magnetic field data using the median filter
+		# of given window size and calculate its standard deviation.
+
+		self.mfi_x_rot_smt = medfilt(
+		                       self.mfi_x_rot, self.opt['mom_med_fil'] )
+		self.mfi_y_rot_smt = medfilt(
+		                       self.mfi_y_rot, self.opt['mom_med_fil'] )
+		self.mfi_z_rot_smt = medfilt(
+		                       self.mfi_z_rot, self.opt['mom_med_fil'] )
+
+		self.mfi_vec_rot_smt = [ self.mfi_x_rot_smt, self.mfi_y_rot_smt,
+		                       self.mfi_z_rot_smt                      ]
+
+		self.mfi_vec_rot_smt_sig = [ std( self.mfi_x_rot_smt ),
+		                             std( self.mfi_y_rot_smt ),
+		                             std( self.mfi_z_rot_smt ) ]
+
+		self.mfi_vec_rot_sig = [ std( self.mfi_x_rot ),
+		                         std( self.mfi_y_rot ),
+		                         std( self.mfi_z_rot ) ]
+
+		self.mfi_avg_vec_rot_smt = array( [ mean( self.mfi_x_rot_smt),
+		                                    mean( self.mfi_y_rot_smt),
+		                                    mean( self.mfi_z_rot_smt)] )
+
+		self.mfi_avg_mag_rot_smt = sqrt( self.mfi_avg_vec_rot_smt[0]**2+
+		                                 self.mfi_avg_vec_rot_smt[1]**2+
+		                                 self.mfi_avg_vec_rot_smt[2]**2)
+
+		self.mfi_avg_nrm_rot_smt =\
+		             self.mfi_avg_vec_rot_smt / self.mfi_avg_mag_rot_smt
+
+		# Smooth the fitted magnetic field data using the median filter of
+		# given window size and calculate its standard deviation.
+
+		self.mfi_x_fit_smt = medfilt(
+		                       self.mfi_x_fit, self.opt['mom_med_fil'] )
+		self.mfi_y_fit_smt = medfilt(
+		                       self.mfi_y_fit, self.opt['mom_med_fil'] )
+		self.mfi_z_fit_smt = medfilt(
+		                       self.mfi_z_fit, self.opt['mom_med_fil'] )
+
+		self.mfi_vec_fit_smt = [ self.mfi_x_fit_smt, self.mfi_y_fit_smt,
+		                         self.mfi_z_fit_smt                    ]
+
+		self.mfi_vec_fit_smt_sig = [ std( self.mfi_x_fit_smt ),
+		                             std( self.mfi_y_fit_smt ),
+		                             std( self.mfi_z_fit_smt ) ]
+
+		self.mfi_vec_fit_sig = [ std( self.mfi_x_fit ),
+		                         std( self.mfi_y_fit ),
+		                         std( self.mfi_z_fit ) ]
+
+		self.mfi_avg_vec_fit_smt = array( [ mean( self.mfi_x_fit_smt),
+		                                    mean( self.mfi_y_fit_smt),
+		                                    mean( self.mfi_z_fit_smt)] )
+
+		self.mfi_avg_mag_fit_smt = sqrt( self.mfi_avg_vec_fit_smt[0]**2+
+		                                 self.mfi_avg_vec_fit_smt[1]**2+
+		                                 self.mfi_avg_vec_fit_smt[2]**2)
+
+		self.mfi_avg_nrm_fit_smt =\
+		             self.mfi_avg_vec_fit_smt / self.mfi_avg_mag_fit_smt
 
 		# Assign all the magnetic fields to a dictionary
 
-		if( any ( x is None for x in self.mfi_b_vec   ) or
-		    any ( x is None for x in self.mfi_vec_fit ) or
-		    any ( x is None for x in self.mfi_vec_smt )     ) :
+		if( any ( x is None for x in self.mfi_vec_raw ) or
+		    any ( x is None for x in self.mfi_vec_rot ) or
+		    any ( x is None for x in self.mfi_vec_fit )     ) :
 
 			self.mfi_fields = None
 		else :
 
-			self.mfi_fields = { "mfi_set_raw": self.mfi_b_vec,
-			                    "mfi_set_fit": self.mfi_vec_fit,
-			                    "mfi_set_smt": self.mfi_vec_smt   }
+			self.mfi_fields = {
+			               "mfi_set_raw"    : self.mfi_vec_raw,
+			               "mfi_set_rot"    : self.mfi_vec_rot,
+			               "mfi_set_fit"    : self.mfi_vec_fit,
+			               "mfi_set_raw_smt": self.mfi_vec_raw_smt,
+			               "mfi_set_rot_smt": self.mfi_vec_rot_smt,
+			               "mfi_set_fit_smt": self.mfi_vec_fit_smt }
 
 		# Use interpolation to estiamte the magnetic field vector for
 		# each datum in the FC spectrum.
@@ -2890,14 +2978,27 @@ class core( QObject ) :
 		self.nln_res_plas['b0_y']     = self.mfi_avg_vec[1]
 		self.nln_res_plas['b0_z']     = self.mfi_avg_vec[2]
 
-		self.nln_res_plas['sig_b0_x'] = self.mfi_b_x_sig
-		self.nln_res_plas['sig_b0_y'] = self.mfi_b_y_sig
-		self.nln_res_plas['sig_b0_z'] = self.mfi_b_z_sig
+		self.nln_res_plas['sig_b0_x'] = self.mfi_vec_raw_sig[0]
+		self.nln_res_plas['sig_b0_y'] = self.mfi_vec_raw_sig[1]
+		self.nln_res_plas['sig_b0_z'] = self.mfi_vec_raw_sig[2]
 
 		self.nln_res_plas['sig_b0']   = self.mfi_b_sig
 
-		print self.nln_res_plas['sig_b0_z']
+		self.nln_res_plas['mfi_fields'] = {
+		                               'raw'    : self.mfi_vec_raw,
+		                               'rot'    : self.mfi_vec_rot,
+		                               'fit'    : self.mfi_vec_fit,
+		                               'raw_smt': self.mfi_vec_raw_smt,
+		                               'rot_smt': self.mfi_vec_rot_smt,
+		                               'fit_smt': self.mfi_vec_fit_smt }
 
+		self.nln_res_plas[ 'sig_mfi_fields'] = {
+		                       'sig_raw'    : self.mfi_vec_raw_sig,
+		                       'sig_smt'    : self.mfi_vec_rot_sig,
+		                       'sig_fit'    : self.mfi_vec_fit_sig,
+		                       'sig_raw_smt': self.mfi_vec_raw_smt_sig,
+		                       'sig_rot_smt': self.mfi_vec_rot_smt_sig,
+		                       'sig_fit_smt': self.mfi_vec_fit_smt_sig }
 
 		pop_v0_vec                    = [fit[0], fit[1], fit[2]]
 		self.nln_res_plas['v0_x']     =  fit[0]
@@ -2910,6 +3011,7 @@ class core( QObject ) :
 		self.nln_res_plas['fv']       =  fit[3]
 		self.nln_res_plas['sig_fv']   =  sig[3]
 
+		print fit[3], sig[3]
 #		print self.nln_res_plas['fv'], sig[3]
 		c = 4
 
@@ -3356,31 +3458,34 @@ class core( QObject ) :
 
 		# Reset the options dictionary to its default values.
 
-		self.opt = { 'res_par'       :True,
-		             'res_par_dw'    :True,
-		             'res_par_dt'    :True,
-		             'res_par_n'     :True,
-		             'res_par_v'     :True,
-		             'res_par_fv'    :True,
-		             'res_par_d'     :True,
-		             'res_par_w'     :True,
-		             'res_par_r'     :True,
-		             'res_par_b'     :True,
-		             'res_par_s'     :True,
-		             'res_par_k'     :True,
-		             'res_par_u'     :True,
-		             'fls_max_fc'    :float('inf'),
-		             'fls_max_spin'  :float('inf'),
-		             'fls_max_mfi_l' :float('inf'),
-		             'fls_max_mfi_h' :float('inf'),
-		             'fls_src_low'   :True,
-		             'fls_src_high'  :False,
-		             'mom_fit_crv'   :True,
-		             'mom_fit_fft'   :False,
- 		             'mom_med_fil'   :int('1'),
-		             'mfi_set_raw'   :True,
-		             'mfi_set_fit'   :False,
-		             'mfi_set_smt'   :False    }
+		self.opt = { 'res_par'         :True,
+		             'res_par_dw'      :True,
+		             'res_par_dt'      :True,
+		             'res_par_n'       :True,
+		             'res_par_v'       :True,
+		             'res_par_fv'      :True,
+		             'res_par_d'       :True,
+		             'res_par_w'       :True,
+		             'res_par_r'       :True,
+		             'res_par_b'       :True,
+		             'res_par_s'       :True,
+		             'res_par_k'       :True,
+		             'res_par_u'       :True,
+		             'fls_max_fc'      :float('inf'),
+		             'fls_max_spin'    :float('inf'),
+		             'fls_max_mfi_l'   :float('inf'),
+		             'fls_max_mfi_h'   :float('inf'),
+		             'fls_src_low'     :True,
+		             'fls_src_high'    :False,
+		             'mom_fit_crv'     :True,
+		             'mom_fit_fft'     :False,
+ 		             'mom_med_fil'     :int('1'),
+		             'mfi_set_raw'     :True,
+		             'mfi_set_rot'     :False,
+		             'mfi_set_fit'     :False,
+		             'mfi_set_raw_smt' :False,
+		             'mfi_set_rot_smt' :False,
+		             'mfi_set_fit_smt' :False           }
 
 		# If requested, propagate any changes.
 

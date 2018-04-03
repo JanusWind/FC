@@ -31,7 +31,7 @@ fname=[]
 i = 0
 
 #for file in glob.glob("janus_2008-11-04-12-00-41_2008-11-04-12-52-53.jns"):
-for file in glob.glob("test.jns"):
+for file in glob.glob("test1.jns"):
         fname.append( file )
 
 dat    = [0]*len(fname)
@@ -74,9 +74,61 @@ count  = 0
 
 for i in range (len(fname)):
 
+	# Extract/compute everything related to magnetic field.
+
+	dat_b_fields_raw = np.array( dat[i]['b0_fields'][i]['raw'] )
+	dat_b_fields_smt = np.array( dat[i]['b0_fields'][i]['smt'] )
+	dat_b_fields_fit = np.array( dat[i]['b0_fields'][i]['fit'] )
+
+	dat_b_fields_sig_raw = np.array( dat[i]['sig_b0_fields'][i]['sig_raw'] )
+	dat_b_fields_sig_smt = np.array( dat[i]['sig_b0_fields'][i]['sig_smt'] )
+	dat_b_fields_sig_fit = np.array( dat[i]['sig_b0_fields'][i]['sig_fit'] )
+
+	dat_b_x_raw = [ dat_b_fields_raw[0][j]
+	                for j in range( len( dat_b_fields_raw[0] ) ) ]
+
+	dat_b_y_raw = [ dat_b_fields_raw[1][j]
+	                for j in range( len( dat_b_fields_raw[1] ) ) ]
+
+	dat_b_z_raw = [ dat_b_fields_raw[2][j]
+	                for j in range( len( dat_b_fields_raw[2] ) ) ]
+
+	dat_b_x_smt = [ dat_b_fields_smt[0][j]
+	                for j in range( len( dat_b_fields_smt[0] ) ) ]
+
+	dat_b_y_smt = [ dat_b_fields_smt[1][j]
+	                for j in range( len( dat_b_fields_smt[1] ) ) ]
+
+	dat_b_z_smt = [ dat_b_fields_smt[2][j]
+	                for j in range( len( dat_b_fields_smt[2] ) ) ]
+
+	dat_b_x_fit = [ dat_b_fields_fit[0][j]
+	                for j in range( len( dat_b_fields_fit[0] ) ) ]
+
+	dat_b_y_fit = [ dat_b_fields_fit[1][j]
+	                for j in range( len( dat_b_fields_fit[1] ) ) ]
+
+	dat_b_z_fit = [ dat_b_fields_fit[2][j]
+	                for j in range( len( dat_b_fields_fit[2] ) ) ]
+
+	dat_b_x_sig_raw = dat_b_fields_sig_raw[0]
+	dat_b_y_sig_raw = dat_b_fields_sig_raw[1]
+	dat_b_z_sig_raw = dat_b_fields_sig_raw[2]
+
+	dat_b_x_sig_smt = dat_b_fields_sig_smt[0]
+	dat_b_y_sig_smt = dat_b_fields_sig_smt[1]
+	dat_b_z_sig_smt = dat_b_fields_sig_smt[2]
+
+	dat_b_x_sig_fit = dat_b_fields_sig_fit[0]
+	dat_b_y_sig_fit = dat_b_fields_sig_fit[1]
+	dat_b_z_sig_fit = dat_b_fields_sig_fit[2]
+
         dat_b_hat      = np.array( dat[i]['b0_hat']       )
         dat_b_sig      = np.array( dat[i]['b0_sig']       )
 	dat_b_r        = dat_b_sig/np.array( dat[i]['b0'] )
+
+	# Extract other parameters computed in 'janus_pyon'.
+
         dat_r_p        = np.array( dat[i]['r_p']          )
         dat_r_p_c      = np.array( dat[i]['r_p_c']        )
         dat_r_p_b      = np.array( dat[i]['r_p_b']        )
