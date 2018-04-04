@@ -2650,8 +2650,6 @@ class core( QObject ) :
 		if ( ( len( pop ) == 0 ) or
 		     ( self.n_mfi == 0 )    ) :
 
-			self.vldt_nln_sel( )
-
 			return
 
 		# Select data based on the selection windows from each of the

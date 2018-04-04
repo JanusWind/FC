@@ -7,14 +7,15 @@ os.system('cls' if os.name == 'nt' else 'clear') # Clear the screen
 import glob
 import pickle
 import numpy as np
-from numpy import mean, sqrt
+from numpy import mean, sqrt, corrcoef
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 from pylab import rcParams
+from scipy.optimize import curve_fit
 
 from numpy import linspace, pi, sqrt, exp
 
-rcParams['figure.figsize'] = 5.5,5.5
+rcParams['figure.figsize'] = 20, 10
 
 plt.clf()
 plt.close()
@@ -250,13 +251,50 @@ if Place == 'w' :
 else:
         os.chdir("/home/ramiz/Dropbox/Studies/Research/Janus_Research")
 
-plt.errorbar( dat_fv_p_c, sig_bb, xerr=sig_b, yerr=dat_b_sig, fmt='o', ecolor='g' )
+
+def fitlin( b, v ) :
+
+	def linfunc( b, m, c ) :
+
+		return m * b + c
+
+	popt, pcov = curve_fit( linfunc, b, v )
+	m, c = popt
+
+	fitfunc = lambda b: m * b + c
+
+	return { "slope"   : m,
+	         "offset"  : c,
+	         "fitfunc" : fitfunc,
+	         "rawres"  : ( popt,pcov ) }
+
+ind = linspace( 0., max( sig_bb ), len( sig_bb ) )
+
+dat_fit = fitlin( sig_bb, dat_fv_p_c )
+
+m = dat_fit['slope']
+c = dat_fit['offset']
+
+y_fit = [ ( m*ind[i] + c ) for i in range( len( sig_bb ) ) ]
+
+cv = corrcoef(sig_bb, dat_fv_p_c )[0,1]
+
+fit_x = dat_fit['fitfunc'](ind)
+plt.errorbar( sig_bb, dat_fv_p_c, yerr=sig_b, fmt='o', ecolor='g' )
+plt.plot( ind, y_fit )
+
 #plt.scatter( dat_fv_p_c, sig_bb )
 #plt.scatter( t_fvpc, t_b_r )
-plt.ylim((min(sig_bb)-0.1*min(sig_bb), ( max(sig_bb)+ 0.1*max(sig_bb))))
-plt.xlim((min(dat_fv_p_c)+0.1*min(dat_fv_p_c), ( max(dat_fv_p_c)+ 0.1*max(dat_fv_p_c))))
-plt.xlabel('Fluctuating Velocity (km/sec) ', fontsize = 14 )
-plt.ylabel(r'$\frac{\sigma_B}{| \vec B|}$', fontsize = 18 )
+
+plt.ylim((min(dat_fv_p_c)+0.1*min(dat_fv_p_c), ( max(dat_fv_p_c)+ 0.1*max(dat_fv_p_c))))
+plt.xlim(( 0., ( max(sig_bb)+ 0.1*max(sig_bb))))
+
+plt.text( 0.09, 2.8, 'Slope = %s\n Offset = %s\n Corr Coeff = %s\n'
+       %( round( m, 2 ), round( c, 2 ), round( cv, 2 ) ) )
+
+plt.xlabel(r'$\frac{\sigma_B}{| \vec B|}$', fontsize = 18 )
+plt.ylabel('Fluctuating Velocity (km/sec)', fontsize = 14 )
+
 plt.title(r'$\frac{\sigma_B}{| \vec B|}$ vs Fluctuating Velocity with error bars', fontsize = 18 )
 plt.show( )
 
