@@ -36,7 +36,7 @@ from numpy import amax, amin, append, arccos, arctan2, arange, argsort, array, \
                     average, cos, deg2rad, diag, dot, exp, indices, interp, \
                     mean, pi, polyfit, rad2deg, reshape, sign, sin, sum, sqrt, \
                     std, tile, transpose, where, zeros, shape, abs, linspace,\
-                    cross, angle, argmax, max, zeros_like, argmin
+                    cross, angle, argmax, max, zeros_like, argmin, corrcoef
 
 from numpy.linalg import lstsq, norm
 from numpy.fft import rfftfreq, fftfreq, fft, irfft, rfft
@@ -57,7 +57,7 @@ from janus_fc_spec import fc_spec
 from janus_pyon import plas, series
 
 import matplotlib.pyplot as plt
-plt.close('all')
+#plt.close('all')
 
 # Load the modules necessary for saving results to a data file.
 
@@ -72,7 +72,7 @@ start = time.time( )
 arcv = mfi_arcv_hres( )
 
 ( mfi_t, mfi_b_x, mfi_b_y,
-  mfi_b_z ) = arcv.load_rang('2008-11-04-12-00-00', 500 )
+  mfi_b_z ) = arcv.load_rang('2008-11-04-11-55-00', 600 )
 
 # Establish the number of data.
 
@@ -118,7 +118,7 @@ mfi_avg_nrm = mfi_avg_vec / mfi_avg_mag
 mfi_nrm     = [ ( mfi_b_x[i], mfi_b_y[i],
                   mfi_b_z[i] ) /mfi_b[i]
                   for i in range( len( mfi_b ) ) ]
-'''
+
 z  = [0., 0., 1.]
 e1 = mfi_avg_nrm
 e2 = cross( z, e1 )/ norm( cross( e1, z ) )
@@ -133,16 +133,28 @@ bz = [ sum( [ mfi_b_vec[i][j]*e3[j] for j in range(3)] )
 
 b_vec = [ [ bx[i], by[i], bz[i] ] for i in range( len( mfi_s ) ) ]
 
-bx = medfilt( bx, 11 )
-by = medfilt( by, 11 )
-bz = medfilt( bz, 11 )
+bxf = medfilt( bx, 11 )
+byf = medfilt( by, 11 )
+bzf = medfilt( bz, 11 )
+
+ind1 = 0
+ind2 = 600
+
+cf = [ None ] * ( len( bx )/100) 
+
+for i in range( len( bx )/100 ) :
+
+	j = ind1 + i * 90
+	k = ind2 + i * 90
+	cf[i] =  corrcoef( by[j:k], bz[j:k] )[0][1]
+
 
 # Define the time interval between measurements
 
 dt = mfi_s[1] - mfi_s[0]
 
 # Compute all the frequencies.
-
+'''
 fq1 = rfftfreq( len( mfi_s ), d = dt )
 
 # Compute the Fourier Transform of each component of magnetic field.
