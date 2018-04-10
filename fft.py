@@ -72,7 +72,7 @@ start = time.time( )
 arcv = mfi_arcv_hres( )
 
 ( mfi_t, mfi_b_x, mfi_b_y,
-  mfi_b_z ) = arcv.load_rang('2008-11-04-11-55-00', 600 )
+  mfi_b_z ) = arcv.load_rang('2008-11-04-11-57-25', 3600 )
 
 # Establish the number of data.
 
@@ -138,16 +138,15 @@ byf = medfilt( by, 11 )
 bzf = medfilt( bz, 11 )
 
 ind1 = 0
-ind2 = 600
+ind2 = 990
 
-cf = [ None ] * ( len( bx )/100) 
+cf = [ None ] * ( len( bx )/990) 
 
-for i in range( len( bx )/100 ) :
+for i in range( len( bx )/990 ) :
 
-	j = ind1 + i * 90
-	k = ind2 + i * 90
+	j = ind1 + i * 990
+	k = ind2 + i * 990
 	cf[i] =  corrcoef( by[j:k], bz[j:k] )[0][1]
-
 
 # Define the time interval between measurements
 

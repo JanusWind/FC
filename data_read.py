@@ -74,6 +74,7 @@ t_wparp   = [0]*nd # Total thermal speed of proton
 t_b_r     = [0]*nd
 sig_b     = [0]*nd
 sig_bb    = [0]*nd
+error_sigbb = [0]*nd
 
 dat_b_x_sig_raw = [0]*nd
 dat_b_y_sig_raw = [0]*nd
@@ -137,7 +138,9 @@ for i in range ( len( fname ) ) :
 
 #		sig_b2[j]      = sqrt( sum( dat_b_y_rot**2 + dat_b_z_rot**2 ) /
 #		                                       ( len( dat_b_x_rot    ) ) )
-	
+
+		error_sigbb[j] = abs( sig_b[j] - dat_b_x_sig_rot[j] )
+
 		sig_bb[j] = sig_b[j] / mean( dat_b_x_rot )
 	
 	        dat_b_hat      = np.array( dat[i]['b0_hat']       )
@@ -145,6 +148,8 @@ for i in range ( len( fname ) ) :
 	
 		dat_b_r        = dat_b_sig/np.array( dat[i]['b0'] )
 	
+		dat_sig_fvpc   = np.array( dat[i]['sig_fv_p_c']   )
+
 		# Extract other parameters computed in 'janus_pyon'.
 	
 		dat_r_p        = np.array( dat[i]['r_p']          )
@@ -280,7 +285,8 @@ y_fit = [ ( m*ind[i] + c ) for i in range( len( sig_bb ) ) ]
 cv = corrcoef(sig_bb, dat_fv_p_c )[0,1]
 
 fit_x = dat_fit['fitfunc'](ind)
-plt.errorbar( sig_bb, dat_fv_p_c, yerr=sig_b, fmt='o', ecolor='g' )
+plt.errorbar( sig_bb, dat_fv_p_c, yerr=dat_sig_fvpc,
+                                                           fmt='o', ecolor='g' )
 plt.plot( ind, y_fit )
 
 #plt.scatter( dat_fv_p_c, sig_bb )
