@@ -257,13 +257,15 @@ else:
         os.chdir("/home/ramiz/Dropbox/Studies/Research/Janus_Research")
 
 
-def fitlin( b, v ) :
+def fitlin( b, v, sigma ) :
 
 	def linfunc( b, m, c ) :
 
 		return m * b + c
 
-	popt, pcov = curve_fit( linfunc, b, v )
+#	sigma = [1]*len(b)
+#	sigma[0]= 0.01
+	popt, pcov = curve_fit( linfunc, b, v, sigma=sigma )
 	m, c = popt
 
 	fitfunc = lambda b: m * b + c
@@ -275,7 +277,7 @@ def fitlin( b, v ) :
 
 ind = linspace( 0., max( sig_bb ), len( sig_bb ) )
 
-dat_fit = fitlin( sig_bb, dat_fv_p_c )
+dat_fit = fitlin( sig_bb, dat_fv_p_c , dat_sig_fvpc )
 
 m = dat_fit['slope']
 c = dat_fit['offset']
@@ -286,7 +288,8 @@ cv = corrcoef(sig_bb, dat_fv_p_c )[0,1]
 
 fit_x = dat_fit['fitfunc'](ind)
 plt.errorbar( sig_bb, dat_fv_p_c, yerr=dat_sig_fvpc,
-                                                           fmt='o', ecolor='g' )
+                                                fmt='o', ecolor='g' )
+#plt.xlim[0,1]
 plt.plot( ind, y_fit )
 
 #plt.scatter( dat_fv_p_c, sig_bb )
@@ -295,13 +298,13 @@ plt.plot( ind, y_fit )
 plt.ylim((min(dat_fv_p_c)+0.1*min(dat_fv_p_c), ( max(dat_fv_p_c)+ 0.1*max(dat_fv_p_c))))
 plt.xlim(( 0., ( max(sig_bb)+ 0.1*max(sig_bb))))
 
-plt.text( 0.09, 2.8, 'Slope = %s\n Offset = %s\n Corr Coeff = %s\n'
-       %( round( m, 2 ), round( c, 2 ), round( cv, 2 ) ) )
+plt.text( 0.08, 2.5, 'Slope = %s\n Offset = %s\n Corr Coeff = %s\n'
+       %( round( m, 2 ), round( c, 2 ), round( cv, 2 ) ), fontsize=22 )
 
-plt.xlabel(r'$\frac{\sigma_B}{| \vec B|}$', fontsize = 18 )
-plt.ylabel('Fluctuating Velocity (km/sec)', fontsize = 14 )
+plt.xlabel(r'$\frac{\sigma_B}{| \vec B|}$', fontsize = 28 )
+plt.ylabel('Fluctuating Velocity (km/sec)', fontsize = 22 )
 
-plt.title(r'$\frac{\sigma_B}{| \vec B|}$ vs Fluctuating Velocity with error bars', fontsize = 18 )
+#plt.title(r'$\frac{\sigma_B}{| \vec B|}$ vs Fluctuating Velocity with error bars', fontsize = 24 )
 plt.show( )
 
 '''
