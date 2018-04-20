@@ -188,9 +188,9 @@ class widget_nln_res( format_TextEdit ) :
 			                    '</i></sub>'
 				lab_a_vel = '<i>V<sub>' +'av'+ sym + \
 				            '</sub></i>'
-				lab_b_frq = '<i>f</i><sub>' + sym + \
+				lab_oplas = '<i>f</i><sub>' + sym + \
 				            '</i></sub>'
-				lab_c_frq = '<i>&omega;<sub>' + sym + \
+				lab_ocycl = '<i>&omega;<sub>' + sym + \
 				            '</i></sub>'
 				lab_s     = '<i>S<sub>' + spc['sym'] + \
 				            '</sub></i>'
@@ -422,15 +422,13 @@ class widget_nln_res( format_TextEdit ) :
 
 				self.prnt_brk( )
 				self.prnt_tab( 2 )
-				self.prnt_htm( lab_b_frq + ' = ' )
-				self.prnt_dcm(
-				            pop['mag_wav_frq'], 4, '1/s' )
+				self.prnt_htm( lab_oplas + ' = ' )
+				self.prnt_dcm( pop['oplas'], 4, '1/s' )
 
 				self.prnt_brk( )
 				self.prnt_tab( 2 )
-				self.prnt_htm( lab_c_frq + ' = ' )
-				self.prnt_dcm(
-				            pop['aic_wav_frq'], 4, '1/s' )
+				self.prnt_htm( lab_ocycl + ' = ' )
+				self.prnt_dcm( pop['ocycl'], 4, '1/s' )
 
 					# Clear the first population indicator.
 

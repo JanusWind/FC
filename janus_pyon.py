@@ -32,8 +32,8 @@ from janus_const import const
 ################################################################################
 
 PARAM = [ 'b0', 'v0', 'fv', 'n', 'v', 'dv', 'w', 'w2', 'r', 't', 'beta', 'time',
-          's', 'm','q', 'k', 'beta_par', 'beta_per', 'alfv_vel', 'frq_mag_wav',
-          'frq_aic_wav'                                                        ]
+          's', 'm','q', 'k', 'beta_par', 'beta_per', 'alfv_vel', 'oplas',
+          'ocycl'                                                        ]
 
 COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat', 'fields' ]
 
@@ -168,7 +168,7 @@ class plas( object ) :
 		self.sig_b0_y = None
 		self.sig_b0_z = None
 
-		self.frq_mag_wav = None
+		self.oplas = None
 
 		self.b0_fields     = dict.fromkeys( [ 'raw', 'rot', 'fit',
 		                                       'raw_smt', 'rot_smt',
@@ -409,9 +409,9 @@ class plas( object ) :
 			else :
 				return self.sig_fv
 
-		elif ( elem['param'] == 'frq' ) :
+		elif ( elem['param'] == 'oplas' ) :
 
-			return self.frq_mag_wav
+			return self.oplas
 
 		# Note.  If this point is reached, the parameter is one to be
 		#        handled by the species or population.
@@ -644,13 +644,13 @@ class plas( object ) :
 
 				self.sig_b0_z = float( value )
 
-		elif ( key == 'mag_wav_frq' ) :
+		elif ( key == 'oplas' ) :
 
-			self.mag_wav_frq = None
+			self.oplas = None
 
 			if ( value is not None ) :
 
-				self.mag_wav_frq = float( value )
+				self.oplas = float( value )
 
 		else :
 
@@ -1241,10 +1241,10 @@ class spec( object ) :
 
 			return  ret
 
-		elif ( key == 'aic_wav_frq' ) :
+		elif ( key == 'ocycl' ) :
 
 			alfv_vel = self['alfv_vel']
-			b_frq = self['mag_wav_frq']
+			b_frq = self['oplas']
 			v_sw = self['v0']
 
 			return b_frq * alfv_vel/( 2 * 3.14 * v_sw)
@@ -1931,10 +1931,10 @@ class pop( object ) :
 
 			return  ret
 
-		elif ( key == 'aic_wav_frq' ) :
+		elif ( key == 'ocycl' ) :
 
 			alfv_vel = self['alfv_vel']
-			b_frq = self['mag_wav_frq']
+			b_frq = self['oplas']
 			v_sw = self['v0']
 
 			return b_frq * alfv_vel/( 2 * 3.14 * v_sw)

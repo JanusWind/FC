@@ -2998,11 +2998,11 @@ class core( QObject ) :
 		                       'sig_rot_smt': self.mfi_vec_rot_smt_sig,
 		                       'sig_fit_smt': self.mfi_vec_fit_smt_sig }
 
-		self.nln_res_plas['mag_wav_frq'] = ( self.mfi_amp_y *
+		self.nln_res_plas['oplas'] = ( self.mfi_amp_y *
 		            self.mfi_frq_y + self.mfi_amp_z * self.mfi_frq_z )/\
 		                           ( self.mfi_amp_y + self.mfi_amp_z )
 
-		print self.nln_res_plas['mag_wav_frq'] 
+		print self.nln_res_plas['oplas'] 
  
 		pop_v0_vec                    = [fit[0], fit[1], fit[2]]
 		self.nln_res_plas['v0_x']     =  fit[0]
