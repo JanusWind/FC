@@ -2998,6 +2998,12 @@ class core( QObject ) :
 		                       'sig_rot_smt': self.mfi_vec_rot_smt_sig,
 		                       'sig_fit_smt': self.mfi_vec_fit_smt_sig }
 
+		self.nln_res_plas['mag_wav_frq'] = ( self.mfi_amp_y *
+		            self.mfi_frq_y + self.mfi_amp_z * self.mfi_frq_z )/\
+		                           ( self.mfi_amp_y + self.mfi_amp_z )
+
+		print self.nln_res_plas['mag_wav_frq'] 
+ 
 		pop_v0_vec                    = [fit[0], fit[1], fit[2]]
 		self.nln_res_plas['v0_x']     =  fit[0]
 		self.nln_res_plas['v0_y']     =  fit[1]
@@ -3276,11 +3282,11 @@ class core( QObject ) :
 				else :
 					self.opt['res_par_dw'] = True
 
-			if ( self.opt['res_par_n']  or self.opt['res_par_v'] or
-			     self.opt['res_par_fv'] or self.opt['res_par_d'] or
-			     self.opt['res_par_w']  or self.opt['res_par_r'] or
-        	             self.opt['res_par_b']  or self.opt['res_par_s'] or 
-        	             self.opt['res_par_k']                           ) :
+			if ( self.opt['res_par_n']  or self.opt['res_par_v']  or
+			     self.opt['res_par_fv'] or self.opt['res_par_d']  or
+			     self.opt['res_par_w']  or self.opt['res_par_r']  or
+        	             self.opt['res_par_b']  or self.opt['res_par_av'] or
+			     self.opt['res_par_s']  or self.opt['res_par_k'] ) :
 				self.opt['res_par'] = True
 			else :
 				self.opt['res_par'] = False
@@ -3466,6 +3472,7 @@ class core( QObject ) :
 		             'res_par_w'       :True,
 		             'res_par_r'       :True,
 		             'res_par_b'       :True,
+		             'res_par_av'      :True,
 		             'res_par_s'       :True,
 		             'res_par_k'       :True,
 		             'res_par_u'       :True,

@@ -174,18 +174,24 @@ class widget_nln_res( format_TextEdit ) :
 				lab_dv    = '<i>&Delta;v</i><sub>||<i>' + \
 				                 sym + '</i></sub>'
 				lab_w     = '<i>w<sub>' + sym + '</sub></i>'
-				lab_w_per = '<i>w</i><sub>&perp;<i>' + \
-				                 sym + '</i></sub>'
-				lab_w_par = '<i>w</i><sub>||<i>' + \
-				                 sym + '</i></sub>'
+				lab_w_per = '<i>w</i><sub>&perp;<i>' + sym + \
+				            '</i></sub>'
+				lab_w_par = '<i>w</i><sub>||<i>' + sym + \
+				            '</i></sub>'
 				lab_r     = '<i>R<sub>' + sym + '</sub></i>'
-				lab_b     = '<i>&beta;</i><sub>||<i>' + \
-				                sym + '</i></sub>'
+				lab_b     = '<i>&beta;</i><sub>||<i>' + sym + \
+				            '</i></sub>'
 				lab_t     = '<i>T<sub>' + sym + '</sub></i>'
-				lab_t_per = '<i>T</i><sub>&perp;<i>' + \
-				                 sym + '</i></sub>'
-				lab_t_par = '<i>T</i><sub>||<i>' + \
-			                 sym + '</i></sub>'
+				lab_t_per = '<i>T</i><sub>&perp;<i>' + sym + \
+				            '</i></sub>'
+				lab_t_par = '<i>T</i><sub>||<i>' + sym + \
+			                    '</i></sub>'
+				lab_a_vel = '<i>V<sub>' +'av'+ sym + \
+				            '</sub></i>'
+				lab_b_frq = '<i>f</i><sub>' + sym + \
+				            '</i></sub>'
+				lab_c_frq = '<i>&omega;<sub>' + sym + \
+				            '</i></sub>'
 				lab_s     = '<i>S<sub>' + spc['sym'] + \
 				            '</sub></i>'
 				lab_k     = '<i>K<sub>' + spc['sym'] + \
@@ -405,6 +411,26 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_tab( 2 )
 					self.prnt_htm( lab_b + ' = ' )
 					self.prnt_dcm( pop['beta_par'], 4 )
+
+				if ( self.core.opt['res_par_av'] ) :
+
+					self.prnt_brk( )
+					self.prnt_tab( 2 )
+					self.prnt_htm( lab_a_vel + ' = ' )
+					self.prnt_dcm(
+					            pop['alfv_vel'], 4, 'km/s' )
+
+				self.prnt_brk( )
+				self.prnt_tab( 2 )
+				self.prnt_htm( lab_b_frq + ' = ' )
+				self.prnt_dcm(
+				            pop['mag_wav_frq'], 4, '1/s' )
+
+				self.prnt_brk( )
+				self.prnt_tab( 2 )
+				self.prnt_htm( lab_c_frq + ' = ' )
+				self.prnt_dcm(
+				            pop['aic_wav_frq'], 4, '1/s' )
 
 					# Clear the first population indicator.
 

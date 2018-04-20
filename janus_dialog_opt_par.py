@@ -100,6 +100,7 @@ class dialog_opt_par( QWidget ) :
                        'res_par_w' :QLabel( 'Therm. Speed/Temp. (W/T)' , self ),
                        'res_par_r' :QLabel( 'Anisotropy (R)'           , self ),
                        'res_par_b' :QLabel( 'Beta ( parallel )'        , self ),
+                       'res_par_av':QLabel( 'Alfven Speed'             , self ),
                        'res_par_s' :QLabel( 'Skewness (S)'             , self ),
                        'res_par_k' :QLabel( 'Kurtosis (K)'             , self ),
                        'lab_3'     :QLabel( 'Uncertainties'            , self ),
@@ -113,17 +114,18 @@ class dialog_opt_par( QWidget ) :
 		             'res_par_w' :event_CheckBox( self, 'res_par_w'  ),
 		             'res_par_r' :event_CheckBox( self, 'res_par_r'  ),
 		             'res_par_b' :event_CheckBox( self, 'res_par_b'  ),
+		             'res_par_av':event_CheckBox( self, 'res_par_av' ),
 		             'res_par_s' :event_CheckBox( self, 'res_par_s'  ),
 		             'res_par_fv':event_CheckBox( self, 'res_par_fv' ),
 		             'res_par_k' :event_CheckBox( self, 'res_par_k'  ),
 		             'res_par_u' :event_CheckBox( self, 'res_par_u'  ) }
 
 
-		self.order = [ 'lab_1',     'res_par_dt', 'res_par_dw', 'lab_2',
-		               'res_par_n', 'res_par_v', 'res_par_fv',
-		               'res_par_d' ,'res_par_w', 'res_par_r',
-		               'res_par_b', 'res_par_s', 'res_par_k',
-		               'lab_3',     'res_par_u'                        ]
+		self.order = [ 'lab_1'    , 'res_par_dt', 'res_par_dw', 'lab_2',
+		               'res_par_n', 'res_par_v' , 'res_par_fv',
+		               'res_par_d','res_par_w'  , 'res_par_r' ,
+		               'res_par_b', 'res_par_av', 'res_par_s' ,
+		               'res_par_k', 'lab_3'     , 'res_par_u'          ]
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
@@ -162,6 +164,7 @@ class dialog_opt_par( QWidget ) :
 		self.box['res_par_w' ].setChecked( self.core.opt['res_par_w' ] )
 		self.box['res_par_r' ].setChecked( self.core.opt['res_par_r' ] )
 		self.box['res_par_b' ].setChecked( self.core.opt['res_par_b' ] )
+		self.box['res_par_av'].setChecked( self.core.opt['res_par_av'] )
 		self.box['res_par_s' ].setChecked( self.core.opt['res_par_s' ] )
 		self.box['res_par_k' ].setChecked( self.core.opt['res_par_k' ] )
 		self.box['res_par_u' ].setChecked( self.core.opt['res_par_u' ] )

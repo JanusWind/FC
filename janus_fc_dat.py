@@ -213,7 +213,7 @@ class fc_dat( ) :
 		# Calculate the total velocity using drift
 
 		db = [ ( self._norm_b[key][i] - av_b[i] )
-		                  for i in range( len( self._norm_b[key] ) ) ]
+		                    for i in range( len( self._norm_b[key] ) ) ]
 
 		db_nrm = calc_arr_norm( db )
 

@@ -31,8 +31,9 @@ from janus_const import const
 ## DEFINE THE LIST OF RESERVED NAMES.
 ################################################################################
 
-PARAM = [ 'b0', 'v0', 'fv', 'n', 'v', 'dv', 'w', 'w2', 'r', 't', 'beta',
-          'ac', 'time', 's','m','q', 'k', 'beta_par', 'beta_per'               ]
+PARAM = [ 'b0', 'v0', 'fv', 'n', 'v', 'dv', 'w', 'w2', 'r', 't', 'beta', 'time',
+          's', 'm','q', 'k', 'beta_par', 'beta_per', 'alfv_vel', 'frq_mag_wav',
+          'frq_aic_wav'                                                        ]
 
 COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat', 'fields' ]
 
@@ -167,12 +168,14 @@ class plas( object ) :
 		self.sig_b0_y = None
 		self.sig_b0_z = None
 
+		self.frq_mag_wav = None
+
 		self.b0_fields     = dict.fromkeys( [ 'raw', 'rot', 'fit',
 		                                       'raw_smt', 'rot_smt',
 		                                       'fit_smt'             ] )
 
 		self.sig_b0_fields = dict.fromkeys( [ 'sig_raw', 'sig_rot',
-		                                       'sig_fit', 'sig_raw_smt',
+		                                       'sig_fit','sig_raw_smt',
 		                                       'sig_rot_smt',
 		                                       'sig_fit_smt'         ] )
 
@@ -406,6 +409,10 @@ class plas( object ) :
 			else :
 				return self.sig_fv
 
+		elif ( elem['param'] == 'frq' ) :
+
+			return self.frq_mag_wav
+
 		# Note.  If this point is reached, the parameter is one to be
 		#        handled by the species or population.
 
@@ -636,6 +643,14 @@ class plas( object ) :
 			if ( value is not None ) :
 
 				self.sig_b0_z = float( value )
+
+		elif ( key == 'mag_wav_frq' ) :
+
+			self.mag_wav_frq = None
+
+			if ( value is not None ) :
+
+				self.mag_wav_frq = float( value )
 
 		else :
 
@@ -1179,7 +1194,7 @@ class spec( object ) :
 			return  w_par**3
 
  
-                elif ( key == 'w4_par' ) :
+		elif ( key == 'w4_par' ) :
 
 			w2_par = self['w2_par']
 
@@ -1190,46 +1205,49 @@ class spec( object ) :
 
 		elif ( key == 'beta_par' ) :
 		
-#		        arr_pop = self.my_plas.lst_pop( self )
-#		
-#		        if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
-#		                return None
-		
-		        b0 = self.my_plas.get_b0_mag( )
-		
-		        n       = self['n']
-		        t_par   = self['t_par']
-		        
-#		        arr_n      = [ p['n'] for p in arr_pop ]
+			b0 = self.my_plas.get_b0_mag( )
+
+			n       = self['n']
+			t_par   = self['t_par']
 
 			if ( t_par is None ) :
 				return None
 
-#		        for ( p, obj ) in enumerate( arr_pop ) : 
-	                ret = ( n * 1.E6 ) * const['k_b'] * ( t_par * 1.E3 )
-	                ret /= ( b0 / 1.E9 )**2 / ( 2. * const['mu_0'] )
+			ret = ( n * 1.E6 ) * const['k_b'] * ( t_par * 1.E3 )
+			ret /= ( b0 / 1.E9 )**2 / ( 2. * const['mu_0'] )
 		
 		        return  ret
 
                 elif ( key == 'beta_per' ) :
 
-#                        arr_pop = self.my_plas.lst_pop( self )
-#
-#                        if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
-#                                return None
+			b0 = self.my_plas.get_b0_mag( )
 
-                        b0 = self.my_plas.get_b0_mag( )
-
-                        n       = self['n']
-                        t_par   = self['t_per']
+			n       = self['n']
+			t_par   = self['t_per']
                         
-#                        arr_n      = [ p['n'] for p in arr_pop ]
-
-#                        for ( p, obj ) in enumerate( arr_pop ) : 
-                        ret = ( n * 1.E6 ) * const['k_b'] * ( t_per * 1.E3 )
-                        ret /= ( b0 / 1.E9 )**2 / ( 2. * const['mu_0'] )
+			ret  = ( n * 1.E6 ) * const['k_b'] * ( t_per * 1.E3 )
+			ret /= ( b0 / 1.E9 )**2 / ( 2. * const['mu_0'] )
 
 			return  ret
+
+		elif ( key == 'alfv_vel' ) :
+
+			b0 = self.my_plas.get_b0_mag( )
+
+			n    = self['n']
+
+			ret  = ( b0 / 1.E12 )
+			ret /= ( n * 1.E6 * const['m_p'] * const['mu_0'] )**0.5
+
+			return  ret
+
+		elif ( key == 'aic_wav_frq' ) :
+
+			alfv_vel = self['alfv_vel']
+			b_frq = self['mag_wav_frq']
+			v_sw = self['v0']
+
+			return b_frq * alfv_vel/( 2 * 3.14 * v_sw)
 
                 elif ( key == 's' ) :
 
@@ -1901,6 +1919,25 @@ class pop( object ) :
 			ret /= ( b0 / 1.E9 )**2 / ( 2. * const['mu_0'] )
 			
 			return  ret
+
+                elif ( key == 'alfv_vel' ) :
+
+			b0 = self.my_plas.get_b0_mag( )
+
+			n    = self['n']
+
+			ret  = ( b0 / 1.E12 )
+			ret /= ( n * 1.E6 * const['m_p'] * const['mu_0'] )**0.5
+
+			return  ret
+
+		elif ( key == 'aic_wav_frq' ) :
+
+			alfv_vel = self['alfv_vel']
+			b_frq = self['mag_wav_frq']
+			v_sw = self['v0']
+
+			return b_frq * alfv_vel/( 2 * 3.14 * v_sw)
 
                 elif ( key == 's' ) :
 

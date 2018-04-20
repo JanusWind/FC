@@ -15,10 +15,12 @@ from scipy.optimize import curve_fit
 
 from numpy import linspace, pi, sqrt, exp
 
+from janus_const import const
+
 rcParams['figure.figsize'] = 20, 10
 
 plt.clf()
-plt.close()
+#plt.close()
 
 #Place= raw_input('Are you using work or home computer? (w for work, h for home) ==> ')
 Place='w'
@@ -75,6 +77,7 @@ t_b_r     = [0]*nd
 sig_b     = [0]*nd
 sig_bb    = [0]*nd
 error_sigbb = [0]*nd
+t_av      = [0]*nd
 
 dat_b_x_sig_raw = [0]*nd
 dat_b_y_sig_raw = [0]*nd
@@ -174,14 +177,15 @@ for i in range ( len( fname ) ) :
 		dat_t_p_c      = np.array( dat[i]['t_par_p_c']    )
 		dat_t_p_b      = np.array( dat[i]['t_par_p_b']    )
 		dat_w_par_p    = np.array( dat[i]['w_par_p']      )
-	
+		dat_alf_vel    = np.array( dat[i]['alfv_vel']     )
+
 	        inc = [ ( ( dat_n_p_b[j]  is not None ) and ( dat_n_p_b[j] >  0 ) and
-	                  ( dat_n_p[j]    is not None ) and ( dat_n_p[j]   >  0 ) and
-	                  ( dat_s_p[j]    is not None ) and ( dat_s_p[j]   != 0 ) and
-	                  ( dat_s_p[j]    is not None ) and
-		          ( dat_dv_p_b[j] is not None ) and ( dat_r_p_c[j] > .1 ) and 
-	                  ( dat_r_p_b[j] > .1 )         and ( dat_r_p_c[j] < 10 ) and 
-	                  ( dat_r_p_b[j] < 10 )                                      )
+	                ( dat_n_p[j] is not None ) and ( dat_n_p[j]   >  0 ) and
+	                ( dat_s_p[j] is not None ) and ( dat_s_p[j]   != 0 ) and
+	                ( dat_s_p[j] is not None ) and
+		        ( dat_dv_p_b[j] is not None ) and  
+	                ( dat_r_p_b[j] > .1 )      and ( dat_r_p_c[j] < 10 ) and 
+	                ( dat_r_p_c[j] > .1 )      and ( dat_r_p_b[j] < 10 )   )
 	
 	                for j in range( len( dat_n_p_b ) ) ]
 	
@@ -218,44 +222,55 @@ for i in range ( len( fname ) ) :
 		sel_wparp   = dat_w_par_p[tk]
 		sel_b_r     = dat_b_r[tk]
 #		sel_sig_b   = dat_sig_b[tk]
+#		sel_av      = dat_alf_vel[tk]
+		sel_av      = [ ( dat[0]['b0'][l]*10**(-9) )/\
+		                  sqrt( const['mu_0']*dat[0]['n_p'][l]*\
+		                  10**6*const['m_p'] )
+		                                     for l in (tk) ]
 	
-	        for k in range(len(sel_np)):
-	
-	                t_b0[count]      = sel_b0[k]
-	                t_bs[count]      = sel_bs[k]
-	                t_br[count]      = sel_br[k]
-	                t_rp[count]      = sel_rp[k]
-	                t_rc[count]      = sel_rc[k]
-	                t_rb[count]      = sel_rb[k]
-	                t_np[count]      = sel_np[k]
-	                t_nc[count]      = sel_nc[k]
-	                t_nb[count]      = sel_nb[k]
-	                t_fvpc[count]    = sel_fvpc[k]
-	                t_fvpb[count]    = sel_fvpb[k]
-	                t_dvpc[count]    = sel_dvpc[k]
-	                t_dvpb[count]    = sel_dvpb[k]
-	                t_wparc[count]   = sel_wparc[k]
-	                t_wparb[count]   = sel_wparb[k]
-	                t_wperc[count]   = sel_wperc[k]
-	                t_wperb[count]   = sel_wperb[k]
-			t_wp[count]      = sel_wp[k]
-	                t_dvvecpc[count] = sel_dvvecpc[k]
-	                t_dvvecpb[count] = sel_dvvecpb[k]
-			t_wparp[count]   = sel_wparp[k]
-	                t_s[count]       = sel_s[k]
-	                t_k[count]       = sel_k[k]
-	                t_nf[count]      = sel_nf[k]
-	                t_tpc[count]     = sel_tpc[k]
-	                t_tpb[count]     = sel_tpb[k]
-			t_b_r[count]     = sel_b_r[k]
-	
-                count           += 1
+#	        for k in range(len(sel_np)):
+#	
+#	                t_b0[count]      = sel_b0[k]
+#	                t_bs[count]      = sel_bs[k]
+#	                t_br[count]      = sel_br[k]
+#	                t_rp[count]      = sel_rp[k]
+#	                t_rc[count]      = sel_rc[k]
+#	                t_rb[count]      = sel_rb[k]
+#	                t_np[count]      = sel_np[k]
+#	                t_nc[count]      = sel_nc[k]
+#	                t_nb[count]      = sel_nb[k]
+#	                t_fvpc[count]    = sel_fvpc[k]
+#	                t_fvpb[count]    = sel_fvpb[k]
+#	                t_dvpc[count]    = sel_dvpc[k]
+#	                t_dvpb[count]    = sel_dvpb[k]
+#	                t_wparc[count]   = sel_wparc[k]
+#	                t_wparb[count]   = sel_wparb[k]
+#	                t_wperc[count]   = sel_wperc[k]
+#	                t_wperb[count]   = sel_wperb[k]
+#			t_wp[count]      = sel_wp[k]
+#	                t_dvvecpc[count] = sel_dvvecpc[k]
+#	                t_dvvecpb[count] = sel_dvvecpb[k]
+#			t_wparp[count]   = sel_wparp[k]
+#	                t_s[count]       = sel_s[k]
+#	                t_k[count]       = sel_k[k]
+#	                t_nf[count]      = sel_nf[k]
+#	                t_tpc[count]     = sel_tpc[k]
+#	                t_tpb[count]     = sel_tpb[k]
+#			t_b_r[count]     = sel_b_r[k]
+#			t_av[count]      = sel_av[k]
+##			print sel_av[k]
+#	
+#			print count
+#	                count           += 1
+
+# Change back to the working directory.
 
 if Place == 'w' :
         os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
 else:
         os.chdir("/home/ramiz/Dropbox/Studies/Research/Janus_Research")
 
+# Define the linear model to fit the data.
 
 def fitlin( b, v, sigma ) :
 
@@ -275,34 +290,58 @@ def fitlin( b, v, sigma ) :
 	         "fitfunc" : fitfunc,
 	         "rawres"  : ( popt,pcov ) }
 
+# Define list of index.
+
 ind = linspace( 0., max( sig_bb ), len( sig_bb ) )
 
-dat_fit = fitlin( sig_bb, dat_fv_p_c , dat_sig_fvpc )
+# Scale the fluctuating velocity with Alfven speed.
+
+s_fv = 1.E3*dat_fv_p_c/sel_av 
+
+# Calculate the  amplitude of wave using standard deviation of the magnetic
+# field.
+
+amp_b = [ sqrt(2)*sig_bb[i] for i in range( len( sig_bb ) ) ]
+
+# Scale the error in the fluctuating velocity,
+
+s_sig_fv = 1.E3*dat_sig_fvpc/sel_av
+
+# Linearly fit the data using the model defined earlier.
+
+dat_fit = fitlin( sig_bb, s_fv, dat_sig_fvpc )
+
+# Extract the slope and intercept.
 
 m = dat_fit['slope']
 c = dat_fit['offset']
 
+# 
 y_fit = [ ( m*ind[i] + c ) for i in range( len( sig_bb ) ) ]
 
-cv = corrcoef(sig_bb, dat_fv_p_c )[0,1]
+# Find the Pearson correlation coefficient.
+
+cv = corrcoef( amp_b, s_fv )[0,1]
+
+# Extract the x-value from the fit.
 
 fit_x = dat_fit['fitfunc'](ind)
-plt.errorbar( sig_bb, dat_fv_p_c, yerr=dat_sig_fvpc,
-                                                fmt='o', ecolor='g' )
+#plt.scatter( sig_bb, s_fv )
+plt.errorbar( sig_bb, s_fv, yerr=s_sig_fv, fmt='o', ecolor='g' )
 #plt.xlim[0,1]
 plt.plot( ind, y_fit )
 
 #plt.scatter( dat_fv_p_c, sig_bb )
 #plt.scatter( t_fvpc, t_b_r )
 
-plt.ylim((min(dat_fv_p_c)+0.1*min(dat_fv_p_c), ( max(dat_fv_p_c)+ 0.1*max(dat_fv_p_c))))
+plt.ylim((min(s_fv)+0.1*min(s_fv), ( max(s_fv)+ 0.1*max(s_fv))))
 plt.xlim(( 0., ( max(sig_bb)+ 0.1*max(sig_bb))))
 
-plt.text( 0.08, 2.5, 'Slope = %s\n Offset = %s\n Corr Coeff = %s\n'
+plt.text( 0.07, 0.0, 'Slope = %s\n Offset = %s\n Corr Coeff = %s\n'
        %( round( m, 2 ), round( c, 2 ), round( cv, 2 ) ), fontsize=22 )
 
 plt.xlabel(r'$\frac{\sigma_B}{| \vec B|}$', fontsize = 28 )
-plt.ylabel('Fluctuating Velocity (km/sec)', fontsize = 22 )
+plt.ylabel(r'$\frac{\delta v}{v_A}(km/sec)$', fontsize = 22 )
 
 #plt.title(r'$\frac{\sigma_B}{| \vec B|}$ vs Fluctuating Velocity with error bars', fontsize = 24 )
 plt.show( )
