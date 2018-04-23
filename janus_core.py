@@ -3002,8 +3002,9 @@ class core( QObject ) :
 		            self.mfi_frq_y + self.mfi_amp_z * self.mfi_frq_z )/\
 		                           ( self.mfi_amp_y + self.mfi_amp_z )
 
-		print self.nln_res_plas['oplas'] 
- 
+		self.nln_res_plas['ogyro'] = ( 1.E-9 * const['q_p'] *
+		                         self.mfi_avg_mag_raw_smt )/const['m_p']
+
 		pop_v0_vec                    = [fit[0], fit[1], fit[2]]
 		self.nln_res_plas['v0_x']     =  fit[0]
 		self.nln_res_plas['v0_y']     =  fit[1]

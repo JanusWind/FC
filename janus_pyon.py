@@ -33,7 +33,7 @@ from janus_const import const
 
 PARAM = [ 'b0', 'v0', 'fv', 'n', 'v', 'dv', 'w', 'w2', 'r', 't', 'beta', 'time',
           's', 'm','q', 'k', 'beta_par', 'beta_per', 'alfv_vel', 'oplas',
-          'ocycl'                                                        ]
+          'ocycl', 'ogyro'                                                     ]
 
 COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat', 'fields' ]
 
@@ -169,6 +169,7 @@ class plas( object ) :
 		self.sig_b0_z = None
 
 		self.oplas = None
+		self.ogyro = None
 
 		self.b0_fields     = dict.fromkeys( [ 'raw', 'rot', 'fit',
 		                                       'raw_smt', 'rot_smt',
@@ -413,6 +414,10 @@ class plas( object ) :
 
 			return self.oplas
 
+		elif ( elem['param'] == 'ogyro' ) :
+
+			return self.ogyro
+
 		# Note.  If this point is reached, the parameter is one to be
 		#        handled by the species or population.
 
@@ -651,6 +656,14 @@ class plas( object ) :
 			if ( value is not None ) :
 
 				self.oplas = float( value )
+
+		elif ( key == 'ogyro' ) :
+
+			self.ogyro = None
+
+			if ( value is not None ) :
+
+				self.ogyro = float( value )
 
 		else :
 
@@ -1234,6 +1247,11 @@ class spec( object ) :
 
 			b0 = self.my_plas.get_b0_mag( )
 
+			arr_pop = self.my_plas.lst_pop( self )
+
+			if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+				return None
+
 			n    = self['n']
 
 			ret  = ( b0 / 1.E12 )
@@ -1540,7 +1558,7 @@ class pop( object ) :
 	              n=None, fv=None, dv=None, w=None,
 	              w_per=None, w_par=None,
 	              sig_n=None, sig_fv=None, sig_dv=None, sig_w=None,
-	              sig_w_per=None, sig_w_par=None       ) :
+	              sig_w_per=None, sig_w_par=None, oplas=None       ) :
 
 		self.my_plas = my_plas
 		self.my_spec = my_spec
@@ -1559,6 +1577,7 @@ class pop( object ) :
 		self.sig_w     = None
 		self.sig_w_per = None
 		self.sig_w_par = None
+		self.oplas     = None
 
 		if ( name is not None ) :
 			self['name'] = name
@@ -1712,6 +1731,8 @@ class pop( object ) :
 			return ( b0_hat[0] * self.dv,
 			         b0_hat[1] * self.dv,
 			         b0_hat[2] * self.dv  )
+
+		#TODO: Add 'fv' to the total velocity here.
 
 		elif ( key == 'v_vec' ) :
 
@@ -1934,8 +1955,8 @@ class pop( object ) :
 		elif ( key == 'ocycl' ) :
 
 			alfv_vel = self['alfv_vel']
-			b_frq = self['oplas']
-			v_sw = self['v0']
+			b_frq = self.my_plas['oplas']
+			v_sw = self.my_plas['v0']
 
 			return b_frq * alfv_vel/( 2 * 3.14 * v_sw)
 

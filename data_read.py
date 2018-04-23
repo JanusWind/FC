@@ -278,8 +278,8 @@ def fitlin( b, v, sigma ) :
 
 		return m * b + c
 
-#	sigma = [1]*len(b)
-#	sigma[0]= 0.01
+	sigma = np.ones(len(b))
+	sigma[ -1]= 1.E-5
 	popt, pcov = curve_fit( linfunc, b, v, sigma=sigma )
 	m, c = popt
 
@@ -289,10 +289,6 @@ def fitlin( b, v, sigma ) :
 	         "offset"  : c,
 	         "fitfunc" : fitfunc,
 	         "rawres"  : ( popt,pcov ) }
-
-# Define list of index.
-
-ind = linspace( 0., max( sig_bb ), len( sig_bb ) )
 
 # Scale the fluctuating velocity with Alfven speed.
 
@@ -309,7 +305,15 @@ s_sig_fv = 1.E3*dat_sig_fvpc/sel_av
 
 # Linearly fit the data using the model defined earlier.
 
+sig_bb       = np.append( sig_bb, 0 )
+s_fv         = np.append( s_fv, 0)
+dat_sig_fvpc = np.append( dat_sig_fvpc, 0 )
+
 dat_fit = fitlin( sig_bb, s_fv, dat_sig_fvpc )
+
+# Define list of index.
+
+ind = linspace( 0., max( sig_bb ), len( sig_bb ) )
 
 # Extract the slope and intercept.
 
@@ -321,15 +325,19 @@ y_fit = [ ( m*ind[i] + c ) for i in range( len( sig_bb ) ) ]
 
 # Find the Pearson correlation coefficient.
 
-cv = corrcoef( amp_b, s_fv )[0,1]
+#amp_b = np.append( amp_b, 0 )
+cv = corrcoef( amp_b, s_fv[0:-1] )[0,1]
 
 # Extract the x-value from the fit.
 
 fit_x = dat_fit['fitfunc'](ind)
 #plt.scatter( sig_bb, s_fv )
-plt.errorbar( sig_bb, s_fv, yerr=s_sig_fv, fmt='o', ecolor='g' )
+plt.errorbar( sig_bb[0:-1], s_fv[0:-1], yerr=s_sig_fv, fmt='o', ecolor='g' )
 #plt.xlim[0,1]
 plt.plot( ind, y_fit )
+
+plt.xticks([0, 0.02, 0.04, 0.06, 0.08, 0.1], fontsize=20)
+plt.yticks([0, 0.02, 0.04, 0.06, 0.08, 0.1], fontsize=20)
 
 #plt.scatter( dat_fv_p_c, sig_bb )
 #plt.scatter( t_fvpc, t_b_r )
@@ -338,12 +346,13 @@ plt.ylim((min(s_fv)+0.1*min(s_fv), ( max(s_fv)+ 0.1*max(s_fv))))
 plt.xlim(( 0., ( max(sig_bb)+ 0.1*max(sig_bb))))
 
 plt.text( 0.07, 0.0, 'Slope = %s\n Offset = %s\n Corr Coeff = %s\n'
-       %( round( m, 2 ), round( c, 2 ), round( cv, 2 ) ), fontsize=22 )
+       %( round( m, 2 ), round( c, 4 ), round( cv, 2 ) ), fontsize=22 )
 
 plt.xlabel(r'$\frac{\sigma_B}{| \vec B|}$', fontsize = 28 )
 plt.ylabel(r'$\frac{\delta v}{v_A}(km/sec)$', fontsize = 22 )
 
 #plt.title(r'$\frac{\sigma_B}{| \vec B|}$ vs Fluctuating Velocity with error bars', fontsize = 24 )
+plt.tight_layout()
 plt.show( )
 
 '''
