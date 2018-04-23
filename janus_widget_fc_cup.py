@@ -43,7 +43,8 @@ from janus_step import step
 
 # Load the necessary "numpy" array modules and numeric-function modules.
 
-from numpy import amax, amin, array, ceil, floor, log10, sqrt, tile, where
+from numpy import amax, amin, array, ceil, floor, log10, sqrt, tile, where,\
+shape
 
 # Load the necessary threading modules.
 

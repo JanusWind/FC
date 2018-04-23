@@ -217,13 +217,13 @@ class widget_nln_res( format_TextEdit ) :
 						self.prnt_htm( lab_v + ' = '   )
 						self.prnt_dcm(
 						   self.core.nln_res_plas[
-						        'v0'], 0, 'km/s'       )
+						        'v0'], 3, 'km/s'       )
 						self.prnt_brk( )
 						self.prnt_tab( 3 )
 						self.prnt_htm( lab_v_x + ' = ' )
 						self.prnt_dcm(
 						   self.core.nln_res_plas[
-						                    'v0_x'], 0 )
+						                    'v0_x'], 3 )
 
 						if ( self.core.opt['res_u'] ) :
 
@@ -231,7 +231,7 @@ class widget_nln_res( format_TextEdit ) :
 						        '&nbsp;&plusmn;&nbsp;' )
 							self.prnt_dcm(
 						        self.core.nln_res_plas[
-						               'sig_v0_x'], 0  )
+						               'sig_v0_x'], 3  )
 						self.prnt_htm( 'km/s'          )
 
 						self.prnt_brk( )
@@ -239,7 +239,7 @@ class widget_nln_res( format_TextEdit ) :
 						self.prnt_htm( lab_v_y + ' = ' )
 						self.prnt_dcm(
 						   self.core.nln_res_plas[
-						                    'v0_y'], 0 )
+						                    'v0_y'], 3 )
 
 						if ( self.core.opt['res_u'] ):
 
@@ -247,7 +247,7 @@ class widget_nln_res( format_TextEdit ) :
 						        '&nbsp;&plusmn;&nbsp;' )
 							self.prnt_dcm(
 						         self.core.nln_res_plas[
-						               'sig_v0_y'], 0  )
+						               'sig_v0_y'], 3  )
 						self.prnt_htm( 'km/s'          )
 
 						self.prnt_brk( )
@@ -255,14 +255,14 @@ class widget_nln_res( format_TextEdit ) :
 						self.prnt_htm( lab_v_z + ' = ' )
 						self.prnt_dcm(
 						   self.core.nln_res_plas[
-						                    'v0_z'], 0 )
+						                    'v0_z'], 3 )
 
 						if ( self.core.opt['res_u'] ):
 							self.prnt_htm(
 						        '&nbsp;&plusmn;&nbsp;' )
 							self.prnt_dcm(
 						         self.core.nln_res_plas[
-						               'sig_v0_z'], 0  )
+						               'sig_v0_z'], 3  )
 						self.prnt_htm( 'km/s'          )
 
 				elif ( pop['drift'] ) :
@@ -271,12 +271,12 @@ class widget_nln_res( format_TextEdit ) :
 						self.prnt_brk( )
 						self.prnt_tab( 2 )
 						self.prnt_htm( lab_dv + ' = ' )
-						self.prnt_dcm( pop['dv'], 1 )
+						self.prnt_dcm( pop['dv'], 3 )
 						if( self.core.opt['res_u'] ) :
 							self.prnt_htm(
 							'&nbsp;&plusmn;&nbsp;' )
 							self.prnt_dcm(
-							pop['sig_dv'], 1       )
+							pop['sig_dv'], 3       )
 						self.prnt_htm( 'km/s')
 
 				# Print the population's thermal speed(s).
