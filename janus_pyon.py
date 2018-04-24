@@ -32,8 +32,8 @@ from janus_const import const
 ################################################################################
 
 PARAM = [ 'b0', 'v0', 'fv', 'n', 'v', 'dv', 'w', 'w2', 'r', 't', 'beta', 'time',
-          's', 'm','q', 'k', 'beta_par', 'beta_per', 'alfv_vel', 'oplas',
-          'ocycl', 'ogyro'                                                     ]
+          's', 'm','q', 'k', 'beta', 'beta', 'alfvel', 'oplas', 'ocycl',
+          'ogyro'                                                              ]
 
 COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat', 'fields' ]
 
@@ -1243,7 +1243,7 @@ class spec( object ) :
 
 			return  ret
 
-		elif ( key == 'alfv_vel' ) :
+		elif ( key == 'alfvel' ) :
 
 			b0 = self.my_plas.get_b0_mag( )
 
@@ -1257,15 +1257,16 @@ class spec( object ) :
 			ret  = ( b0 / 1.E12 )
 			ret /= ( n * 1.E6 * const['m_p'] * const['mu_0'] )**0.5
 
+			print ret
 			return  ret
 
 		elif ( key == 'ocycl' ) :
 
-			alfv_vel = self['alfv_vel']
-			b_frq = self['oplas']
-			v_sw = self['v0']
+			alfvel = self['alfvel']
+			b_frq = self.my_plas['oplas']
+			v_sw = self.my_plas['v0']
 
-			return b_frq * alfv_vel/( 2 * 3.14 * v_sw)
+			return b_frq * alfvel/( 2 * 3.14 * v_sw)
 
                 elif ( key == 's' ) :
 
@@ -1941,7 +1942,7 @@ class pop( object ) :
 			
 			return  ret
 
-                elif ( key == 'alfv_vel' ) :
+                elif ( key == 'alfvel' ) :
 
 			b0 = self.my_plas.get_b0_mag( )
 
@@ -1954,11 +1955,11 @@ class pop( object ) :
 
 		elif ( key == 'ocycl' ) :
 
-			alfv_vel = self['alfv_vel']
+			alfvel = self['alfvel']
 			b_frq = self.my_plas['oplas']
 			v_sw = self.my_plas['v0']
 
-			return b_frq * alfv_vel/( 2 * 3.14 * v_sw)
+			return b_frq * alfvel/( 2 * 3.14 * v_sw)
 
                 elif ( key == 's' ) :
 

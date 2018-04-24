@@ -426,19 +426,22 @@ class widget_nln_res( format_TextEdit ) :
 				self.prnt_tab( 2 )
 				self.prnt_htm( lab_oplas + ' = ' )
 				self.prnt_dcm( self.core.nln_res_plas[
-				                            'oplas'], 4, '1/s' )
+				                            'oplas'], 4 )
+				self.prnt_htm( ' s<sup>-1</sup>' )
 
 				self.prnt_brk( )
 				self.prnt_tab( 2 )
 				self.prnt_htm( lab_ocycl + ' = ' )
-				self.prnt_dcm( pop['ocycl'], 4, '1/s' )
+				self.prnt_dcm( pop['ocycl'], 4 )
+				self.prnt_htm( ' s<sup>-1</sup>' )
 
 				self.prnt_brk( )
 				self.prnt_tab( 2 )
 				self.prnt_htm( lab_ogyro + ' = ' )
 				self.prnt_dcm( self.core.nln_res_plas[
-				                            'ogyro'], 4, '1/s' )
-				print self.core.nln_res_plas['ogyro']
+				                                   'ogyro'], 4 )
+				self.prnt_htm( ' s<sup>-1</sup>' )
+
 				# Clear the first population indicator.
 
 				first_pop = False
