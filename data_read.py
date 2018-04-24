@@ -347,7 +347,7 @@ plt.ylim( 0, 0.045 )
 plt.xlim( 0.0, 0.045 )
 #plt.xlim(( 0., ( max(sig_bb)+ 0.1*max(sig_bb))))
 
-plt.text( 0.0, 0.03, 'Slope = %s+/- %s\n Offset = %s\n Corr Coeff = %s\n'
+plt.text( 0.0, 0.03, 'Slope = %s+/- %s\nOffset = %s\nCorr Coeff = %s\n'
 %( round( m, 2 ), round( del_m, 2 ),  round( c, 4 ), round( cv, 2 ) ), fontsize=22 )
 
 plt.xlabel(r'$\frac{\sigma_B}{| \vec B|}$', fontsize = 28 )

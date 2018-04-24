@@ -420,7 +420,7 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_tab( 2 )
 					self.prnt_htm( lab_a_vel + ' = ' )
 					self.prnt_dcm(
-					            pop['alfv_vel'], 4, 'km/s' )
+					            pop['alfvel'], 4, 'km/s' )
 
 				self.prnt_brk( )
 				self.prnt_tab( 2 )
