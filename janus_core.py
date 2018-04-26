@@ -1915,6 +1915,7 @@ class core( QObject ) :
 		self.mom_res = plas( )
 
 		self.mom_res['v0_vec'] = mom_v_vec
+
 		self.mom_res['fv']     = 0.0
 		self.mom_res.add_spec( name='Proton', sym='p', m=1., q=1. )
 

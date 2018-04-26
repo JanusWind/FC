@@ -46,6 +46,13 @@ dat    = [0]*len(fname)
 for i in range (len(fname)):
         dat[i] = pickle.load(open(fname[i],'rb'))
 
+# Change back to the working directory.
+
+if Place == 'w' :
+        os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
+else:
+        os.chdir("/home/ramiz/Dropbox/Studies/Research/Janus_Research")
+
 nd = sum( [ len(dat[i]['b0'] ) for i in range ( len( fname ) ) ] )
 
 t_b0      = [0]*nd # Magnetic field
@@ -143,7 +150,7 @@ for i in range ( len( fname ) ) :
 #		sig_b2[j]      = sqrt( sum( dat_b_y_rot**2 + dat_b_z_rot**2 ) /
 #		                                       ( len( dat_b_x_rot    ) ) )
 
-		error_sigbb[j] = abs( sig_b[j] - dat_b_x_sig_rot[j] )
+		error_sigbb[j] = abs( sig_b[j]- dat_b_x_sig_rot[j] )
 
 		sig_bb[j] = sig_b[j] / mean( dat_b_x_rot )
 	
@@ -258,13 +265,6 @@ for i in range ( len( fname ) ) :
 #	
 #			print count
 #	                count           += 1
-
-# Change back to the working directory.
-
-if Place == 'w' :
-        os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
-else:
-        os.chdir("/home/ramiz/Dropbox/Studies/Research/Janus_Research")
 
 # Define the linear model to fit the data.
 

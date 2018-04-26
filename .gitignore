@@ -101,6 +101,7 @@ ENV/
 .mypy_cache/
 *.pyc
 *.swp
+*.swn
 *.swo
 *.sh
 results/export/*.dat
