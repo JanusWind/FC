@@ -19,7 +19,8 @@ from janus_const import const
 
 rcParams['figure.figsize'] = 20, 10
 
-plt.clf()
+#plt.clf()
+plt.close('all')
 
 fname1 = 'fm_22.jns'
 fname2 = 'fm_14.jns'
@@ -242,28 +243,30 @@ cv1 = corrcoef( dat1_sig_bb[0:-1], dat1_s_fv[0:-1] )[0,1]
 plt.errorbar( dat1_sig_bb[0:-1], dat1_s_fv[0:-1], yerr=dat1_s_sig_fv_p[0:-1],
                                                            fmt='o', ecolor='g' )
 plt.plot( ind1, y1_fit )
+plt.plot( ind1, y3_fit, dashes=[6,2], color='m')
 #plt.scatter(dat1_sig_bb[0:-1], dat1_thr, marker='*', color='r')
 
-plt.xticks([0, 0.02, 0.04, 0.06, 0.08, 0.1], fontsize=20)
-plt.yticks([0, 0.02, 0.04, 0.06, 0.08, 0.1], fontsize=20)
+plt.xticks([0, 0.02, 0.04, 0.05], fontsize=20)
+plt.yticks([0, 0.02, 0.04, 0.05], fontsize=20)
 
-plt.ylim( 0, 0.1 )
+plt.ylim( 0, 0.055 )
 #plt.ylim( ( min( dat1_s_fv ) + 0.1*min( dat1_s_fv ),
 #          ( max( dat1_s_fv ) + 0.1*max( dat1_s_fv ) ) ) )
-plt.xlim( 0, 0.1 )
+plt.xlim( 0, 0.055 )
 #plt.xlim(( 0., ( max( dat1_sig_bb )+ 0.1*max( dat1_sig_bb ) ) ) )
 
-plt.text( 0.0, 0.03, 'Slope = %s+/- %s\nOffset = %s\nCorr Coeff = %s\n'
-%( round( m1, 2 ), round( mean( dat1_m ), 2 ),  round( c1, 4 ), round( cv1, 2 )
-                                                               ), fontsize=22 )
+plt.text( 0.0, 0.03, 'Slope = %s+/- %s'
+%( round( m1, 2 ), round( mean( dat1_m ), 2 ) ), fontsize = 30 )
 
-plt.xlabel(r'$\frac{\sigma_B}{| \vec B|}$', fontsize = 28 )
-plt.ylabel(r'$\frac{\delta v}{v_A}(km/sec)$', fontsize = 22 )
+plt.xlabel( r'$\frac{\delta B}{| \vec B|}$'  , fontsize = 32 )
+plt.ylabel( r'$\frac{\delta V_f}{V_A}$', fontsize = 32 )
 
+leg1 = [ 'Linear Fit ', 'Predicted' , 'Observations']
+plt.legend( leg1, loc = 2, fontsize = 30 )
 #plt.title(r'$\frac{\sigma_B}{| \vec B|}$ vs Fluctuating Velocity with error bars', fontsize = 24 )
 plt.tight_layout()
 plt.show( )
-
+'''
 ################################################################################
 ## Everything for second data set.
 ################################################################################
@@ -289,10 +292,10 @@ ind2 = linspace( 0., max( dat2_sig_bb ), len( dat2_sig_bb ) )
 m2 = dat2_fit['slope']
 c2 = dat2_fit['offset']
 
-print c2
 slope2 = r'$ m \pm del_m$'
 
-y2_fit = [ ( m2*ind2[i] + c2 ) for i in range( len( dat2_sig_bb ) ) ]
+y2_fit = [ ( m2*ind1[i] + c2 ) for i in range( len( dat1_sig_bb ) ) ]
+y3_fit = [ ( mean(dat2_thr_slp)*ind1[i] ) for i in range( len( dat1_sig_bb ) ) ]
 
 fit2_x = dat2_fit['fitfunc'](ind2)
 
@@ -305,26 +308,28 @@ plt.figure( )
 
 plt.errorbar( dat2_sig_bb[0:-1], dat2_s_fv[0:-1], yerr=dat2_s_sig_fv_p[0:-1],
                                                            fmt='o', ecolor='g' )
-plt.plot( ind2, y2_fit )
-plt.scatter(dat2_sig_bb[0:-1], dat2_thr, marker='*', color='r')
+plt.plot( ind1, y2_fit, color='r' )
+plt.plot( ind1, y3_fit, dashes=[6,2], color='m' )
+#plt.scatter( dat2_sig_bb[0:-1], dat2_thr, marker='*', color='r')
 
-#plt.xticks([0, 0.02, 0.04, 0.06, 0.08, 0.1], fontsize=20)
-#plt.yticks([0, 0.02, 0.04, 0.06, 0.08, 0.1], fontsize=20)
+plt.xticks([0, 0.02, 0.04, 0.05], fontsize=20)
+plt.yticks([0, 0.02, 0.04, 0.05], fontsize=20)
 
 plt.ylim( 0, 0.055 )
 #plt.ylim((min(s_fv)+0.1*min(s_fv), ( max(s_fv)+ 0.1*max(s_fv))))
 plt.xlim( 0.0, 0.055 )
 #plt.xlim(( 0., ( max(sig_bb)+ 0.1*max(sig_bb))))
 
-plt.text( 0.0, 0.03, 'Slope = %s+/- %s\nOffset = %s\nCorr Coeff = %s\n'
-%( round( m2, 2 ), round( mean( dat2_m ), 2 ),  round( c2, 4 ), round( cv2, 2 )
-                                                               ), fontsize=22 )
+plt.text( 0.0, 0.03, 'Slope = %s+/- %s'
+%( round( m2, 2 ), round( mean( dat2_m ), 2 ) ), fontsize = 30 )
 
-plt.xlabel(r'$\frac{\sigma_B}{| \vec B|}$', fontsize = 28 )
-plt.ylabel(r'$\frac{\delta v}{v_A}(km/sec)$', fontsize = 22 )
+plt.xlabel( r'$\frac{\sigma_B}{| \vec B|}$'  , fontsize = 32 )
+plt.ylabel( r'$\frac{\delta v}{v_A}(km/sec)$', fontsize = 32 )
 
+leg2 = [ 'Linear Fit', 'Theoretical Data', 'Observations' ]
+plt.legend( leg2, loc = 2, fontsize = 30 )
 #plt.title(r'$\frac{\sigma_B}{| \vec B|}$ vs Fluctuating Velocity with error bars', fontsize = 24 )
 plt.tight_layout()
 plt.show( )
-
+'''
 print ('It took','%.6f'% (time.time()-start), 'seconds.')#plt,show()
