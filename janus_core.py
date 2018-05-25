@@ -434,13 +434,13 @@ class core( QObject ) :
 					        'p', name='Core', sym='c',
 					        drift=False, aniso=True    )
 				elif ( p == 1 ) :
-					self.nln_pop_use[p] = False
+					self.nln_pop_use[p] = True
 					self.nln_pop_vld[p] = True
 					self.nln_plas.add_pop(
 					        'p', name='Beam', sym='b',
-					        drift=True , aniso=False   )
+					        drift=True , aniso=True    )
 				elif ( p == 2 ) :
-					self.nln_pop_use[p] = True
+					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = True
 					self.nln_plas.add_pop(
 					        'a', name='Core', sym='c',
@@ -1932,7 +1932,7 @@ class core( QObject ) :
 		                                    self.mom_res['q_p'],
 		                                    self.mom_res['v0_vec'],
 		                                    self.mom_res['fv'],
-		                                    self.mfi_avg_nrm,
+		                                    self.mfi_avg_vec,
 		                                    self.mom_res['n_p_c'], 0.,
 		                                    self.mom_res['w_p_c'],
 		                                    self.mfi_set_key   )
@@ -2291,8 +2291,12 @@ class core( QObject ) :
 		try :
 			self.nln_plas['v0_vec'] = [
 			         round( v, 1 ) for v in self.mom_res['v0_vec'] ]
-			self.nln_plas['fv'] = 0.05*norm( self.nln_plas['v0_vec'])
+#			self.nln_plas['fv'] = 0.05*norm( self.nln_plas['v0_vec'])
+			self.nln_plas['fv'] = 10**( -15 )*self.mfi_avg_mag/sqrt(
+			        const['mu_0']*const['m_p']*self.mom_res['n_p'] )
+
 		except :
+
 			pass
 
 		# Attempt to generate an initial guess of the parameters for
@@ -2565,7 +2569,7 @@ class core( QObject ) :
 			     self.fc_spec.calc_curr(
 			                    self.nln_plas.arr_pop[p]['m'],
 			                    self.nln_plas.arr_pop[p]['q'],
-			                    pop_v0_vec, fv, self.mfi_avg_nrm,
+			                    pop_v0_vec, fv, self.mfi_avg_vec,
 			                    pop_n, pop_dv, pop_w,
 			                    self.mfi_set_key                 ) )
 
@@ -2682,7 +2686,7 @@ class core( QObject ) :
 				# on the initial guess).
 
 				vel = array( self.nln_plas['vec_v0'] ) +\
-				                    self.mfi_avg_nrm * \
+				      ( self.mfi_avg_nrm/self.mfi_avg_mag ) * \
 				                    array( self.nln_plas['fv'] )
 
 				if ( self.nln_plas.arr_pop[i]['drift'] ) :
@@ -2861,7 +2865,8 @@ class core( QObject ) :
 				curr[d] += dat[d].calc_curr(
 				                self.nln_plas.arr_pop[p]['m'],
 				                self.nln_plas.arr_pop[p]['q'],
-				                prm_v0, prm_fv,self.mfi_avg_nrm,
+				                prm_v0, prm_fv,
+				                self.mfi_avg_vec,
 				                prm_n,  prm_dv, prm_w,
 				                self.mfi_set_key               )
 
@@ -2899,6 +2904,8 @@ class core( QObject ) :
 		     ( len( self.nln_gss_pop ) == 0      ) or
 		     ( 0 not in self.nln_gss_pop         ) or
 		     ( len( self.nln_gss_prm ) == 0      ) or
+#		     ( ( self.mfi_frq_y < 0.1 )            and
+#		       ( self.mfi_frq_z < 0.1 )          ) or
 		     ( self.nln_n_sel < self.nln_min_sel )    ) :
 
 			self.emit( SIGNAL('janus_mesg'),
@@ -2999,9 +3006,16 @@ class core( QObject ) :
 		                       'sig_rot_smt': self.mfi_vec_rot_smt_sig,
 		                       'sig_fit_smt': self.mfi_vec_fit_smt_sig }
 
-		self.nln_res_plas['oplas'] = ( self.mfi_amp_y *
-		            self.mfi_frq_y + self.mfi_amp_z * self.mfi_frq_z )/\
-		                           ( self.mfi_amp_y + self.mfi_amp_z )
+		if ( self.mfi_frq_y > self.mfi_frq_z ) :
+
+			self.nln_res_plas['oplas'] = self.mfi_frq_y
+
+		else :
+			self.nln_res_plas['oplas'] = self.mfi_frq_z
+
+#		self.nln_res_plas['oplas'] = ( self.mfi_amp_y *
+#		            self.mfi_frq_y + self.mfi_amp_z * self.mfi_frq_z )/\
+#		                           ( self.mfi_amp_y + self.mfi_amp_z )
 
 		self.nln_res_plas['ogyro'] = ( 1.E-9 * const['q_p'] *
 		                         self.mfi_avg_mag_raw_smt )/const['m_p']
@@ -3017,7 +3031,7 @@ class core( QObject ) :
 		self.nln_res_plas['fv']       =  fit[3]
 		self.nln_res_plas['sig_fv']   =  sig[3]
 
-		print fit[3], sig[3]
+		print (" %.3f " % fit[3], " %.3f " % sig[3] , self.time_epc )
 #		print self.nln_res_plas['fv'], sig[3]
 		c = 4
 
@@ -3090,7 +3104,7 @@ class core( QObject ) :
 			     self.fc_spec.calc_curr ( 
 			                  self.nln_plas.arr_pop[p]['m'],
 			                  self.nln_plas.arr_pop[p]['q'],
-			                  pop_v0_vec, fv, self.mfi_avg_nrm,
+			                  pop_v0_vec, fv, self.mfi_avg_vec,
 			                  pop_n, pop_dv, pop_w,
 			                  self.mfi_set_key                   ) )
 

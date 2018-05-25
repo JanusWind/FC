@@ -1248,16 +1248,16 @@ class spec( object ) :
 			b0 = self.my_plas.get_b0_mag( )
 
 			arr_pop = self.my_plas.lst_pop( self )
+			arr_n      = [ p['n'] for p in arr_pop ]
 
 			if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
 				return None
 
-			n    = self['n']
+			n    = sum( arr_n )
 
 			ret  = ( b0 / 1.E12 )
 			ret /= ( n * 1.E6 * const['m_p'] * const['mu_0'] )**0.5
 
-			print ret
 			return  ret
 
 		elif ( key == 'ocycl' ) :

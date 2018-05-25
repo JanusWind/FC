@@ -26,7 +26,7 @@
 ################################################################################
 
 from math import sqrt, acos, pi
-from numpy import interp, sin, cos, deg2rad, exp, array
+from numpy import interp, sin, cos, deg2rad, exp, array, linalg
 from scipy.special import erf
 
 from janus_const import const
@@ -76,6 +76,7 @@ class fc_dat( ) :
 
 		self._maglook = { }
 		self._norm_b  = { }
+		self._vec_b   = { }
 
 		if ( ( self._azim     is None ) or ( self._elev     is None ) or
 		     ( self._volt_cen is None ) or ( self._volt_del is None ) or
@@ -157,6 +158,7 @@ class fc_dat( ) :
 		# look direction.
 
 		self._norm_b[ key] = norm_b
+		self._vec_b[  key] = b_vec
 		self._maglook[key] = maglook
 
 	#-----------------------------------------------------------------------
@@ -212,12 +214,13 @@ class fc_dat( ) :
 
 		# Calculate the total velocity using drift
 
-		db = [ ( self._norm_b[key][i] - av_b[i] )
-		                    for i in range( len( self._norm_b[key] ) ) ]
+		db = [ ( self._vec_b[key][i] - av_b[i] )
+		                    for i in range( len( self._vec_b[key] ) ) ]
 
 		db_nrm = calc_arr_norm( db )
 
-		fv_vec = [ ( fv * db_nrm[i] ) for i in range( len( db_nrm ) ) ]
+		fv_vec = [ ( fv * db[i]/ linalg.norm( av_b ) )
+		                              for i in range( len( db_nrm ) ) ]
 
 		if ( dv is None ) :
 			v_vec = [ ( v0[i] - fv_vec[i] )

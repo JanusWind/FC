@@ -422,6 +422,10 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_dcm(
 					            pop['alfvel'], 4, 'km/s' )
 
+#				if ( ( first_spc ) and ( first_pop ) ) :
+#
+#					print ( '%0.3f' % pop['alfvel'] )
+
 				self.prnt_brk( )
 				self.prnt_tab( 2 )
 				self.prnt_htm( lab_oplas + ' = ' )

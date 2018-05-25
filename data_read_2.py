@@ -156,7 +156,7 @@ for j in range( nd2 ) :
 
 	dat2_ocycl[j] = dat2['ocycl_p'][j]
 
-	dat2_thr_slp[j] = 1/( 1 - dat2_ocycl[j]/dat2_ogyro[j])
+	dat2_thr_slp[j] = 1/( 1 - dat2_ocycl[j]/dat2_ogyro[j] )
 
 	dat2_vmag[j] = dat2['v0'][j]
 
@@ -167,7 +167,7 @@ for j in range( nd2 ) :
 
 	dat2_nsig[j] = dat2['sig_n_p_c'][j] + dat2['sig_n_p_c'][j]
 
-	dat2_bmag[j]    = dat2['b0'][j]
+	dat2_bmag[j] = dat2['b0'][j]
 
 	dat2_bsig[j] = dat2['sig_b0'][j]
 
@@ -243,7 +243,7 @@ cv1 = corrcoef( dat1_sig_bb[0:-1], dat1_s_fv[0:-1] )[0,1]
 plt.errorbar( dat1_sig_bb[0:-1], dat1_s_fv[0:-1], yerr=dat1_s_sig_fv_p[0:-1],
                                                            fmt='o', ecolor='g' )
 plt.plot( ind1, y1_fit )
-plt.plot( ind1, y3_fit, dashes=[6,2], color='m')
+#plt.plot( ind1, y3_fit, dashes=[6,2], color='m')
 #plt.scatter(dat1_sig_bb[0:-1], dat1_thr, marker='*', color='r')
 
 plt.xticks([0, 0.02, 0.04, 0.05], fontsize=20)
