@@ -26,95 +26,135 @@ plt.close('all')
 #fname2 = 'fm_14.jns'
 #fname3 = 'ms_14.jns'
 
-fname1 = 'dat_auto_run_11.jns'
-fname2 = 'dat_non_auto_run_11.jns' 
-fname3 = 'dat_auto_run_22.jns' 
+#fname1 = 'dat_auto_run_11.jns'
+#fname2 = 'dat_non_auto_run_11.jns' 
+#fname3 = 'dat_auto_run_22.jns' 
+#fname4 = 'dat_auto_run_03.jns'
+#fname4 = 'dat_auto_run_03_b.jns'
+fname4 = 'dat_auto_run_11_c.jns'
 
 i = 0
 
-dat1   = [0]*len( fname1 )
-dat2   = [0]*len( fname2 )
-dat3   = [0]*len( fname3 )
+#dat1   = [0]*len( fname1 )
+#dat2   = [0]*len( fname2 )
+#dat3   = [0]*len( fname3 )
+dat4   = [0]*len( fname4 )
 
-dat1 = pickle.load( open( fname1, 'rb' ) )
-dat2 = pickle.load( open( fname2, 'rb' ) )
-dat3 = pickle.load( open( fname3, 'rb' ) )
+#dat1 = pickle.load( open( fname1, 'rb' ) )
+#dat2 = pickle.load( open( fname2, 'rb' ) )
+#dat3 = pickle.load( open( fname3, 'rb' ) )
+dat4 = pickle.load( open( fname4, 'rb' ) )
 
 # Find the total number of data points in all the files being analyzed.
 
-nd1 = len( dat1['b0'] )
-nd2 = len( dat2['b0'] )
-nd3 = len( dat3['b0'] )
+#nd1 = len( dat1['b0'] )
+#nd2 = len( dat2['b0'] )
+#nd3 = len( dat3['b0'] )
+nd4 = len( dat4['b0'] )
 
-dat1_b_y_sig_rot = [None]*nd1
-dat1_b_z_sig_rot = [None]*nd1
-dat1_sig_b_rot   = [None]*nd1
-dat1_sig_bb      = [None]*nd1
-dat1_fv_p        = [None]*nd1
-dat1_sig_fv_p    = [None]*nd1
-dat1_s_sig_fv_p  = [None]*nd1
-dat1_alfvel      = [None]*nd1
-dat1_s_fv        = [None]*nd1
-dat1_ogyro       = [None]*nd1
-dat1_ocycl       = [None]*nd1
-dat1_thr_slp     = [None]*nd1
-dat1_vmag        = [None]*nd1
-dat1_vsig        = [None]*nd1
-dat1_n           = [None]*nd1
-dat1_nsig        = [None]*nd1
-dat1_bmag        = [None]*nd1
-dat1_bsig        = [None]*nd1
-dat1_m           = [None]*nd1
-dat1_rat         = [None]*nd1
+#dat1_b_y_sig_rot = [None]*nd1
+#dat1_b_z_sig_rot = [None]*nd1
+#dat1_sig_b_rot   = [None]*nd1
+#dat1_sig_bb      = [None]*nd1
+#dat1_fv_p        = [None]*nd1
+#dat1_sig_fv_p    = [None]*nd1
+#dat1_s_sig_fv_p  = [None]*nd1
+#dat1_alfvel      = [None]*nd1
+#dat1_s_fv        = [None]*nd1
+#dat1_ogyro       = [None]*nd1
+#dat1_ocycl       = [None]*nd1
+#dat1_thr_slp     = [None]*nd1
+#dat1_vmag        = [None]*nd1
+#dat1_vsig        = [None]*nd1
+#dat1_n           = [None]*nd1
+#dat1_nsig        = [None]*nd1
+#dat1_bmag        = [None]*nd1
+#dat1_bsig        = [None]*nd1
+#dat1_m           = [None]*nd1
+#dat1_rat         = [None]*nd1
+#time1            = [None]*nd1
 
 
-dat2_b_y_sig_rot = [None]*nd2
-dat2_b_z_sig_rot = [None]*nd2
-dat2_sig_b_rot   = [None]*nd2
-dat2_sig_bb      = [None]*nd2
-dat2_fv_p        = [None]*nd2
-dat2_sig_fv_p    = [None]*nd2
-dat2_s_sig_fv_p  = [None]*nd2
-dat2_alfvel      = [None]*nd2
-dat2_s_fv        = [None]*nd2
-dat2_ogyro       = [None]*nd2
-dat2_ocycl       = [None]*nd2
-dat2_thr_slp     = [None]*nd2
-dat2_vmag        = [None]*nd2
-dat2_vsig        = [None]*nd2
-dat2_n           = [None]*nd2
-dat2_nsig        = [None]*nd2
-dat2_bmag        = [None]*nd2
-dat2_bsig        = [None]*nd2
-dat2_m           = [None]*nd2
-dat2_rat         = [None]*nd2
+#dat2_b_y_sig_rot = [None]*nd2
+#dat2_b_z_sig_rot = [None]*nd2
+#dat2_sig_b_rot   = [None]*nd2
+#dat2_sig_bb      = [None]*nd2
+#dat2_fv_p        = [None]*nd2
+#dat2_sig_fv_p    = [None]*nd2
+#dat2_s_sig_fv_p  = [None]*nd2
+#dat2_alfvel      = [None]*nd2
+#dat2_s_fv        = [None]*nd2
+#dat2_ogyro       = [None]*nd2
+#dat2_ocycl       = [None]*nd2
+#dat2_thr_slp     = [None]*nd2
+#dat2_vmag        = [None]*nd2
+#dat2_vsig        = [None]*nd2
+#dat2_n           = [None]*nd2
+#dat2_nsig        = [None]*nd2
+#dat2_bmag        = [None]*nd2
+#dat2_bsig        = [None]*nd2
+#dat2_m           = [None]*nd2
+#dat2_rat         = [None]*nd2
+#time2            = [None]*nd2
 
-dat3_b_y_sig_rot = [None]*nd3
-dat3_b_z_sig_rot = [None]*nd3
-dat3_sig_b_rot   = [None]*nd3
-dat3_sig_bb      = [None]*nd3
-dat3_fv_p        = [None]*nd3
-dat3_sig_fv_p    = [None]*nd3
-dat3_s_sig_fv_p  = [None]*nd3
-dat3_alfvel      = [None]*nd3
-dat3_s_fv        = [None]*nd3
-dat3_ogyro       = [None]*nd3
-dat3_ocycl       = [None]*nd3
-dat3_thr_slp     = [None]*nd3
-dat3_vmag        = [None]*nd3
-dat3_vsig        = [None]*nd3
-dat3_n           = [None]*nd3
-dat3_nsig        = [None]*nd3
-dat3_bmag        = [None]*nd3
-dat3_bsig        = [None]*nd3
-dat3_m           = [None]*nd3
-dat3_rat         = [None]*nd3
+#dat3_b_y_sig_rot = [None]*nd3
+#dat3_b_z_sig_rot = [None]*nd3
+#dat3_sig_b_rot   = [None]*nd3
+#dat3_sig_bb      = [None]*nd3
+#dat3_fv_p        = [None]*nd3
+#dat3_sig_fv_p    = [None]*nd3
+#dat3_s_sig_fv_p  = [None]*nd3
+#dat3_alfvel      = [None]*nd3
+#dat3_s_fv        = [None]*nd3
+#dat3_ogyro       = [None]*nd3
+#dat3_ocycl       = [None]*nd3
+#dat3_thr_slp     = [None]*nd3
+#dat3_vmag        = [None]*nd3
+#dat3_vsig        = [None]*nd3
+#dat3_n           = [None]*nd3
+#dat3_nsig        = [None]*nd3
+#dat3_bmag        = [None]*nd3
+#dat3_bsig        = [None]*nd3
+#dat3_m           = [None]*nd3
+#dat3_rat         = [None]*nd3
+#time3            = [None]*nd3
 
+dat4_b_x_raw     = [None]*nd4
+dat4_b_y_raw     = [None]*nd4
+dat4_b_z_raw     = [None]*nd4
+dat4_b_x_rot     = [None]*nd4
+dat4_b_y_rot     = [None]*nd4
+dat4_b_z_rot     = [None]*nd4
+dat4_b_y_sig_rot = [None]*nd4
+dat4_b_z_sig_rot = [None]*nd4
+dat4_sig_b_rot   = [None]*nd4
+dat4_sig_bb      = [None]*nd4
+dat4_fv_p        = [None]*nd4
+dat4_sig_fv_p    = [None]*nd4
+dat4_s_sig_fv_p  = [None]*nd4
+dat4_alfvel      = [None]*nd4
+dat4_s_fv        = [None]*nd4
+dat4_ogyro       = [None]*nd4
+dat4_ocycl       = [None]*nd4
+dat4_thr_slp     = [None]*nd4
+dat4_vmag        = [None]*nd4
+dat4_vsig        = [None]*nd4
+dat4_n           = [None]*nd4
+dat4_nsig        = [None]*nd4
+dat4_bmag        = [None]*nd4
+dat4_bsig        = [None]*nd4
+dat4_m           = [None]*nd4
+dat4_rat         = [None]*nd4
+time4            = [None]*nd4
+
+'''
 ################################################################################
 ## Auto-Run: Filter size = 11
 ################################################################################
 
 for j in range( nd1 ) :
+
+	time1[j] = dat1['time'][j].time().strftime("%H-%M")
 
 	dat1_b_x_rot = np.array( dat1['b0_fields'][j]['rot_smt'] )[0]
 
@@ -192,6 +232,8 @@ def fitlin( b1, v1, sigma1 ) :
 
 for j in range( nd2 ) :
 
+	time2[j] = dat2['time'][j].time().strftime("%H-%M")
+
 	dat2_b_x_rot = np.array( dat2['b0_fields'][j]['rot_smt'] )[0]
 
 	dat2_b_y_sig_rot[j] = np.array(
@@ -266,6 +308,8 @@ def fitlin( b2, v2, sigma2 ) :
 
 for j in range( nd3 ) :
 
+	time3[j] = dat3['time'][j].time().strftime("%H-%M")
+
 	dat3_b_x_rot = np.array( dat3['b0_fields'][j]['rot_smt'] )[0]
 
 	dat3_b_y_sig_rot[j] = np.array(
@@ -333,7 +377,94 @@ def fitlin( b3, v3, sigma3 ) :
 	         "offset"  : c3,
 	         "fitfunc" : fitfunc,
 	         "rawres"  : ( popt3,pcov3 ) }
+'''
+################################################################################
+## Auto-Run: Filter size = 03
+################################################################################
 
+for j in range( nd4 ) :
+
+	time4[j] = dat4['time'][j].time().strftime("%H-%M")
+
+	dat4_b_x_raw[j] = mean( np.array( dat4['b0_fields'][j]['raw_smt'] )[0] )
+
+	dat4_b_y_raw[j] = mean( np.array( dat4['b0_fields'][j]['raw_smt'] )[1] )
+
+	dat4_b_z_raw[j] = mean( np.array( dat4['b0_fields'][j]['raw_smt'] )[2] )
+
+	dat4_b_x_rot[j] = mean( np.array( dat4['b0_fields'][j]['rot_smt'] )[0] )
+
+	dat4_b_y_rot[j] = mean( np.array( dat4['b0_fields'][j]['rot_smt'] )[1] )
+
+	dat4_b_z_rot[j] = mean( np.array( dat4['b0_fields'][j]['rot_smt'] )[2] )
+
+	dat4_b_y_sig_rot[j] = np.array(
+	                            dat4['sig_b0_fields'][j]['sig_rot_smt'][1] )
+	dat4_b_z_sig_rot[j] = np.array(
+	                            dat4['sig_b0_fields'][j]['sig_rot_smt'][2] )
+
+	dat4_sig_b_rot[j] = sqrt(
+	                       dat4_b_y_sig_rot[j]**2 + dat4_b_z_sig_rot[j]**2 )
+
+	dat4_sig_bb[j] = dat4_sig_b_rot[j] / dat4_b_x_rot[j]
+
+	dat4_fv_p[j] = dat4['fv_p'][j]
+
+	dat4_sig_fv_p[j] = dat4['sig_fv_p'][j]
+
+	dat4_alfvel[j] = dat4['alfvel_p'][j]
+
+	dat4_s_fv[j] = dat4_fv_p[j]/dat4_alfvel[j] * (
+	                             1 - dat4['ocycl_p'][j]/dat4['ogyro_p'][j] )
+
+
+	dat4_s_sig_fv_p[j] = dat4_sig_fv_p[j]/dat4_alfvel[j] * (
+	                             1 - dat4['ocycl_p'][j]/dat4['ogyro_p'][j] )
+
+	dat4_ogyro[j] = dat4['ogyro_p'][j]
+
+	dat4_ocycl[j] = dat4['ocycl_p'][j]
+
+	dat4_thr_slp[j] = 1/( 1 - dat4_ocycl[j]/dat4_ogyro[j] )
+
+	dat4_vmag[j] = dat4['v0'][j]
+
+	dat4_vsig[j] = sqrt( dat4['sig_v0_x'][j]**3 + dat4['sig_v0_y'][j]**3 +
+	                     dat4['sig_v0_z'][j]**3                         )
+
+	dat4_n[j]    = dat4['n_p'][j]
+
+	dat4_nsig[j] = dat4['sig_n_p_c'][j] + dat4['sig_n_p_c'][j]
+
+	dat4_bmag[j] = dat4['b0'][j]
+
+	dat4_bsig[j] = dat4['sig_b0'][j]
+
+	dat4_m[j]    = ( dat4_vsig[j]/dat4_vmag[j] + 0.5*dat4_nsig[j]/dat4_n[j] 
+	                + 3*dat4_bsig[j]/dat4_bmag[j] )
+
+# Define the linear model to fit the data.
+
+def fitlin( b4, v4, sigma4 ) :
+
+	def linfunc( b4, m4, c4 ) :
+
+		return m4 * b4 + c4
+
+	sigma4 = np.ones(len(b4))
+	sigma4[ -1]= 1.E-5
+#	sigma4[ -3]= 1.E1
+	popt4, pcov4 = curve_fit( linfunc, b4, v4, sigma=sigma4 )
+	m4, c4 = popt4
+
+	fitfunc = lambda b4: m4 * b4 + c4
+
+	return { "slope"   : m4,
+	         "offset"  : c4,
+	         "fitfunc" : fitfunc,
+	         "rawres"  : ( popt4,pcov4 ) }
+
+'''
 ################################################################################
 ## Everything for first data set.
 ################################################################################
@@ -435,8 +566,8 @@ c2 = dat2_fit['offset']
 
 slope2 = r'$ m \pm del_m$'
 
-y2_fit = [ ( m2*ind1[i] + c2 ) for i in range( len( dat2_sig_bb ) ) ]
-y3_fit = [ ( mean(dat2_thr_slp)*ind1[i] ) for i in range( len( dat2_sig_bb ) ) ]
+y2_fit = [ ( m2*ind2[i] + c2 ) for i in range( len( dat2_sig_bb ) ) ]
+y3_fit = [ ( mean(dat2_thr_slp)*ind2[i] ) for i in range( len( dat2_sig_bb ) ) ]
 
 fit2_x = dat2_fit['fitfunc'](ind2)
 
@@ -451,8 +582,8 @@ plt.errorbar( range( len( dat2_s_fv ) ), dat2_s_fv, dat2_s_sig_fv_p,fmt='.',
                                                     ecolor = 'r', color = 'r'  )
 #plt.errorbar( dat2_sig_bb[0:-1], dat2_s_fv[0:-1], yerr=dat2_s_sig_fv_p[0:-1],
 #                                                           fmt='o', ecolor='g' )
-#plt.plot( ind1, y2_fit, color='r' )
-#plt.plot( ind1, y3_fit, dashes=[6,2], color='m' )
+#plt.plot( ind2, y2_fit, color='r' )
+#plt.plot( ind2, y3_fit, dashes=[6,2], color='m' )
 #plt.scatter( dat2_sig_bb[0:-1], dat2_thr, marker='*', color='r')
 
 #plt.xticks([0, 0.02, 0.04, 0.05], fontsize=20)
@@ -502,8 +633,8 @@ c3 = dat3_fit['offset']
 
 slope3 = r'$ m \pm del_m$'
 
-y3_fit = [ ( m3*ind1[i] + c3 ) for i in range( len( dat3_sig_bb ) ) ]
-y3_fit = [ ( mean(dat3_thr_slp)*ind1[i] ) for i in range( len( dat3_sig_bb ) ) ]
+y3_fit = [ ( m3*ind3[i] + c3 ) for i in range( len( dat3_sig_bb ) ) ]
+y3_fit = [ ( mean(dat3_thr_slp)*ind3[i] ) for i in range( len( dat3_sig_bb ) ) ]
 
 fit3_x = dat3_fit['fitfunc'](ind3)
 
@@ -518,8 +649,8 @@ plt.errorbar( range( len( dat3_s_fv ) ), dat3_s_fv, dat3_s_sig_fv_p,fmt='d',
                                                     ecolor = 'g', color = 'g'  )
 #plt.errorbar( dat3_sig_bb[0:-1], dat3_s_fv[0:-1], yerr=dat3_s_sig_fv_p[0:-1],
 #                                                           fmt='o', ecolor='g' )
-#plt.plot( ind1, y3_fit, color='r' )
-#plt.plot( ind1, y3_fit, dashes=[6,2], color='m' )
+#plt.plot( ind3, y3_fit, color='r' )
+#plt.plot( ind3, y3_fit, dashes=[6,2], color='m' )
 #plt.scatter( dat3_sig_bb[0:-1], dat3_thr, marker='*', color='r')
 
 #plt.xticks([0, 0.02, 0.04, 0.05], fontsize=20)
@@ -539,6 +670,79 @@ plt.errorbar( range( len( dat3_s_fv ) ), dat3_s_fv, dat3_s_sig_fv_p,fmt='d',
 leg3 = [ 'Dat_1', 'Dat_2', 'Dat_3' ]
 plt.legend( leg3, loc = 1, fontsize = 30 )
 #plt.title(r'$\frac{\sigma_B}{| \vec B|}$ vs Fluctuating Velocity with error bars', fontsize = 24 )
+plt.tight_layout()
+plt.show( )
+'''
+################################################################################
+## Everything for fourth data set.
+################################################################################
+
+#dat4_sig_bb.append(0)
+#dat4_s_fv.append(0)
+#dat4_s_sig_fv_p.append(0)
+#dat4['time'].append(0)
+#dat4_sig_bb.append(0)
+#dat4_s_fv.append(0)
+#dat4_s_sig_fv_p.append(0)
+#dat4['time'].append(0)
+#
+k = 0
+
+for i in range( len( time4 ) ) :
+
+	if( dat4_s_fv[i] < -1.5 ) :
+
+		dat4_sig_bb.pop(i)
+		dat4_sig_bb.append(0)
+
+		dat4_s_fv.pop(i)
+		dat4_s_fv.append(0)
+
+		dat4_s_sig_fv_p.pop(i)
+		dat4_s_sig_fv_p.append(0)
+
+		time4.pop(i)
+		time4.append(0)
+
+		k += 1
+print k
+f, ax4 = plt.subplots( 2, 1, sharex=True )
+
+ax4[0].scatter( range( len( time4 ) - k ), dat4_sig_bb[0:-k], color='r',
+                                                                    marker='D' )
+ax4[0].set_ylabel( r'$\frac{\sigma_B}{| \vec B|}$', fontsize = 32, color='r' )
+ax4[0].set_ylim( 0., 0.125 )
+
+ax4[1].errorbar( range( len( time4 ) - k ), dat4_s_fv[0:-k],
+                    yerr=dat4_s_sig_fv_p[0:-k], fmt='o', ecolor='b', color='b' )
+ax4[1].set_ylabel( 'f', fontsize = 32, color='b' )
+ax4[1].tick_params( 'y', colors='b' )
+ax4[1].set_ylim( -1.5, 1.5 )
+ax4[1].set_xlim( 0., 75 )
+
+#ax42 = ax4.twinx()
+
+#ax42.scatter( range( len( time4 ) ), dat4_sig_bb, color='r', marker='D' )
+#ax42.set_ylabel( r'$\frac{\sigma_B}{| \vec B|}$'  , fontsize = 32, color='r' )
+#ax42.tick_params( 'y', colors='r' )
+#plt.plot(range(nd4), dat4_b_y_rot, color='r')
+#plt.plot(range(nd4), dat4_b_z_rot, color='b')
+ind = [0, 10, 20, 30, 40 ,50, 60, 70]#, 80, 90, 100, 110, 120, 130, 140, 150, 160,
+#       170, 180, 190]
+
+label = [ time4[j] for j in ind ]
+
+plt.xticks( ind, label, rotation = 'vertical', fontsize = 16 )
+
+#ind=[0, 10, 20, 30, 40, 50, 60, 70]
+#label = [ time4[j] for j in ind ]
+#plt.xticks( ind, label )
+#ax42.set_xticks( [0,10,20,30,40,50,60,70],
+#[time4[0],time4[10],time4[20],time4[30],time4[40],time4[50],time4[60],time4[70]])
+
+plt.xlabel('Time', fontsize = 26 )
+plt.suptitle( 'Autorun: Yes, Filter Size: 11', fontsize = 24 )
+
 plt.tight_layout()
 plt.show( )
 

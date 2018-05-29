@@ -472,11 +472,11 @@ class core( QObject ) :
 			self.nln_set_sel_vld = tile( False, self.nln_n_pop )
 
 			self.nln_set_gss_n[0]   =  1.00
-			self.nln_set_gss_n[1]   =  0.20
+			self.nln_set_gss_n[1]   =  0.30
 			self.nln_set_gss_n[2]   =  0.02
 			self.nln_set_gss_n[3]   =  0.01
 
-			self.nln_set_gss_d[1]   =  0.03
+			self.nln_set_gss_d[1]   =  0.10
 			self.nln_set_gss_d[2]   =  0.01
 			self.nln_set_gss_d[3]   =  0.05
 
