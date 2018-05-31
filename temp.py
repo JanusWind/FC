@@ -1,3 +1,5 @@
+'''
+
 dat4_b_x_raw     = [None]*nd4
 dat4_b_y_raw     = [None]*nd4
 dat4_b_z_raw     = [None]*nd4
@@ -53,3 +55,65 @@ label = [ time4[j] for j in ind ]
 
 plt.xticks( ind, label, rotation = 'vertical', fontsize = 16 )
 plt.show()
+
+f1, ax41 = plt.subplots( )
+
+ax41.set_ylabel( r'$\left< \frac{\Delta{\vec{B}}}{| \vec B|} \right >$',
+fontsize = 32, color='m' )
+#ax41.set_ylabel( r'$h$' , fontsize = 32, color='m' )
+ax41.set_ylim( 0, 0.1 )
+ax42 = ax41.twinx()
+
+#ax42.scatter( range( len( time4 ) - k ), dat4_sig_bb[0:-k], color='r',
+#                                                                    marker='D' )
+if ( k > 0 ) :
+
+	ax41.plot( range( len( time4 ) - k ), dat4_db_raw[0:-k], color='m',
+	                                                            marker='^' )
+	ax42.plot( range( len( time4 ) - k ), dat4_sig_bb[0:-k], color='g',
+	                                                            marker='d' )
+else :
+
+	ax41.plot( range( len( time4 ) ), dat4_s_fv, color='m', marker='^'   )
+	ax42.plot( range( len( time4 ) ), dat4_db_raw, color='g', marker='d' )
+
+ax42.tick_params( 'y', colors='g' )
+ax42.set_ylabel( r'$\frac{\sigma\vec{B}}{| \vec B|} $',
+fontsize = 32, color='g' )
+#ax42.set_ylabel( r'$\left< \frac{\Delta{\vec{B}}}{| \vec B|} \right >$',
+#fontsize = 32, color='g' )
+ax42.set_ylim( 0., 0.1 )
+#plt.plot(range(nd4), dat4_b_y_rot, color='r')
+#plt.plot(range(nd4), dat4_b_z_rot, color='b')
+plt.xticks( ind, label, rotation = 'vertical', fontsize = 16 )
+
+#ind=[0, 10, 20, 30, 40, 50, 60, 70]
+#label = [ time4[j] for j in ind ]
+#plt.xticks( ind, label )
+#ax42.set_xticks( [0,10,20,30,40,50,60,70],
+#[time4[0],time4[10],time4[20],time4[30],time4[40],time4[50],time4[60],time4[70]])
+
+plt.xlabel('Time', fontsize = 26 )
+plt.suptitle( 'Autorun: Yes, Filter Size: 11', fontsize = 24 )
+
+plt.tight_layout()
+plt.show( )
+'''
+
+fname3 = 'test_1_ms.jns'
+dat3   = [0]*len( fname3 )
+
+dat3 = pickle.load( open( fname3, 'rb' ) )
+
+nd3 = len( dat3['b0'] )
+
+dat3 = pickle.load( open( fname3, 'rb' ) )
+
+plt.figure( )
+
+plt.scatter( range( len( time4 ) ), dat4['t_p'], color='b', marker='^' )
+plt.scatter( range( len( time4 ) -2 ), dat3['t_p'], color='r', marker='D' )
+
+plt.ylim([35, 60])
+
+plt.show( )

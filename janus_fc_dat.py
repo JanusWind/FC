@@ -222,6 +222,7 @@ class fc_dat( ) :
 		fv_vec = [ ( fv * db[i]/ linalg.norm( av_b ) )
 		                               for i in range( len( db_nrm ) ) ]
 
+#		print calc_arr_dot( db, self._vec_b[key] )
 		if ( dv is None ) :
 			v_vec = [ ( v0[i] - fv_vec[i] )
 			                           for i in range( len( v0 ) ) ]

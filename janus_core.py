@@ -1067,6 +1067,10 @@ class core( QObject ) :
 			self.mfi_y_fit = irfft( ffby, n = len( self.mfi_s ) ) 
 			self.mfi_z_fit = irfft( ffbz, n = len( self.mfi_s ) ) 
 
+			self.mfi_x_fit = [ ( 
+			                 self.mfi_x_fit[i] + self.mfi_x_rot[i] )
+			                  for i in range( len ( self.mfi_s ) ) ]
+
 			self.mfi_vec_fit = [ self.mfi_x_fit, self.mfi_y_fit,
 			                     self.mfi_z_fit                  ]
 
@@ -1128,7 +1132,7 @@ class core( QObject ) :
 
 					gss_a = std( b ) * 2.**0.5
 
-					# Compute the mean of the magnetic filed
+					# Compute the mean of the magnetic field
 					# and use it as the initial guess of
 					# off-set of the data.
 
@@ -1154,7 +1158,8 @@ class core( QObject ) :
 					fitfunc = lambda t: A * sin(w*t + p) + c
 
 					return { "amp"     : A,
-					         "omega"   : w,  "phase": p,
+					         "omega"   : w/(2.*pi),
+					         "phase"   : p,
 					         "offset"  : c,  "freq" : f,
 					         "period"  : [ ( 0 if f[i] == 0 else 1./f[i] ) for i in range( len ( f ) ) ],
 					         "fitfunc" : fitfunc,
@@ -1436,6 +1441,21 @@ class core( QObject ) :
 			               "mfi_set_raw_smt": self.mfi_vec_raw_smt,
 			               "mfi_set_rot_smt": self.mfi_vec_rot_smt,
 			               "mfi_set_fit_smt": self.mfi_vec_fit_smt }
+
+		if( any ( x is None for x in self.mfi_vec_raw ) or
+		    any ( x is None for x in self.mfi_vec_rot ) or
+		    any ( x is None for x in self.mfi_vec_fit )     ) :
+
+			self.b0_avg_fields = None
+		else :
+
+			self.b0_avg_fields = {
+			           "mfi_set_raw"    : self.mfi_avg_vec,
+			           "mfi_set_rot"    : self.mfi_avg_vec_rot_smt,
+			           "mfi_set_fit"    : self.mfi_avg_vec_fit_smt,
+			           "mfi_set_raw_smt": self.mfi_avg_vec_raw_smt,
+			           "mfi_set_rot_smt": self.mfi_avg_vec_rot_smt,
+			           "mfi_set_fit_smt": self.mfi_avg_vec_fit_smt }
 
 		# Use interpolation to estiamte the magnetic field vector for
 		# each datum in the FC spectrum.
@@ -1928,14 +1948,14 @@ class core( QObject ) :
 		# (linear) moments analysis.
 
 		self.mom_curr = self.fc_spec.calc_curr(
-		                                    self.mom_res['m_p'],
-		                                    self.mom_res['q_p'],
-		                                    self.mom_res['v0_vec'],
-		                                    self.mom_res['fv'],
-		                                    self.mfi_avg_vec,
-		                                    self.mom_res['n_p_c'], 0.,
-		                                    self.mom_res['w_p_c'],
-		                                    self.mfi_set_key   )
+		                           self.mom_res['m_p'],
+		                           self.mom_res['q_p'],
+		                           self.mom_res['v0_vec'],
+		                           self.mom_res['fv'],
+		                           self.b0_avg_fields[self.mfi_set_key],
+		                           self.mom_res['n_p_c'], 0.,
+		                           self.mom_res['w_p_c'],
+		                           self.mfi_set_key                    )
 
 		# Message the user that the moments analysis has completed.
 
@@ -2567,11 +2587,12 @@ class core( QObject ) :
 
 			self.nln_gss_curr_ion.append(
 			     self.fc_spec.calc_curr(
-			                    self.nln_plas.arr_pop[p]['m'],
-			                    self.nln_plas.arr_pop[p]['q'],
-			                    pop_v0_vec, fv, self.mfi_avg_vec,
-			                    pop_n, pop_dv, pop_w,
-			                    self.mfi_set_key                 ) )
+			                   self.nln_plas.arr_pop[p]['m'],
+			                   self.nln_plas.arr_pop[p]['q'],
+			                   pop_v0_vec, fv,
+				           self.b0_avg_fields[self.mfi_set_key],
+			                   pop_n, pop_dv, pop_w,
+			                   self.mfi_set_key                  ) )
 
 		# Alter the axis order of the array of currents.
 
@@ -2685,7 +2706,7 @@ class core( QObject ) :
 				# magnitude thereof) of this ion species (based
 				# on the initial guess).
 
-				vel = array( self.nln_plas['vec_v0'] ) +\
+				vel = array( self.nln_plas['vec_v0'] ) -\
 				      ( self.mfi_avg_nrm/self.mfi_avg_mag ) * \
 				                    array( self.nln_plas['fv'] )
 
@@ -2863,12 +2884,12 @@ class core( QObject ) :
 			for d in range( len( dat ) ) :
 
 				curr[d] += dat[d].calc_curr(
-				                self.nln_plas.arr_pop[p]['m'],
-				                self.nln_plas.arr_pop[p]['q'],
-				                prm_v0, prm_fv,
-				                self.mfi_avg_vec,
-				                prm_n,  prm_dv, prm_w,
-				                self.mfi_set_key               )
+				           self.nln_plas.arr_pop[p]['m'],
+				           self.nln_plas.arr_pop[p]['q'],
+				           prm_v0, prm_fv,
+				           self.b0_avg_fields[self.mfi_set_key],
+				           prm_n,  prm_dv, prm_w,
+				           self.mfi_set_key                    )
 
 		# Return the list of total currents from all modeled ion
 		# species.
@@ -3104,7 +3125,8 @@ class core( QObject ) :
 			     self.fc_spec.calc_curr ( 
 			                  self.nln_plas.arr_pop[p]['m'],
 			                  self.nln_plas.arr_pop[p]['q'],
-			                  pop_v0_vec, fv, self.mfi_avg_vec,
+			                  pop_v0_vec, fv,
+			                  self.b0_avg_fields[self.mfi_set_key],
 			                  pop_n, pop_dv, pop_w,
 			                  self.mfi_set_key                   ) )
 
@@ -3619,10 +3641,10 @@ class core( QObject ) :
 				     ( self.mom_res is None )     ) :
 					self.stop_auto_run = True
 					break
-				if ( ( self.dyn_nln               ) and
-				     ( self.nln_res_ion_n is None )     ) :
-					self.stop_auto_run = True
-					break
+#				if ( ( self.dyn_nln               ) and
+#				     ( self.nln_res_ion_n is None )     ) :
+#					self.stop_auto_run = True
+#					break
 
 			# If the spectrum just loaded was the last that needed
 			# to be loaded, end.

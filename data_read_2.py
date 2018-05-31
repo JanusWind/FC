@@ -24,7 +24,7 @@ plt.close('all')
 
 fname1 = 'fm_22.jns'
 fname2 = 'fm_14.jns'
-fname3 = 'ms_14.jns'
+fname3 = 'test_1_ms.jns'
 
 i = 0
 
@@ -266,7 +266,7 @@ plt.legend( leg1, loc = 2, fontsize = 30 )
 #plt.title(r'$\frac{\sigma_B}{| \vec B|}$ vs Fluctuating Velocity with error bars', fontsize = 24 )
 plt.tight_layout()
 plt.show( )
-'''
+
 ################################################################################
 ## Everything for second data set.
 ################################################################################
@@ -331,5 +331,5 @@ plt.legend( leg2, loc = 2, fontsize = 30 )
 #plt.title(r'$\frac{\sigma_B}{| \vec B|}$ vs Fluctuating Velocity with error bars', fontsize = 24 )
 plt.tight_layout()
 plt.show( )
-'''
+
 print ('It took','%.6f'% (time.time()-start), 'seconds.')#plt,show()
