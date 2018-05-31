@@ -2917,10 +2917,10 @@ class core( QObject ) :
 				     ( self.mom_res is None )     ) :
 					self.stop_auto_run = True
 					break
-				if ( ( self.dyn_nln               ) and
-				     ( self.nln_res_ion_n is None )     ) :
-					self.stop_auto_run = True
-					break
+#				if ( ( self.dyn_nln               ) and
+#				     ( self.nln_res_ion_n is None )     ) :
+#					self.stop_auto_run = True
+#					break
 
 			# If the spectrum just loaded was the last that needed
 			# to be loaded, end.
