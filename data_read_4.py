@@ -9,7 +9,7 @@ import pickle
 import numpy as np
 from numpy import mean, sqrt, corrcoef
 import matplotlib.pyplot as plt
-from matplotlib import gridspec
+from matplotlib import gridspec, rc
 from pylab import rcParams
 from scipy.optimize import curve_fit
 
@@ -650,6 +650,11 @@ plt.savefig('fv_delb_fz11', format='eps', dpi=4000)
 
 plt.figure( )
 
+rc( 'text', usetex=True )
+
+plt.xlabel( r'$\left< \delta B\right >\,/\,B_0$', fontsize = 24 )
+plt.ylabel( r'$\delta V\,/\,v_A$', fontsize = 24 )
+
 plt.errorbar( dat3_db[0:-1], dat3_s_fv[0:-1], yerr=dat3_s_sig_fv_p[0:-1],
                                                            fmt='o', ecolor='g' )
 plt.plot( ind3, y3_fit_dat, color='r' )
@@ -659,11 +664,15 @@ plt.scatter( dat3_db[0:-1], dat3_thr, marker='*', color='r')
 plt.xticks([0, 0.015, 0.03, 0.045, 0.06, 0.075], fontsize=20)
 plt.yticks([0, 0.015, 0.03, 0.045, 0.06, 0.075], fontsize=20)
 
-plt.text( 0.0, -0.003, 'Slope =' '%s' r'$\pm$' '%s'
-%( round( m3, 2 ), round( mean( dat3_m ), 2 ) ), fontsize = 24 )
+#plt.text( 0.0, -0.003, r'${\rm Fit}\ {\rm Slope} =' '%s' r'\pm$' '%s$'
+#%( round( m3, 2 ), round( mean( dat3_m ), 2 ) ), fontsize = 24 )
 
-plt.xlabel( r'$\left< \Delta \vec {B}/|\vec B|\right >$', fontsize = 24 )
-plt.ylabel( r'$\delta v/v_A$', fontsize = 24 )
+plt.text( 0.0, -0.003,
+          r'${\rm Fit}\ {\rm Slope} = %.2f \pm %.2f$'.format(
+                                           m3, mean( dat3_m ) ),
+          fontsize = 24, rotation=45                             )
+
+plt.text( 0.0, 0.1, r'${\rm Expected}\ {\rm Fit} = 1$ )
 
 #leg3 = [ 'Linear Fit', 'Theoretical Data', 'Observations' ]
 #plt.legend( leg3, loc = 2, fontsize = 24 )
