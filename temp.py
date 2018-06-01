@@ -103,17 +103,39 @@ plt.show( )
 fname3 = 'test_1_ms.jns'
 dat3   = [0]*len( fname3 )
 
-dat3 = pickle.load( open( fname3, 'rb' ) )
-
 nd3 = len( dat3['b0'] )
 
 dat3 = pickle.load( open( fname3, 'rb' ) )
+dat4 = pickle.load( open( fname4, 'rb' ) )
+
+time3 = [None]*len( dat3['time'] )
+time4 = [None]*len( dat4['time'] )
+
+for i in range( nd3 ) :
+
+	time3[i] = dat3['time'][i].time().strftime("%H-%M")
+
+for i in range( nd4 ) :
+
+	time4[i] = dat4['time'][i].time().strftime("%H-%M")
+
+t_p_3 = dat3['t_p_per']
+
+t_p_4 = dat4['t_p_per']
+
+t_p_4.pop(22)
+t_p_4.pop(28)
+
+diff = [ ( t_p_4[i] - t_p_3[i] ) for i in range( 72 ) ]
 
 plt.figure( )
 
-plt.scatter( range( len( time4 ) ), dat4['t_p'], color='b', marker='^' )
-plt.scatter( range( len( time4 ) -2 ), dat3['t_p'], color='r', marker='D' )
+plt.scatter( range( len( time4 ) ), t_p_4, color='b', marker='^' )
+plt.scatter( range( len( time4 ) ), t_p_3, color='r', marker='D' )
 
 plt.ylim([35, 60])
 
+plt.figure( )
+
+plt.plot( range( 72 ), diff )
 plt.show( )

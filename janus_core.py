@@ -290,7 +290,7 @@ class core( QObject ) :
 			self.mfi_x_rot           = None
 			self.mfi_y_rot           = None
 			self.mfi_z_rot           = None
-			self.mfi_vec_ro          = None
+			self.mfi_vec_rot         = None
 
 			self.mfi_vec_raw         = None
 			self.mfi_vec_rot         = None

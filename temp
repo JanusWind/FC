@@ -1,0 +1,146 @@
+for j in range( nd3 ) :
+
+	time3[j] = dat3['time'][j].time().strftime("%H-%M")
+
+	dat3_b_x_raw[j] = mean( np.array( dat3['b0_fields'][j]['raw_smt'] )[0] )
+
+	dat3_b_y_raw[j] = mean( np.array( dat3['b0_fields'][j]['raw_smt'] )[1] )
+
+	dat3_b_z_raw[j] = mean( np.array( dat3['b0_fields'][j]['raw_smt'] )[2] )
+
+	dat3_b_x_rot[j] = mean( np.array( dat3['b0_fields'][j]['rot_smt'] )[0] )
+
+	dat3_b_y_rot[j] = mean( np.array( dat3['b0_fields'][j]['rot_smt'] )[1] )
+
+	dat3_b_z_rot[j] = mean( np.array( dat3['b0_fields'][j]['rot_smt'] )[2] )
+
+	dat3_db_x_raw[j] = mean( [ abs( ( dat3['b0_fields'][j]['raw_smt'][0][k] -
+	                                dat3_b_x_raw[j] ) / dat3_b_x_rot[j] )
+	                            for k in range( len( time3 ) ) ] )
+
+	dat3_db_y_raw[j] = mean( [ abs( ( dat3['b0_fields'][j]['raw_smt'][1][k] -
+	                                dat3_b_y_raw[j] ) / dat3_b_x_rot[j] )
+	                            for k in range( len( time3 ) ) ] )
+
+	dat3_db_z_raw[j] = mean( [ abs( ( dat3['b0_fields'][j]['raw_smt'][2][k] -
+	                                dat3_b_z_raw[j] )  / dat3_b_x_rot[j] )
+	                            for k in range( len( time3 ) ) ] )
+
+
+	dat3_b_y_sig_rot[j] = np.array(
+	                            dat3['sig_b0_fields'][j]['sig_rot_smt'][1] )
+	dat3_b_z_sig_rot[j] = np.array(
+	                            dat3['sig_b0_fields'][j]['sig_rot_smt'][2] )
+
+	dat3_sig_b_rot[j] = sqrt(
+	                       dat3_b_y_sig_rot[j]**2 + dat3_b_z_sig_rot[j]**2 )
+
+	dat3_sig_bb[j] = dat3_sig_b_rot[j] / dat3_b_x_rot[j]
+
+	dat3_fv_p[j] = dat3['fv_p'][j]
+
+	dat3_sig_fv_p[j] = dat3['sig_fv_p'][j]
+
+	dat3_alfvel[j] = dat3['alfvel_p'][j]
+
+	dat3_s_fv[j] = dat3_fv_p[j]/dat3_alfvel[j] * (
+	                             1 - dat3['ocycl_p'][j]/dat3['ogyro_p'][j] )
+
+	dat3_s_sig_fv_p[j] = dat3_sig_fv_p[j]/dat3_alfvel[j] * (
+	                             1 - dat3['ocycl_p'][j]/dat3['ogyro_p'][j] )
+
+	dat3_ogyro[j] = dat3['ogyro_p'][j]
+
+	dat3_ocycl[j] = dat3['ocycl_p'][j]
+
+	dat3_thr_slp[j] = 1/( 1 - dat3_ocycl[j]/dat3_ogyro[j] )
+
+	dat3_vmag[j] = dat3['v0'][j]
+
+	dat3_vsig[j] = sqrt( dat3['sig_v0_x'][j]**3 + dat3['sig_v0_y'][j]**3 +
+	                     dat3['sig_v0_z'][j]**3                         )
+
+	dat3_n[j]    = dat3['n_p'][j]
+
+	dat3_nsig[j] = dat3['sig_n_p_c'][j] + dat3['sig_n_p_c'][j]
+
+	dat3_bmag[j] = dat3['b0'][j]
+
+	dat3_bsig[j] = dat3['sig_b0'][j]
+
+	dat3_m[j]    = ( dat3_vsig[j]/dat3_vmag[j] + 0.5*dat3_nsig[j]/dat3_n[j] 
+	                + 3*dat3_bsig[j]/dat3_bmag[j] )
+
+	dat3_vmag[j] = dat3['v0'][j]
+
+	dat3_vsig[j] = sqrt( dat3['sig_v0_x'][j]**2 + dat3['sig_v0_y'][j]**2 +
+	                     dat3['sig_v0_z'][j]**2                         )
+
+	dat3_n[j]    = dat3['n_p'][j]
+
+	dat3_nsig[j] = dat3['sig_n_p_c'][j] + dat3['sig_n_p_c'][j]
+
+	dat3_bmag[j] = dat3['b0'][j]
+
+	dat3_bsig[j] = dat3['sig_b0'][j]
+
+dat3_db_raw = [ sqrt( dat3_db_x_raw[i]**2 + dat3_db_y_raw[i]**2 + 
+                      dat3_db_z_raw[i]**2 ) for i in range( len( time3 ) ) ]
+
+# Define the linear model to fit the data.
+
+def fitlin( b3, v3, sigma3 ) :
+
+	def linfunc( b3, m3, c3 ) :
+
+		return m3 * b3 + c3
+
+	sigma3 = np.ones(len(b3))
+	sigma3[ -1]= 1.E-5
+#	sigma4[ -3]= 1.E1
+	popt3, pcov3 = curve_fit( linfunc, b3, v3, sigma=sigma3 )
+	m3, c3 = popt3
+
+	fitfunc = lambda b3: m3 * b3 + c3
+
+	return { "slope"   : m3,
+	         "offset"  : c3,
+	         "fitfunc" : fitfunc,
+	         "rawres"  : ( popt3,pcov3 ) }
+
+#dat3_sig_bb.append(0)
+#dat3_s_fv.append(0)
+#dat3_s_sig_fv_p.append(0)
+#
+#dat3_sig_bb.pop(-3)
+#dat3_s_fv.pop(-3)
+#dat3_s_sig_fv_p.pop(-3)
+#
+#dat3_sig_bb.pop(-5)
+#dat3_s_fv.pop(-5)
+#dat3_s_sig_fv_p.pop(-5)
+
+dat3_fit = fitlin( dat3_sig_bb, dat3_s_fv, dat3_s_sig_fv_p )
+
+# Define list of index.
+
+ind3 = linspace( 0., max( dat3_sig_bb ), len( dat3_sig_bb ) )
+
+# Extract the slope and intercept.
+
+m3 = dat3_fit['slope']
+c3 = dat3_fit['offset']
+
+dat3_m = mean( np.array( dat3_vsig )/dat3_vmag + 0.5*np.array( dat3_nsig )/dat3_n
+          + 2*np.array( dat3_bsig )/dat3_bmag )
+
+slope3 = r'$ m \pm del_m$'
+
+y3_fit = [ ( m3*ind3[i] + c3 ) for i in range( len( dat3_sig_bb ) ) ]
+
+fit3_x = dat3_fit['fitfunc'](ind3)
+
+cv3 = corrcoef( dat3_sig_bb[0:-1], dat3_s_fv[0:-1] )[0,1]
+
+
+
