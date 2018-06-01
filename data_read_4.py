@@ -29,18 +29,18 @@ fname3 = 'data_final_filter_21.jns'
 i = 0
 
 dat1   = [0]*len( fname1 )
-dat2   = [0]*len( fname2 )
-dat3   = [0]*len( fname3 )
+#dat2   = [0]*len( fname2 )
+#dat3   = [0]*len( fname3 )
 
 dat1 = pickle.load( open( fname1, 'rb' ) )
-dat2 = pickle.load( open( fname2, 'rb' ) )
-dat3 = pickle.load( open( fname3, 'rb' ) )
+#dat2 = pickle.load( open( fname2, 'rb' ) )
+#dat3 = pickle.load( open( fname3, 'rb' ) )
 
 # Find the total number of data points in all the files being analyzed.
 
 nd1 = len( dat1['b0'] )
-nd2 = len( dat2['b0'] )
-nd3 = len( dat3['b0'] )
+#nd2 = len( dat2['b0'] )
+#nd3 = len( dat3['b0'] )
 
 dat1_b_x_raw     = [None]*nd1
 dat1_b_y_raw     = [None]*nd1
@@ -74,7 +74,7 @@ dat1_bsig        = [None]*nd1
 dat1_m           = [None]*nd1
 dat1_rat         = [None]*nd1
 time1            = [None]*nd1
-
+'''
 dat2_b_x_raw     = [None]*nd2
 dat2_b_y_raw     = [None]*nd2
 dat2_b_z_raw     = [None]*nd2
@@ -140,7 +140,7 @@ dat3_bsig        = [None]*nd3
 dat3_m           = [None]*nd3
 dat3_rat         = [None]*nd3
 time3            = [None]*nd3
-
+'''
 
 ################################################################################
 ## For data set 1 of filter size 01.
@@ -287,7 +287,7 @@ fit1_x = dat1_fit['fitfunc'](ind1)
 cv1 = corrcoef( dat1_db[0:-1], dat1_s_fv[0:-1] )[0,1]
 
 dat1_thr = [ dat1_db[i] * dat1_thr_slp[i] for i in range( len( dat1_db )-1 ) ]
-
+'''
 ################################################################################
 ## For data set 2 of filter size 11.
 ################################################################################
@@ -672,7 +672,7 @@ plt.text( 0.0, -0.003,
                                            m3, mean( dat3_m ) ),
           fontsize = 24, rotation=45                             )
 
-plt.text( 0.0, 0.1, r'${\rm Expected}\ {\rm Fit} = 1$ )
+plt.text( 0.0, 0.1, r'${\rm Expected}\ {\rm Fit} = 1$' )
 
 #leg3 = [ 'Linear Fit', 'Theoretical Data', 'Observations' ]
 #plt.legend( leg3, loc = 2, fontsize = 24 )
@@ -683,5 +683,5 @@ plt.tight_layout()
 plt.savefig('fv_delb_fz21', format='eps', dpi=4000)
 
 #plt.show( )
-
+'''
 print ('It took','%.6f'% (time.time()-start), 'seconds.')#plt,show()
