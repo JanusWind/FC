@@ -1393,8 +1393,8 @@ class core( QObject ) :
 		self.mfi_avg_nrm_rot_smt =\
 		             self.mfi_avg_vec_rot_smt / self.mfi_avg_mag_rot_smt
 
-		# Smooth the fitted magnetic field data using the median filter of
-		# given window size and calculate its standard deviation.
+		# Smooth the fitted magnetic field data using the median filter
+		# of given window size and calculate its standard deviation.
 
 		self.mfi_x_fit_smt = medfilt(
 		                       self.mfi_x_fit, self.opt['mom_med_fil'] )
