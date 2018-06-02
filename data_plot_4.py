@@ -1,4 +1,3 @@
-
 ################################################################################
 ## Plotting figures: Data Set 1
 ################################################################################
@@ -29,14 +28,6 @@ plt.text( 0.055, 0.0493, 'Fit Slope = ' '%s' r'$\, \pm \,$' '%s'
 %( round( m1, 2 ), round( mean( dat1_m ), 2 ) ), fontsize = 20, rotation=33 )
 
 plt.text( 0.052, 0.069, 'Expected Slope = 1', fontsize = 20, rotation=45 )
-
-#plt.arrow(0, 0.075, 0.001, 0.003, head_width=0.001, head_length=0.002, fc='k', ec='k')
-#plt.arrow( 0.075, 0.0, 0.001, (0.0001-0) , shape='full', lw=0,
-#length_includes_head=True, head_width=.0015)
-#leg1 = [ 'Linear Fit', 'Theoretical Data', 'Observations' ]
-#plt.legend( leg1, loc = 2, fontsize = 30 )
-#plt.title(r'$\frac{\sigma_B}{| \vec B|}$ vs Fluctuating Velocity with error
-#bars', fontsize = 24 )
 
 rc( 'text', usetex=True )
 
