@@ -373,7 +373,7 @@ class widget_nln_res( format_TextEdit ) :
 								self.prnt_dcm(
 								pop[
 							        'sig_w'],1     )
-							self.prnt_htm( ' km/s' ) 
+							self.prnt_htm( ' km/s' )
 
 				# Print the population's temperature(s).
 
@@ -455,7 +455,7 @@ class widget_nln_res( format_TextEdit ) :
 			if  ( len( self.core.nln_res_plas.lst_pop( spc )
 			                                               ) > 1 ) :
 				if ( ( self.core.opt['res_par_s'] == True ) or
-				     ( self.core.opt['res_par_k'] == True )  )  :
+				     ( self.core.opt['res_par_k'] == True )  ) :
 
 					self.prnt_brk( )
 					self.prnt_brk( )
