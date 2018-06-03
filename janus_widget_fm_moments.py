@@ -43,7 +43,8 @@ from janus_step import step
 
 # Load the necessary "numpy" array modules and numeric-function modules.
 
-from numpy import amax, amin, array, ceil, floor, log10, sqrt, tile, where, mean, std
+from numpy import amax, amin, array, ceil, floor, log10, sqrt, tile, where,\
+                  mean, std
 
 # Load the necessary threading modules.
 
@@ -54,7 +55,7 @@ from scipy.signal import medfilt
 
 
 ################################################################################
-## DEFINE THE "widget_fm_moments" CLASS TO CUSTOMIZE "QWidget" FOR Wind/FC PLOTS.
+## DEFINE THE "widget_fm_moments" TO CUSTOMIZE "QWidget" FOR Wind/FC PLOTS.
 ################################################################################
 
 class widget_fm_moments( QWidget ) :
@@ -73,14 +74,14 @@ class widget_fm_moments( QWidget ) :
 		# Initialize the counter of repaint events for this widget as
 		# well as a maximum value for this counter.
 
-		# Note.  For some reason, adjusting the individual plots to have
-		#        uniform sizes is difficult to achieve before the widget
-		#        is rendered.  Thus, once a paint event occurs, the
-		#        "self.paintEvent( )" function picks it up and makes a
-		#        call to "self.ajst_grd( )".  This counter and its
-		#        maximum value are to used ensure that "self.paintEvent( )"
-		#        makes such a call only in response to the intial few
-		#        painting (so as to prevent an infinite loop).
+		# Note:For some reason, adjusting the individual plots to have
+		#      uniform sizes is difficult to achieve before the widget
+		#      is rendered.  Thus, once a paint event occurs, the
+		#      "self.paintEvent( )" function picks it up and makes a
+		#      call to "self.ajst_grd( )".  This counter and its
+		#      maximum value are to used ensure that "self.paintEvent( )
+		#      makes such a call only in response to the intial few
+		#      painting (so as to prevent an infinite loop).
 
 		# Note.  The first paint seems to be a "dummy" of some sort.
 		#        Whatever the case, "self.n_paint_max = 1" seems to
@@ -133,7 +134,7 @@ class widget_fm_moments( QWidget ) :
 #		self.pen_crv_gr = mkPen( color='#342C2B' )
 
 		self.pen_crv = [ self.pen_crv_r, self.pen_crv_g, self.pen_crv_b,
-		                 self.pen_crv_gr, self.pen_crv_br              ]    
+		                 self.pen_crv_gr, self.pen_crv_br              ]
 		self.bsh_pnt_c = mkBrush( color='c' )
 		self.bsh_pnt_y = mkBrush( color='y' )
 		self.bsh_pnt_r = mkBrush( color='r' )
@@ -417,6 +418,9 @@ class widget_fm_moments( QWidget ) :
 				                        self.lim_x[1] )
 				self.axs_y[j].setRange( self.lim_y[0],
 				                        self.lim_y[1] )
+#				self.axs_y[j].set_yticks( range( self.lim_y[0],
+#				                                 self.lim_y[1]),
+#				           ( self.lim_y[1] - self.lim_y[0] )/6 )
 
 				self.lbl[j,i].setPos( self.lim_x[1],
 				                      self.lim_y[1] )
@@ -444,7 +448,6 @@ class widget_fm_moments( QWidget ) :
 			except :
 #				raise TypeError('Median filter length must be odd')
 				pass
-
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESETTING THE PLOTS' FIT CURVES.

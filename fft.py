@@ -153,7 +153,7 @@ for i in range( len( bx )/990 ) :
 dt = mfi_s[1] - mfi_s[0]
 
 # Compute all the frequencies.
-'''
+
 fq1 = rfftfreq( len( mfi_s ), d = dt )
 
 # Compute the Fourier Transform of each component of magnetic field.

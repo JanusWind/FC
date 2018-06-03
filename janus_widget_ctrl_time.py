@@ -195,7 +195,7 @@ class widget_ctrl_time( QWidget ) :
 				self.core.emit( SIGNAL('janus_rset') )
 				Thread( target=thread_load_spec,
 				        args=( self.core,
-				          self.core.time_val + 3600. ) ).start()
+				          self.core.time_val + 600. ) ).start()
 			return
 
 	#-----------------------------------------------------------------------

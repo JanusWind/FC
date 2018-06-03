@@ -19,8 +19,6 @@ from numpy import linspace, pi, sqrt, exp
 
 from janus_const import const
 
-rcParams['figure.figsize'] = 20, 10
-
 #plt.clf()
 plt.close('all')
 
