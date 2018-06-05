@@ -46,7 +46,7 @@ from scipy.special     import erf
 from scipy.interpolate import interp1d
 from scipy.optimize    import curve_fit
 from scipy.stats       import pearsonr, spearmanr
-from scipy.signal      import medfilt
+from scipy.signal      import medfilt, butter, lfilter
 from pylab import rcParams
 
 from janus_helper import round_sig
@@ -147,6 +147,63 @@ if( download == 'y' ) :
 	
 	omega_p = mfi_avg_mag*const['q_p']/const['m_p']
 
+###############################################################################
+## Defining Butterworth bandpass filter.
+###############################################################################
+
+def butter_bandpass(lowcut, highcut, fs, order=5):
+
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
+    b, a = butter( order, [ low, high ], btype='band' )
+
+    return b, a
+
+
+def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
+
+    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+    y = lfilter(b, a, data)
+
+    return y
+
+fs = 1 / ( mfi_s[1] - mfi_s[0] )
+lc = 0.08
+hc = 0.5
+
+# Compute the bandpass filtered data for all the three components.
+
+filt_x = butter_bandpass_filter( mfi_b_x, lc, hc, fs, order=5 )
+filt_y = butter_bandpass_filter( mfi_b_y, lc, hc, fs, order=5 )
+filt_z = butter_bandpass_filter( mfi_b_z, lc, hc, fs, order=5 )
+
+f, ax2 = plt.subplots( 3, 1, sharex = True )
+
+rcParams['figure.figsize'] = 30, 15
+
+ax2[0].plot( mfi_t, mfi_b_x, linewidth=0.75, color='#d7d1cf', label = 'non-filtered' )
+ax2[0].plot( mfi_t, filt_x,  linewidth=0.75, color='#4D2619', label = 'filtered'     )
+ax2[0].set_ylabel( 'x-component' )
+ax2[0].legend( )
+
+ax2[1].plot( mfi_t, mfi_b_y, linewidth=0.75, color='#d7d1cf', label = 'non-filtered' )
+ax2[1].plot( mfi_t, filt_y,  linewidth=0.75, color='#4D2619', label = 'filtered'     )
+ax2[1].set_ylabel( 'y-component' )
+ax2[1].legend( )
+
+ax2[2].plot( mfi_t, mfi_b_z, linewidth=0.75, color='#d7d1cf', label = 'non-filtered' )
+ax2[2].plot( mfi_t, filt_z,  linewidth=0.75, color='#4D2619', label = 'filtered'     )
+ax2[2].set_ylabel( 'z-component' )
+ax2[2].set_xlabel( 'Time ( Date hr:mn )' )
+ax2[2].legend( )
+
+plt.suptitle( 'Plot of magnetic field with and without Butterworth Filter ( order=5 )' )
+
+plt.show( )
+plt.tight_layout( )
+
+'''
 f, ax = plt.subplots( 3, 1, sharex = True )
 
 rcParams['figure.figsize'] = 60, 30
@@ -167,3 +224,5 @@ ax[1].legend( legend[1], loc = 1 )
 ax[2].legend( legend[2], loc = 1 )
 
 plt.show( )
+
+'''
