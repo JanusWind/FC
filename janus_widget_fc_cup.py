@@ -594,7 +594,6 @@ class widget_fc_cup( QWidget ) :
 
 			if ( curr_ion is not None ) :
 
-#				print self.c, d, shape(curr_ion)
 				for n in range( len( curr_ion[self.c][d][0] ) ):
 
 					# Extract the points for this fit curve.

@@ -173,7 +173,8 @@ class plas( object ) :
 
 		self.b0_fields     = dict.fromkeys( [ 'raw', 'rot', 'fit',
 		                                       'raw_smt', 'rot_smt',
-		                                       'fit_smt'             ] )
+		                                       'fit_smt', 'but_bnd',
+		                                       'but_low'             ] )
 
 		self.sig_b0_fields = dict.fromkeys( [ 'sig_raw', 'sig_rot',
 		                                       'sig_fit','sig_raw_smt',

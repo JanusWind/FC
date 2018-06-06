@@ -71,7 +71,7 @@ from scipy.special     import erf
 from scipy.interpolate import interp1d
 from scipy.optimize    import curve_fit
 from scipy.stats       import pearsonr, spearmanr
-from scipy.signal      import medfilt
+from scipy.signal      import medfilt, butter, lfilter
 
 from janus_helper import round_sig, srch_dict_keys_strt
 
@@ -325,6 +325,25 @@ class core( QObject ) :
 			self.mfi_avg_mag_fit_smt = None
 			self.mfi_avg_nrm_fit_smt = None
 			self.mfi_vec_fit_smt_sig = None
+
+			self.mfi_x_but_bnd       = None
+			self.mfi_y_but_bnd       = None
+			self.mfi_z_but_bnd       = None
+			self.mfi_vec_but_bnd     = None
+
+			self.mfi_x_but_avg       = None
+			self.mfi_y_but_avg       = None
+			self.mfi_z_but_avg       = None
+			self.mfi_avg_vec_but     = None
+
+			self.mfi_x_but_low       = None
+			self.mfi_y_but_low       = None
+			self.mfi_z_but_low       = None
+			self.mfi_vec_but_low     = None
+
+			self.fs                  = None
+			self.lc                  = None
+			self.hc                  = None
 
 			self.mfi_bbx_t           = None
 			self.mfi_bby_t           = None
@@ -1329,6 +1348,75 @@ class core( QObject ) :
 		# TODO: Need to do the same thing for fit data as well. As of
 		# now, the algorithm only fits the rotated data.
 
+		# Carry out the band-pass filtering (_Butterworth ) of the raw
+		# magnetic-field data.
+
+		# Defining Butterworth bandpass filter.
+
+		def but_bnd_pss(lowcut, highcut, fs, order=5):
+
+		    nyq = 0.5 * fs
+		    low = lowcut / nyq
+		    high = highcut / nyq
+		    b, a = butter( order, [ low, high ], btype='band' )
+
+		    return b, a
+
+
+		def but_bnd_pss_flt(data, lowcut, highcut, fs, order=5):
+
+		    b, a = but_bnd_pss(lowcut, highcut, fs, order=order)
+		    y = lfilter(b, a, data)
+
+		    return y
+
+		# Define parameters. 
+
+		self.fs = 1 / ( self.mfi_s[1] - self.mfi_s[0] )
+		self.lc = 0.08
+		self.hc = 0.5
+
+		# Computing the band-pass values of magnetic-field.
+
+		self.mfi_x_but_bnd = but_bnd_pss_flt( self.mfi_b_x, self.lc,
+		                                   self.hc, self.fs, order = 5 )
+		self.mfi_y_but_bnd = but_bnd_pss_flt( self.mfi_b_y, self.lc,
+		                                   self.hc, self.fs, order = 5 )
+		self.mfi_z_but_bnd = but_bnd_pss_flt( self.mfi_b_z, self.lc,
+		                                   self.hc, self.fs, order = 5 )
+
+		self.mfi_vec_but_bnd = [ self.mfi_x_but_bnd, self.mfi_y_but_bnd,
+		                         self.mfi_z_but_bnd ]
+
+		# Computing the low-pass values of magnetic-field.
+
+		self.mfi_x_but_low = but_bnd_pss_flt( self.mfi_b_x, 0.0,
+		                                   self.hc, self.fs, order = 5 )
+		self.mfi_y_but_low = but_bnd_pss_flt( self.mfi_b_y, 0.0,
+		                                   self.hc, self.fs, order = 5 )
+		self.mfi_z_but_low = but_bnd_pss_flt( self.mfi_b_z, 0.0,
+		                                   self.hc, self.fs, order = 5 )
+
+		self.mfi_vec_but_low = [ self.mfi_x_but_low, self.mfi_y_but_low,
+		                         self.mfi_z_but_low ]
+
+		# Compute the DC component of the magnetic-field.
+
+		self.mfi_x_but_avg = [ ( self.mfi_x_but_low[i] -
+		                         self.mfi_x_but_bnd[i] )
+		                         for i in range( len( self.mfi_s ) ) ]
+
+		self.mfi_y_but_avg = [ ( self.mfi_y_but_low[i] -
+		                         self.mfi_y_but_bnd[i] )
+		                         for i in range( len( self.mfi_s ) ) ]
+
+		self.mfi_z_but_avg = [ ( self.mfi_z_but_low[i] -
+		                         self.mfi_z_but_bnd[i] )
+		                         for i in range( len( self.mfi_s ) ) ]
+
+		self.mfi_avg_vec_but = [ self.mfi_x_but_avg, self.mfi_y_but_avg,
+		                         self.mfi_z_but_avg ]
+
 		# Smooth the raw magnetic field data using the median filter of
 		# given window size and calculate its standard deviation.
 
@@ -1440,7 +1528,9 @@ class core( QObject ) :
 			               "mfi_set_fit"    : self.mfi_vec_fit,
 			               "mfi_set_raw_smt": self.mfi_vec_raw_smt,
 			               "mfi_set_rot_smt": self.mfi_vec_rot_smt,
-			               "mfi_set_fit_smt": self.mfi_vec_fit_smt }
+			               "mfi_set_fit_smt": self.mfi_vec_fit_smt,
+			               "mfi_set_but_bnd": self.mfi_vec_but_bnd,
+			               "mfi_set_but_low": self.mfi_vec_but_low }
 
 		if( any ( x is None for x in self.mfi_vec_raw ) or
 		    any ( x is None for x in self.mfi_vec_rot ) or
@@ -1455,7 +1545,9 @@ class core( QObject ) :
 			           "mfi_set_fit"    : self.mfi_avg_vec_fit_smt,
 			           "mfi_set_raw_smt": self.mfi_avg_vec_raw_smt,
 			           "mfi_set_rot_smt": self.mfi_avg_vec_rot_smt,
-			           "mfi_set_fit_smt": self.mfi_avg_vec_fit_smt }
+			           "mfi_set_fit_smt": self.mfi_avg_vec_fit_smt,
+			           "mfi_set_but_bnd": self.mfi_avg_vec_but,
+			           "mfi_set_but_low": self.mfi_avg_vec_but     }
 
 		# Use interpolation to estiamte the magnetic field vector for
 		# each datum in the FC spectrum.
@@ -1953,6 +2045,7 @@ class core( QObject ) :
 		                           self.mom_res['v0_vec'],
 		                           self.mom_res['fv'],
 		                           self.b0_avg_fields[self.mfi_set_key],
+		                           self.mfi_vec_but_bnd,
 		                           self.mom_res['n_p_c'], 0.,
 		                           self.mom_res['w_p_c'],
 		                           self.mfi_set_key                    )
@@ -2591,6 +2684,7 @@ class core( QObject ) :
 			                   self.nln_plas.arr_pop[p]['q'],
 			                   pop_v0_vec, fv,
 				           self.b0_avg_fields[self.mfi_set_key],
+			                   self.mfi_vec_but_bnd,
 			                   pop_n, pop_dv, pop_w,
 			                   self.mfi_set_key                  ) )
 
@@ -2888,6 +2982,7 @@ class core( QObject ) :
 				           self.nln_plas.arr_pop[p]['q'],
 				           prm_v0, prm_fv,
 				           self.b0_avg_fields[self.mfi_set_key],
+				           self.mfi_vec_but_bnd,
 				           prm_n,  prm_dv, prm_w,
 				           self.mfi_set_key                    )
 
@@ -3017,7 +3112,9 @@ class core( QObject ) :
 		                               'fit'    : self.mfi_vec_fit,
 		                               'raw_smt': self.mfi_vec_raw_smt,
 		                               'rot_smt': self.mfi_vec_rot_smt,
-		                               'fit_smt': self.mfi_vec_fit_smt }
+		                               'fit_smt': self.mfi_vec_fit_smt,
+		                               'but_bnd': self.mfi_vec_but_bnd,
+		                               'but_low': self.mfi_vec_but_low }
 
 		self.nln_res_plas[ 'sig_b0_fields'] = {
 		                       'sig_raw'    : self.mfi_vec_raw_sig,
@@ -3127,6 +3224,7 @@ class core( QObject ) :
 			                  self.nln_plas.arr_pop[p]['q'],
 			                  pop_v0_vec, fv,
 			                  self.b0_avg_fields[self.mfi_set_key],
+			                  self.mfi_vec_but_bnd,
 			                  pop_n, pop_dv, pop_w,
 			                  self.mfi_set_key                   ) )
 
@@ -3528,7 +3626,9 @@ class core( QObject ) :
 		             'mfi_set_fit'     :False,
 		             'mfi_set_raw_smt' :True,
 		             'mfi_set_rot_smt' :False,
-		             'mfi_set_fit_smt' :False           }
+		             'mfi_set_fit_smt' :False,
+		             'mfi_set_but_bnd' :False,
+		             'mfi_set_but_low' :False           }
 
 		# If requested, propagate any changes.
 

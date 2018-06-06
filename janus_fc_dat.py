@@ -191,7 +191,7 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION TO CALCULATE EXPECTED MAXWELLIAN CURRENT.
 	#-----------------------------------------------------------------------
 
-	def calc_curr( self, m, q, v0, fv, av_b, n, dv, w, key=None ) :
+	def calc_curr( self, m, q, v0, fv, av_b, db, n, dv, w, key=None ) :
 
 		# Note.  This function is based on Equation 2.34 from Maruca
 		#        (PhD thesis, 2012), but differs by a factor of $2$
@@ -214,8 +214,8 @@ class fc_dat( ) :
 
 		# Calculate the total velocity using drift
 
-		db = [ ( self._vec_b[key][i] - av_b[i] )
-		                    for i in range( len( self._vec_b[key] ) ) ]
+#		db = [ ( self._vec_b[key][i] - av_b[i] )
+#		                    for i in range( len( self._vec_b[key] ) ) ]
 
 		db_nrm = calc_arr_norm( db )
 

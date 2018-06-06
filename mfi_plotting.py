@@ -169,31 +169,38 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
     return y
 
 fs = 1 / ( mfi_s[1] - mfi_s[0] )
-lc = 0.08
+lc = 0.0001
 hc = 0.5
 
 # Compute the bandpass filtered data for all the three components.
 
-filt_x = butter_bandpass_filter( mfi_b_x, lc, hc, fs, order=5 )
-filt_y = butter_bandpass_filter( mfi_b_y, lc, hc, fs, order=5 )
-filt_z = butter_bandpass_filter( mfi_b_z, lc, hc, fs, order=5 )
+filt_x = butter_bandpass_filter( mfi_b_x, lc, hc, fs, order=8 )
+filt_y = butter_bandpass_filter( mfi_b_y, lc, hc, fs, order=8 )
+filt_z = butter_bandpass_filter( mfi_b_z, lc, hc, fs, order=8 )
+
+resd_x = mfi_b_x - filt_x
+resd_y = mfi_b_y - filt_y
+resd_z = mfi_b_z - filt_z
 
 f, ax2 = plt.subplots( 3, 1, sharex = True )
 
-rcParams['figure.figsize'] = 30, 15
+rcParams['figure.figsize'] = 20, 10
 
 ax2[0].plot( mfi_t, mfi_b_x, linewidth=0.75, color='#d7d1cf', label = 'non-filtered' )
 ax2[0].plot( mfi_t, filt_x,  linewidth=0.75, color='#4D2619', label = 'filtered'     )
+#ax2[0].plot( mfi_t, resd_x,  linewidth=0.75, color='#1e5c10', label = 'residue' )
 ax2[0].set_ylabel( 'x-component' )
 ax2[0].legend( )
 
 ax2[1].plot( mfi_t, mfi_b_y, linewidth=0.75, color='#d7d1cf', label = 'non-filtered' )
 ax2[1].plot( mfi_t, filt_y,  linewidth=0.75, color='#4D2619', label = 'filtered'     )
+#ax2[1].plot( mfi_t, resd_y,  linewidth=0.75, color='#1e5c10', label = 'residue' )
 ax2[1].set_ylabel( 'y-component' )
 ax2[1].legend( )
 
 ax2[2].plot( mfi_t, mfi_b_z, linewidth=0.75, color='#d7d1cf', label = 'non-filtered' )
 ax2[2].plot( mfi_t, filt_z,  linewidth=0.75, color='#4D2619', label = 'filtered'     )
+#ax2[2].plot( mfi_t, resd_z,  linewidth=0.75, color='#1e5c10', label = 'residue' )
 ax2[2].set_ylabel( 'z-component' )
 ax2[2].set_xlabel( 'Time ( Date hr:mn )' )
 ax2[2].legend( )
