@@ -103,7 +103,7 @@ class fc_arcv( object ) :
 
 		self.path       = str( path )       if ( path  is not None )\
 		                                    else os.path.join( 
-		                                    os.path.dirname( __file__ ), 
+		                                    os.path.dirname( __file__ ),
 		                                    'data', 'fc' )
 
 		self.verbose    = bool( verbose )   if ( verbose is not None )\

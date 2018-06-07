@@ -83,7 +83,7 @@ class mfi_arcv_hres( object ) :
 		                                    else 3600.
 
 		self.tol        = float( tol )      if ( tol is not None )\
-		                                    else 0.
+		                                    else 15.
 
 		self.n_date_max = int( n_date_max ) if ( n_date_max 
 		                                    is not None ) else 40
@@ -93,7 +93,7 @@ class mfi_arcv_hres( object ) :
 
 		self.path       = str( path )       if ( path  is not None )\
 		                                    else os.path.join( 
-		                                    os.path.dirname( __file__ ), 
+		                                    os.path.dirname( __file__ ),
 		                                    'data', 'mfi', 'hres' )
 
 		self.verbose    = bool( verbose )   if ( verbose is not None )\

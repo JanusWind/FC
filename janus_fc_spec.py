@@ -346,13 +346,13 @@ class fc_spec( ) :
 	# DEFINE THE FUNCTION FOR CALC'ING EXPECTED CURRENT FROM A POPULATION.
 	#-----------------------------------------------------------------------
 
-	def calc_curr( self, m, q, v0, fv, av_b, db, n, dv, w, key ) :
+	def calc_curr( self, m, q, v0, fv, av_b, n, dv, w, key ) :
 
 		# Return a 3-D list with the calculated current for each bin in
 		# the spectrum.
 
 		return [ [ [ self.arr[c][d][b].calc_curr( 
-		                    m, q, v0, fv, av_b, db, n, dv, w, key )
+		                    m, q, v0, fv, av_b, n, dv, w, key )
 		                    for b in range( self['n_bin'] ) ]
 		                    for d in range( self['n_dir'] ) ]
 		                    for c in range( self['n_cup'] ) ]
@@ -426,13 +426,17 @@ class fc_spec( ) :
 	# DEFINE THE FUNCTION TO ASSIGN THE MAGNETIC FIELD TO EACH DATUM. 
 	#-----------------------------------------------------------------------
 
-	def set_mag( self, mfi_t, mfi_b, key ) :
+	def set_mag( self, mfi_t, mfi_b, mfi_db, key ) :
 
 		mfi_s = [ ( t - mfi_t[0] ).total_seconds( ) for t in mfi_t ]
 
-		fnc_b = [ interp1d( mfi_s, mfi_b[0] ),
-		          interp1d( mfi_s, mfi_b[1] ), 
-		          interp1d( mfi_s, mfi_b[2] ) ]
+		fnc_b  = [ interp1d( mfi_s, mfi_b[0] ),
+		           interp1d( mfi_s, mfi_b[1] ), 
+		           interp1d( mfi_s, mfi_b[2] ) ]
+
+		fnc_db = [ interp1d( mfi_s, mfi_db[0] ),
+		           interp1d( mfi_s, mfi_db[1] ), 
+		           interp1d( mfi_s, mfi_db[2] ) ]
 
 		try :
 
@@ -445,12 +449,16 @@ class fc_spec( ) :
 						s = ( self.arr[c][d][b]['time']
                                                    - mfi_t[0] ).total_seconds( )
 
-						b_vec = [ fnc_b[0]( s ),
-						          fnc_b[1]( s ),
-						          fnc_b[2]( s )  ]
+						b_vec  = [ fnc_b[0]( s ),
+						           fnc_b[1]( s ),
+						           fnc_b[2]( s )  ]
+
+						db_vec = [ fnc_db[0]( s ),
+						           fnc_db[1]( s ),
+						           fnc_db[2]( s )  ]
 
 						self.arr[c][d][b].set_mag(
-						            b_vec, key )
+						            b_vec, db_vec, key )
 
 		except :
 
@@ -459,6 +467,7 @@ class fc_spec( ) :
 			avg_b_z = sum( mfi_b[2] ) / float( len( mfi_b[2] ) )
 
 			avg_b_vec = [ avg_b_x, avg_b_y, avg_b_z ]
+
 			for c in range( self['n_cup'] ) :
 
                                 for d in range( self['n_dir'] ) :
@@ -466,4 +475,5 @@ class fc_spec( ) :
                                         for b in range( self['n_bin'] ) :
 
                                                 self.arr[c][d][b].set_mag( 
-						                avg_b_vec, key )
+						     avg_b_vec, avg_b_vec, key )
+						print 'janus_fc_spec:line 479'

@@ -889,15 +889,14 @@ class core( QObject ) :
 
 			( self.mfi_t, self.mfi_b_x, self.mfi_b_y,
 			  self.mfi_b_z ) = self.mfi_arcv_lres.load_rang(
-			( self.time_val       - ( 2. * self.fc_spec['rot'] ) ),
-
+			( self.time_val       - ( 4.* self.fc_spec['rot'] ) ),
 			( self.fc_spec['dur'] + ( 4. * self.fc_spec['rot'] ) ) )
 
 		elif ( self.opt['fls_src_high'] ) :
 
 			( self.mfi_t, self.mfi_b_x, self.mfi_b_y,
 			  self.mfi_b_z ) = self.mfi_arcv_hres.load_rang(
-			( self.time_val       - ( 2. * self.fc_spec['rot'] ) ),
+			( self.time_val       - ( 4.* self.fc_spec['rot'] ) ),
 			( self.fc_spec['dur'] + ( 4. * self.fc_spec['rot'] ) ) )
 
 		# Establish the number of data.
@@ -1390,11 +1389,11 @@ class core( QObject ) :
 
 		# Computing the low-pass values of magnetic-field.
 
-		self.mfi_x_but_low = but_bnd_pss_flt( self.mfi_b_x, 0.0,
+		self.mfi_x_but_low = but_bnd_pss_flt( self.mfi_b_x, 0.0001,
 		                                   self.hc, self.fs, order = 5 )
-		self.mfi_y_but_low = but_bnd_pss_flt( self.mfi_b_y, 0.0,
+		self.mfi_y_but_low = but_bnd_pss_flt( self.mfi_b_y, 0.0001,
 		                                   self.hc, self.fs, order = 5 )
-		self.mfi_z_but_low = but_bnd_pss_flt( self.mfi_b_z, 0.0,
+		self.mfi_z_but_low = but_bnd_pss_flt( self.mfi_b_z, 0.0001,
 		                                   self.hc, self.fs, order = 5 )
 
 		self.mfi_vec_but_low = [ self.mfi_x_but_low, self.mfi_y_but_low,
@@ -1559,7 +1558,9 @@ class core( QObject ) :
 				self.mfi_set_key = self.b0_fields.keys()[i]
 
 		self.fc_spec.set_mag( self.mfi_t,
-		                      self.b0_fields[self.mfi_set_key],
+		                      self.mfi_vec_raw_smt,
+#		                      self.b0_fields[self.mfi_set_key],
+		                      self.mfi_vec_but_bnd,
 		                      self.mfi_set_key                  )
 
 		# Message the user that new Wind/MFI data have been loaded.
@@ -2044,8 +2045,8 @@ class core( QObject ) :
 		                           self.mom_res['q_p'],
 		                           self.mom_res['v0_vec'],
 		                           self.mom_res['fv'],
-		                           self.b0_avg_fields[self.mfi_set_key],
-		                           self.mfi_vec_but_bnd,
+			                  self.mfi_avg_vec_raw_smt,
+#		                           self.b0_avg_fields[self.mfi_set_key],
 		                           self.mom_res['n_p_c'], 0.,
 		                           self.mom_res['w_p_c'],
 		                           self.mfi_set_key                    )
@@ -2404,9 +2405,9 @@ class core( QObject ) :
 		try :
 			self.nln_plas['v0_vec'] = [
 			         round( v, 1 ) for v in self.mom_res['v0_vec'] ]
-#			self.nln_plas['fv'] = 0.05*norm( self.nln_plas['v0_vec'])
-			self.nln_plas['fv'] = 10**( -15 )*self.mfi_avg_mag/sqrt(
-			        const['mu_0']*const['m_p']*self.mom_res['n_p'] )
+			self.nln_plas['fv'] = -0.05*norm( self.nln_plas['v0_vec'])
+#			self.nln_plas['fv'] = 10**( -15 )*self.mfi_avg_mag/sqrt(
+#			        const['mu_0']*const['m_p']*self.mom_res['n_p'] )
 
 		except :
 
@@ -2683,8 +2684,8 @@ class core( QObject ) :
 			                   self.nln_plas.arr_pop[p]['m'],
 			                   self.nln_plas.arr_pop[p]['q'],
 			                   pop_v0_vec, fv,
-				           self.b0_avg_fields[self.mfi_set_key],
-			                   self.mfi_vec_but_bnd,
+			                  self.mfi_avg_vec_raw_smt,
+#				           self.b0_avg_fields[self.mfi_set_key],
 			                   pop_n, pop_dv, pop_w,
 			                   self.mfi_set_key                  ) )
 
@@ -2981,8 +2982,8 @@ class core( QObject ) :
 				           self.nln_plas.arr_pop[p]['m'],
 				           self.nln_plas.arr_pop[p]['q'],
 				           prm_v0, prm_fv,
-				           self.b0_avg_fields[self.mfi_set_key],
-				           self.mfi_vec_but_bnd,
+			                  self.mfi_avg_vec_raw_smt,
+#				           self.b0_avg_fields[self.mfi_set_key],
 				           prm_n,  prm_dv, prm_w,
 				           self.mfi_set_key                    )
 
@@ -3223,8 +3224,8 @@ class core( QObject ) :
 			                  self.nln_plas.arr_pop[p]['m'],
 			                  self.nln_plas.arr_pop[p]['q'],
 			                  pop_v0_vec, fv,
-			                  self.b0_avg_fields[self.mfi_set_key],
-			                  self.mfi_vec_but_bnd,
+			                  self.mfi_avg_vec_raw_smt,
+#			                  self.b0_avg_fields[self.mfi_set_key],
 			                  pop_n, pop_dv, pop_w,
 			                  self.mfi_set_key                   ) )
 

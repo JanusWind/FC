@@ -307,24 +307,26 @@ class widget_fm_moments( QWidget ) :
 
 		else :
 
-			data = self.core.mfi_vec_rot[d]
+			data1 = self.core.mfi_vec_raw[d]
+			data2 = self.core.mfi_vec_but_bnd[d]
 
 			if( d == 0) :
 
 				self.lim_y = [
-				          mean( data ) - 2*std( data )*2.**0.5,
-				          mean( data ) + 2*std( data )*2.**0.5 ]
+				        mean( data2 ) - 2*std( data2 )*2.**0.5,
+				        mean( data1 ) + 2*std( data1 )*2.**0.5 ]
 
 			else :
 
 
 				self.lim_y = [
-				      1.1*mean( data ) - 2*std( data )*2.**0.5,
-				      1.1*mean( data ) + 2*std( data )*2.**0.5 ]
+				    1.1*mean( data1 ) - 2*std( data1 )*2.**0.5,
+				    1.1*mean( data2 ) + 2*std( data2 )*2.**0.5 ]
 
 
-			self.lim_x = [ min( self.core.mfi_s ),
-			               max( self.core.mfi_s ) ]
+			self.lim_x = [ -5, 95 ]
+#			self.lim_x = [ min( self.core.mfi_s ),
+#			               max( self.core.mfi_s ) ]
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CREATING THE PLOTS' FIT CURVES.
@@ -345,13 +347,13 @@ class widget_fm_moments( QWidget ) :
 		text = [ 'X-component', 'Y-component', 'Z-component' ]
 
 		x     = self.core.mfi_s
-		y_raw = self.core.mfi_vec_rot
-		y_smt = self.core.mfi_vec_rot_smt
+		y_raw = self.core.mfi_vec_but_bnd
+		y_smt = self.core.mfi_vec_raw
 
 		if( self.core.mfi_vec_fit is None ) :
 			return
 		else :
-			y_fit = self.core.mfi_vec_fit
+			y_fit = self.core.mfi_vec_but_bnd
 
 		# For each plot in the grid, generate and display a fit curve
 		# based on the results of the analysis.

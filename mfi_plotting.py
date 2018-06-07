@@ -58,7 +58,8 @@ from janus_fc_spec import fc_spec
 from janus_pyon import plas, series
 
 import matplotlib.pyplot as plt
-plt.close('all')
+#plt.close('all')
+#plt.clf()
 
 # Load the modules necessary for saving results to a data file.
 
@@ -151,7 +152,7 @@ if( download == 'y' ) :
 ## Defining Butterworth bandpass filter.
 ###############################################################################
 
-def butter_bandpass(lowcut, highcut, fs, order=5):
+def butter_bandpass(lowcut, highcut, fs, order):
 
     nyq = 0.5 * fs
     low = lowcut / nyq
@@ -161,22 +162,26 @@ def butter_bandpass(lowcut, highcut, fs, order=5):
     return b, a
 
 
-def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
+def butter_bandpass_filter(data, lowcut, highcut, fs, order):
 
-    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+    b, a = butter_bandpass(lowcut, highcut, fs, order)
     y = lfilter(b, a, data)
 
     return y
 
 fs = 1 / ( mfi_s[1] - mfi_s[0] )
-lc = 0.0001
-hc = 0.5
+lc = 0.08
+hc = 0.3
 
 # Compute the bandpass filtered data for all the three components.
 
-filt_x = butter_bandpass_filter( mfi_b_x, lc, hc, fs, order=8 )
-filt_y = butter_bandpass_filter( mfi_b_y, lc, hc, fs, order=8 )
-filt_z = butter_bandpass_filter( mfi_b_z, lc, hc, fs, order=8 )
+filt_x = butter_bandpass_filter( mfi_b_x, lc, hc, fs, 5 )
+filt_y = butter_bandpass_filter( mfi_b_y, lc, hc, fs, 5 )
+filt_z = butter_bandpass_filter( mfi_b_z, lc, hc, fs, 5 )
+
+filt_x_low = butter_bandpass_filter( mfi_b_x, 0.05, hc, fs, 5 )
+filt_y_low = butter_bandpass_filter( mfi_b_y, 0.05, hc, fs, 5 )
+filt_z_low = butter_bandpass_filter( mfi_b_z, 0.05, hc, fs, 5 )
 
 resd_x = mfi_b_x - filt_x
 resd_y = mfi_b_y - filt_y
@@ -186,22 +191,40 @@ f, ax2 = plt.subplots( 3, 1, sharex = True )
 
 rcParams['figure.figsize'] = 20, 10
 
-ax2[0].plot( mfi_t, mfi_b_x, linewidth=0.75, color='#d7d1cf', label = 'non-filtered' )
-ax2[0].plot( mfi_t, filt_x,  linewidth=0.75, color='#4D2619', label = 'filtered'     )
-#ax2[0].plot( mfi_t, resd_x,  linewidth=0.75, color='#1e5c10', label = 'residue' )
+a1 = 300
+b1 = -1
+
+ax2[0].plot( mfi_s[a1:b1], mfi_b_x[a1:b1], linewidth=0.75, color='k', label = 'non-filtered' )
+ax2[0].plot( mfi_s[a1:b1], filt_x[a1:b1],  linewidth=0.75, color='r', label = 'band-pass'   )
+#ax2[0].plot( mfi_s[a1:b1], filt_x_low[a1:b1], linewidth=0.75, color='b', label = 'low-pass' )
+ax2[0].plot( mfi_s[a1:b1], resd_x[a1:b1],  linewidth=0.75, color='#1e5c10', label = 'residue' )
 ax2[0].set_ylabel( 'x-component' )
 ax2[0].legend( )
 
-ax2[1].plot( mfi_t, mfi_b_y, linewidth=0.75, color='#d7d1cf', label = 'non-filtered' )
-ax2[1].plot( mfi_t, filt_y,  linewidth=0.75, color='#4D2619', label = 'filtered'     )
-#ax2[1].plot( mfi_t, resd_y,  linewidth=0.75, color='#1e5c10', label = 'residue' )
-ax2[1].set_ylabel( 'y-component' )
+ax2[1].plot( mfi_s[a1:b1], mfi_b_y[a1:b1], linewidth=0.75, color='k', label = 'non-filtered' )
+ax2[1].plot( mfi_s[a1:b1], filt_y[a1:b1],  linewidth=0.75, color='r', label = 'band-pass'   )
+#ax2[1].plot( mfi_s[a1:b1], filt_y_low[a1:b1], linewidth=0.75, color='b', label = 'low-pass' )
+ax2[1].plot( mfi_s[a1:b1], resd_y[a1:b1],  linewidth=0.75, color='#1e5c10', label = 'residue' )
+ax2[1].set_ylabel( 'x-component' )
 ax2[1].legend( )
 
-ax2[2].plot( mfi_t, mfi_b_z, linewidth=0.75, color='#d7d1cf', label = 'non-filtered' )
-ax2[2].plot( mfi_t, filt_z,  linewidth=0.75, color='#4D2619', label = 'filtered'     )
-#ax2[2].plot( mfi_t, resd_z,  linewidth=0.75, color='#1e5c10', label = 'residue' )
-ax2[2].set_ylabel( 'z-component' )
+ax2[2].plot( mfi_s[a1:b1], mfi_b_z[a1:b1], linewidth=0.75, color='k', label = 'non-filtered' )
+ax2[2].plot( mfi_s[a1:b1], filt_z[a1:b1],  linewidth=0.75, color='r', label = 'band-pass'   )
+#ax2[2].plot( mfi_s[a1:b1], filt_z_low[a1:b1], linewidth=0.75, color='b', label = 'low-pass' )
+ax2[2].plot( mfi_s[a1:b1], resd_z[a1:b1],  linewidth=0.75, color='#1e5c10', label = 'residue' )
+ax2[2].set_ylabel( 'x-component' )
+ax2[2].legend( )
+
+#ax2[1].plot( mfi_s[a1:b1], mfi_b_y, linewidth=0.75, color='#d7d1cf', label = 'non-filtered' )
+#ax2[1].plot( mfi_s[a1:b1], filt_y,  linewidth=0.75, color='#4D2619', label = 'filtered'     )
+##ax2[1].plot( mfi_s[a1:b1], resd_y,  linewidth=0.75, color='#1e5c10', label = 'residue' )
+#ax2[1].set_ylabel( 'y-component' )
+#ax2[1].legend( )
+#
+#ax2[2].plot( mfi_s[a1:b1], mfi_b_z, linewidth=0.75, color='#d7d1cf', label = 'non-filtered' )
+#ax2[2].plot( mfi_s[a1:b1], filt_z,  linewidth=0.75, color='#4D2619', label = 'filtered'     )
+##ax2[2].plot( mfi_s[a1:b1], resd_z,  linewidth=0.75, color='#1e5c10', label = 'residue' )
+#ax2[2].set_ylabel( 'z-component' )
 ax2[2].set_xlabel( 'Time ( Date hr:mn )' )
 ax2[2].legend( )
 
@@ -215,14 +238,14 @@ f, ax = plt.subplots( 3, 1, sharex = True )
 
 rcParams['figure.figsize'] = 60, 30
 
-ax[0].plot( mfi_t, bx_r, color='#d7d1cf' )
-ax[0].plot( mfi_t, bxf,  color='#4D2619' )
+ax[0].plot( mfi_s[a1:b1], bx_r, color='#d7d1cf' )
+ax[0].plot( mfi_s[a1:b1], bxf,  color='#4D2619' )
 
-ax[1].plot( mfi_t, by_r, color='#d7d1cf' )
-ax[1].plot( mfi_t, byf,  color='#4D2619' )
+ax[1].plot( mfi_s[a1:b1], by_r, color='#d7d1cf' )
+ax[1].plot( mfi_s[a1:b1], byf,  color='#4D2619' )
 
-ax[2].plot( mfi_t, bz_r, color='#d7d1cf' )
-ax[2].plot( mfi_t, bzf,  color='#4D2619' )
+ax[2].plot( mfi_s[a1:b1], bz_r, color='#d7d1cf' )
+ax[2].plot( mfi_s[a1:b1], bzf,  color='#4D2619' )
 
 legend = [ 'X-data', 'Y-data', 'Z-data' ]
 

@@ -77,6 +77,7 @@ class fc_dat( ) :
 		self._maglook = { }
 		self._norm_b  = { }
 		self._vec_b   = { }
+		self._vec_db  = { }
 
 		if ( ( self._azim     is None ) or ( self._elev     is None ) or
 		     ( self._volt_cen is None ) or ( self._volt_del is None ) or
@@ -145,7 +146,7 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION FOR SETIING THE MAGNETIC FIELD DIRECTION.
 	#-----------------------------------------------------------------------
 
-	def set_mag( self, b_vec, key ) :
+	def set_mag( self, b_vec, db_vec, key ) :
 
 		# Normalize the magnetic-field vector and calcualte the magnetic
 		# look direction.
@@ -159,6 +160,7 @@ class fc_dat( ) :
 
 		self._norm_b[ key] = norm_b
 		self._vec_b[  key] = b_vec
+		self._vec_db[ key] = db_vec
 		self._maglook[key] = maglook
 
 	#-----------------------------------------------------------------------
@@ -191,7 +193,7 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION TO CALCULATE EXPECTED MAXWELLIAN CURRENT.
 	#-----------------------------------------------------------------------
 
-	def calc_curr( self, m, q, v0, fv, av_b, db, n, dv, w, key=None ) :
+	def calc_curr( self, m, q, v0, fv, av_b, n, dv, w, key=None ) :
 
 		# Note.  This function is based on Equation 2.34 from Maruca
 		#        (PhD thesis, 2012), but differs by a factor of $2$
@@ -216,6 +218,8 @@ class fc_dat( ) :
 
 #		db = [ ( self._vec_b[key][i] - av_b[i] )
 #		                    for i in range( len( self._vec_b[key] ) ) ]
+
+		db = self._vec_db[key]
 
 		db_nrm = calc_arr_norm( db )
 
