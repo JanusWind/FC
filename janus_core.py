@@ -1474,12 +1474,12 @@ class core( QObject ) :
 		self.order = 1
 		# Computing the band-pass values of magnetic-field.
 
-		self.mfi_x_but_bnd = but_bnd_pss_flt( self.mfi_x_raw_smt,
-		                         self.mc, self.hc, self.fs, self.order )
-		self.mfi_y_but_bnd = but_bnd_pss_flt( self.mfi_y_raw_smt,
-		                         self.mc, self.hc, self.fs, self.order )
-		self.mfi_z_but_bnd = but_bnd_pss_flt( self.mfi_z_raw_smt,
-		                         self.mc, self.hc, self.fs, self.order )
+		self.mfi_x_but_bnd = list( but_bnd_pss_flt( self.mfi_x_raw_smt,
+		                         self.mc, self.hc, self.fs, self.order ) )
+		self.mfi_y_but_bnd = list( but_bnd_pss_flt( self.mfi_y_raw_smt,
+		                         self.mc, self.hc, self.fs, self.order ) )
+		self.mfi_z_but_bnd = list( but_bnd_pss_flt( self.mfi_z_raw_smt,
+		                         self.mc, self.hc, self.fs, self.order ) )
 
 		self.mfi_vec_but_bnd = [ self.mfi_x_but_bnd, self.mfi_y_but_bnd,
 		                         self.mfi_z_but_bnd ]
@@ -1496,12 +1496,12 @@ class core( QObject ) :
 #                                         self.mfi_z_but_bnd[i] )
 #		                         for i in range( len( self.mfi_t ) ) ]
 
-		self.mfi_x_but_low = but_bnd_pss_flt( self.mfi_x_raw_smt,
-		                         self.lc, self.mc, self.fs, self.order )
-		self.mfi_y_but_low = but_bnd_pss_flt( self.mfi_y_raw_smt,
-		                         self.lc, self.mc, self.fs, self.order )
-		self.mfi_z_but_low = but_bnd_pss_flt( self.mfi_z_raw_smt,
-		                         self.lc, self.mc, self.fs, self.order )
+		self.mfi_x_but_low = list( but_bnd_pss_flt( self.mfi_x_raw_smt,
+		                         self.lc, self.mc, self.fs, self.order ) )
+		self.mfi_y_but_low = list( but_bnd_pss_flt( self.mfi_y_raw_smt,
+		                         self.lc, self.mc, self.fs, self.order ) )
+		self.mfi_z_but_low = list( but_bnd_pss_flt( self.mfi_z_raw_smt,
+		                         self.lc, self.mc, self.fs, self.order ) )
 
 		self.mfi_vec_but_low = [ self.mfi_x_but_low, self.mfi_y_but_low,
 		                         self.mfi_z_but_low ]
@@ -2430,7 +2430,7 @@ class core( QObject ) :
 		try :
 			self.nln_plas['v0_vec'] = [
 			         round( v, 1 ) for v in self.mom_res['v0_vec'] ]
-			self.nln_plas['fv'] = .05*norm( self.nln_plas['v0_vec'])
+			self.nln_plas['fv'] = 0.#.05*norm( self.nln_plas['v0_vec'])
 #			self.nln_plas['fv'] = 10**-15*self.mfi_avg_mag_but_low/\
 #			  sqrt( const['mu_0']*const['m_p']*self.mom_res['n_p'] )
 		except :
@@ -3098,22 +3098,22 @@ class core( QObject ) :
 		# Attempt to perform the non-linear fit.  If this fails, reset
 		# the associated variables and abort.
 
-		try :
+		#try :
 
-			( fit, covar ) = curve_fit( model, x, y, 
-			                            self.nln_gss_prm,
-			                            sigma=sigma       )
-			sig = sqrt( diag( covar ) )
+		( fit, covar ) = curve_fit( model, x, y, 
+		                            self.nln_gss_prm,
+		                            sigma=sigma       )
+		sig = sqrt( diag( covar ) )
 
-		except :
+		#except :
 
-			self.emit( SIGNAL('janus_mesg'), 'core', 'fail', 'nln' )
+		#	self.emit( SIGNAL('janus_mesg'), 'core', 'fail', 'nln' )
 
-			self.rset_var( var_nln_res=True )
+		#	self.rset_var( var_nln_res=True )
 
-			self.emit( SIGNAL('janus_chng_nln_res') )
+		#	self.emit( SIGNAL('janus_chng_nln_res') )
 
-			return
+		#	return
 
 		# Save the properties and fit parameters for each ion species
 		# used in this analysis.

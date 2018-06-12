@@ -195,6 +195,10 @@ class fc_dat( ) :
 
 	def calc_curr( self, m, q, v0, fv, n, dv, w, key=None ) :
 
+
+		if ( n <= 0. ) :
+			return 0.
+
 		# Note.  This function is based on Equation 2.34 from Maruca
 		#        (PhD thesis, 2012), but differs by a factor of $2$
 		#        (i.e., the factor of $2$ from Equation 2.13, which is
@@ -226,9 +230,18 @@ class fc_dat( ) :
 #		fv_vec = [ fv * db[i]
 #		                                   for i in range( len( db ) ) ]
 
-		fv_vec = [ ( 1.e-15 * fv * db[i] /\
-		                      sqrt( const['mu_0'] * const['m_p'] * n ) )
-		                                   for i in range( len( db ) ) ]
+		try :
+
+			fv_vec = [ fv * dbi for dbi in db ]
+
+			#fv_vec = [ ( 1.e-15 * fv * db[i] /\
+			#                      sqrt( const['mu_0'] * const['m_p'] * n ) )
+			#                                   for i in range( len( db ) ) ]
+		except :
+
+			print fv, db, n, len(db)
+			return
+
 
 #		fv_vec = [ ( fv * db[i]/ linalg.norm( self._vec_db[key] ) )
 #		                               for i in range( len( db ) ) ]

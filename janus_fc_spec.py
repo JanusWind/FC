@@ -438,43 +438,55 @@ class fc_spec( ) :
 		           interp1d( mfi_s, mfi_db[1] ), 
 		           interp1d( mfi_s, mfi_db[2] ) ]
 
-		try :
+		print type(mfi_s)
+		print type(mfi_db), type(mfi_db[0])
+		print type(mfi_b), type(mfi_b[0])
 
-			for c in range( self['n_cup'] ) :
+		print fnc_b[0]( 0. )
 
-				for d in range( self['n_dir'] ) :
+		#try :
 
-					for b in range( self['n_bin'] ) :
+		for c in range( self['n_cup'] ) :
 
-						s = ( self.arr[c][d][b]['time']
-                                                   - mfi_t[0] ).total_seconds( )
+			for d in range( self['n_dir'] ) :
 
-						b_vec  = [ fnc_b[0]( s ),
-						           fnc_b[1]( s ),
-						           fnc_b[2]( s )  ]
+				for b in range( self['n_bin'] ) :
 
-						db_vec = [ fnc_db[0]( s ),
-						           fnc_db[1]( s ),
-						           fnc_db[2]( s )  ]
+					s = ( self.arr[c][d][b]['time']
+                                           - mfi_t[0] ).total_seconds( )
 
-						self.arr[c][d][b].set_mag(
-						            b_vec, db_vec, key )
+					b_vec  = [ fnc_b[0]( s ),
+					           fnc_b[1]( s ),
+					           fnc_b[2]( s )  ]
 
-		except :
+					db_vec = [ fnc_db[0]( s ),
+					           fnc_db[1]( s ),
+					           fnc_db[2]( s )  ]
 
-			avg_b_x = sum( mfi_b[0] ) / float( len( mfi_b[0] ) )
-			avg_b_y = sum( mfi_b[1] ) / float( len( mfi_b[1] ) )
-			avg_b_z = sum( mfi_b[2] ) / float( len( mfi_b[2] ) )
+					b_vec = [ b_vec[i] for i in range( 3 ) ]
+					db_vec = [ db_vec[i] for i in range( 3 ) ]
 
-			avg_b_vec  = [ avg_b_x, avg_b_y, avg_b_z ]
-			avg_db_vec = [ 0., 0., 0. ]
+					print b_vec
 
-			for c in range( self['n_cup'] ) :
 
-                                for d in range( self['n_dir'] ) :
+					self.arr[c][d][b].set_mag(
+					            b_vec, db_vec, key )
 
-                                        for b in range( self['n_bin'] ) :
+		#except :
 
-                                                self.arr[c][d][b].set_mag( 
-						    avg_b_vec, avg_db_vec, key )
-						print 'janus_fc_spec:line 479'
+		#	avg_b_x = sum( mfi_b[0] ) / float( len( mfi_b[0] ) )
+		#	avg_b_y = sum( mfi_b[1] ) / float( len( mfi_b[1] ) )
+		#	avg_b_z = sum( mfi_b[2] ) / float( len( mfi_b[2] ) )
+
+		#	avg_b_vec  = [ avg_b_x, avg_b_y, avg_b_z ]
+		#	avg_db_vec = [ 0., 0., 0. ]
+
+		#	for c in range( self['n_cup'] ) :
+
+                 #               for d in range( self['n_dir'] ) :
+
+                  #                      for b in range( self['n_bin'] ) :
+
+                   #                             self.arr[c][d][b].set_mag( 
+			#			    avg_b_vec, avg_db_vec, key )
+			#			print 'janus_fc_spec:line 479'
