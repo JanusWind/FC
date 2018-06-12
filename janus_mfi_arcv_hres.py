@@ -83,7 +83,7 @@ class mfi_arcv_hres( object ) :
 		                                    else 3600.
 
 		self.tol        = float( tol )      if ( tol is not None )\
-		                                    else 15.
+		                                    else 300.
 
 		self.n_date_max = int( n_date_max ) if ( n_date_max 
 		                                    is not None ) else 40

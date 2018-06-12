@@ -373,10 +373,10 @@ class widget_fc_cup( QWidget ) :
 		# Generate a step function for each look direction associated
 		# with this widget.
 
-		self.stp = array( [ step(  self.core.fc_spec['vel_cen'][self.c] ,
-					   self.core.fc_spec['vel_del'][self.c] ,
-					   self.core.fc_spec['curr'][self.c][d])
-						for d in range(self.core.fc_spec['n_dir']) ])
+		self.stp = array( [ step( self.core.fc_spec['vel_cen'][self.c] ,
+					  self.core.fc_spec['vel_del'][self.c] ,
+					  self.core.fc_spec['curr'][self.c][d] )
+		                 for d in range(self.core.fc_spec['n_dir'] ) ] )
 
 		stp_pnt = array( [ array( self.stp[d]\
 		                              .calc_pnt( lev_min=curr_min ) )
@@ -470,7 +470,7 @@ class widget_fc_cup( QWidget ) :
 
 		# Add selection points to each plot.
 
-		for d in range( min( self.core.fc_spec['n_dir'], self.n_plt ) ) :
+		for d in range( min( self.core.fc_spec['n_dir'], self.n_plt ) ):
 
 			# Determine the location of this plot within the grid
 			# layout.
@@ -498,7 +498,7 @@ class widget_fc_cup( QWidget ) :
 					                   is not None )     ) :
 
 					sel_bin = \
-					       self.core.mom_sel_bin[self.c][d][b]
+					     self.core.mom_sel_bin[self.c][d][b]
 					sel_dir = \
 					       self.core.mom_sel_dir[self.c][d]
 
@@ -512,13 +512,13 @@ class widget_fc_cup( QWidget ) :
 					                   is not None )     ) :
 
 					sel_bin = \
-					       self.core.nln_res_sel[self.c][d][b]
+					     self.core.nln_res_sel[self.c][d][b]
 
 					if ( self.core.nln_sel is None ) :
 						sel_alt = None
 					else :
 						sel_alt = \
-						   self.core.nln_sel[self.c][d][b]
+						 self.core.nln_sel[self.c][d][b]
 
 				self.chng_pnt( j, i, b, sel_bin,
 					       sel_dir=sel_dir,
@@ -1115,8 +1115,8 @@ class widget_fc_cup( QWidget ) :
 
 			for b in range( self.core.fc_spec['n_bin'] ) :
 				self.chng_pnt( j, i, b,
-				            self.core.mom_sel_bin[c][d][b],
-				            sel_dir=self.core.mom_sel_dir[c][d] )
+				           self.core.mom_sel_bin[c][d][b],
+				           sel_dir=self.core.mom_sel_dir[c][d] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO THE "chng_mom_sel_all" SIGNAL.
@@ -1207,11 +1207,11 @@ class widget_fc_cup( QWidget ) :
 			if ( self.core.nln_res_sel is None ) :
 				self.chng_pnt( j, i, b,
 				              False,
-				              sel_alt=self.core.nln_sel[self.c][d][b] )			
+				       sel_alt=self.core.nln_sel[self.c][d][b] )			
 			else :
 				self.chng_pnt( j, i, b,
-				              self.core.nln_res_sel[self.c][d][b],
-				              sel_alt=self.core.nln_sel[self.c][d][b] )
+				       self.core.nln_res_sel[self.c][d][b],
+				       sel_alt=self.core.nln_sel[self.c][d][b] )
 
 			self.make_crv( d_lst=[d] )
 

@@ -27,9 +27,11 @@ n_data = [ int( n_data[j] ) for j in range( len( n_data ) ) ]
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development/data/edited")
 
-fname1 = 'data_final_filter_01.jns'
-fname2 = 'data_final_filter_11.jns'
-fname3 = 'data_final_filter_21.jns'
+fname1 = 'dat_bnd_11_9.jns'
+#fname2 = 'dat_bnd_11_1.jns'
+#fname1 = 'data_final_filter_01.jns'
+#fname2 = 'data_final_filter_11.jns'
+#fname3 = 'data_final_filter_21.jns'
 
 if ( 1 in n_data ) :
 
@@ -176,13 +178,13 @@ if ( 1 in n_data ) :
 		time1[j] = dat1['time'][j].time().strftime("%H-%M")
 
 		dat1_b_x_raw[j] = mean( 
-		                np.array( dat1['b0_fields'][j]['raw_smt'] )[0] )
+		                np.array( dat1['b0_fields'][j]['but_low'] )[0] )
 
 		dat1_b_y_raw[j] = mean(
-		                np.array( dat1['b0_fields'][j]['raw_smt'] )[1] )
+		                np.array( dat1['b0_fields'][j]['but_low'] )[1] )
 
 		dat1_b_z_raw[j] = mean(
-		                np.array( dat1['b0_fields'][j]['raw_smt'] )[2] )
+		                np.array( dat1['b0_fields'][j]['but_low'] )[2] )
 
 		dat1_b_x_rot[j] = mean(
 		                np.array( dat1['b0_fields'][j]['rot_smt'] )[0] )
@@ -193,20 +195,11 @@ if ( 1 in n_data ) :
 		dat1_b_z_rot[j] = mean(
 		                np.array( dat1['b0_fields'][j]['rot_smt'] )[2] )
 
-		dat1_db_x_raw = [
-		         dat1['b0_fields'][j]['raw_smt'][0][k] - dat1_b_x_raw[j]
-		                        for k in range( len(
-		                        dat1['b0_fields'][j]['raw_smt'][0] ) ) ]
+		dat1_db_x_raw = dat1['b0_fields'][j]['but_bnd'][0]
 
-		dat1_db_y_raw = [
-		         dat1['b0_fields'][j]['raw_smt'][1][k] - dat1_b_y_raw[j]
-		                        for k in range( len( 
-		                         dat1['b0_fields'][j]['raw_smt'][0]) ) ]
+		dat1_db_y_raw = dat1['b0_fields'][j]['but_bnd'][1]
 
-		dat1_db_z_raw = [
-		         dat1['b0_fields'][j]['raw_smt'][2][k] - dat1_b_z_raw[j]
-		                        for k in range( len( 
-		                        dat1['b0_fields'][j]['raw_smt'][0] ) ) ]
+		dat1_db_z_raw = dat1['b0_fields'][j]['but_bnd'][2]
 
 		dat1_db[j]    = sum( [ sqrt( dat1_db_x_raw[k]**2 +
 		                             dat1_db_y_raw[k]**2 +
@@ -214,6 +207,28 @@ if ( 1 in n_data ) :
 		                    for k in range( len( dat1_db_x_raw ) ) ] )/(
 		            len( dat1_db_x_raw )*( sqrt( dat1_b_x_raw[j]**2 +
 		                 dat1_b_y_raw[j]**2 + dat1_b_z_raw[j]**2   ) ) )
+
+#		dat1_db_x_raw = [
+#		         dat1['b0_fields'][j]['raw_smt'][0][k] - dat1_b_x_raw[j]
+#		                        for k in range( len(
+#		                        dat1['b0_fields'][j]['raw_smt'][0] ) ) ]
+#
+#		dat1_db_y_raw = [
+#		         dat1['b0_fields'][j]['raw_smt'][1][k] - dat1_b_y_raw[j]
+#		                        for k in range( len( 
+#		                         dat1['b0_fields'][j]['raw_smt'][0]) ) ]
+#
+#		dat1_db_z_raw = [
+#		         dat1['b0_fields'][j]['raw_smt'][2][k] - dat1_b_z_raw[j]
+#		                        for k in range( len( 
+#		                        dat1['b0_fields'][j]['raw_smt'][0] ) ) ]
+#
+#		dat1_db[j]    = sum( [ sqrt( dat1_db_x_raw[k]**2 +
+#		                             dat1_db_y_raw[k]**2 +
+#		                             dat1_db_z_raw[k]**2  )
+#		                    for k in range( len( dat1_db_x_raw ) ) ] )/(
+#		            len( dat1_db_x_raw )*( sqrt( dat1_b_x_raw[j]**2 +
+#		                 dat1_b_y_raw[j]**2 + dat1_b_z_raw[j]**2   ) ) )
 
 		dat1_b_y_sig_rot[j] = np.array(
 		                    dat1['sig_b0_fields'][j]['sig_rot_smt'][1] )
@@ -295,9 +310,9 @@ if ( 1 in n_data ) :
 		         "fitfunc" : fitfunc,
 		         "rawres"  : ( popt1,pcov1 ) }
 
-	dat1_db.pop( -7 )
-	dat1_s_fv.pop( -7 )
-	dat1_s_sig_fv_p.pop( -7 )
+#	dat1_db.pop( -7 )
+#	dat1_s_fv.pop( -7 )
+#	dat1_s_sig_fv_p.pop( -7 )
 
 	dat1_db.append( 0 )
 	dat1_s_fv.append( 0 )
@@ -666,31 +681,27 @@ if ( 1 in n_data ) :
 
 	rcParams['figure.figsize'] = 10, 10
 
-	indx = linspace( -0.08, 0.08, 10 )
-
-	xx = [0]*len( indx )
-
 	plt.errorbar( dat1_db[0:-1], dat1_s_fv[0:-1],
 	                       yerr=dat1_s_sig_fv_p[0:-1], fmt='o', ecolor='g' )
 
 	plt.plot( ind1, y1_fit_dat, color='r' )
 	plt.plot( ind1, y1_fit_thr, dashes=[1,1], color='m' )
 	plt.scatter( dat1_db[0:-1], dat1_thr, marker='*', color='r')
-	plt.plot( indx, xx, color='gray' )
-	plt.plot( xx, indx, color='gray' )
+	plt.axhline( 0, color='gray' )
+	plt.axvline( 0, color='gray' )
 
-	plt.ylim( [ -0.005, 0.08 ] )
-	plt.xlim( [ -0.005, 0.08 ] )
+#	plt.ylim( [ -0.005, 0.08 ] )
+#	plt.xlim( [ -0.005, 0.08 ] )
 
-	plt.xticks([0, 0.015, 0.03, 0.045, 0.06, 0.075], fontsize=24 )
-	plt.yticks([0, 0.015, 0.03, 0.045, 0.06, 0.075], fontsize=24 )
+	#plt.xticks([0, 0.015, 0.03, 0.045, 0.06, 0.075], fontsize=24 )
+	#plt.yticks([0, 0.015, 0.03, 0.045, 0.06, 0.075], fontsize=24 )
 
 	plt.text( 0.055, 0.0493, 'Fit Slope = ' '%s' r'$\, \pm \,$' '%s'
 	%( round( m1, 2 ), round( mean( dat1_m ), 2 ) ), fontsize = 20,
 	                                                           rotation=33 )
 
-	plt.text( 0.052, 0.069, 'Expected Slope = 1', fontsize = 20,
-	                                                           rotation=45 )
+	#plt.text( 0.052, 0.069, 'Expected Slope = 1', fontsize = 20,
+	#                                                          rotation=45 )
 
 #	rc( 'text', usetex=True )
 
@@ -699,13 +710,13 @@ if ( 1 in n_data ) :
 
 	plt.tight_layout()
 
-	os.chdir("/home/ahmadr/Desktop/GIT/fm_development/figures")
+	#os.chdir("/home/ahmadr/Desktop/GIT/fm_development/figures")
 
-	plt.savefig('fv_delb_fz01'+'.eps', bbox_inches='tight', dpi=200)
+	#plt.savefig('fv_delb_fz01'+'.eps', bbox_inches='tight', dpi=200)
 
-	os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
+	#os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
 
-	#plt.show( )
+	plt.show( )
 
 if ( 2 in n_data ) :
 
@@ -730,18 +741,18 @@ if ( 2 in n_data ) :
 	plt.plot( indx, xx, color='gray' )
 	plt.plot( xx, indx, color='gray' )
 
-	plt.ylim( [ -0.005, 0.08 ] )
-	plt.xlim( [ -0.005, 0.08 ] )
+#	plt.ylim( [ -0.005, 0.08 ] )
+#	plt.xlim( [ -0.005, 0.08 ] )
 
-	plt.xticks([0, 0.015, 0.03, 0.045, 0.06, 0.075], fontsize=24 )
-	plt.yticks([0, 0.015, 0.03, 0.045, 0.06, 0.075], fontsize=24 )
+#	plt.xticks([0, 0.015, 0.03, 0.045, 0.06, 0.075], fontsize=24 )
+#	plt.yticks([0, 0.015, 0.03, 0.045, 0.06, 0.075], fontsize=24 )
 
 	plt.text( 0.055, 0.0493, 'Fit Slope = ' '%s' r'$\, \pm \,$' '%s'
 	%( round( m2, 2 ), round( mean( dat2_m ), 2 ) ), fontsize = 20,
 	                                                           rotation=33 )
 
-	plt.text( 0.052, 0.069, 'Expected Slope = 1', fontsize = 20,
-	                                                           rotation=45 )
+#	plt.text( 0.052, 0.069, 'Expected Slope = 1', fontsize = 20,
+#	                                                           rotation=45 )
 
 #	rc( 'text', usetex=True )
 
@@ -750,13 +761,13 @@ if ( 2 in n_data ) :
 
 	plt.tight_layout()
 
-	os.chdir("/home/ahmadr/Desktop/GIT/fm_development/figures")
+#	os.chdir("/home/ahmadr/Desktop/GIT/fm_development/figures")
 
-	plt.savefig('fv_delb_fz11'+'.eps', bbox_inches='tight', dpi=200)
+#	plt.savefig('fv_delb_fz11'+'.eps', bbox_inches='tight', dpi=200)
 
-	os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
+#	os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
 
-	#plt.show( )
+	plt.show( )
 
 if ( 3 in n_data ) :
 

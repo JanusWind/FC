@@ -346,13 +346,13 @@ class fc_spec( ) :
 	# DEFINE THE FUNCTION FOR CALC'ING EXPECTED CURRENT FROM A POPULATION.
 	#-----------------------------------------------------------------------
 
-	def calc_curr( self, m, q, v0, fv, av_b, n, dv, w, key ) :
+	def calc_curr( self, m, q, v0, fv, n, dv, w, key ) :
 
 		# Return a 3-D list with the calculated current for each bin in
 		# the spectrum.
 
 		return [ [ [ self.arr[c][d][b].calc_curr( 
-		                    m, q, v0, fv, av_b, n, dv, w, key )
+		                    m, q, v0, fv, n, dv, w, key )
 		                    for b in range( self['n_bin'] ) ]
 		                    for d in range( self['n_dir'] ) ]
 		                    for c in range( self['n_cup'] ) ]
@@ -466,7 +466,8 @@ class fc_spec( ) :
 			avg_b_y = sum( mfi_b[1] ) / float( len( mfi_b[1] ) )
 			avg_b_z = sum( mfi_b[2] ) / float( len( mfi_b[2] ) )
 
-			avg_b_vec = [ avg_b_x, avg_b_y, avg_b_z ]
+			avg_b_vec  = [ avg_b_x, avg_b_y, avg_b_z ]
+			avg_db_vec = [ 0., 0., 0. ]
 
 			for c in range( self['n_cup'] ) :
 
@@ -475,5 +476,5 @@ class fc_spec( ) :
                                         for b in range( self['n_bin'] ) :
 
                                                 self.arr[c][d][b].set_mag( 
-						     avg_b_vec, avg_b_vec, key )
+						    avg_b_vec, avg_db_vec, key )
 						print 'janus_fc_spec:line 479'

@@ -193,7 +193,7 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION TO CALCULATE EXPECTED MAXWELLIAN CURRENT.
 	#-----------------------------------------------------------------------
 
-	def calc_curr( self, m, q, v0, fv, av_b, n, dv, w, key=None ) :
+	def calc_curr( self, m, q, v0, fv, n, dv, w, key=None ) :
 
 		# Note.  This function is based on Equation 2.34 from Maruca
 		#        (PhD thesis, 2012), but differs by a factor of $2$
@@ -221,10 +221,17 @@ class fc_dat( ) :
 
 		db = self._vec_db[key]
 
-		db_nrm = calc_arr_norm( db )
+#		db_nrm = calc_arr_norm( db )
 
-		fv_vec = [ ( fv * db[i]/ linalg.norm( av_b ) )
-		                               for i in range( len( db_nrm ) ) ]
+#		fv_vec = [ fv * db[i]
+#		                                   for i in range( len( db ) ) ]
+
+		fv_vec = [ ( 1.e-15 * fv * db[i] /\
+		                      sqrt( const['mu_0'] * const['m_p'] * n ) )
+		                                   for i in range( len( db ) ) ]
+
+#		fv_vec = [ ( fv * db[i]/ linalg.norm( self._vec_db[key] ) )
+#		                               for i in range( len( db ) ) ]
 
 #		print calc_arr_dot( db, self._vec_b[key] )
 		if ( dv is None ) :
@@ -237,7 +244,7 @@ class fc_dat( ) :
 		# Calculate the component of the magnetic field unit vector
 		# along that lies along the look direction.
 
-		dlk_v   = -calc_arr_dot( self['dir'], v_vec )
+		dlk_v   = - calc_arr_dot( self['dir'], v_vec )
 
 		# Scale the velocities with charge to mass ratio.
 

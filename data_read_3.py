@@ -22,6 +22,8 @@ rcParams['figure.figsize'] = 20, 10
 #plt.clf()
 plt.close('all')
 
+os.chdir("/home/ahmadr/Desktop/GIT/fm_development/data/edited")
+
 #fname1 = 'fm_22.jns'
 #fname2 = 'fm_14.jns'
 #fname3 = 'ms_14.jns'
@@ -31,7 +33,8 @@ plt.close('all')
 #fname3 = 'dat_auto_run_22.jns' 
 #fname4 = 'dat_auto_run_03.jns'
 #fname4 = 'dat_auto_run_03_b.jns'
-fname4 = 'dat_auto_run_11_d.jns'
+fname4 = 'dat_bnd_11_8.jns'
+#fname4 = 'dat_auto_run_11_d.jns'
 #fname4  = 'test_1_fm.jns'
 
 i = 0
@@ -41,6 +44,7 @@ dat4   = [0]*len( fname4 )
 dat4 = pickle.load( open( fname4, 'rb' ) )
 
 # Find the total number of data points in all the files being analyzed.
+os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
 
 nd4 = len( dat4['b0'] )
 
@@ -204,32 +208,34 @@ for i in range( len( time4 ) ) :
 
 		k += 1
 print k
-#f, ax4 = plt.subplots( 3, 1, sharex=True )
-#
-#if (k > 0 ) :
-#
-#	ax4[0].scatter( range( len( time4 ) - k ), dat4_sig_bb[0:-k], color='r',
-#	                                                            marker='D' )
-#	ax4[1].errorbar( range( len( time4 ) - k ), dat4_s_fv[0:-k],
-#	            yerr=dat4_s_sig_fv_p[0:-k], fmt='o', ecolor='b', color='b' )
-#
-#	ax4[2].scatter( range( len( time4 ) - k ), dat4_db_raw[0:-k], color='m',
-#	                                                            marker='D' )
-#else:
-#
-#	ax4[0].scatter( range( len( time4 ) ), dat4_sig_bb, color='r',
-#	                                                            marker='D' )
-#	ax4[1].errorbar( range( len( time4 ) ), dat4_s_fv,
-#	            yerr=dat4_s_sig_fv_p, fmt='o', ecolor='b', color='b' )
-#
-#	ax4[2].scatter( range( len( time4 ) ), dat4_db_raw, color='m',
-#	                                                            marker='D' )
-#
-#ax4[0].set_ylabel( r'$\frac{\sigma_B}{| \vec B|}$', fontsize = 32, color='r' )
-#ax4[0].set_ylim( 0., 0.125 )
-#
-#ax4[1].set_ylabel( 'f', fontsize = 32, color='b' )
-#ax4[1].tick_params( 'y', colors='b' )
+f, ax4 = plt.subplots( 3, 1, sharex=True )
+
+if (k > 0 ) :
+
+	ax4[0].scatter( range( len( time4 ) - k ), dat4_sig_bb[0:-k], color='r',
+	                                                            marker='D' )
+	ax4[1].errorbar( range( len( time4 ) - k ), dat4_s_fv[0:-k],
+	            yerr=dat4_s_sig_fv_p[0:-k], fmt='o', ecolor='b', color='b' )
+
+	ax4[2].scatter( range( len( time4 ) - k ), dat4_db_raw[0:-k], color='m',
+	                                                            marker='D' )
+else:
+
+	ax4[0].scatter( range( len( time4 ) ), dat4_sig_bb, color='r',
+	                                                            marker='D' )
+	ax4[1].errorbar( range( len( time4 ) ), dat4_s_fv,
+	            yerr=dat4_s_sig_fv_p, fmt='o', ecolor='b', color='b' )
+
+	ax4[2].scatter( range( len( time4 ) ), dat4_db_raw, color='m',
+	                                                            marker='D' )
+
+ax4[0].set_ylabel( r'$\frac{\sigma_B}{| \vec B|}$', fontsize = 32, color='r' )
+ax4[0].set_ylim( 0., 0.125 )
+
+ax4[1].set_ylabel( 'f', fontsize = 32, color='b' )
+ax4[2].set_ylabel( r'$\sigma_b$', fontsize = 32, color='m' )
+ax4[2].set_xlabel( 'Data Number', fontsize = 32, color='k')
+ax4[1].tick_params( 'y', colors='b' )
 #ax4[1].set_ylim( -1.5, 1.5 )
 #ax4[1].set_xlim( 0., 75 )
 '''

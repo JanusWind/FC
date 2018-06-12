@@ -350,10 +350,10 @@ class widget_fm_moments( QWidget ) :
 		y_raw = self.core.mfi_vec_but_bnd
 		y_smt = self.core.mfi_vec_raw
 
-		if( self.core.mfi_vec_fit is None ) :
+		if( self.core.mfi_vec_but_low is None ) :
 			return
 		else :
-			y_fit = self.core.mfi_vec_but_bnd
+			y_fit = self.core.mfi_vec_but_low
 
 		# For each plot in the grid, generate and display a fit curve
 		# based on the results of the analysis.
