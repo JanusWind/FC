@@ -225,28 +225,27 @@ class fc_dat( ) :
 
 		db = self._vec_db[key]
 
-#		db_nrm = calc_arr_norm( db )
+		db_nrm = calc_arr_norm( db )
 
-#		fv_vec = [ fv * db[i]
+#		fv_vec = [ fv * db[i] / linalg.norm( self._vec_b[key] )
 #		                                   for i in range( len( db ) ) ]
 
-		try :
+#		print fv
 
-			fv_vec = [ fv * dbi for dbi in db ]
+#		fv_vec = [ fv * dbi/linalg.norm( self._vec_b[key] )
+#		                                              for dbi in db ]
 
-			#fv_vec = [ ( 1.e-15 * fv * db[i] /\
-			#                      sqrt( const['mu_0'] * const['m_p'] * n ) )
-			#                                   for i in range( len( db ) ) ]
-		except :
+		fv_vec = [ ( 1.e-15 * fv * db[i] /\
+		                      sqrt( const['mu_0'] * const['m_p'] * n ) )
+		                                   for i in range( len( db ) ) ]
 
-			print fv, db, n, len(db)
-			return
-
-
+		print fv_vec, fv, db
+#		print 1.e15 * sqrt( const['mu_0'] * const['m_p'] * n )
 #		fv_vec = [ ( fv * db[i]/ linalg.norm( self._vec_db[key] ) )
 #		                               for i in range( len( db ) ) ]
 
 #		print calc_arr_dot( db, self._vec_b[key] )
+
 		if ( dv is None ) :
 			v_vec = [ ( v0[i] - fv_vec[i] )
 			                           for i in range( len( v0 ) ) ]

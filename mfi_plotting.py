@@ -74,7 +74,7 @@ start = time.time( )
 download = raw_input('Download the data ==>  ')
 
 date = '2008-11-04-11-57-25'
-dur  =  300
+dur  =  100
 filter_length = 11
 
 if( download == 'y' ) :
@@ -184,9 +184,9 @@ for i in range( len( orders ) ) :
 
 	fs = 1 / ( mfi_s[1] - mfi_s[0] )
 	lc = 0.0
-	mc = 0.01
-	mc1 = 0.01
-	hc = 0.6
+	mc = 0.005
+	mc1 = 0.005
+	hc = 1.5
 	order = orders[i]
 
 	# Compute the bandpass filtered data for all the three components.
@@ -199,16 +199,16 @@ for i in range( len( orders ) ) :
 	filt_y_low = butter_bandpass_filter( mfi_b_y_filt, lc, mc, fs, order )
 	filt_z_low = butter_bandpass_filter( mfi_b_z_filt, lc, mc, fs, order )
 
-	resd_x = mfi_b_x_filt - filt_x
-	resd_y = mfi_b_y_filt - filt_y
-	resd_z = mfi_b_z_filt - filt_z
+	resd_x = filt_x_low + filt_x
+	resd_y = filt_y_low + filt_y
+	resd_z = filt_z_low + filt_z
 
 	f, ax2 = plt.subplots( 3, 1, sharex = True )
 
 	rcParams['figure.figsize'] = 20, 10
 
-	a1 = 0
-	b1 = -1
+	a1 = 3000
+	b1 = -3000
 
 	indx = int( fs*300 )
 	siggg = [ std( filt_x[indx:-indx] ),

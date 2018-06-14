@@ -434,15 +434,15 @@ class fc_spec( ) :
 		           interp1d( mfi_s, mfi_b[1] ), 
 		           interp1d( mfi_s, mfi_b[2] ) ]
 
-		fnc_db = [ interp1d( mfi_s, mfi_db[0] ),
-		           interp1d( mfi_s, mfi_db[1] ), 
-		           interp1d( mfi_s, mfi_db[2] ) ]
+#		fnc_db = [ interp1d( mfi_s, mfi_db[0] ),
+#		           interp1d( mfi_s, mfi_db[1] ), 
+#		           interp1d( mfi_s, mfi_db[2] ) ]
 
-		print type(mfi_s)
-		print type(mfi_db), type(mfi_db[0])
-		print type(mfi_b), type(mfi_b[0])
-
-		print fnc_b[0]( 0. )
+#		print type(mfi_s)
+#		print type(mfi_db), type(mfi_db[0])
+#		print type(mfi_b), type(mfi_b[0])
+#
+#		print fnc_b[0]( 0. )
 
 		#try :
 
@@ -459,18 +459,18 @@ class fc_spec( ) :
 					           fnc_b[1]( s ),
 					           fnc_b[2]( s )  ]
 
-					db_vec = [ fnc_db[0]( s ),
-					           fnc_db[1]( s ),
-					           fnc_db[2]( s )  ]
+#					db_vec = [ fnc_db[0]( s ),
+#					           fnc_db[1]( s ),
+#					           fnc_db[2]( s )  ]
 
 					b_vec = [ b_vec[i] for i in range( 3 ) ]
-					db_vec = [ db_vec[i] for i in range( 3 ) ]
+#					db_vec = [ db_vec[i] for i in range( 3 ) ]
 
-					print b_vec
+#					print b_vec
 
 
 					self.arr[c][d][b].set_mag(
-					            b_vec, db_vec, key )
+					            b_vec, mfi_db, key )
 
 		#except :
 

@@ -52,15 +52,15 @@ db = [ [0.016131047858542212, 0.082373984060854485, 0.08061276447137472],
        [0.031665016032814311, 0.075650386822514515, 0.10705578184931727],
        [0.022849539971544916, 0.079277445501067981, 0.1072202956897946] ]
 
-def fitlin( b1, v1, sigma1 ) :
+def fitlin( b1, v1, sigma ) :
 
 	def linfunc( b1, m1, c1 ) :
 
 		return m1 * b1 + c1
 
-	sigma1 = np.ones(len(b1))
-	sigma1[ -1]= 1.E-5
-	popt1, pcov1 = curve_fit( linfunc, b1, v1, sigma=sigma1 )
+	sigma = np.ones(len(b1))
+	sigma[ -1]= 1.E-5
+	popt1, pcov1 = curve_fit( linfunc, b1, v1, sigma=sigma )
 	m1, c1 = popt1
 
 	fitfunc = lambda b1: m1 * b1 + c1
@@ -71,3 +71,79 @@ def fitlin( b1, v1, sigma1 ) :
 	         "rawres"  : ( popt1,pcov1 ) }
 
 
+v_x = [ fv_vec[i][0] for i in range( shape( fv_vec )[0] ) ]
+
+v_y = [ fv_vec[i][1] for i in range( shape( fv_vec )[0] ) ]
+
+v_z = [ fv_vec[i][2] for i in range( shape( fv_vec )[0] ) ]
+
+b_x = [ db[i][0] for i in range( shape( fv_vec )[0] ) ]
+
+b_y = [ db[i][1] for i in range( shape( fv_vec )[0] ) ]
+
+b_z = [ db[i][2] for i in range( shape( fv_vec )[0] ) ]
+
+v = sqrt( [ ( v_x[i]**2 + v_y[i]**2 + v_z[i]**2 ) for i in range( len( v_x ) ) ] )
+b = sqrt( [ ( b_x[i]**2 + b_y[i]**2 + b_z[i]**2 ) for i in range( len( v_x ) ) ] )
+
+v_x.append( 0 )
+v_y.append( 0 )
+v_z.append( 0 )
+b_x.append( 0 )
+b_y.append( 0 )
+b_z.append( 0 )
+
+sigx = [1]*len( b_x )
+sigy = [1]*len( b_y )
+sigz = [1]*len( b_z )
+
+dat_fit_x = fitlin( b_x, v_x, sigx )
+dat_fit_y = fitlin( b_y, v_y, sigy )
+dat_fit_z = fitlin( b_z, v_z, sigz )
+
+m_x = dat_fit_x['slope']
+m_y = dat_fit_y['slope']
+m_z = dat_fit_z['slope']
+
+c_x = dat_fit_x['offset']
+c_y = dat_fit_y['offset']
+c_z = dat_fit_z['offset']
+
+indx = linspace( 0., max( b_x ), len( b_x ) )
+indy = linspace( 0., max( b_y ), len( b_y ) )
+indz = linspace( 0., max( b_z ), len( b_z ) )
+
+fit_x = dat_fit_x['fitfunc'](indx)
+fit_y = dat_fit_y['fitfunc'](indy)
+fit_z = dat_fit_z['fitfunc'](indz)
+
+y_x = [ m_x*ind for ind in indx ]
+y_y = [ m_y*ind for ind in indy ]
+y_z = [ m_z*ind for ind in indz ]
+
+x_fit_dat = [ ( m_x*indx[i] + c_x ) for i in range( len( b_x ) ) ]
+y_fit_dat = [ ( m_y*indy[i] + c_y ) for i in range( len( b_x ) ) ]
+z_fit_dat = [ ( m_z*indz[i] + c_z ) for i in range( len( b_x ) ) ]
+
+plt.figure()
+
+plt.scatter( b_x, v_x, marker='^', color='r' )
+plt.plot( indx, y_x, marker='*', color='m' )
+plt.xlabel( r'$\sigma_{bx}$' )
+plt.ylabel( r'$\delta V_x$' )
+
+plt.figure()
+
+plt.scatter( b_y, v_y, marker='^', color='r' )
+plt.plot( indy, y_y, marker='*', color='m' )
+plt.xlabel( r'$\sigma_{by}$' )
+plt.ylabel( r'$\delta V_y$' )
+
+plt.figure()
+
+plt.scatter( b_z, v_z, marker='^', color='r' )
+plt.plot( indz, y_z, marker='*', color='m' )
+plt.xlabel( r'$\sigma_{bz}$' )
+plt.ylabel( r'$\delta V_z$' )
+
+plt.show( )

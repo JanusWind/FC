@@ -1469,17 +1469,17 @@ class core( QObject ) :
 
 		self.fs = 1 / ( self.mfi_s[1] - self.mfi_s[0] )
 		self.lc = 0.0
-		self.mc = 0.01
-		self.hc = 0.5
+		self.mc = 0.005
+		self.hc = 1.5
 		self.order = 1
 		# Computing the band-pass values of magnetic-field.
 
 		self.mfi_x_but_bnd = list( but_bnd_pss_flt( self.mfi_x_raw_smt,
-		                         self.mc, self.hc, self.fs, self.order ) )
+		                       self.mc, self.hc, self.fs, self.order ) )
 		self.mfi_y_but_bnd = list( but_bnd_pss_flt( self.mfi_y_raw_smt,
-		                         self.mc, self.hc, self.fs, self.order ) )
+		                       self.mc, self.hc, self.fs, self.order ) )
 		self.mfi_z_but_bnd = list( but_bnd_pss_flt( self.mfi_z_raw_smt,
-		                         self.mc, self.hc, self.fs, self.order ) )
+		                       self.mc, self.hc, self.fs, self.order ) )
 
 		self.mfi_vec_but_bnd = [ self.mfi_x_but_bnd, self.mfi_y_but_bnd,
 		                         self.mfi_z_but_bnd ]
@@ -1497,11 +1497,11 @@ class core( QObject ) :
 #		                         for i in range( len( self.mfi_t ) ) ]
 
 		self.mfi_x_but_low = list( but_bnd_pss_flt( self.mfi_x_raw_smt,
-		                         self.lc, self.mc, self.fs, self.order ) )
+		                       self.lc, self.mc, self.fs, self.order ) )
 		self.mfi_y_but_low = list( but_bnd_pss_flt( self.mfi_y_raw_smt,
-		                         self.lc, self.mc, self.fs, self.order ) )
+		                       self.lc, self.mc, self.fs, self.order ) )
 		self.mfi_z_but_low = list( but_bnd_pss_flt( self.mfi_z_raw_smt,
-		                         self.lc, self.mc, self.fs, self.order ) )
+		                       self.lc, self.mc, self.fs, self.order ) )
 
 		self.mfi_vec_but_low = [ self.mfi_x_but_low, self.mfi_y_but_low,
 		                         self.mfi_z_but_low ]
@@ -1518,6 +1518,8 @@ class core( QObject ) :
 		                       std( self.mfi_x_but_bnd[indx:-indx] ),
 		                       std( self.mfi_y_but_bnd[indx:-indx] ),
 		                       std( self.mfi_z_but_bnd[indx:-indx] ) ]
+
+#		print self.mfi_sig_vec_db_bnd
 
 #		# Compute the DC component of the magnetic-field.
 #
@@ -1583,7 +1585,8 @@ class core( QObject ) :
 
 		self.fc_spec.set_mag( self.mfi_t,
 		                      self.b0_avg_fields[self.mfi_set_key],
-		                      self.b0_fields[self.mfi_set_key],
+		                      self.mfi_sig_vec_db_bnd,
+#		                      self.b0_fields[self.mfi_set_key],
 #		                      self.mfi_vec_but_low,
 #		                      self.mfi_vec_but_bnd,
 		                      self.mfi_set_key                  )
@@ -2430,7 +2433,7 @@ class core( QObject ) :
 		try :
 			self.nln_plas['v0_vec'] = [
 			         round( v, 1 ) for v in self.mom_res['v0_vec'] ]
-			self.nln_plas['fv'] = 0.#.05*norm( self.nln_plas['v0_vec'])
+			self.nln_plas['fv'] = 1.#.05*norm( self.nln_plas['v0_vec'])
 #			self.nln_plas['fv'] = 10**-15*self.mfi_avg_mag_but_low/\
 #			  sqrt( const['mu_0']*const['m_p']*self.mom_res['n_p'] )
 		except :
@@ -2700,7 +2703,7 @@ class core( QObject ) :
 
 			# For each datum in the spectrum, compute the expected
 			# current from each population.
-			print fv
+#			print fv
 			self.nln_gss_curr_ion.append(
 			     self.fc_spec.calc_curr(
 			                   self.nln_plas.arr_pop[p]['m'],
