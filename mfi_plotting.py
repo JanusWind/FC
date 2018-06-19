@@ -180,6 +180,48 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order):
 
 orders= [ 1 ]
 
+
+N = 1000
+
+cum_sum_x, mvg_avg_x = [0], []
+
+for i, x in enumerate( mfi_b_x, 1 ) :
+
+	cum_sum_x.append( cum_sum_x[i-1] + x )
+
+	if i>=N:
+		avg_x = ( cum_sum_x[i] - cum_sum_x[i-N] )/N
+
+		#can do stuff with moving_ave here
+
+		mvg_avg_x.append( avg_x )
+
+cum_sum_y, mvg_avg_y = [0], []
+
+for i, x in enumerate( mfi_b_y, 1 ) :
+
+	cum_sum_y.append( cum_sum_y[i-1] + x )
+
+	if i>=N:
+		avg_y = ( cum_sum_y[i] - cum_sum_y[i-N] )/N
+
+		#can do stuff with moving_ave here
+
+		mvg_avg_y.append( avg_y )
+
+cum_sum_z, mvg_avg_z = [0], []
+
+for i, x in enumerate( mfi_b_z, 1 ) :
+
+	cum_sum_z.append( cum_sum_z[i-1] + x )
+
+	if i>=N:
+		avg_z = ( cum_sum_z[i] - cum_sum_z[i-N] )/N
+
+		#can do stuff with moving_ave here
+
+		mvg_avg_z.append( avg_z )
+
 for i in range( len( orders ) ) :
 
 	fs = 1 / ( mfi_s[1] - mfi_s[0] )
@@ -253,7 +295,7 @@ for i in range( len( orders ) ) :
 	ax2[2].legend( )
 
 	plt.suptitle( 'Plot of magnetic field with and without Butterworth Filter ( order= %0.0f)' % (order) )
-	'''
+
 
 	plt.figure( )
 
@@ -272,9 +314,32 @@ for i in range( len( orders ) ) :
 	plt.ylabel( 'Magnetic Field', fontsize=24 )
 	plt.title( 'Different components of MF against Time', fontsize=24 )
 	plt.legend( )
-	
-	plt.show( )
+	'''	
+
+	f, ax3 = plt.subplots( 3, 1, sharex=True )
+
+	plt.subplots_adjust( hspace = 0. )
+
+	ax3[0].plot( mfi_s, mfi_b_x, color='b', label='raw x-component')
+	ax3[0].plot( mfi_s[N/2:-(N/2-1) ], mvg_avg_x, color='r', label='Moving average x-component')
+	ax3[0].set_ylabel( 'Magnitude' )
+	ax3[0].legend( )
+
+	ax3[1].plot( mfi_s, mfi_b_y, color='b', label='raw y-component')
+	ax3[1].plot( mfi_s[N/2:-(N/2-1) ], mvg_avg_y, color='r', label='Moving average y-component')
+	ax3[1].set_ylabel( 'Magnitude' )
+	ax3[1].legend( )
+
+	ax3[2].plot( mfi_s, mfi_b_z, color='b', label='raw z-component')
+	ax3[2].plot( mfi_s[N/2:-(N/2-1) ], mvg_avg_z, color='r', label='Moving average z-component')
+	ax3[2].set_ylabel( 'Magnitude' )
+	ax3[2].set_xlim( 0, 700 )
+	ax3[2].set_xlabel( 'Time' )
+	ax3[2].legend( )
+	ax3[0].set_title( 'Raw magnetic field and time moving average for window size = 10sec' )
+
 	plt.tight_layout( )
+	plt.show( )
 
 '''
 f, ax = plt.subplots( 3, 1, sharex = True )

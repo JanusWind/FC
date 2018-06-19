@@ -20,14 +20,14 @@ from numpy import linspace, pi, sqrt, exp
 from janus_const import const
 
 #plt.clf()
-plt.close('all')
+#plt.close('all')
 
 n_data = raw_input('Which file numbers do you want to run the code for ==>  ')
 n_data = [ int( n_data[j] ) for j in range( len( n_data ) ) ]
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development/data/edited")
 
-fname1 = 'dat_bnd_21_16.jns'
+fname1 = 'dat_bnd_21_17.jns'
 
 if ( 1 in n_data ) :
 
@@ -154,12 +154,15 @@ if ( 1 in n_data ) :
 
 		dat1_alfvel[j] = dat1['alfvel_p'][j]
 
-		dat1_s_fv[j] = dat1_fv_p[j]/dat1_alfvel[j] * (
-		                     1 - dat1['ocycl_p'][j]/dat1['ogyro_p'][j] )
+		try :
+			dat1_s_fv[j] = dat1_fv_p[j]/dat1_alfvel[j] * (
+			             1 - dat1['ocycl_p'][j]/dat1['ogyro_p'][j] )
 
-		dat1_s_sig_fv_p[j] = dat1_sig_fv_p[j]/dat1_alfvel[j] * (
-		                     1 - dat1['ocycl_p'][j]/dat1['ogyro_p'][j] )
+			dat1_s_sig_fv_p[j] = dat1_sig_fv_p[j]/dat1_alfvel[j] * (
+			             1 - dat1['ocycl_p'][j]/dat1['ogyro_p'][j] )
+		except :
 
+			pass
 		dat1_ogyro[j] = dat1['ogyro_p'][j]
 
 		dat1_ocycl[j] = dat1['ocycl_p'][j]
@@ -197,7 +200,7 @@ if ( 1 in n_data ) :
 		dat1_bmag[j] = dat1['b0'][j]
 
 		dat1_bsig[j] = dat1['sig_b0'][j]
-
+	'''
 	# Define the linear model to fit the data.
 
 	def fitlin( b1, v1, sigma1 ) :
@@ -217,7 +220,7 @@ if ( 1 in n_data ) :
 		         "offset"  : c1,
 		         "fitfunc" : fitfunc,
 		         "rawres"  : ( popt1,pcov1 ) }
-	'''
+
 	dat1_db.pop( 13 )
 	dat1_s_fv.pop( 13 )
 	dat1_fv_p.pop( 13 )
@@ -272,7 +275,7 @@ if ( 1 in n_data ) :
 	dat1_s_fv.pop( -1 )
 	dat1_fv_p.pop( -1 )
 	dat1_s_sig_fv_p.pop( -1 )
-	'''
+
 	dat1_db.append( 0 )
 	dat1_s_fv.append( 0 )
 	dat1_fv_p.append( 0 )
@@ -302,11 +305,11 @@ if ( 1 in n_data ) :
 
 	dat1_thr = [ dat1_db[i] * dat1_thr_slp[i]
 	                                    for i in range( len( dat1_db )-1 ) ]
-
+	'''
 	########################################################################
 	## Plotting figures: Data Set 1
 	########################################################################
-
+	'''
 	plt.figure( )
 
 	rcParams['figure.figsize'] = 10, 10
@@ -345,6 +348,17 @@ if ( 1 in n_data ) :
 	#plt.savefig('fv_delb_fz01'+'.eps', bbox_inches='tight', dpi=200)
 
 	#os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
+	'''
+
+	plt.figure( )
+
+	plt.scatter( range( len( dat1_s_fv ) ), dat1_s_fv, marker='*', color='r', label='scaled fluctuating velocity' )
+	plt.ylim( -0.025, 0.025 )
+	plt.axhline( 0 )
+	plt.axvline( 0 )
+	plt.xlabel( 'Spectra number', fontsize=22 )
+	plt.ylabel( r'$f_v/v_A$', fontsize=22 )
+	plt.title( 'Scaled fluctuating velocity against time', fontsize=22 )
 
 	plt.show( )
 

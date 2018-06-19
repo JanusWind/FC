@@ -430,13 +430,15 @@ class fc_spec( ) :
 
 		mfi_s = [ ( t - mfi_t[0] ).total_seconds( ) for t in mfi_t ]
 
+		mfi_s = mfi_s[250:-249]
+
 		fnc_b  = [ interp1d( mfi_s, mfi_b[0] ),
 		           interp1d( mfi_s, mfi_b[1] ), 
 		           interp1d( mfi_s, mfi_b[2] ) ]
 
-		fnc_db = [ interp1d( mfi_s, mfi_db[0] ),
-		           interp1d( mfi_s, mfi_db[1] ), 
-		           interp1d( mfi_s, mfi_db[2] ) ]
+		fnc_db = [ interp1d( mfi_s, mfi_db[0][250:-249] ),
+		           interp1d( mfi_s, mfi_db[1][250:-249] ), 
+		           interp1d( mfi_s, mfi_db[2][250:-249] ) ]
 
 #		print type(mfi_s)
 #		print type(mfi_db), type(mfi_db[0])

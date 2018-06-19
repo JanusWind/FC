@@ -1496,19 +1496,68 @@ class core( QObject ) :
 #                                         self.mfi_z_but_bnd[i] )
 #		                         for i in range( len( self.mfi_t ) ) ]
 
-		self.mfi_x_but_low = list( but_bnd_pss_flt( self.mfi_x_raw_smt,
-		                       self.lc, self.mc, self.fs, self.order ) )
-		self.mfi_y_but_low = list( but_bnd_pss_flt( self.mfi_y_raw_smt,
-		                       self.lc, self.mc, self.fs, self.order ) )
-		self.mfi_z_but_low = list( but_bnd_pss_flt( self.mfi_z_raw_smt,
-		                       self.lc, self.mc, self.fs, self.order ) )
+#		self.mfi_x_but_low = list( but_bnd_pss_flt( self.mfi_x_raw_smt,
+#		                       self.lc, self.mc, self.fs, self.order ) )
+#		self.mfi_y_but_low = list( but_bnd_pss_flt( self.mfi_y_raw_smt,
+#		                       self.lc, self.mc, self.fs, self.order ) )
+#		self.mfi_z_but_low = list( but_bnd_pss_flt( self.mfi_z_raw_smt,
+#		                       self.lc, self.mc, self.fs, self.order ) )
+#
+#		self.mfi_vec_but_low = [ self.mfi_x_but_low, self.mfi_y_but_low,
+#		                         self.mfi_z_but_low ]
+#
+#		self.mfi_avg_vec_but_low = [ mean( self.mfi_x_but_low ),
+#		                             mean( self.mfi_y_but_low ),
+#		                             mean( self.mfi_z_but_low ) ]
+#
+#		self.mfi_avg_mag_but_low = norm( self.mfi_avg_vec_but_low )
 
-		self.mfi_vec_but_low = [ self.mfi_x_but_low, self.mfi_y_but_low,
-		                         self.mfi_z_but_low ]
+		N = 500
 
-		self.mfi_avg_vec_but_low = [ mean( self.mfi_x_but_low ),
-		                             mean( self.mfi_y_but_low ),
-		                             mean( self.mfi_z_but_low ) ]
+		self.cum_sum_x, mvg_avg_x = [0], []
+		
+		for i, x in enumerate( self.mfi_b_x, 1 ) :
+		
+			self.cum_sum_x.append( self.cum_sum_x[i-1] + x )
+		
+			if i>=N:
+				avg_x = ( self.cum_sum_x[i] - self.cum_sum_x[i-N] )/N
+		
+				#can do stuff with moving_ave here
+		
+				mvg_avg_x.append( avg_x )
+		
+		self.cum_sum_y, mvg_avg_y = [0], []
+		
+		for i, x in enumerate( self.mfi_b_y, 1 ) :
+		
+			self.cum_sum_y.append( self.cum_sum_y[i-1] + x )
+		
+			if i>=N:
+				avg_y = ( self.cum_sum_y[i] - self.cum_sum_y[i-N] )/N
+		
+				#can do stuff with moving_ave here
+		
+				mvg_avg_y.append( avg_y )
+		
+		self.cum_sum_z, mvg_avg_z = [0], []
+		
+		for i, x in enumerate( self.mfi_b_z, 1 ) :
+		
+			self.cum_sum_z.append( self.cum_sum_z[i-1] + x )
+		
+			if i>=N:
+				avg_z = ( self.cum_sum_z[i] - self.cum_sum_z[i-N] )/N
+		
+				#can do stuff with moving_ave here
+		
+				mvg_avg_z.append( avg_z )
+
+		self.mfi_vec_but_low = [ mvg_avg_x, mvg_avg_y, mvg_avg_z ]
+
+		self.mfi_avg_vec_but_low = [ mean( mvg_avg_x ),
+		                             mean( mvg_avg_y ),
+		                             mean( mvg_avg_z ) ]
 
 		self.mfi_avg_mag_but_low = norm( self.mfi_avg_vec_but_low )
 

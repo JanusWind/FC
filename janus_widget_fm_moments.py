@@ -431,7 +431,7 @@ class widget_fm_moments( QWidget ) :
 				                         pen = self.pen_crv[3] )
 
 				try:
-					self.crv_fit[j,i] = PlotDataItem( x,
+					self.crv_fit[j,i] = PlotDataItem( x[250:-249],
 					       y_fit[d], pen = self.pen_crv[0] )
 				except:
 					pass
