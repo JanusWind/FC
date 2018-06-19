@@ -1474,7 +1474,7 @@ class core( QObject ) :
 		self.order = 1
 		# Computing the band-pass values of magnetic-field.
 
-		self.mfi_x_but_bnd = list( but_bnd_pss_flt( self.mfi_x_raw_smt,
+		self.mfi_x_but_bnd = list( but_bnd_pss_flt( self.mfi_x_rot_smt,
 		                       self.mc, self.hc, self.fs, self.order ) )
 		self.mfi_y_but_bnd = list( but_bnd_pss_flt( self.mfi_y_raw_smt,
 		                       self.mc, self.hc, self.fs, self.order ) )
@@ -1515,9 +1515,10 @@ class core( QObject ) :
 		indx = int( self.fs*300 )
 
 		self.mfi_sig_vec_db_bnd = [
-		                       std( self.mfi_x_but_bnd[indx:-indx] ),
-		                       std( self.mfi_y_but_bnd[indx:-indx] ),
-		                       std( self.mfi_z_but_bnd[indx:-indx] ) ]
+		             0.,
+#		             sqrt( 2 ) * std( self.mfi_x_but_bnd[indx:-indx] ),
+		             sqrt( 2 ) * std( self.mfi_y_but_bnd[indx:-indx] ),
+		             sqrt( 2 ) * std( self.mfi_z_but_bnd[indx:-indx] ) ]
 
 #		print self.mfi_sig_vec_db_bnd
 
@@ -1552,7 +1553,7 @@ class core( QObject ) :
 			               "mfi_set_rot"    : self.mfi_vec_rot,
 			               "mfi_set_fit"    : self.mfi_vec_fit,
 			               "mfi_set_raw_smt": self.mfi_vec_raw_smt,
-			               "mfi_set_rot_smt": self.mfi_vec_rot_smt,
+			               "mfi_set_raw_smt": self.mfi_vec_rot_smt,
 			               "mfi_set_fit_smt": self.mfi_vec_fit_smt,
 			               "mfi_set_but_bnd": self.mfi_vec_but_bnd,
 			               "mfi_set_but_low": self.mfi_vec_but_low }
@@ -1585,8 +1586,8 @@ class core( QObject ) :
 
 		self.fc_spec.set_mag( self.mfi_t,
 		                      self.b0_avg_fields[self.mfi_set_key],
-		                      self.mfi_sig_vec_db_bnd,
-#		                      self.b0_fields[self.mfi_set_key],
+#		                      self.mfi_sig_vec_db_bnd,
+		                      self.b0_fields[self.mfi_set_key],
 #		                      self.mfi_vec_but_low,
 #		                      self.mfi_vec_but_bnd,
 		                      self.mfi_set_key                  )
@@ -2073,6 +2074,7 @@ class core( QObject ) :
 		                           self.mom_res['q_p'],
 		                           self.mom_res['v0_vec'],
 		                           self.mom_res['fv'],
+		                           self.mfi_sig_vec_db_bnd,
 #			                   self.mfi_avg_vec_raw_smt,
 #		                           self.b0_avg_fields[self.mfi_set_key],
 		                           self.mom_res['n_p_c'], 0.,
@@ -2433,7 +2435,7 @@ class core( QObject ) :
 		try :
 			self.nln_plas['v0_vec'] = [
 			         round( v, 1 ) for v in self.mom_res['v0_vec'] ]
-			self.nln_plas['fv'] = 1.#.05*norm( self.nln_plas['v0_vec'])
+			self.nln_plas['fv'] = 0.#.05*norm( self.nln_plas['v0_vec'])
 #			self.nln_plas['fv'] = 10**-15*self.mfi_avg_mag_but_low/\
 #			  sqrt( const['mu_0']*const['m_p']*self.mom_res['n_p'] )
 		except :
@@ -2709,6 +2711,7 @@ class core( QObject ) :
 			                   self.nln_plas.arr_pop[p]['m'],
 			                   self.nln_plas.arr_pop[p]['q'],
 			                   pop_v0_vec, fv,
+		                           self.mfi_sig_vec_db_bnd,
 #			                   self.mfi_avg_vec_raw_smt,
 #				           self.b0_avg_fields[self.mfi_set_key],
 			                   pop_n, pop_dv, pop_w,
@@ -3012,6 +3015,7 @@ class core( QObject ) :
 				           self.nln_plas.arr_pop[p]['m'],
 				           self.nln_plas.arr_pop[p]['q'],
 				           prm_v0, prm_fv,
+		                           self.mfi_sig_vec_db_bnd,
 #			                   self.mfi_avg_vec_raw_smt,
 #				           self.b0_avg_fields[self.mfi_set_key],
 				           prm_n,  prm_dv, prm_w,
@@ -3254,6 +3258,7 @@ class core( QObject ) :
 			                  self.nln_plas.arr_pop[p]['m'],
 			                  self.nln_plas.arr_pop[p]['q'],
 			                  pop_v0_vec, fv,
+		                           self.mfi_sig_vec_db_bnd,
 #			                  self.mfi_avg_vec_raw_smt,
 #			                  self.b0_avg_fields[self.mfi_set_key],
 			                  pop_n, pop_dv, pop_w,

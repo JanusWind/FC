@@ -346,13 +346,13 @@ class fc_spec( ) :
 	# DEFINE THE FUNCTION FOR CALC'ING EXPECTED CURRENT FROM A POPULATION.
 	#-----------------------------------------------------------------------
 
-	def calc_curr( self, m, q, v0, fv, n, dv, w, key ) :
+	def calc_curr( self, m, q, v0, fv, s_db, n, dv, w, key ) :
 
 		# Return a 3-D list with the calculated current for each bin in
 		# the spectrum.
 
 		return [ [ [ self.arr[c][d][b].calc_curr( 
-		                    m, q, v0, fv, n, dv, w, key )
+		                    m, q, v0, fv, s_db, n, dv, w, key )
 		                    for b in range( self['n_bin'] ) ]
 		                    for d in range( self['n_dir'] ) ]
 		                    for c in range( self['n_cup'] ) ]
@@ -434,9 +434,9 @@ class fc_spec( ) :
 		           interp1d( mfi_s, mfi_b[1] ), 
 		           interp1d( mfi_s, mfi_b[2] ) ]
 
-#		fnc_db = [ interp1d( mfi_s, mfi_db[0] ),
-#		           interp1d( mfi_s, mfi_db[1] ), 
-#		           interp1d( mfi_s, mfi_db[2] ) ]
+		fnc_db = [ interp1d( mfi_s, mfi_db[0] ),
+		           interp1d( mfi_s, mfi_db[1] ), 
+		           interp1d( mfi_s, mfi_db[2] ) ]
 
 #		print type(mfi_s)
 #		print type(mfi_db), type(mfi_db[0])
@@ -444,49 +444,48 @@ class fc_spec( ) :
 #
 #		print fnc_b[0]( 0. )
 
-		#try :
+		try :
 
-		for c in range( self['n_cup'] ) :
+			for c in range( self['n_cup'] ) :
 
-			for d in range( self['n_dir'] ) :
+				for d in range( self['n_dir'] ) :
 
-				for b in range( self['n_bin'] ) :
+					for b in range( self['n_bin'] ) :
 
-					s = ( self.arr[c][d][b]['time']
-                                           - mfi_t[0] ).total_seconds( )
+						s = ( self.arr[c][d][b]['time']
+	                                           - mfi_t[0] ).total_seconds( )
 
-					b_vec  = [ fnc_b[0]( s ),
-					           fnc_b[1]( s ),
-					           fnc_b[2]( s )  ]
+						b_vec  = [ fnc_b[0]( s ),
+						           fnc_b[1]( s ),
+						           fnc_b[2]( s )  ]
 
-#					db_vec = [ fnc_db[0]( s ),
-#					           fnc_db[1]( s ),
-#					           fnc_db[2]( s )  ]
+						db_vec = [ fnc_db[0]( s ),
+						           fnc_db[1]( s ),
+						           fnc_db[2]( s )  ]
 
-					b_vec = [ b_vec[i] for i in range( 3 ) ]
-#					db_vec = [ db_vec[i] for i in range( 3 ) ]
+#				b_vec = [ b_vec[i] for i in range( 3 ) ]
+#				db_vec = [ db_vec[i] for i in range( 3 ) ]
 
-#					print b_vec
+	#					print b_vec
 
+						self.arr[c][d][b].set_mag(
+						            b_vec, db_vec, key )
 
-					self.arr[c][d][b].set_mag(
-					            b_vec, mfi_db, key )
+		except :
 
-		#except :
+			avg_b_x = sum( mfi_b[0] ) / float( len( mfi_b[0] ) )
+			avg_b_y = sum( mfi_b[1] ) / float( len( mfi_b[1] ) )
+			avg_b_z = sum( mfi_b[2] ) / float( len( mfi_b[2] ) )
 
-		#	avg_b_x = sum( mfi_b[0] ) / float( len( mfi_b[0] ) )
-		#	avg_b_y = sum( mfi_b[1] ) / float( len( mfi_b[1] ) )
-		#	avg_b_z = sum( mfi_b[2] ) / float( len( mfi_b[2] ) )
+			avg_b_vec  = [ avg_b_x, avg_b_y, avg_b_z ]
+			avg_db_vec = [ 0., 0., 0. ]
 
-		#	avg_b_vec  = [ avg_b_x, avg_b_y, avg_b_z ]
-		#	avg_db_vec = [ 0., 0., 0. ]
+			for c in range( self['n_cup'] ) :
 
-		#	for c in range( self['n_cup'] ) :
+                                for d in range( self['n_dir'] ) :
 
-                 #               for d in range( self['n_dir'] ) :
+                                        for b in range( self['n_bin'] ) :
 
-                  #                      for b in range( self['n_bin'] ) :
-
-                   #                             self.arr[c][d][b].set_mag( 
-			#			    avg_b_vec, avg_db_vec, key )
-			#			print 'janus_fc_spec:line 479'
+                                                self.arr[c][d][b].set_mag( 
+						    avg_b_vec, avg_db_vec, key )
+						print 'janus_fc_spec:line 479'

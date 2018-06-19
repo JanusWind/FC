@@ -193,7 +193,7 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION TO CALCULATE EXPECTED MAXWELLIAN CURRENT.
 	#-----------------------------------------------------------------------
 
-	def calc_curr( self, m, q, v0, fv, n, dv, w, key=None ) :
+	def calc_curr( self, m, q, v0, fv, s_db, n, dv, w, key=None ) :
 
 
 		if ( n <= 0. ) :
@@ -220,38 +220,23 @@ class fc_dat( ) :
 
 		# Calculate the total velocity using drift
 
-#		db = [ ( self._vec_b[key][i] - av_b[i] )
-#		                    for i in range( len( self._vec_b[key] ) ) ]
-
 		db = self._vec_db[key]
 
 		db_nrm = calc_arr_norm( db )
 
-#		fv_vec = [ fv * db[i] / linalg.norm( self._vec_b[key] )
+#		fv_vec = [ fv * db[i]/linalg.norm( self._vec_b[key] )
 #		                                   for i in range( len( db ) ) ]
 
-#		print fv
-
-#		fv_vec = [ fv * dbi/linalg.norm( self._vec_b[key] )
-#		                                              for dbi in db ]
-
-		fv_vec = [ ( 1.e-15 * fv * db[i] /\
+		fv_vec = [ ( 1.e-15 * fv * s_db[i]*db_nrm[i] /\
 		                      sqrt( const['mu_0'] * const['m_p'] * n ) )
 		                                   for i in range( len( db ) ) ]
-
-		print fv_vec, fv, db
-#		print 1.e15 * sqrt( const['mu_0'] * const['m_p'] * n )
-#		fv_vec = [ ( fv * db[i]/ linalg.norm( self._vec_db[key] ) )
-#		                               for i in range( len( db ) ) ]
-
-#		print calc_arr_dot( db, self._vec_b[key] )
 
 		if ( dv is None ) :
 			v_vec = [ ( v0[i] - fv_vec[i] )
 			                           for i in range( len( v0 ) ) ]
 		else :
 			v_vec = [ ( v0[i] + dv * self._norm_b[key][i] -
-			            fv_vec[i] )    for i in range( len( v0 ) ) ]
+			            fv_vec[i] )  for i in range( len( v0 ) ) ]
 
 		# Calculate the component of the magnetic field unit vector
 		# along that lies along the look direction.

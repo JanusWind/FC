@@ -203,10 +203,6 @@ for i in range( len( orders ) ) :
 	resd_y = filt_y_low + filt_y
 	resd_z = filt_z_low + filt_z
 
-	f, ax2 = plt.subplots( 3, 1, sharex = True )
-
-	rcParams['figure.figsize'] = 20, 10
-
 	a1 = 3000
 	b1 = -3000
 
@@ -217,42 +213,66 @@ for i in range( len( orders ) ) :
 	lw = 0.75
 	lbl = [ 'non-filtered', 'band-pass', 'low-pass', 'residue' ]
 
-	ax2[0].plot( mfi_s[a1:b1], mfi_b_x_filt[a1:b1], linewidth=lw, color='k', label = lbl[0])
-	ax2[0].plot( mfi_s[a1:b1], filt_x[a1:b1],  linewidth=lw, color='r', label = lbl[1])
-	ax2[0].plot( mfi_s[a1:b1], filt_x_low[a1:b1], linewidth=lw, color='b', label = lbl[2])
-	ax2[0].plot( mfi_s[a1:b1], resd_x[a1:b1],  linewidth=lw, color='#1e5c10', label = lbl[3] )
+	'''
+	f, ax2 = plt.subplots( 3, 1, sharex = True )
+
+	rcParams['figure.figsize'] = 20, 10
+
+	ax2[0].plot( mfi_s[indx:-indx], mfi_b_x_filt[indx:-indx], linewidth=lw, color='k', label = lbl[0])
+	ax2[0].plot( mfi_s[indx:-indx], filt_x[indx:-indx],  linewidth=lw, color='r', label = lbl[1])
+	ax2[0].plot( mfi_s[indx:-indx], filt_x_low[indx:-indx], linewidth=lw, color='b', label = lbl[2])
+	ax2[0].plot( mfi_s[indx:-indx], resd_x[indx:-indx],  linewidth=lw, color='#1e5c10', label = lbl[3] )
 	ax2[0].set_ylabel( 'x-component' )
 	ax2[0].legend( )
 
-	ax2[1].plot( mfi_s[a1:b1], mfi_b_y_filt[a1:b1], linewidth=lw, color='k', label = lbl[0] )
-	ax2[1].plot( mfi_s[a1:b1], filt_y[a1:b1],  linewidth=lw, color='r', label = lbl[1] )
-	ax2[1].plot( mfi_s[a1:b1], filt_y_low[a1:b1], linewidth=lw, color='b', label = lbl[2] )
-	ax2[1].plot( mfi_s[a1:b1], resd_y[a1:b1],  linewidth=lw, color='#1e5c10', label = lbl[3] )
+	ax2[1].plot( mfi_s[indx:-indx], mfi_b_y_filt[indx:-indx], linewidth=lw, color='k', label = lbl[0] )
+	ax2[1].plot( mfi_s[indx:-indx], filt_y[indx:-indx],  linewidth=lw, color='r', label = lbl[1] )
+	ax2[1].plot( mfi_s[indx:-indx], filt_y_low[indx:-indx], linewidth=lw, color='b', label = lbl[2] )
+	ax2[1].plot( mfi_s[indx:-indx], resd_y[indx:-indx],  linewidth=lw, color='#1e5c10', label = lbl[3] )
 	ax2[1].set_ylabel( 'y-component' )
 	ax2[1].legend( )
 
-	ax2[2].plot( mfi_s[a1:b1], mfi_b_z_filt[a1:b1], linewidth=lw, color='k', label = lbl[0] )
-	ax2[2].plot( mfi_s[a1:b1], filt_z[a1:b1],  linewidth=lw, color='r', label = lbl[1] )
-	ax2[2].plot( mfi_s[a1:b1], filt_z_low[a1:b1], linewidth=lw, color='b', label = lbl[2] )
-	ax2[2].plot( mfi_s[a1:b1], resd_z[a1:b1],  linewidth=lw, color='#1e5c10', label = lbl[3] )
+	ax2[2].plot( mfi_s[indx:-indx], mfi_b_z_filt[indx:-indx], linewidth=lw, color='k', label = lbl[0] )
+	ax2[2].plot( mfi_s[indx:-indx], filt_z[indx:-indx],  linewidth=lw, color='r', label = lbl[1] )
+	ax2[2].plot( mfi_s[indx:-indx], filt_z_low[indx:-indx], linewidth=lw, color='b', label = lbl[2] )
+	ax2[2].plot( mfi_s[indx:-indx], resd_z[indx:-indx],  linewidth=lw, color='#1e5c10', label = lbl[3] )
 	ax2[2].set_ylabel( 'z-component' )
 	ax2[2].legend( )
 
-	#ax2[1].plot( mfi_s[a1:b1], mfi_b_y, linewidth=lw, color='#d7d1cf', label = lbl[] )
-	#ax2[1].plot( mfi_s[a1:b1], filt_y,  linewidth=lw, color='#4D2619', label = lbl[] )
-	##ax2[1].plot( mfi_s[a1:b1], resd_y,  linewidth=lw, color='#1e5c10', label = lbl[])
+	#ax2[1].plot( mfi_s[indx:-indx], mfi_b_y, linewidth=lw, color='#d7d1cf', label = lbl[] )
+	#ax2[1].plot( mfi_s[indx:-indx], filt_y,  linewidth=lw, color='#4D2619', label = lbl[] )
+	##ax2[1].plot( mfi_s[indx:-indx], resd_y,  linewidth=lw, color='#1e5c10', label = lbl[])
 	#ax2[1].set_ylabel( 'y-component' )
 	#ax2[1].legend( )
 	#
-	#ax2[2].plot( mfi_s[a1:b1], mfi_b_z, linewidth=lw, color='#d7d1cf', label = lbl[] )
-	#ax2[2].plot( mfi_s[a1:b1], filt_z,  linewidth=lw, color='#4D2619', label = lbl[] )
-	##ax2[2].plot( mfi_s[a1:b1], resd_z,  linewidth=lw, color='#1e5c10', label = lbl[] )
+	#ax2[2].plot( mfi_s[indx:-indx], mfi_b_z, linewidth=lw, color='#d7d1cf', label = lbl[] )
+	#ax2[2].plot( mfi_s[indx:-indx], filt_z,  linewidth=lw, color='#4D2619', label = lbl[] )
+	##ax2[2].plot( mfi_s[indx:-indx], resd_z,  linewidth=lw, color='#1e5c10', label = lbl[] )
 	#ax2[2].set_ylabel( 'z-component' )
 	ax2[2].set_xlabel( 'Time ( Date hr:mn )' )
 	ax2[2].legend( )
 
 	plt.suptitle( 'Plot of magnetic field with and without Butterworth Filter ( order= %0.0f)' % (order) )
+	'''
 
+	plt.figure( )
+
+	b_a = sqrt( [ ( filt_x[i]**2+filt_y[i]**2+filt_z[i]**2 ) for i in range( len( filt_x ) ) ]  )
+
+	plt.plot( mfi_s[indx:-indx], b_a[indx:-indx], color='r', label='' )
+	plt.xlabel( 'Time', fontsize=24 )
+	plt.ylabel( 'Magnitude of Magnetic Field', fontsize=24 )
+	plt.title( 'Magnitude of MF against Time', fontsize=24 )
+
+	plt.figure( )
+
+	plt.plot( mfi_s[indx:-indx], filt_y[indx:-indx], color='g', label='y-component' )
+	plt.plot( mfi_s[indx:-indx], filt_z[indx:-indx], color='r', label='z-component' )
+	plt.xlabel( 'Time', fontsize=24 )
+	plt.ylabel( 'Magnetic Field', fontsize=24 )
+	plt.title( 'Different components of MF against Time', fontsize=24 )
+	plt.legend( )
+	
 	plt.show( )
 	plt.tight_layout( )
 
@@ -261,14 +281,14 @@ f, ax = plt.subplots( 3, 1, sharex = True )
 
 rcParams['figure.figsize'] = 60, 30
 
-ax[0].plot( mfi_s[a1:b1], bx_r, color='#d7d1cf' )
-ax[0].plot( mfi_s[a1:b1], bxf,  color='#4D2619' )
+ax[0].plot( mfi_s[indx:-indx], bx_r, color='#d7d1cf' )
+ax[0].plot( mfi_s[indx:-indx], bxf,  color='#4D2619' )
 
-ax[1].plot( mfi_s[a1:b1], by_r, color='#d7d1cf' )
-ax[1].plot( mfi_s[a1:b1], byf,  color='#4D2619' )
+ax[1].plot( mfi_s[indx:-indx], by_r, color='#d7d1cf' )
+ax[1].plot( mfi_s[indx:-indx], byf,  color='#4D2619' )
 
-ax[2].plot( mfi_s[a1:b1], bz_r, color='#d7d1cf' )
-ax[2].plot( mfi_s[a1:b1], bzf,  color='#4D2619' )
+ax[2].plot( mfi_s[indx:-indx], bz_r, color='#d7d1cf' )
+ax[2].plot( mfi_s[indx:-indx], bzf,  color='#4D2619' )
 
 legend = [ 'X-data', 'Y-data', 'Z-data' ]
 

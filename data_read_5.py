@@ -27,7 +27,7 @@ n_data = [ int( n_data[j] ) for j in range( len( n_data ) ) ]
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development/data/edited")
 
-fname1 = 'dat_bnd_11_13.jns'
+fname1 = 'dat_bnd_21_16.jns'
 
 if ( 1 in n_data ) :
 
@@ -217,7 +217,7 @@ if ( 1 in n_data ) :
 		         "offset"  : c1,
 		         "fitfunc" : fitfunc,
 		         "rawres"  : ( popt1,pcov1 ) }
-
+	'''
 	dat1_db.pop( 13 )
 	dat1_s_fv.pop( 13 )
 	dat1_fv_p.pop( 13 )
@@ -272,7 +272,7 @@ if ( 1 in n_data ) :
 	dat1_s_fv.pop( -1 )
 	dat1_fv_p.pop( -1 )
 	dat1_s_sig_fv_p.pop( -1 )
-
+	'''
 	dat1_db.append( 0 )
 	dat1_s_fv.append( 0 )
 	dat1_fv_p.append( 0 )
