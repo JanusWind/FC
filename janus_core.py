@@ -1474,15 +1474,15 @@ class core( QObject ) :
 		self.order = 1
 		# Computing the band-pass values of magnetic-field.
 
-		self.mfi_x_but_bnd = list( but_bnd_pss_flt( self.mfi_x_rot_smt,
-		                       self.mc, self.hc, self.fs, self.order ) )
-		self.mfi_y_but_bnd = list( but_bnd_pss_flt( self.mfi_y_raw_smt,
-		                       self.mc, self.hc, self.fs, self.order ) )
-		self.mfi_z_but_bnd = list( but_bnd_pss_flt( self.mfi_z_raw_smt,
-		                       self.mc, self.hc, self.fs, self.order ) )
-
-		self.mfi_vec_but_bnd = [ self.mfi_x_but_bnd, self.mfi_y_but_bnd,
-		                         self.mfi_z_but_bnd ]
+#		self.mfi_x_but_bnd = list( but_bnd_pss_flt( self.mfi_x_rot_smt,
+#		                       self.mc, self.hc, self.fs, self.order ) )
+#		self.mfi_y_but_bnd = list( but_bnd_pss_flt( self.mfi_y_raw_smt,
+#		                       self.mc, self.hc, self.fs, self.order ) )
+#		self.mfi_z_but_bnd = list( but_bnd_pss_flt( self.mfi_z_raw_smt,
+#		                       self.mc, self.hc, self.fs, self.order ) )
+#
+#		self.mfi_vec_but_bnd = [ self.mfi_x_but_bnd, self.mfi_y_but_bnd,
+#		                         self.mfi_z_but_bnd ]
 
 		# Computing the low-pass values of magnetic-field.
 
@@ -1512,7 +1512,7 @@ class core( QObject ) :
 #
 #		self.mfi_avg_mag_but_low = norm( self.mfi_avg_vec_but_low )
 
-		N = 500
+		N = 2 * int( self.opt['mom_run_win']/2 )
 
 		self.cum_sum_x, mvg_avg_x = [0], []
 		
@@ -1561,6 +1561,19 @@ class core( QObject ) :
 
 		self.mfi_avg_mag_but_low = norm( self.mfi_avg_vec_but_low )
 
+		self.mfi_x_but_bnd = [ x - y for x,y in zip(
+		               self.mfi_x_raw_smt[ N/2:-(N/2-1) ], mvg_avg_x ) ]
+
+		self.mfi_y_but_bnd = [ x - y for x,y in zip(
+		               self.mfi_y_raw_smt[ N/2:-(N/2-1) ], mvg_avg_y ) ]
+
+		self.mfi_z_but_bnd = [ x - y for x,y in zip(
+		               self.mfi_z_raw_smt[ N/2:-(N/2-1) ], mvg_avg_z ) ]
+
+
+		self.mfi_vec_but_bnd = [ self.mfi_x_but_bnd, self.mfi_y_but_bnd,
+		                         self.mfi_z_but_bnd ]
+ 
 		indx = int( self.fs*300 )
 
 		self.mfi_sig_vec_db_bnd = [
@@ -1639,7 +1652,7 @@ class core( QObject ) :
 		                      self.b0_fields[self.mfi_set_key],
 #		                      self.mfi_vec_but_low,
 #		                      self.mfi_vec_but_bnd,
-		                      self.mfi_set_key                  )
+		                      self.mfi_set_key, self.opt['mom_run_win'])
 
 		# Message the user that new Wind/MFI data have been loaded.
 
@@ -3233,7 +3246,8 @@ class core( QObject ) :
 		self.nln_res_plas['fv']       =  fit[3]
 		self.nln_res_plas['sig_fv']   =  sig[3]
 
-		print (" %.3f " % fit[3], " %.3f " % sig[3] , self.time_epc )
+		print (" %.3f " % fit[3], " %.3f " % sig[3] ,
+		                     self.time_epc.time().strftime("%H-%M-%S") )
 #		print self.nln_res_plas['fv'], sig[3]
 		c = 4
 
@@ -3592,7 +3606,25 @@ class core( QObject ) :
 			elif ( sub == 'med' ) :
 
 				self.opt['mom_med_fil'] = value
+				print self.opt['mom_med_fil']
 				self.fit_mfi( )
+
+				if ( self.dyn_nln ) :
+
+					self.anls_nln()
+
+					self.emit( SIGNAL('janus_chng_mfi') )
+
+			elif ( sub == 'run' ) :
+
+				self.opt['mom_run_win'] = value
+				self.fit_mfi( )
+
+				if ( self.dyn_nln ) :
+
+					self.anls_nln()
+
+					self.emit( SIGNAL('janus_chng_mfi') )
 
 		elif ( prefix == 'mfi' ) :
 
@@ -3705,14 +3737,15 @@ class core( QObject ) :
 		             'fls_src_high'    :True,
 		             'mom_fit_crv'     :False,
 		             'mom_fit_fft'     :True,
- 		             'mom_med_fil'     :int('11'),
+ 		             'mom_med_fil'     :int('21'),
+ 		             'mom_run_win'     :int('600'),
 		             'mfi_set_raw'     :False,
 		             'mfi_set_rot'     :False,
 		             'mfi_set_fit'     :False,
-		             'mfi_set_raw_smt' :True,
+		             'mfi_set_raw_smt' :False,
 		             'mfi_set_rot_smt' :False,
 		             'mfi_set_fit_smt' :False,
-		             'mfi_set_but_bnd' :False,
+		             'mfi_set_but_bnd' :True,
 		             'mfi_set_but_low' :False           }
 
 		# If requested, propagate any changes.

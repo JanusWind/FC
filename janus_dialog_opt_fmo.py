@@ -85,13 +85,15 @@ class dialog_opt_fmo( QWidget ) :
 
 		self.sg.setContentsMargins( 0, 0, 0, 0 )
 
-		self.grd.addLayout( self.sg, 0, 0, 5, 2 )
+		self.grd.addLayout( self.sg, 0, 0, 7, 2 )
 
 		# Initialize the text boxes, buttons, and labels that comprise
 		# this dialog box.
 
 		self.lab_hdr1 = QLabel( 'Select Algorithm' )
 		self.lab_hdr2 = QLabel( 'Select the median Filter size' )
+		self.lab_hdr3 = QLabel(
+		                      'Select the running average window size' )
 
 		self.lab1 = {
 		     'mom_fit_crv' :QLabel( 'Use Curve Fit algorithm', self ),
@@ -100,30 +102,39 @@ class dialog_opt_fmo( QWidget ) :
 		self.lab2 = {
 		    'mom_med_fil':QLabel( 'Assign the size of median filter' ) }
 
+		self.lab3 = {
+		              'mom_run_win':QLabel(
+		                 'Assign the size of running average window' ) }
+
 		self.arr_txt = {
-		          'mom_med_fil': event_LineEdit( self, 'mom_med_fil' ) }
+		          'mom_med_fil': event_LineEdit( self, 'mom_med_fil' ),
+		          'mom_run_win': event_LineEdit( self, 'mom_run_win' ) }
 
 		self.box = { 
-		        'mom_fit_crv' :event_RadioBox( self, 'mom_fit_crv'  ),
-		        'mom_fit_fft' :event_RadioBox( self, 'mom_fit_fft'  ), }
+		         'mom_fit_crv' :event_RadioBox( self, 'mom_fit_crv' ),
+		         'mom_fit_fft' :event_RadioBox( self, 'mom_fit_fft' )  }
 
 
 		self.order1 = [ 'mom_fit_crv', 'mom_fit_fft' ]
 
 		self.order2 = [ 'mom_med_fil' ]
 
+		self.order3 = [ 'mom_run_win' ]
+
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
 
 		self.lab_hdr1.setFont( QFont( "Helvetica", 12, QFont.Bold ) )
 		self.lab_hdr2.setFont( QFont( "Helvetica", 12, QFont.Bold ) )
+		self.lab_hdr3.setFont( QFont( "Helvetica", 12, QFont.Bold ) )
 
 		self.sg.addWidget( self.lab_hdr1, 0, 0, 1, 3 )
 		self.sg.addWidget( self.lab_hdr2, 3, 0, 1, 3 )
+		self.sg.addWidget( self.lab_hdr3, 5, 0, 1, 3 )
 
 		for i, key in enumerate( self.order1 ) :
 
-			self.box[key].setFont( QFont( "Helvetica", 12 ) )
+			self.box[key].setFont(  QFont( "Helvetica", 12 ) )
 			self.lab1[key].setFont( QFont( "Helvetica", 12 ) )
 			self.sg.addWidget( self.box[key], 1+i, 0, 1, 1 )
 			self.sg.addWidget( self.lab1[key], 1+i, 1, 1, 1 )
@@ -131,11 +142,21 @@ class dialog_opt_fmo( QWidget ) :
 
 		for i, key in enumerate( self.order2 ) :
 
-			self.lab2[key].setFont(    QFont( "Helvetica", 12 ) )
+			self.lab2[key].setFont(     QFont( "Helvetica", 12 ) )
 			self.arr_txt[key].setFont( QFont( "Helvetica", 12 ) )
 
 			self.sg.addWidget( self.arr_txt[key], 4+i, 0, 1, 1 )
 			self.sg.addWidget( self.lab2[key],  4+i, 1, 1, 1 )
+			self.arr_txt[key].setMaximumWidth( 60 )
+			self.arr_txt[key].setMaximumWidth( 40 )
+
+		for i, key in enumerate( self.order3 ) :
+
+			self.lab3[key].setFont(     QFont( "Helvetica", 12 ) )
+			self.arr_txt[key].setFont( QFont( "Helvetica", 12 ) )
+
+			self.sg.addWidget( self.arr_txt[key], 6+i, 0, 1, 1 )
+			self.sg.addWidget( self.lab3[key],  6+i, 1, 1, 1 )
 			self.arr_txt[key].setMaximumWidth( 60 )
 			self.arr_txt[key].setMaximumWidth( 40 )
 
@@ -171,6 +192,8 @@ class dialog_opt_fmo( QWidget ) :
 
 			txt = self.arr_txt[key].text( )
 
+			self.key = key
+
 			if( txt == '' ) :
 				val = None
 			else :
@@ -188,9 +211,21 @@ class dialog_opt_fmo( QWidget ) :
 	
 				txt = str( self.core.opt[key] )
 
-			if( ( val is not None ) and ( val%2 == 0 ) ) :
+			if( self.key == 'mom_med_fil' ) :
 
-				self.arr_txt[key].setStyleSheet( 'color: red;' )
+				if( ( val is not None )  and ( val%2 == 0 ) ) :
+
+					self.arr_txt[key].setStyleSheet(
+					                         'color: red;' )
+
+			elif( self.key == 'mom_run_win' ) :
+
+				if( ( val is not None ) and ( val%2 != 0 ) ) :
+
+					self.arr_txt[key].setStyleSheet(
+					                         'color: red;' )
+
+
 #				raise TypeError('Median filter length must be odd')
 
 			self.arr_txt[key].setTextUpdate( txt )
@@ -217,6 +252,7 @@ class dialog_opt_fmo( QWidget ) :
 				self.make_opt( )
 
 		else :
+
 			txt = self.arr_txt[fnc].text( )
 
 			try :

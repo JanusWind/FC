@@ -196,7 +196,8 @@ class widget_mfi_lin_plot( QWidget ) :
 
 		# Set the range of the axis of each plot.
 
-		self.plt.setXRange( t_min, t_max, padding=0.0 )
+		self.plt.setXRange( -5., 100, padding=0.0 )
+#		self.plt.setXRange( t_min, t_max, padding=0.0 )
 		self.plt.setYRange( b_min, b_max, padding=0.0 )
 
 		# If the core contains no Wind/MFI magnetic field data, return.

@@ -426,19 +426,19 @@ class fc_spec( ) :
 	# DEFINE THE FUNCTION TO ASSIGN THE MAGNETIC FIELD TO EACH DATUM. 
 	#-----------------------------------------------------------------------
 
-	def set_mag( self, mfi_t, mfi_b, mfi_db, key ) :
+	def set_mag( self, mfi_t, mfi_b, mfi_db, key, N ) :
 
 		mfi_s = [ ( t - mfi_t[0] ).total_seconds( ) for t in mfi_t ]
 
-		mfi_s = mfi_s[250:-249]
+		mfi_s = mfi_s[ N/2: - ( N/2-1 ) ]
 
 		fnc_b  = [ interp1d( mfi_s, mfi_b[0] ),
 		           interp1d( mfi_s, mfi_b[1] ), 
 		           interp1d( mfi_s, mfi_b[2] ) ]
 
-		fnc_db = [ interp1d( mfi_s, mfi_db[0][250:-249] ),
-		           interp1d( mfi_s, mfi_db[1][250:-249] ), 
-		           interp1d( mfi_s, mfi_db[2][250:-249] ) ]
+		fnc_db = [ interp1d( mfi_s, mfi_db[0] ),
+		           interp1d( mfi_s, mfi_db[1] ), 
+		           interp1d( mfi_s, mfi_db[2] ) ]
 
 #		print type(mfi_s)
 #		print type(mfi_db), type(mfi_db[0])

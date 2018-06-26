@@ -313,15 +313,15 @@ class widget_fm_moments( QWidget ) :
 			if( d == 0) :
 
 				self.lim_y = [
-				        mean( data2 ) - 2*std( data2 )*2.**0.5,
-				        mean( data1 ) + 2*std( data1 )*2.**0.5 ]
+				        mean( data2 ) - 7*std( data2 )*2.**0.5,
+				        mean( data1 ) + 5*std( data1 )*2.**0.5 ]
 
 			else :
 
 
 				self.lim_y = [
 				    1.1*mean( data1 ) - 2*std( data1 )*2.**0.5,
-				    1.1*mean( data2 ) + 2*std( data2 )*2.**0.5 ]
+				    1.1*mean( data2 ) + 5*std( data2 )*2.**0.5 ]
 
 
 			self.lim_x = [ -5, 95 ]
@@ -349,6 +349,9 @@ class widget_fm_moments( QWidget ) :
 		x     = self.core.mfi_s
 		y_raw = self.core.mfi_vec_but_bnd
 		y_smt = self.core.mfi_vec_raw
+
+		N  = int( self.core.opt['mom_run_win']/2 )
+		NN = -int ( ( self.core.opt['mom_run_win']/2-1 ) )
 
 		if( self.core.mfi_vec_but_low is None ) :
 			return
@@ -427,11 +430,11 @@ class widget_fm_moments( QWidget ) :
 				self.lbl[j,i].setPos( self.lim_x[1],
 				                      self.lim_y[1] )
 
-				self.crv_raw[j,i] = PlotDataItem( x, y_raw[d],
-				                         pen = self.pen_crv[3] )
+				self.crv_raw[j,i] = PlotDataItem( x[N:NN],
+				               y_raw[d], pen = self.pen_crv[3] )
 
 				try:
-					self.crv_fit[j,i] = PlotDataItem( x[250:-249],
+					self.crv_fit[j,i] = PlotDataItem( x[N:NN],
 					       y_fit[d], pen = self.pen_crv[0] )
 				except:
 					pass
