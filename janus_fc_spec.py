@@ -435,7 +435,7 @@ class fc_spec( ) :
 		fnc_b  = [ interp1d( mfi_s, mfi_b[0] ),
 		           interp1d( mfi_s, mfi_b[1] ), 
 		           interp1d( mfi_s, mfi_b[2] ) ]
-
+		print len(mfi_s), len(mfi_b[0]), len(mfi_db[0])
 		fnc_db = [ interp1d( mfi_s, mfi_db[0] ),
 		           interp1d( mfi_s, mfi_db[1] ), 
 		           interp1d( mfi_s, mfi_db[2] ) ]

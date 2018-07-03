@@ -1472,8 +1472,8 @@ class core( QObject ) :
 		self.mc = 0.005
 		self.hc = 1.5
 		self.order = 1
-		# Computing the band-pass values of magnetic-field.
-
+#		# Computing the band-pass values of magnetic-field.
+#
 #		self.mfi_x_but_bnd = list( but_bnd_pss_flt( self.mfi_x_rot_smt,
 #		                       self.mc, self.hc, self.fs, self.order ) )
 #		self.mfi_y_but_bnd = list( but_bnd_pss_flt( self.mfi_y_raw_smt,
@@ -1483,9 +1483,9 @@ class core( QObject ) :
 #
 #		self.mfi_vec_but_bnd = [ self.mfi_x_but_bnd, self.mfi_y_but_bnd,
 #		                         self.mfi_z_but_bnd ]
-
-		# Computing the low-pass values of magnetic-field.
-
+#
+#       	# Computing the low-pass values of magnetic-field.
+#
 #		self.mfi_x_but_low = [ ( self.mfi_x_raw_smt[i] - 
 #		                         self.mfi_x_but_bnd[i] )
 #		                         for i in range( len( self.mfi_t ) ) ]
@@ -1495,7 +1495,7 @@ class core( QObject ) :
 #		self.mfi_z_but_low = [ ( self.mfi_z_raw_smt[i] - 
 #                                         self.mfi_z_but_bnd[i] )
 #		                         for i in range( len( self.mfi_t ) ) ]
-
+#
 #		self.mfi_x_but_low = list( but_bnd_pss_flt( self.mfi_x_raw_smt,
 #		                       self.lc, self.mc, self.fs, self.order ) )
 #		self.mfi_y_but_low = list( but_bnd_pss_flt( self.mfi_y_raw_smt,

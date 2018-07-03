@@ -27,7 +27,7 @@ n_data = [ int( n_data[j] ) for j in range( len( n_data ) ) ]
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development/data/edited/error_analysis")
 
-fname1 = 'dat_filt_21_mvg_600.jns'
+fname1 = 'janus_rng_avg_600_med_flt_21_2008-11-04-12-00-41_2008-11-04-12-56-08.jns'
 
 if ( 1 in n_data ) :
 
@@ -174,7 +174,7 @@ if ( 1 in n_data ) :
 		dat1_sig_bb[j] = sqrt(
 		 std( dat1_db_x_raw[2930:int(2930+10.869*50)] )**2 +
 		 std( dat1_db_y_raw[2930:int(2930+10.869*50)] )**2 +
-		 std( dat1_db_z_raw[2930:int(2930+10.869*50)] )**2 ) / dat1_b[j]
+		 std( dat1_db_z_raw[2930:int(2930+10.869*50)] )**2 )
 
 
 		dat1_fv_p[j] = dat1['fv_p'][j]

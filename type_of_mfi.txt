@@ -1,0 +1,12 @@
+janus_type_of_mfi_and_size_med_filt_size_start_time_end_time.jns
+
+type_of_mfi :
+a) rng_avg_size = running average filter and it's size
+b) raw_mag = raw magentic field
+c) smt_mag = smoothed magnetic field (median filter used)
+d) rot_mag = rotated magnetic field
+e) but_bnd = butterworth band filter
+f) pcw_fit = piecewise fit magnetic field
+g) fit_raw = fit from raw magnetic field data
+h) fit_smt = fit from smoothed magnetic field data
+
