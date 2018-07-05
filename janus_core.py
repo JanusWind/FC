@@ -914,6 +914,7 @@ class core( QObject ) :
 
 		self.mfi_s = [ ( t - self.fc_spec['time'] ).total_seconds( )
 		                                       for t in self.mfi_t ]
+		self.fs = 1 / ( self.mfi_s[1] - self.mfi_s[0] )
 
 		# Compute the vector magnetic field.
 
@@ -1468,7 +1469,6 @@ class core( QObject ) :
 
 		# Define parameters. 
 
-		self.fs = 1 / ( self.mfi_s[1] - self.mfi_s[0] )
 		self.lc = 0.0
 		self.mc = 0.005
 		self.hc = 1.5
@@ -1604,8 +1604,6 @@ class core( QObject ) :
 		                            self.mfi_db_y_rng_avg,
 		                            self.mfi_db_z_rng_avg ]
  
-		indx = int( self.fs*300 )
-
 		self.mfi_sig_vec_db_rng_avg = [
 #		          0.,
 		          sqrt( 2 ) * std( self.mfi_db_x_rng_avg[indx:-indx] ),
@@ -1614,13 +1612,12 @@ class core( QObject ) :
 
 		# Assign all the magnetic fields to a dictionary
 
-		self.mfi_avg_vec_t = [ [None]*len( self.mfi_s ) ]*3
+		print len(self.mfi_s)
+		self.mfi_avg_vec_n = [
+		                     [ self.mfi_avg_vec[0] ]*len( self.mfi_s ),
+		                     [ self.mfi_avg_vec[1] ]*len( self.mfi_s ),
+		                     [ self.mfi_avg_vec[2] ]*len( self.mfi_s ) ]
 
-		for i in range( 3 ) :
-
-			for j in range( len( self.mfi_s ) ) :
-
-				self.mfi_avg_vec_t[i][j] = self.mfi_avg_vec[i]
 
 		if( any ( x is None for x in self.mfi_vec_raw ) or
 		    any ( x is None for x in self.mfi_vec_rot ) or
@@ -1643,7 +1640,7 @@ class core( QObject ) :
 			            "mfi_set_rng_avg": self.mfi_db_vec_rng_avg }
 
 			self.b0_avg_fields = {
-			           "mfi_set_raw"    : self.mfi_avg_vec_t,
+			           "mfi_set_raw"    : self.mfi_avg_vec_n,
 			           "mfi_set_rot"    : self.mfi_avg_vec_rot_smt,
 			           "mfi_set_fit"    : self.mfi_avg_vec_fit_smt,
 			           "mfi_set_raw_smt": self.mfi_avg_vec_raw_smt,
