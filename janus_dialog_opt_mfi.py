@@ -101,7 +101,8 @@ class dialog_opt_mfi( QWidget ) :
 		     'mfi_set_rot_smt':QLabel( 'Rotated Smoothed Data', self ),
 		     'mfi_set_fit_smt':QLabel( 'Fit Smoothed Data',     self ),
 		     'mfi_set_but_bnd':QLabel( 'Band pass filter Data', self ),
-		     'mfi_set_but_low':QLabel( 'Low pass filter Data',  self ) }
+		     'mfi_set_but_low':QLabel( 'Low pass filter Data',  self ),
+		     'mfi_set_rng_avg':QLabel( 'Running average Data',  self ) }
 
 
 		self.box = {
@@ -112,12 +113,13 @@ class dialog_opt_mfi( QWidget ) :
 		  'mfi_set_rot_smt':event_RadioBox( self, 'mfi_set_rot_smt' ),
 		  'mfi_set_fit_smt':event_RadioBox( self, 'mfi_set_fit_smt' ),
 		  'mfi_set_but_bnd':event_RadioBox( self, 'mfi_set_but_bnd' ),
-		  'mfi_set_but_low':event_RadioBox( self, 'mfi_set_but_low' ) }
+		  'mfi_set_but_low':event_RadioBox( self, 'mfi_set_but_low' ),
+		  'mfi_set_rng_avg':event_RadioBox( self, 'mfi_set_rng_avg' ) }
 
 		self.order = [
 		       'mfi_set_raw',     'mfi_set_rot',    'mfi_set_fit',
 		       'mfi_set_raw_smt', 'mfi_set_rot_smt','mfi_set_fit_smt',
-		       'mfi_set_but_bnd', 'mfi_set_but_low'                    ]
+		       'mfi_set_but_bnd', 'mfi_set_but_low', 'mfi_set_rng_avg' ]
 
 		# Row by row, add the text boxes, buttons, and labels to this
 		# widget's sub-grids.
@@ -163,6 +165,9 @@ class dialog_opt_mfi( QWidget ) :
 		                              self.core.opt['mfi_set_but_bnd'] )
 		self.box['mfi_set_but_low'].setCheckedSilent(
 		                              self.core.opt['mfi_set_but_low'] )
+
+		self.box['mfi_set_rng_avg'].setCheckedSilent(
+		                              self.core.opt['mfi_set_rng_avg'] )
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR RESPONDING TO A USER-INITIATED EVENT.

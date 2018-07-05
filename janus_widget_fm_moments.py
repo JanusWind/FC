@@ -126,6 +126,7 @@ class widget_fm_moments( QWidget ) :
 		self.pen_pnt_r  = mkPen( color='k' )
 		self.pen_crv_c  = mkPen( color='c' )
 		self.pen_crv_r  = mkPen( color='r' )
+		self.pen_crv_m  = mkPen( color='m' )
 		self.pen_crv_g  = mkPen( color='g' )
 		self.pen_crv_b  = mkPen( color='b' )
 		self.pen_crv_gr = mkPen( color='#d7d1cf' )
@@ -133,8 +134,9 @@ class widget_fm_moments( QWidget ) :
 #		self.pen_crv_gr = mkPen( color='#342C2B' )
 #		self.pen_crv_gr = mkPen( color='#342C2B' )
 
-		self.pen_crv = [ self.pen_crv_r, self.pen_crv_g, self.pen_crv_b,
-		                 self.pen_crv_gr, self.pen_crv_br              ]
+		self.pen_crv = [ self.pen_crv_r, self.pen_crv_m, self.pen_crv_g,
+		                 self.pen_crv_b, self.pen_crv_gr, self.pen_crv_br]
+
 		self.bsh_pnt_c = mkBrush( color='c' )
 		self.bsh_pnt_y = mkBrush( color='y' )
 		self.bsh_pnt_r = mkBrush( color='r' )
@@ -208,8 +210,9 @@ class widget_fm_moments( QWidget ) :
 		self.lbl = tile( None, [ self.n_plt_y, self.n_plt_x ] )
 
 		self.crv_raw = tile( None, [ self.n_plt_y, self.n_plt_x ] )
-		self.crv_fit = tile( None, [ self.n_plt_y, self.n_plt_x ] )
 		self.crv_smt = tile( None, [ self.n_plt_y, self.n_plt_x ] )
+		self.crv_bgd = tile( None, [ self.n_plt_y, self.n_plt_x ] )
+		self.crv_fit = tile( None, [ self.n_plt_y, self.n_plt_x ] )
 
 		# Initialize the scale-type for each axis, then generate the
 		# (default) axis-limits and adjusted axis-limits.
@@ -308,7 +311,7 @@ class widget_fm_moments( QWidget ) :
 		else :
 
 			data1 = self.core.mfi_vec_raw[d]
-			data2 = self.core.mfi_vec_but_bnd[d]
+			data2 = self.core.b0_fields[self.key][d]
 
 			if( d == 0) :
 
@@ -346,17 +349,43 @@ class widget_fm_moments( QWidget ) :
 
 		text = [ 'X-component', 'Y-component', 'Z-component' ]
 
-		x     = self.core.mfi_s
-		y_raw = self.core.mfi_vec_but_bnd
-		y_smt = self.core.mfi_vec_raw
+		self.key = self.core.mfi_set_key
 
-		N  = int( self.core.opt['mom_run_win']/2 )
-		NN = -int ( ( self.core.opt['mom_run_win']/2-1 ) )
+		N  =  int( self.core.opt['mom_run_win']/2    )
+		NN = -int ( self.core.opt['mom_run_win']/2-1 )
 
-		if( self.core.mfi_vec_but_low is None ) :
+		x     = self.core.mfi_s[N:NN]
+		y_raw = [ self.core.mfi_vec_raw[0][N:NN],
+		          self.core.mfi_vec_raw[1][N:NN],
+		          self.core.mfi_vec_raw[2][N:NN] ]
+
+		y_smt = [ self.core.mfi_vec_raw_smt[0][N:NN],
+		          self.core.mfi_vec_raw_smt[1][N:NN],
+		          self.core.mfi_vec_raw_smt[2][N:NN] ]
+
+#		y_raw = self.core.mfi_vec_but_bnd
+#		y_smt = self.core.mfi_vec_raw
+
+		if( self.core.b0_fields[self.key] is None ) :
 			return
 		else :
-			y_fit = self.core.mfi_vec_but_low
+
+			if( self.key == 'mfi_set_rng_avg' ) :
+
+				y_bgd = self.core.b0_avg_fields[self.key]
+				y_fit = self.core.b0_fields[self.key]
+
+			else :
+
+				y_bgd = [
+				    self.core.b0_avg_fields[self.key][0][N:NN],
+				    self.core.b0_avg_fields[self.key][1][N:NN],
+				    self.core.b0_avg_fields[self.key][2][N:NN] ]
+
+				y_fit = [
+				        self.core.b0_fields[self.key][0][N:NN],
+				        self.core.b0_fields[self.key][1][N:NN],
+				        self.core.b0_fields[self.key][2][N:NN] ]
 
 		# For each plot in the grid, generate and display a fit curve
 		# based on the results of the analysis.
@@ -382,14 +411,17 @@ class widget_fm_moments( QWidget ) :
 				self.plt[j,i].removeItem( self.crv_raw[j,i] )
 				self.crv_raw[j,i] = None
 
-			if ( self.crv_fit[j,i] is not None ) :
-				self.plt[j,i].removeItem( self.crv_fit[j,i] )
-				self.crv_fit[j,i] = None
-
 			if ( self.crv_smt[j,i] is not None ) :
 				self.plt[j,i].removeItem( self.crv_smt[j,i] )
 				self.crv_smt[j,i] = None
 
+			if ( self.crv_bgd[j,i] is not None ) :
+				self.plt[j,i].removeItem( self.crv_bgd[j,i] )
+				self.crv_bgd[j,i] = None
+
+			if ( self.crv_fit[j,i] is not None ) :
+				self.plt[j,i].removeItem( self.crv_fit[j,i] )
+				self.crv_fit[j,i] = None
 
 			# Clear this plot's label of text.
 
@@ -411,47 +443,80 @@ class widget_fm_moments( QWidget ) :
 
 			try :
 
+#				print 'Point 1'
 				# Adjust the individual axes to the new limits.
 
 				self.make_lim( d )
+#				print 'Point 1a'
 
 				self.plt[j,i].setRange( xRange=self.lim_x,
 				                        yRange=self.lim_y,
 				                        padding=0.         )
+#				print 'Point 1b'
 
 				self.axs_x[i].setRange( self.lim_x[0],
 				                        self.lim_x[1] )
+#				print 'Point 1c'
 				self.axs_y[j].setRange( self.lim_y[0],
 				                        self.lim_y[1] )
 #				self.axs_y[j].set_yticks( range( self.lim_y[0],
 #				                                 self.lim_y[1]),
 #				           ( self.lim_y[1] - self.lim_y[0] )/6 )
+#				print 'Point 1d'
 
 				self.lbl[j,i].setPos( self.lim_x[1],
 				                      self.lim_y[1] )
+#				print 'Point 1e'
 
-				self.crv_raw[j,i] = PlotDataItem( x[N:NN],
-				               y_raw[d], pen = self.pen_crv[3] )
-
-				try:
-					self.crv_fit[j,i] = PlotDataItem( x[N:NN],
-					       y_fit[d], pen = self.pen_crv[0] )
-				except:
-					pass
-
-				self.crv_smt[j,i] = PlotDataItem( x, y_smt[d],
-				                         pen = self.pen_crv[4] )
+				self.crv_raw[j,i] = PlotDataItem( x,
+				               y_raw[d], pen = self.pen_crv[4] )
+#				print 'Point 1f'
 
 				self.plt[j,i].addItem( self.crv_raw[j][i] )
+#				print 'Point 1g'
+
+				self.crv_smt[j,i] = PlotDataItem( x, y_smt[d],
+				                         pen = self.pen_crv[5] )
+#				print 'Point 1h'
+
+				self.plt[j,i].addItem( self.crv_smt[j][i] )
+#				print 'Point 1i'
+
+				try:
+#					print 'Point 2'
+					self.crv_bgd[j,i] = PlotDataItem( x,
+					       y_bgd[d], pen = self.pen_crv[0] )
+				except:
+#					print 'Point 3'
+					pass
 				try :
+#					print 'Point 4'
+					self.plt[j,i].addItem(
+					                    self.crv_bgd[j][i] )
+				except:
+#					print 'Point 5'
+					pass
+#			except :
+#				raise TypeError('Median filter length must be odd')
+#				pass
+
+				try:
+#					print 'Point 6'
+					self.crv_fit[j,i] = PlotDataItem( x,
+					       y_fit[d], pen = self.pen_crv[1] )
+				except:
+#					print 'Point 7'
+					pass
+				try :
+#					print 'Point 8'
 					self.plt[j,i].addItem(
 					                    self.crv_fit[j][i] )
 				except:
+#					print 'Point 9'
 					pass
-				self.plt[j,i].addItem( self.crv_smt[j][i] )
-
 			except :
 #				raise TypeError('Median filter length must be odd')
+				print 'Point 10'
 				pass
 
 	#-----------------------------------------------------------------------
@@ -480,15 +545,21 @@ class widget_fm_moments( QWidget ) :
 					                     self.crv_raw[j,i] )
 					self.crv_raw[j,i] = None
 
+				if ( self.crv_smt[j,i] is not None ) :
+					self.plt[j,i].removeItem(
+					                     self.crv_smt[j,i] )
+					self.crv_smt[j,i] = None
+
+				if ( self.crv_bgd[j,i] is not None ) :
+					self.plt[j,i].removeItem(
+					                     self.crv_bgd[j,i] )
+					self.crv_bgd[j,i] = None
+
 				if ( self.crv_fit[j,i] is not None ) :
 					self.plt[j,i].removeItem(
 					                     self.crv_fit[j,i] )
 					self.crv_fit[j,i] = None
 
-				if ( self.crv_smt[j,i] is not None ) :
-					self.plt[j,i].removeItem(
-					                     self.crv_smt[j,i] )
-					self.crv_smt[j,i] = None
 				# If requested, reset this plot's label text to
 				# the empty string.
 
