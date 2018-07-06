@@ -1486,6 +1486,19 @@ class core( QObject ) :
 		self.mfi_vec_but_bnd = [ self.mfi_x_but_bnd, self.mfi_y_but_bnd,
 		                         self.mfi_z_but_bnd ]
 
+		self.mfi_x_but_bnd_smt = medfilt( self.mfi_x_but_bnd,
+		                                       self.opt['mom_med_fil'] )
+		self.mfi_y_but_bnd_smt = medfilt( self.mfi_y_but_bnd,
+		                                       self.opt['mom_med_fil'] )
+		self.mfi_z_but_bnd_smt = medfilt( self.mfi_z_but_bnd,
+		                                       self.opt['mom_med_fil'] )
+
+		self.mfi_db_vec_but_bnd = self.mfi_vec_but_bnd
+
+		self.mfi_vec_but_bnd_smt = [ self.mfi_x_but_bnd_smt,
+		                             self.mfi_x_but_bnd_smt,
+		                             self.mfi_x_but_bnd_smt ]
+
 	       	# Computing the low-pass values of magnetic-field.
 
 		self.mfi_x_but_low = [ ( self.mfi_x_raw_smt[i] - 
@@ -1604,6 +1617,17 @@ class core( QObject ) :
 		                            self.mfi_db_y_rng_avg,
 		                            self.mfi_db_z_rng_avg ]
  
+		self.mfi_x_rng_avg_smt = medfilt( self.rng_avg_x,
+		                                       self.opt['mom_med_fil'] )
+		self.mfi_y_rng_avg_smt = medfilt( self.rng_avg_y,
+		                                       self.opt['mom_med_fil'] )
+		self.mfi_z_rng_avg_smt = medfilt( self.rng_avg_z,
+		                                       self.opt['mom_med_fil'] )
+
+		self.mfi_vec_rng_avg_smt = [ self.mfi_x_rng_avg_smt,
+		                             self.mfi_y_rng_avg_smt,
+		                             self.mfi_x_rng_avg_smt ]
+
 		self.mfi_sig_vec_db_rng_avg = [
 #		          0.,
 		          sqrt( 2 ) * std( self.mfi_db_x_rng_avg[indx:-indx] ),
@@ -1612,20 +1636,68 @@ class core( QObject ) :
 
 		# Assign all the magnetic fields to a dictionary
 
-		print len(self.mfi_s)
-		self.mfi_avg_vec_n = [
-		                     [ self.mfi_avg_vec[0] ]*len( self.mfi_s ),
-		                     [ self.mfi_avg_vec[1] ]*len( self.mfi_s ),
-		                     [ self.mfi_avg_vec[2] ]*len( self.mfi_s ) ]
+		self.mfi_avg_vec_arr = [
+		                       [ self.mfi_avg_vec[i] ]*len( self.mfi_s )
+		                                           for i in range( 3 ) ]
 
+		self.mfi_db_vec_raw = [ [ self.mfi_vec_raw[i][j] -
+		                          self.mfi_avg_vec_arr[i][j]
+		                           for j in range( len( self.mfi_s ) ) ]
+		                           for i in range( 3 ) ]
+
+		self.mfi_avg_vec_rot_smt_arr = [
+		               [ self.mfi_avg_vec_rot_smt[i] ]*len( self.mfi_s )
+		                                           for i in range( 3 ) ]
+
+		self.mfi_db_vec_rot = [ [ self.mfi_vec_rot[i][j] -
+		                          self.mfi_avg_vec_rot_smt_arr[i][j]
+		                           for j in range( len( self.mfi_s ) ) ]
+		                           for i in range( 3 ) ]
+
+		self.mfi_avg_vec_fit_arr = [
+		               [ self.mfi_avg_vec_fit_smt[i] ]*len( self.mfi_s )
+		                                           for i in range( 3 ) ]
+
+		self.mfi_db_vec_fit = [ [ self.mfi_vec_fit[i][j] -
+		                              self.mfi_avg_vec_fit_arr[i][j]
+		                           for j in range( len( self.mfi_s ) ) ]
+		                           for i in range( 3 ) ]
+
+		self.mfi_avg_vec_raw_smt_arr = [
+		               [ self.mfi_avg_vec_raw_smt[i] ]*len( self.mfi_s )
+		                                           for i in range( 3 ) ]
+
+		self.mfi_db_vec_raw_smt = [ [ self.mfi_vec_raw_smt[i][j] -
+		                          self.mfi_avg_vec_raw_smt_arr[i][j]
+		                           for j in range( len( self.mfi_s ) ) ]
+		                           for i in range( 3 ) ]
+
+		self.mfi_avg_vec_rot_smt_arr = [
+		               [ self.mfi_avg_vec_rot_smt[i] ]*len( self.mfi_s )
+		                                           for i in range( 3 ) ]
+
+		self.mfi_db_vec_rot_smt = [ [ self.mfi_vec_rot_smt[i][j] -
+		                          self.mfi_avg_vec_rot_smt_arr[i][j]
+		                           for j in range( len( self.mfi_s ) ) ]
+		                           for i in range( 3 ) ]
+
+		self.mfi_avg_vec_fit_smt_arr = [
+		               [ self.mfi_avg_vec_fit_smt[i] ]*len( self.mfi_s )
+		                                           for i in range( 3 ) ]
+
+		self.mfi_db_vec_fit_smt = [ [ self.mfi_vec_fit_smt[i][j] -
+		                          self.mfi_avg_vec_fit_smt_arr[i][j]
+		                           for j in range( len( self.mfi_s ) ) ]
+		                           for i in range( 3 ) ]
 
 		if( any ( x is None for x in self.mfi_vec_raw ) or
 		    any ( x is None for x in self.mfi_vec_rot ) or
 		    any ( x is None for x in self.mfi_vec_fit )     ) :
 
 			self.b0_fields     = None
+			self.b0_smt_fields = None
 			self.b0_avg_fields = None
-			self.b0_sig_fields = None
+			self.b0_db_fields  = None
 		else :
 
 			self.b0_fields = {
@@ -1633,22 +1705,44 @@ class core( QObject ) :
 			            "mfi_set_rot"    : self.mfi_vec_rot,
 			            "mfi_set_fit"    : self.mfi_vec_fit,
 			            "mfi_set_raw_smt": self.mfi_vec_raw_smt,
-			            "mfi_set_raw_smt": self.mfi_vec_rot_smt,
+			            "mfi_set_rot_smt": self.mfi_vec_rot_smt,
 			            "mfi_set_fit_smt": self.mfi_vec_fit_smt,
 			            "mfi_set_but_bnd": self.mfi_vec_but_bnd,
 			            "mfi_set_but_low": self.mfi_vec_but_low,
-			            "mfi_set_rng_avg": self.mfi_db_vec_rng_avg }
+			            "mfi_set_rng_avg": self.mfi_vec_raw }
+
+			self.b0_smt_fields = {
+			           "mfi_set_raw"    : self.mfi_vec_raw_smt, 
+			           "mfi_set_rot"    : self.mfi_vec_rot_smt, 
+			           "mfi_set_fit"    : self.mfi_vec_fit_smt, 
+			           "mfi_set_raw_smt": self.mfi_vec_raw_smt,
+			           "mfi_set_rot_smt": self.mfi_vec_rot_smt,
+			           "mfi_set_fit_smt": self.mfi_vec_fit_smt,
+			           "mfi_set_but_bnd": self.mfi_vec_but_bnd_smt,
+			           "mfi_set_but_low": self.mfi_vec_but_bnd_smt,
+			           "mfi_set_rng_avg": self.mfi_vec_raw_smt }
 
 			self.b0_avg_fields = {
-			           "mfi_set_raw"    : self.mfi_avg_vec_n,
-			           "mfi_set_rot"    : self.mfi_avg_vec_rot_smt,
-			           "mfi_set_fit"    : self.mfi_avg_vec_fit_smt,
-			           "mfi_set_raw_smt": self.mfi_avg_vec_raw_smt,
-			           "mfi_set_rot_smt": self.mfi_avg_vec_rot_smt,
-			           "mfi_set_fit_smt": self.mfi_avg_vec_fit_smt,
-			           "mfi_set_but_bnd": self.mfi_vec_but_low,
-			           "mfi_set_but_low": self.mfi_vec_but_low,
-			           "mfi_set_rng_avg": self.mfi_vec_rng_avg     }
+			        "mfi_set_raw"    : self.mfi_avg_vec_arr,
+			        "mfi_set_rot"    : self.mfi_avg_vec_rot_smt_arr,
+			        "mfi_set_fit"    : self.mfi_avg_vec_fit_smt_arr,
+			        "mfi_set_raw_smt": self.mfi_avg_vec_raw_smt_arr,
+			        "mfi_set_rot_smt": self.mfi_avg_vec_rot_smt_arr,
+			        "mfi_set_fit_smt": self.mfi_avg_vec_fit_smt_arr,
+			        "mfi_set_but_bnd": self.mfi_vec_but_low,
+			        "mfi_set_but_low": self.mfi_vec_but_low,
+			        "mfi_set_rng_avg": self.mfi_vec_rng_avg        }
+
+			self.b0_db_fields = {
+			            "mfi_set_raw"    : self.mfi_db_vec_raw,
+			            "mfi_set_rot"    : self.mfi_db_vec_rot,
+			            "mfi_set_fit"    : self.mfi_db_vec_fit,
+			            "mfi_set_raw_smt": self.mfi_db_vec_raw_smt,
+			            "mfi_set_rot_smt": self.mfi_db_vec_rot_smt,
+			            "mfi_set_fit_smt": self.mfi_db_vec_fit_smt,
+			            "mfi_set_but_bnd": self.mfi_db_vec_but_bnd,
+			            "mfi_set_but_low": self.mfi_db_vec_but_bnd,
+			            "mfi_set_rng_avg": self.mfi_db_vec_rng_avg }
 
 
 		# Use interpolation to estiamte the magnetic field vector for
@@ -1662,7 +1756,7 @@ class core( QObject ) :
 
 		self.fc_spec.set_mag( self.mfi_t,
 		                      self.b0_avg_fields[self.mfi_set_key],
-		                      self.b0_fields[self.mfi_set_key],
+		                      self.b0_db_fields[self.mfi_set_key],
 		                      self.mfi_set_key, self.opt['mom_run_win'])
 
 		# Message the user that new Wind/MFI data have been loaded.

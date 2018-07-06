@@ -44,7 +44,7 @@ from janus_step import step
 # Load the necessary "numpy" array modules and numeric-function modules.
 
 from numpy import amax, amin, array, ceil, floor, log10, sqrt, tile, where,\
-                  mean, std
+                  mean, std, shape
 
 # Load the necessary threading modules.
 
@@ -355,13 +355,13 @@ class widget_fm_moments( QWidget ) :
 		NN = -int ( self.core.opt['mom_run_win']/2-1 )
 
 		x     = self.core.mfi_s[N:NN]
-		y_raw = [ self.core.mfi_vec_raw[0][N:NN],
-		          self.core.mfi_vec_raw[1][N:NN],
-		          self.core.mfi_vec_raw[2][N:NN] ]
-
-		y_smt = [ self.core.mfi_vec_raw_smt[0][N:NN],
-		          self.core.mfi_vec_raw_smt[1][N:NN],
-		          self.core.mfi_vec_raw_smt[2][N:NN] ]
+#		y_raw = [ self.core.mfi_vec_raw[0][N:NN],
+#		          self.core.mfi_vec_raw[1][N:NN],
+#		          self.core.mfi_vec_raw[2][N:NN] ]
+#
+#		y_smt = [ self.core.mfi_vec_raw_smt[0][N:NN],
+#		          self.core.mfi_vec_raw_smt[1][N:NN],
+#		          self.core.mfi_vec_raw_smt[2][N:NN] ]
 
 #		y_raw = self.core.mfi_vec_but_bnd
 #		y_smt = self.core.mfi_vec_raw
@@ -369,11 +369,18 @@ class widget_fm_moments( QWidget ) :
 		if( self.core.b0_fields[self.key] is None ) :
 			return
 		else :
+			y_raw = [ self.core.b0_fields[self.key][0][N:NN],
+			          self.core.b0_fields[self.key][1][N:NN],
+			          self.core.b0_fields[self.key][2][N:NN] ]
+
+			y_smt = [ self.core.b0_smt_fields[self.key][0][N:NN],
+			          self.core.b0_smt_fields[self.key][1][N:NN],
+			          self.core.b0_smt_fields[self.key][2][N:NN] ]
 
 			if( self.key == 'mfi_set_rng_avg' ) :
 
 				y_bgd = self.core.b0_avg_fields[self.key]
-				y_fit = self.core.b0_fields[self.key]
+				y_fit = self.core.b0_db_fields[self.key]
 
 			else :
 
@@ -383,9 +390,9 @@ class widget_fm_moments( QWidget ) :
 				    self.core.b0_avg_fields[self.key][2][N:NN] ]
 
 				y_fit = [
-				        self.core.b0_fields[self.key][0][N:NN],
-				        self.core.b0_fields[self.key][1][N:NN],
-				        self.core.b0_fields[self.key][2][N:NN] ]
+				     self.core.b0_db_fields[self.key][0][N:NN],
+				     self.core.b0_db_fields[self.key][1][N:NN],
+				     self.core.b0_db_fields[self.key][2][N:NN] ]
 
 		# For each plot in the grid, generate and display a fit curve
 		# based on the results of the analysis.
