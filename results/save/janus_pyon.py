@@ -394,9 +394,12 @@ class plas( object ) :
 				elif ( elem['comp'] == 'y' ) :
 					return self.b0_y
 				elif ( elem['comp'] == 'z' ) :
+					print elem['comp']
 					return self.b0_z
 				elif ( elem['comp'] == 'fields' ) :
 
+					print elem['comp']
+					print elem['comp2'], 1
 					if( elem['comp2'] == 'raw' ) :
 						return self.b0_fields_raw
 					elif( elem['comp2'] == 'smt' ) :
@@ -405,7 +408,9 @@ class plas( object ) :
 						return self.b0_fields_avg
 					elif( elem['comp2'] == 'db' ) :
 						return self.b0_fields_db
+					print elem['comp2']
 				else :
+					print 'Hello'
 					return None
 
 			else :
