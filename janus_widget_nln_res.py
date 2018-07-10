@@ -166,6 +166,7 @@ class widget_nln_res( format_TextEdit ) :
 				sym = spc['sym'] + pop['sym']
 
 				lab_n     = '<i>n<sub>'  + sym + '</sub></i>'
+				lab_fn    = '<i>fn<sub>' + sym + '</sub></i>'
 				lab_v     = '<i>v<sub>'  + sym + '</sub></i>'
 				lab_v_x   = '<i>v<sub>x' + sym + '</sub></i>'
 				lab_v_y   = '<i>v<sub>y' + sym + '</sub></i>'
@@ -209,13 +210,23 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_brk( )
 					self.prnt_tab( 2 )
 					self.prnt_htm( lab_n + ' = ' )
-					self.prnt_dcm( pop['n'], dcm )
+					self.prnt_dcm( pop['n'], 3 )
 					if ( sig_disp ) :
 						self.prnt_htm(
 						        '&nbsp;&plusmn;&nbsp;' )
-						self.prnt_dcm( pop['sig_n'],dcm)
+						self.prnt_dcm( pop['sig_n'], 3 )
 					self.prnt_htm( 'cm<sup>-3</sup>' )
-	
+
+					self.prnt_brk( )
+					self.prnt_tab( 3 )
+					self.prnt_htm( lab_fn + ' = ' )
+					self.prnt_dcm( pop['fn'], 3 )
+					if ( sig_disp ) :
+						self.prnt_htm(
+						        '&nbsp;&plusmn;&nbsp;' )
+						self.prnt_dcm( pop['sig_fn'], 3)
+					self.prnt_htm( 'cm<sup>-3</sup>' )
+
 				# If this is the first population of the first
 				# species, print the bulk velocity.  Otherwise,
 				# if the population has drift, print its drift
@@ -230,7 +241,7 @@ class widget_nln_res( format_TextEdit ) :
 						self.prnt_htm( lab_v + ' = '   )
 						self.prnt_dcm(
 						   self.core.nln_res_plas[
-						        'v0'], 3, ' km/s'      )
+						        'v0'], 4, ' km/s'      )
 						self.prnt_brk( )
 						self.prnt_tab( 3 )
 						self.prnt_htm( lab_v_x + ' = ' )

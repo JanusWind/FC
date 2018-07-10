@@ -193,7 +193,7 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION TO CALCULATE EXPECTED MAXWELLIAN CURRENT.
 	#-----------------------------------------------------------------------
 
-	def calc_curr( self, m, q, v0, fv, s_db, n, dv, w, key=None ) :
+	def calc_curr( self, m, q, v0, fv, s_db, n, fn, dv, w, key=None ) :
 
 
 		if ( n <= 0. ) :
@@ -269,10 +269,9 @@ class fc_dat( ) :
 		ret_prn = ( ( ret_exp_2 + ret_erf_2 ) -
 		            ( ret_exp_1 + ret_erf_1 )   )
 
-
 		# Calculate the expected current.
 
 		return (   ( 1.e12 ) * ( 1. / 2. )
-		         * ( q * const['q_p'] ) * ( 1.e6 * n )
+		         * ( q * const['q_p'] ) * ( 1.e6 * ( n + fn ) )
 		         * ( 1.e-4 * self.calc_eff_area( v_vec ) )
 		         * ( ret_prn )                             )

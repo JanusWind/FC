@@ -1,3 +1,21 @@
+import os
+import sys
+os.system('cls' if os.name == 'nt' else 'clear') # Clear the screen
+
+import glob
+import pickle
+import numpy as np
+
+#os.chdir("/home/ahmadr/Desktop/GIT/fm_development/data/edited/error_analysis")
+#
+#fname = 'janus_rng_avg_600_med_flt_21_2008-11-04-12-00-41_2008-11-04-12-56-08.jns'
+#
+#dat = [0]*len( fname )
+#dat = pickle.load( open( fname, 'rb' ) )
+#
+#os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
+
+
 # time_rng_avg
 # time_but_bnd
 # time_smt_mag
@@ -795,20 +813,26 @@ for i in pop_ind :
 
 fig, ax1 = plt.subplots()
 
-ax1.scatter( range( 24 ), dat_sig_fv_rng_avg, marker='^', color='r', label='running average' )
-ax1.scatter( range( 24 ), dat_sig_fv_but_bnd, marker='*', color='g', label='butterworth' )
-ax1.scatter( range( 24 ), dat_sig_fv_smt_mag, marker='<', color='b', label='smoothed MF' )
-ax1.scatter( range( 24 ), dat_sig_fv_raw_mag, marker='>', color='c', label='raw MF' )
-ax1.scatter( range( 24 ), dat_sig_fv_rot_mag, marker='.', color='m', label='rotated MF' )
-#ax1.scatter( range( 24 ), dat_sig_fv_fit_smt, marker='o', color='k', label='fit MF' )
+ax1.plot( range( 24 ), dat_sig_fv_rng_avg, marker='^', linewidth=0.5, 
+color='r', label=r'$\sigma_V$ (running average)' )
+#ax1.plot( range( 24 ), dat_sig_fv_but_bnd, marker='*', linewidth=0.5,
+#color='g', label=r'$\sigma_V$ ( butterworth)' )
+#ax1.plot( range( 24 ), dat_sig_fv_smt_mag, marker='<', linewidth=0.5,
+#color='b', label=r'$\sigma_V$ (smoothed)' )
+ax1.plot( range( 24 ), dat_sig_fv_raw_mag, marker='>', linewidth=0.5,
+color='c', label=r'$\sigma_V$ ( raw)' )
+#ax1.plot( range( 24 ), dat_sig_fv_rot_mag, marker='.', linewidth=0.5,
+#color='m', label='rotated MF' )
+#ax1.plot( range( 24 ), dat_sig_fv_fit_smt, marker='o', linewidth=0.5,
+#color='k', label='fit MF' )
 
 ax1.set_xlim( -0.5, 24 )
 ax1.set_ylim( 0, 0.5 )
 
 ax1.set_xlabel( 'Observation number', fontsize=22 )
-ax1.set_ylabel( r'$\sigma_{fv}$', fontsize=22 )
+ax1.set_ylabel( r'$\sigma_{V}$', fontsize=22, color='r' )
 ax1.set_title( 'Comparison of error for various MFI', fontsize=24 )
-ax1.legend( loc=1, fontsize=16 )
+ax1.legend( loc=2, fontsize=16 )
 
 #ax1.xticks([0, 5, 10, 15, 20, 25], fontsize=24 )
 
@@ -820,19 +844,20 @@ ax1.set_yticks( y1_ticks )
 ax1.set_xticklabels( x1_ticks, fontsize=20 )
 ax1.set_yticklabels( y1_ticks, fontsize=20 )
 
-#ax2 = ax1.twinx( )
-#
-#ax2.scatter( range( 24 ), dat_sig_bb_rng_avg, marker='>', color='b', label='amp[litude of fluctuation' )
-##ax2.scatter( range( 24 ), dat_fv_but_bnd, marker='<', color='m', label='butterworth' )
-#
-#ax2.legend( loc=2, fontsize=16 )
-#
-#y2_ticks = [ 0.02, 0.04, 0.06, 0.08, 0.1 ]
-#
-#ax2.set_yticks( y2_ticks )
-#ax2.set_yticklabels( y2_ticks, fontsize=20 )
-#
-#ax2.set_ylabel( r'$\Delta B$', fontsize=22, color='b' )
+ax2 = ax1.twinx( )
+
+ax2.plot( range( 24 ), dat_sig_bb_rng_avg, marker='*', linewidth=1.0, color='b',
+ label=r'$\Delta B$' )
+#ax2.scatter( range( 24 ), dat_fv_but_bnd, marker='<', color='m', label='butterworth' )
+
+ax2.legend( loc=1, fontsize=16 )
+
+y2_ticks = [ 0.02, 0.04, 0.06, 0.08, 0.1 ]
+
+ax2.set_yticks( y2_ticks )
+ax2.set_yticklabels( y2_ticks, fontsize=20 )
+
+ax2.set_ylabel( r'$\Delta B$', fontsize=22, color='b' )
 fig.tight_layout( )
 
 plt.show( )

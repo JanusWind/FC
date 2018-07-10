@@ -31,8 +31,8 @@ from janus_const import const
 ## DEFINE THE LIST OF RESERVED NAMES.
 ################################################################################
 
-PARAM = [ 'b0', 'v0', 'fv', 'n', 'v', 'dv', 'w', 'w2', 'r', 't', 'beta', 'time',
-          's', 'm','q', 'k', 'beta', 'beta', 'alfvel', 'oplas', 'ocycl',
+PARAM = [ 'b0', 'v0', 'fv', 'n', 'fn', 'v', 'dv', 'w', 'w2', 'r', 't', 'beta',
+          'time', 's', 'm','q', 'k', 'beta', 'beta', 'alfvel', 'oplas', 'ocycl',
           'ogyro'                                                              ]
 
 COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat', 'fields' ]
@@ -465,6 +465,19 @@ class plas( object ) :
 			else :
 				return self.sig_fv
 
+#		elif ( elem['param'] == 'fn' ) :
+#
+#			if ( elem['sigma'] is None ) :
+#
+#				if ( ( elem['comp'] is None  ) or
+#				     ( elem['comp'] == 'mag' )    ) :
+#					return self.fn
+#				else :
+#					return None
+#
+#			else :
+#				return self.sig_fn
+
 		elif ( elem['param'] == 'oplas' ) :
 
 			return self.oplas
@@ -582,6 +595,14 @@ class plas( object ) :
 			if ( value is not None ) :
 
 				self.fv = float( value )
+
+		elif ( key == 'fn' ) :
+
+			self.fn = None
+
+			if ( value is not None ) :
+
+				self.fn = float( value )
 
 		elif ( key == 'sig_v0_x' ) :
 
@@ -857,19 +878,20 @@ class plas( object ) :
 
 	def add_pop( self, spc,
 	             drift=False, aniso=False,
-	             name=None, sym=None, n=None, dv=None,
+	             name=None, sym=None, n=None, fn=None, dv=None,
 	             w=None, w_per=None, w_par=None,
-	             sig_n=None, sig_dv=None, sig_w=None,
+	             sig_n=None, sig_fn=None, sig_dv=None, sig_w=None,
 	             sig_w_per=None, sig_w_par=None       ) :
 
 		self.arr_pop.append( pop( self,
 		                          self.get_spec( spc ),
 		                          drift=drift, aniso=aniso,
 		                          name=name, sym=sym,
-		                          n=n, dv=dv, w=w,
+		                          n=n, fn=fn, dv=dv, w=w,
 		                          w_per=w_per, w_par=w_par,
-		                          sig_n=sig_n, sig_dv=sig_dv,
-		                          sig_w=sig_w, sig_w_per=sig_w_per,
+		                          sig_n=sig_n, sig_fn=sig_fn,
+		                          sig_dv=sig_dv, sig_w=sig_w,
+		                          sig_w_per=sig_w_per,
 		                          sig_w_par=sig_w_par ) )
 
 	#-----------------------------------------------------------------------
@@ -1059,6 +1081,23 @@ class spec( object ) :
 				return None
 
 			return sum( arr_n )
+
+		elif ( key == 'fn' ) :
+
+			arr_pop = self.my_plas.lst_pop( self )
+
+			if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+				return None
+
+			arr_n  = [ p['n']  for p in arr_pop ]
+			arr_fn = [ p['fn'] for p in arr_pop ]
+
+			if ( None in arr_n ) :
+				return None
+
+			return sum( [ x*y/sum( arr_n )
+			              for x,y in zip( arr_n, arr_fn ) ] )
+
 
 		elif ( ( key == 'dv' ) or ( key == 'dv_mag' )
 		                       or ( key == 'dv_par' ) ) :
@@ -1635,10 +1674,10 @@ class pop( object ) :
 	def __init__( self, my_plas, my_spec,
 	              drift=False, aniso=False,
 	              name=None, sym=None,
-	              n=None, fv=None, dv=None, w=None,
+	              n=None, fn=None, fv=None, dv=None, w=None,
 	              w_per=None, w_par=None,
-	              sig_n=None, sig_fv=None, sig_dv=None, sig_w=None,
-	              sig_w_per=None, sig_w_par=None, oplas=None       ) :
+	              sig_n=None, sig_fn=None, sig_fv=None, sig_dv=None,
+	              sig_w=None, sig_w_per=None, sig_w_par=None, oplas=None ) :
 
 		self.my_plas = my_plas
 		self.my_spec = my_spec
@@ -1648,11 +1687,13 @@ class pop( object ) :
 		self.name      = None
 		self.sym       = None
 		self.n         = None
+		self.fn        = None
 		self.dv        = None
 		self.w         = None
 		self.w_per     = None
 		self.w_par     = None
 		self.sig_n     = None
+		self.sig_fn    = None
 		self.sig_dv    = None
 		self.sig_w     = None
 		self.sig_w_per = None
@@ -1665,6 +1706,8 @@ class pop( object ) :
 			self['sym'] = sym
 		if ( n is not None ) :
 			self['n'] = n
+		if ( fn is not None ) :
+			self['fn'] = fn
 		if ( dv is not None ) :
 			self['dv'] = dv
 		if ( w is not None ) :
@@ -1675,6 +1718,8 @@ class pop( object ) :
 			self['w_par'] = w_par
 		if ( sig_n is not None ) :
 			self['sig_n'] = sig_n
+		if ( sig_fn is not None ) :
+			self['sig_fn'] = sig_fn
 		if ( sig_dv is not None ) :
 			self['sig_dv'] = sig_dv
 		if ( sig_w is not None ) :
@@ -1786,6 +1831,10 @@ class pop( object ) :
 		elif ( key == 'n' ) :
 
 			return self.n
+
+		elif ( key == 'fn' ) :
+
+			return self.fn
 
 		elif ( ( key == 'dv' ) or ( key == 'dv_mag' )
 		                       or ( key == 'dv_per' ) ) :
@@ -1968,6 +2017,10 @@ class pop( object ) :
 		elif ( key == 'sig_n' ) :
 
 			return self.sig_n
+
+		elif ( key == 'sig_fn' ) :
+
+			return self.sig_fn
 
 		elif ( key == 'sig_dv' ) :
 
@@ -2255,6 +2308,28 @@ class pop( object ) :
 
 			self.n = value
 
+		elif ( key == 'fn' ) :
+
+			if ( value is None ) :
+
+				self.gn = None
+
+				return
+
+			value = float( value )
+
+			if ( ( self.my_plas.enforce ) and
+			     ( value <= 0           )     ) :
+
+				self.fn = None
+
+				raise ValueError(
+				            'Density enforced to be positive.' )
+
+				return
+
+			self.fn = value
+
 		elif ( key == 'dv' ) :
 
 			if ( value is None ) :
@@ -2378,6 +2453,13 @@ class pop( object ) :
 				self.sig_n = None
 			else :
 				self.sig_n = float( value )
+
+		elif ( key == 'sig_fn' ) :
+
+			if ( value is None ) :
+				self.sig_fn = None
+			else :
+				self.sig_fn = float( value )
 
 		elif ( key == 'sig_dv' ) :
 

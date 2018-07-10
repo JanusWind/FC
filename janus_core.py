@@ -2225,6 +2225,7 @@ class core( QObject ) :
 
 		self.mom_res['v0_vec'] = mom_v_vec
 
+#		self.mom_res['fn_p_c'] = 0.0
 		self.mom_res['fv']     = 0.0
 		self.mom_res.add_spec( name='Proton', sym='p', m=1., q=1. )
 
@@ -2244,7 +2245,9 @@ class core( QObject ) :
 		                           self.mfi_sig_vec_db_rng_avg,
 #			                   self.mfi_avg_vec_raw_smt,
 #		                           self.b0_avg_fields[self.mfi_set_key],
-		                           self.mom_res['n_p_c'], 0.,
+		                           self.mom_res['n_p_c'],
+#		                           self.mom_res['fn_p_c'], 0.,
+		                           0., 0.,
 		                           self.mom_res['w_p_c'],
 		                           self.mfi_set_key                    )
 
@@ -2630,8 +2633,12 @@ class core( QObject ) :
 				self.nln_plas.arr_pop[i]['n'] = round_sig(
 				                      self.nln_set_gss_n[i]
 				                      * self.mom_res['n_p'], 4 )
+				self.nln_plas.arr_pop[i]['fn'] = 0.05*round_sig(
+				                      self.nln_set_gss_n[i]
+				                      * self.mom_res['n_p'], 4 )
 			except :
-				self.nln_plas.arr_pop[i]['n'] = None
+				self.nln_plas.arr_pop[i]['n']  = None
+				self.nln_plas.arr_pop[i]['fn'] = None
 
 			# Generate (if necessary) the initial guess for this
 			# population's differential flow.
@@ -2841,6 +2848,13 @@ class core( QObject ) :
 
 			self.nln_gss_prm.append( pop_n )
 
+			# Extract the population's fluctuating density and add
+			# add it to the parameter array.
+
+			pop_fn = self.nln_plas.arr_pop[p]['fn']
+
+			self.nln_gss_prm.append( pop_fn )
+
 			# If the population is drifting, extract its drift and
 			# add it to the parameter array.  Otherwise, set the
 			# drift as zero.
@@ -2881,7 +2895,7 @@ class core( QObject ) :
 		                           self.mfi_sig_vec_db_rng_avg,
 #			                   self.mfi_avg_vec_raw_smt,
 #				           self.b0_avg_fields[self.mfi_set_key],
-			                   pop_n, pop_dv, pop_w,
+			                   pop_n, pop_fn, pop_dv, pop_w,
 			                   self.mfi_set_key                  ) )
 
 		# Alter the axis order of the array of currents.
@@ -3142,9 +3156,10 @@ class core( QObject ) :
 
 			# Extract the density of population "p".
 
-			prm_n = prm[k]
+			prm_n  = prm[k]
+			prm_fn = prm[k+1]
 
-			k += 1
+			k += 2
 
 			# Determine the bulk velocity of population "p",
 			# extracting (if necessary) the population's drift.
@@ -3185,7 +3200,7 @@ class core( QObject ) :
 		                           self.mfi_sig_vec_db_rng_avg,
 #			                   self.mfi_avg_vec_raw_smt,
 #				           self.b0_avg_fields[self.mfi_set_key],
-				           prm_n,  prm_dv, prm_w,
+				           prm_n, prm_fn, prm_dv, prm_w,
 				           self.mfi_set_key                    )
 
 		# Return the list of total currents from all modeled ion
@@ -3396,7 +3411,7 @@ class core( QObject ) :
 		self.nln_res_plas['fv']       =  fit[3]
 		self.nln_res_plas['sig_fv']   =  sig[3]
 
-		print (" %.3f " % fit[3], " %.3f " % sig[3] ,
+		print ('fv = ', " %.3f " % fit[3], " %.3f " % sig[3] ,
 		                     self.time_epc.time().strftime("%H-%M-%S") )
 #		print self.nln_res_plas['fv'], sig[3]
 		c = 4
@@ -3425,14 +3440,20 @@ class core( QObject ) :
 
 			# Add the population itself to the results.
 
-			pop_drift = self.nln_plas.arr_pop[p]['drift']
-			pop_aniso = self.nln_plas.arr_pop[p]['aniso']
-			pop_name  = self.nln_plas.arr_pop[p]['name' ]
-			pop_sym   = self.nln_plas.arr_pop[p]['sym'  ]
+			pop_drift  = self.nln_plas.arr_pop[p]['drift']
+			pop_aniso  = self.nln_plas.arr_pop[p]['aniso']
+			pop_name   = self.nln_plas.arr_pop[p]['name' ]
+			pop_sym    = self.nln_plas.arr_pop[p]['sym'  ]
 
-			pop_n     = fit[c]
-			pop_sig_n = sig[c]
-			c += 1
+			pop_n      = fit[c]
+			pop_sig_n  = sig[c]
+
+			pop_fn     = fit[c+1]
+			pop_sig_fn = sig[c+1]
+
+			print ( 'fn = ','%0.3f' % pop_fn, '%0.3f' % pop_sig_fn )
+
+			c += 2
 
 			if ( pop_drift ) :
 				pop_dv     = fit[c]
@@ -3456,12 +3477,12 @@ class core( QObject ) :
 				c += 1
 
 			self.nln_res_plas.add_pop(
-			       spc=spc_name, drift=pop_drift,
-			       aniso=pop_aniso, name=pop_name,
-			       sym=pop_sym, n=pop_n, dv=pop_dv, w=pop_w,
-			       sig_n=pop_sig_n, sig_dv=pop_sig_dv, 
-			       sig_w=pop_sig_w, sig_w_per=pop_sig_w_per,
-			       sig_w_par=pop_sig_w_par                    )
+			      spc=spc_name, drift=pop_drift,
+			      aniso=pop_aniso, name=pop_name,
+			      sym=pop_sym, n=pop_n, fn=pop_fn, dv=pop_dv,
+			      w=pop_w, sig_n=pop_sig_n, sig_fn=pop_sig_fn,
+			      sig_dv=pop_sig_dv, sig_w=pop_sig_w,
+			      sig_w_per=pop_sig_w_per, sig_w_par=pop_sig_w_par )
 
 			# For each datum in the spectrum, compute the expected
 			# current from each population.
@@ -3471,10 +3492,10 @@ class core( QObject ) :
 			                  self.nln_plas.arr_pop[p]['m'],
 			                  self.nln_plas.arr_pop[p]['q'],
 			                  pop_v0_vec, fv,
-		                           self.mfi_sig_vec_db_rng_avg,
+		                          self.mfi_sig_vec_db_rng_avg,
 #			                  self.mfi_avg_vec_raw_smt,
 #			                  self.b0_avg_fields[self.mfi_set_key],
-			                  pop_n, pop_dv, pop_w,
+			                  pop_n, pop_fn, pop_dv, pop_w,
 			                  self.mfi_set_key                   ) )
 
 		# Save the results of the this non-linear analysis to the
@@ -3756,7 +3777,7 @@ class core( QObject ) :
 			elif ( sub == 'med' ) :
 
 				self.opt['mom_med_fil'] = value
-				print self.opt['mom_med_fil']
+
 				self.fit_mfi( )
 
 				if ( self.dyn_nln ) :
