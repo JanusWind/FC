@@ -2319,7 +2319,7 @@ class pop( object ) :
 			value = float( value )
 
 			if ( ( self.my_plas.enforce ) and
-			     ( value <= 0           )     ) :
+			     ( value < 0           )     ) :
 
 				self.fn = None
 

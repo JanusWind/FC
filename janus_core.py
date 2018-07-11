@@ -1375,7 +1375,7 @@ class core( QObject ) :
 
 		self.mfi_avg_mag_raw_smt = sqrt( self.mfi_avg_vec_raw_smt[0]**2+
 		                                 self.mfi_avg_vec_raw_smt[1]**2+
-		                                 self.mfi_avg_vec_raw_smt[2]**2)
+		                                 self.mfi_avg_vec_raw_smt[2]**2 )
 
 		self.mfi_avg_nrm_raw_smt =\
 		             self.mfi_avg_vec_raw_smt / self.mfi_avg_mag_raw_smt
@@ -1754,7 +1754,7 @@ class core( QObject ) :
 
 				self.mfi_set_key = self.b0_fields.keys()[i]
 
-		self.fc_spec.set_mag( self.mfi_t,
+		self.fc_spec.set_mag( self.mfi_t, self.mfi_avg_mag_raw_smt, 
 		                      self.b0_avg_fields[self.mfi_set_key],
 		                      self.b0_db_fields[self.mfi_set_key],
 		                      self.mfi_set_key, self.opt['mom_run_win'])
@@ -2243,7 +2243,7 @@ class core( QObject ) :
 		                           self.mom_res['v0_vec'],
 		                           self.mom_res['fv'],
 		                           self.mfi_sig_vec_db_rng_avg,
-#			                   self.mfi_avg_vec_raw_smt,
+#			                   self.mfi_avg_mag_raw_smt,
 #		                           self.b0_avg_fields[self.mfi_set_key],
 		                           self.mom_res['n_p_c'],
 #		                           self.mom_res['fn_p_c'], 0.,
@@ -2633,7 +2633,7 @@ class core( QObject ) :
 				self.nln_plas.arr_pop[i]['n'] = round_sig(
 				                      self.nln_set_gss_n[i]
 				                      * self.mom_res['n_p'], 4 )
-				self.nln_plas.arr_pop[i]['fn'] = 0.05*round_sig(
+				self.nln_plas.arr_pop[i]['fn'] = 0.00*round_sig(
 				                      self.nln_set_gss_n[i]
 				                      * self.mom_res['n_p'], 4 )
 			except :
@@ -2893,7 +2893,7 @@ class core( QObject ) :
 			                   self.nln_plas.arr_pop[p]['q'],
 			                   pop_v0_vec, fv,
 		                           self.mfi_sig_vec_db_rng_avg,
-#			                   self.mfi_avg_vec_raw_smt,
+#			                   self.mfi_avg_mag_raw_smt,
 #				           self.b0_avg_fields[self.mfi_set_key],
 			                   pop_n, pop_fn, pop_dv, pop_w,
 			                   self.mfi_set_key                  ) )
@@ -3198,7 +3198,7 @@ class core( QObject ) :
 				           self.nln_plas.arr_pop[p]['q'],
 				           prm_v0, prm_fv,
 		                           self.mfi_sig_vec_db_rng_avg,
-#			                   self.mfi_avg_vec_raw_smt,
+#			                   self.mfi_avg_mag_raw_smt,
 #				           self.b0_avg_fields[self.mfi_set_key],
 				           prm_n, prm_fn, prm_dv, prm_w,
 				           self.mfi_set_key                    )
@@ -3291,7 +3291,7 @@ class core( QObject ) :
 
 		( fit, covar ) = curve_fit( model, x, y, 
 		                            self.nln_gss_prm,
-		                            sigma=sigma       )
+		                            sigma=sigma, maxfev=15000       )
 		sig = sqrt( diag( covar ) )
 
 		#except :
@@ -3493,7 +3493,7 @@ class core( QObject ) :
 			                  self.nln_plas.arr_pop[p]['q'],
 			                  pop_v0_vec, fv,
 		                          self.mfi_sig_vec_db_rng_avg,
-#			                  self.mfi_avg_vec_raw_smt,
+#			                  self.mfi_avg_mag_raw_smt,
 #			                  self.b0_avg_fields[self.mfi_set_key],
 			                  pop_n, pop_fn, pop_dv, pop_w,
 			                  self.mfi_set_key                   ) )

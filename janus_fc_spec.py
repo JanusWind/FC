@@ -426,7 +426,7 @@ class fc_spec( ) :
 	# DEFINE THE FUNCTION TO ASSIGN THE MAGNETIC FIELD TO EACH DATUM. 
 	#-----------------------------------------------------------------------
 
-	def set_mag( self, mfi_t, mfi_b, mfi_db, key, N ) :
+	def set_mag( self, mfi_t, b_avg, mfi_b, mfi_db, key, N ) :
 
 		mfi_s = [ ( t - mfi_t[0] ).total_seconds( ) for t in mfi_t ]
 
@@ -472,7 +472,7 @@ class fc_spec( ) :
 	#					print b_vec
 
 						self.arr[c][d][b].set_mag(
-						            b_vec, db_vec, key )
+						     b_avg, b_vec, db_vec, key )
 
 		except :
 
@@ -489,6 +489,6 @@ class fc_spec( ) :
 
                                         for b in range( self['n_bin'] ) :
 
-                                                self.arr[c][d][b].set_mag( 
-						    avg_b_vec, avg_db_vec, key )
+                                                self.arr[c][d][b].set_mag(
+						b_avg, avg_b_vec, avg_db_vec, key )
 						print 'janus_fc_spec:line 479'

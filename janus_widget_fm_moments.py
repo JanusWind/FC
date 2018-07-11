@@ -367,6 +367,9 @@ class widget_fm_moments( QWidget ) :
 #		y_smt = self.core.mfi_vec_raw
 
 		if( self.core.b0_fields[self.key] is None ) :
+
+			print self.core.b0_fields[self.key]
+
 			return
 		else :
 			y_raw = [ self.core.b0_fields[self.key][0][N:NN],

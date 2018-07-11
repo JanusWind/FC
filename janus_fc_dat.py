@@ -146,7 +146,7 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION FOR SETIING THE MAGNETIC FIELD DIRECTION.
 	#-----------------------------------------------------------------------
 
-	def set_mag( self, b_vec, db_vec, key ) :
+	def set_mag( self, b_avg, b_vec, db_vec, key ) :
 
 		# Normalize the magnetic-field vector and calcualte the magnetic
 		# look direction.
@@ -160,6 +160,7 @@ class fc_dat( ) :
 
 		self._norm_b[ key] = norm_b
 		self._vec_b[  key] = b_vec
+		self._avg_b        = b_avg
 		self._vec_db[ key] = db_vec
 		self._maglook[key] = maglook
 
@@ -224,6 +225,9 @@ class fc_dat( ) :
 
 		db_nrm = calc_arr_norm( db )
 
+		nn = n + fn * linalg.norm( self._vec_db[key] ) / linalg.norm( self._vec_b[key] )
+
+		print  linalg.norm( self._vec_db[key] )/ linalg.norm( self._vec_b[key] )
 #		fv_vec = [ fv * db[i]/linalg.norm( self._vec_b[key] )
 #		                                   for i in range( len( db ) ) ]
 
@@ -272,6 +276,6 @@ class fc_dat( ) :
 		# Calculate the expected current.
 
 		return (   ( 1.e12 ) * ( 1. / 2. )
-		         * ( q * const['q_p'] ) * ( 1.e6 * ( n + fn ) )
+		         * ( q * const['q_p'] ) * ( 1.e6 * nn )
 		         * ( 1.e-4 * self.calc_eff_area( v_vec ) )
 		         * ( ret_prn )                             )
