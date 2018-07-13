@@ -3284,6 +3284,7 @@ class core( QObject ) :
 
 		sigma = [ sqrt( yy ) for yy in y ]
 
+		print sigma
 		# Attempt to perform the non-linear fit.  If this fails, reset
 		# the associated variables and abort.
 

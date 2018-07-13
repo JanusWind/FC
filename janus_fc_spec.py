@@ -430,6 +430,7 @@ class fc_spec( ) :
 
 		mfi_s = [ ( t - mfi_t[0] ).total_seconds( ) for t in mfi_t ]
 
+
 		if( key == 'mfi_set_rng_avg' ) :
 			mfi_s = mfi_s[ N/2: - ( N/2-1 ) ]
 
