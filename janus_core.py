@@ -749,7 +749,7 @@ class core( QObject ) :
 				self.emit( SIGNAL('janus_mesg'),
 			           'core', 'end', 'flcv' )
 			else :
-				self.flc_n = True
+				self.flc_v = True
 				self.emit( SIGNAL('janus_mesg'),
 			           'core', 'begin', 'flcv' )
 
@@ -2278,7 +2278,7 @@ class core( QObject ) :
 		# Calculate the expected currents based on the results of the
 		# (linear) moments analysis.
 
-		self.mom_curr = self.fc_spec.calc_curr(
+		self.mom_curr = self.fc_spec.calc_curr( self.flc_n, self.flc_v,
 		                           self.mom_res['m_p'],
 		                           self.mom_res['q_p'],
 		                           self.mom_res['v0_vec'],
@@ -2934,7 +2934,7 @@ class core( QObject ) :
 			# current from each population.
 #			print fv
 			self.nln_gss_curr_ion.append(
-			     self.fc_spec.calc_curr(
+			     self.fc_spec.calc_curr( self.flc_n, self.flc_v,
 			                   self.nln_plas.arr_pop[p]['m'],
 			                   self.nln_plas.arr_pop[p]['q'],
 			                   pop_v0_vec, fv,
@@ -3241,7 +3241,8 @@ class core( QObject ) :
 
 			for d in range( len( dat ) ) :
 
-				curr[d] += dat[d].calc_curr(
+				curr[d] += dat[d].calc_curr( self.flc_n,
+				                             self.flc_v,
 				           self.nln_plas.arr_pop[p]['m'],
 				           self.nln_plas.arr_pop[p]['q'],
 				           prm_v0, prm_fv,
@@ -3542,7 +3543,7 @@ class core( QObject ) :
 			# current from each population.
 
 			self.nln_res_curr_ion.append(
-			     self.fc_spec.calc_curr ( 
+			     self.fc_spec.calc_curr ( self.flc_n, self.flc_v,
 			                  self.nln_plas.arr_pop[p]['m'],
 			                  self.nln_plas.arr_pop[p]['q'],
 			                  pop_v0_vec, fv,

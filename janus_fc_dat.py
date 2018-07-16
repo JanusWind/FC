@@ -194,8 +194,8 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION TO CALCULATE EXPECTED MAXWELLIAN CURRENT.
 	#-----------------------------------------------------------------------
 
-	def calc_curr( self, m, q, v0, fv, s_db, n, fn, dv, w, key=None ) :
-
+	def calc_curr( self, flcn, flcv, m, q, v0, fv, s_db, n, fn, dv, w,
+	                                                            key=None ) :
 
 		if ( n <= 0. ) :
 			return 0.
@@ -225,18 +225,23 @@ class fc_dat( ) :
 
 		db_nrm = calc_arr_norm( db )
 
-		nn = n + fn * linalg.norm( self._vec_b[key] ) / self._avg_b
-
-		if ( nn <= 0. ) :
-
-			return 0.
+		if ( flcn ) :
+			nn = n + fn * linalg.norm( self._vec_b[key] ) /\
+			                                             self._avg_b
+			if ( nn <= 0. ) :
+				 nn = n
+		else :
+			nn = n
 
 #		fv_vec = [ fv * db[i]/linalg.norm( self._vec_b[key] )
 #		                                   for i in range( len( db ) ) ]
 
-		fv_vec = [ ( 1.e-15 * fv * s_db[i]*db_nrm[i] /\
-		                     sqrt( const['mu_0'] * const['m_p'] * nn ) )
-		                                   for i in range( len( db ) ) ]
+		if ( flcv ) :
+			fv_vec = [ ( 1.e-15 * fv * s_db[i]*db_nrm[i] /\
+			             sqrt( const['mu_0'] * const['m_p'] * nn ) )
+			                           for i in range( len( db ) ) ]
+		else :
+			fv_vec = [ 0., 0., 0. ]
 
 		if ( dv is None ) :
 			v_vec = [ ( v0[i] - fv_vec[i] )

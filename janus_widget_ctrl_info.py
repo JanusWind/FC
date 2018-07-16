@@ -290,13 +290,13 @@ class widget_ctrl_info( format_TextEdit ) :
 					     'Debugging mode has been ' +
 					     'deactivated.'               )
 
-				if ( mesg_obj == 'flcn' ) :
+				if ( mesg_obj == 'flcv' ) :
 					self.clear( )
 					self.prnt_htm(
 					     'Fluctuating velocity ' + 
 					     'calculation deactivated'   )
 
-				if ( mesg_obj == 'flcv' ) :
+				if ( mesg_obj == 'flcn' ) :
 					self.clear( )
 					self.prnt_htm(
 					     'Fluctuating density ' + 
