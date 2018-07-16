@@ -220,11 +220,14 @@ class widget_nln_res( format_TextEdit ) :
 					self.prnt_brk( )
 					self.prnt_tab( 3 )
 					self.prnt_htm( lab_fn + ' = ' )
-					self.prnt_dcm( pop['fn'], 3 )
+					self.prnt_dcm(
+					       self.core.nln_res_plas['fn'], 3 )
 					if ( sig_disp ) :
 						self.prnt_htm(
 						        '&nbsp;&plusmn;&nbsp;' )
-						self.prnt_dcm( pop['sig_fn'], 3)
+						self.prnt_dcm(
+						self.core.nln_res_plas['sig_fn'],
+						                             3 )
 					self.prnt_htm( 'cm<sup>-3</sup>' )
 
 				# If this is the first population of the first

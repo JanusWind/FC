@@ -465,18 +465,18 @@ class plas( object ) :
 			else :
 				return self.sig_fv
 
-#		elif ( elem['param'] == 'fn' ) :
-#
-#			if ( elem['sigma'] is None ) :
-#
-#				if ( ( elem['comp'] is None  ) or
-#				     ( elem['comp'] == 'mag' )    ) :
-#					return self.fn
-#				else :
-#					return None
-#
-#			else :
-#				return self.sig_fn
+		elif ( elem['param'] == 'fn' ) :
+
+			if ( elem['sigma'] is None ) :
+
+				if ( ( elem['comp'] is None  ) or
+				     ( elem['comp'] == 'mag' )    ) :
+					return self.fn
+				else :
+					return None
+
+			else :
+				return self.sig_fn
 
 		elif ( elem['param'] == 'oplas' ) :
 
@@ -635,6 +635,14 @@ class plas( object ) :
 			if ( value is not None ) :
 
 				self.sig_fv = float( value )
+
+		elif ( key == 'sig_fn' ) :
+
+			self.sig_fn = None
+
+			if ( value is not None ) :
+
+				self.sig_fn = float( value )
 
 		elif   ( key == 'b0_x' ) :
 
@@ -1082,22 +1090,22 @@ class spec( object ) :
 
 			return sum( arr_n )
 
-		elif ( key == 'fn' ) :
-
-			arr_pop = self.my_plas.lst_pop( self )
-
-			if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
-				return None
-
-			arr_n  = [ p['n']  for p in arr_pop ]
-			arr_fn = [ p['fn'] for p in arr_pop ]
-
-			if ( None in arr_n ) :
-				return None
-
-			return sum( [ x*y/sum( arr_n )
-			              for x,y in zip( arr_n, arr_fn ) ] )
-
+#		elif ( key == 'fn' ) :
+#
+#			arr_pop = self.my_plas.lst_pop( self )
+#
+#			if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+#				return None
+#
+#			arr_n  = [ p['n']  for p in arr_pop ]
+#			arr_fn = [ p['fn'] for p in arr_pop ]
+#
+#			if ( None in arr_n ) :
+#				return None
+#
+#			return sum( [ x*y/sum( arr_n )
+#			              for x,y in zip( arr_n, arr_fn ) ] )
+#
 
 		elif ( ( key == 'dv' ) or ( key == 'dv_mag' )
 		                       or ( key == 'dv_par' ) ) :

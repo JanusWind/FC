@@ -225,9 +225,8 @@ class fc_dat( ) :
 
 		db_nrm = calc_arr_norm( db )
 
-		nn = n + fn * linalg.norm( self._vec_db[key] ) / linalg.norm( self._vec_b[key] )
+		nn = n + fn * self._avg_b / linalg.norm( self._vec_b[key] )
 
-		print  linalg.norm( self._vec_db[key] )/ linalg.norm( self._vec_b[key] )
 #		fv_vec = [ fv * db[i]/linalg.norm( self._vec_b[key] )
 #		                                   for i in range( len( db ) ) ]
 
