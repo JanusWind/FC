@@ -225,13 +225,17 @@ class fc_dat( ) :
 
 		db_nrm = calc_arr_norm( db )
 
-		nn = n + fn * self._avg_b / linalg.norm( self._vec_b[key] )
+		nn = n + fn * linalg.norm( self._vec_b[key] ) / self._avg_b
+
+		if ( nn <= 0. ) :
+
+			return 0.
 
 #		fv_vec = [ fv * db[i]/linalg.norm( self._vec_b[key] )
 #		                                   for i in range( len( db ) ) ]
 
 		fv_vec = [ ( 1.e-15 * fv * s_db[i]*db_nrm[i] /\
-		                      sqrt( const['mu_0'] * const['m_p'] * n ) )
+		                     sqrt( const['mu_0'] * const['m_p'] * nn ) )
 		                                   for i in range( len( db ) ) ]
 
 		if ( dv is None ) :

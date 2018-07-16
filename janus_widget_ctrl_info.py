@@ -200,6 +200,18 @@ class widget_ctrl_info( format_TextEdit ) :
 					self.prnt_brk( )
 					self.prnt_htm( 'hard to implement' )
 
+				if ( mesg_obj == 'flcn' ) :
+					self.clear( )
+					self.prnt_htm( 'Fluctuating density' )
+					self.prnt_brk( )
+					self.prnt_htm( 'calculation active' )
+
+				if ( mesg_obj == 'flcv' ) :
+					self.clear( )
+					self.prnt_htm( 'Fluctuating velocity' )
+					self.prnt_brk( )
+					self.prnt_htm( 'calculation active' )
+
 			if ( mesg_typ == 'norun' ) :
 
 				if ( mesg_obj == 'mom' ) :
@@ -277,6 +289,18 @@ class widget_ctrl_info( format_TextEdit ) :
 					self.prnt_htm(
 					     'Debugging mode has been ' +
 					     'deactivated.'               )
+
+				if ( mesg_obj == 'flcn' ) :
+					self.clear( )
+					self.prnt_htm(
+					     'Fluctuating velocity ' + 
+					     'calculation deactivated'   )
+
+				if ( mesg_obj == 'flcv' ) :
+					self.clear( )
+					self.prnt_htm(
+					     'Fluctuating density ' + 
+					     'calculation deactivated'   )
 
 		# If the message is from one of the data archives, attept to add
 		# a statement to the text area that is appropriate to the

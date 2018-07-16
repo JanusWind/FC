@@ -193,9 +193,9 @@ class widget_nln_set( QWidget ) :
 				             str( self.core.nln_set_gss_n[p] ) )
 
 			if ( ( self.arr_gss_d[p]          is not None ) and
-			     ( self.core.nln_set_gss_d[p] is not None )     ) :
+			     ( self.core.nln_set_gss_dv[p] is not None )     ) :
 				self.arr_gss_d[p].setTextUpdate(
-				             str( self.core.nln_set_gss_d[p] ) )
+				             str( self.core.nln_set_gss_dv[p] ) )
 
 			if ( ( self.arr_gss_w[p]          is not None ) and
 			     ( self.core.nln_set_gss_w[p] is not None )     ) :
@@ -243,7 +243,7 @@ class widget_nln_set( QWidget ) :
 			else :
 				ss_gss_n += 'color: black;'
 
-			if ( ( self.core.nln_set_gss_d[p] is None     ) and
+			if ( ( self.core.nln_set_gss_dv[p] is None     ) and
 			     ( self.arr_gss_d[p]          is not None ) and
 			     ( len( self.arr_gss_d[p].text( ) ) > 0   )     ) :
 				ss_gss_d += 'color: red;'
