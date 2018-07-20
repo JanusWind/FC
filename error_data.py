@@ -5,6 +5,10 @@ os.system('cls' if os.name == 'nt' else 'clear') # Clear the screen
 import glob
 import pickle
 import numpy as np
+from numpy import mean, sqrt, corrcoef
+import matplotlib.pyplot as plt
+from matplotlib import gridspec, rc
+from pylab import rcParams
 
 #os.chdir("/home/ahmadr/Desktop/GIT/fm_development/data/edited/error_analysis")
 #
@@ -12,9 +16,45 @@ import numpy as np
 #
 #dat = [0]*len( fname )
 #dat = pickle.load( open( fname, 'rb' ) )
+#nd  = len( dat['b0'] )
 #
 #os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
+#
+#dat_alfvel = dat['alfvel_p']
 
+dat_alfvel = [ 44.26592069742441,
+               44.3920596038429,
+               44.477487241527356,
+               44.21326931643325,
+               44.22631287479057,
+               44.29952973541283,
+               44.268793822847826,
+               43.625943146482655,
+               44.384526577001004,
+               43.75648088693947,
+               43.88056497319111,
+               43.38854462828582,
+               43.22629096673751,
+               43.452354574914196,
+               43.61940913562395,
+               44.425460942450584,
+               44.469618218083035,
+               44.25598596468114,
+               43.69477702858036,
+               43.62135411684833,
+               43.31699998655192,
+               43.35332058335138,
+               43.29635610946848,
+               43.80918013227704,
+               43.46766028284068,
+               42.845997162273584,
+               42.775649095196144,
+               42.91414895371891,
+               43.617051867764616,
+               43.780353540863686,
+               43.95317002533217,
+               43.76115742574854,
+               43.789660134788456 ]
 
 # time_rng_avg
 # time_but_bnd
@@ -793,6 +833,8 @@ for i in pop_ind :
 	dat_fv_fit_smt.pop( i-k )
 	dat_sig_fv_fit_smt.pop( i-k )
 
+	dat_alfvel.pop( i-k )
+
 	k += 1
 
 #print mean( dat_fv_rng_avg )
@@ -813,51 +855,51 @@ for i in pop_ind :
 
 fig, ax1 = plt.subplots()
 
-ax1.plot( range( 24 ), dat_sig_fv_rng_avg, marker='^', linewidth=0.5, 
-color='r', label=r'$\sigma_V$ (running average)' )
+ax1.plot( range( 24 ), dat_sig_fv_rng_avg/np.array( dat_alfvel ), marker='^',
+linewidth=0.5, color='r', label=r'$\sigma_V$ (running average)' )
 #ax1.plot( range( 24 ), dat_sig_fv_but_bnd, marker='*', linewidth=0.5,
 #color='g', label=r'$\sigma_V$ ( butterworth)' )
 #ax1.plot( range( 24 ), dat_sig_fv_smt_mag, marker='<', linewidth=0.5,
 #color='b', label=r'$\sigma_V$ (smoothed)' )
-ax1.plot( range( 24 ), dat_sig_fv_raw_mag, marker='>', linewidth=0.5,
-color='c', label=r'$\sigma_V$ ( raw)' )
+ax1.plot( range( 24 ), dat_sig_fv_raw_mag/np.array( dat_alfvel ), marker='>',
+linewidth=0.5,color='c', label=r'$\sigma_V$ ( raw)' )
 #ax1.plot( range( 24 ), dat_sig_fv_rot_mag, marker='.', linewidth=0.5,
 #color='m', label='rotated MF' )
 #ax1.plot( range( 24 ), dat_sig_fv_fit_smt, marker='o', linewidth=0.5,
 #color='k', label='fit MF' )
 
 ax1.set_xlim( -0.5, 24 )
-ax1.set_ylim( 0, 0.5 )
+ax1.set_ylim( 0, 0.009 )
 
-ax1.set_xlabel( 'Observation number', fontsize=22 )
-ax1.set_ylabel( r'$\sigma_{V}$', fontsize=22, color='r' )
-ax1.set_title( 'Comparison of error for various MFI', fontsize=24 )
-ax1.legend( loc=2, fontsize=16 )
+ax1.set_xlabel( 'Spectra number', fontsize=28 )
+ax1.set_ylabel( r'$\sigma_{\delta V}/V_A$', fontsize=28, color='r' )
+#ax1.set_title( 'Comparison of error for various MFI', fontsize=24 )
+ax1.legend( loc=2, fontsize=24 )
 
 #ax1.xticks([0, 5, 10, 15, 20, 25], fontsize=24 )
 
 x1_ticks = [ 0, 5, 10, 15, 20, 25 ]
-y1_ticks = [ 0, 0.1, 0.2, 0.3, 0.4, 0.5 ]
+y1_ticks = [ 0, 0.002, 0.004, 0.006, 0.008 ]
 
 ax1.set_xticks( x1_ticks )
 ax1.set_yticks( y1_ticks )
-ax1.set_xticklabels( x1_ticks, fontsize=20 )
-ax1.set_yticklabels( y1_ticks, fontsize=20 )
+ax1.set_xticklabels( x1_ticks, fontsize=28 )
+ax1.set_yticklabels( y1_ticks, fontsize=28 )
 
 ax2 = ax1.twinx( )
 
 ax2.plot( range( 24 ), dat_sig_bb_rng_avg, marker='*', linewidth=1.0, color='b',
- label=r'$\Delta B$' )
+ label=r'$\delta B$' )
 #ax2.scatter( range( 24 ), dat_fv_but_bnd, marker='<', color='m', label='butterworth' )
 
-ax2.legend( loc=1, fontsize=16 )
+ax2.legend( loc=1, fontsize=28 )
 
 y2_ticks = [ 0.02, 0.04, 0.06, 0.08, 0.1 ]
 
 ax2.set_yticks( y2_ticks )
 ax2.set_yticklabels( y2_ticks, fontsize=20 )
 
-ax2.set_ylabel( r'$\Delta B$', fontsize=22, color='b' )
+ax2.set_ylabel( r'$\delta B / |\vec B|$', fontsize=28, color='b' )
 fig.tight_layout( )
 
 plt.show( )

@@ -25,10 +25,11 @@ plt.close('all')
 n_data = raw_input('Which file numbers do you want to run the code for ==>  ')
 n_data = [ int( n_data[j] ) for j in range( len( n_data ) ) ]
 
-os.chdir("/home/ahmadr/Desktop/GIT/fm_development/data/edited")
+os.chdir("/home/ahmadr/Desktop/GIT/fm_development/data/edited/")
 
+
+#fname1 = 'janus_but_bnd_med_flt_21_2008-11-04-12-00-41_2008-11-04-12-56-08.jns'
 fname1 = 'dat_bnd_11_9.jns'
-#fname2 = 'dat_bnd_11_1.jns'
 #fname1 = 'data_final_filter_01.jns'
 #fname2 = 'data_final_filter_11.jns'
 #fname3 = 'data_final_filter_21.jns'
