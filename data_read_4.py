@@ -29,9 +29,9 @@ os.chdir("/home/ahmadr/Desktop/GIT/fm_development/data/edited/")
 
 
 #fname1 = 'janus_but_bnd_med_flt_21_2008-11-04-12-00-41_2008-11-04-12-56-08.jns'
-fname1 = 'dat_bnd_11_9.jns'
-#fname1 = 'data_final_filter_01.jns'
-#fname2 = 'data_final_filter_11.jns'
+#fname1 = 'dat_bnd_11_9.jns'
+fname1 = 'data_final_filter_01.jns'
+fname2 = 'data_final_filter_11.jns'
 #fname3 = 'data_final_filter_21.jns'
 
 if ( 1 in n_data ) :
@@ -179,13 +179,13 @@ if ( 1 in n_data ) :
 		time1[j] = dat1['time'][j].time().strftime("%H-%M")
 
 		dat1_b_x_raw[j] = mean( 
-		                np.array( dat1['b0_fields'][j]['but_low'] )[0] )
+		                np.array( dat1['b0_fields'][j]['raw_smt'] )[0] )
 
 		dat1_b_y_raw[j] = mean(
-		                np.array( dat1['b0_fields'][j]['but_low'] )[1] )
+		                np.array( dat1['b0_fields'][j]['raw_smt'] )[1] )
 
 		dat1_b_z_raw[j] = mean(
-		                np.array( dat1['b0_fields'][j]['but_low'] )[2] )
+		                np.array( dat1['b0_fields'][j]['raw_smt'] )[2] )
 
 		dat1_b_x_rot[j] = mean(
 		                np.array( dat1['b0_fields'][j]['rot_smt'] )[0] )
@@ -196,11 +196,33 @@ if ( 1 in n_data ) :
 		dat1_b_z_rot[j] = mean(
 		                np.array( dat1['b0_fields'][j]['rot_smt'] )[2] )
 
-		dat1_db_x_raw = dat1['b0_fields'][j]['but_bnd'][0]
+#		dat1_db_x_raw = dat1['b0_fields'][j]['but_bnd'][0]
+#
+#		dat1_db_y_raw = dat1['b0_fields'][j]['but_bnd'][1]
+#
+#		dat1_db_z_raw = dat1['b0_fields'][j]['but_bnd'][2]
 
-		dat1_db_y_raw = dat1['b0_fields'][j]['but_bnd'][1]
+#		dat1_db[j]    = sum( [ sqrt( dat1_db_x_raw[k]**2 +
+#		                             dat1_db_y_raw[k]**2 +
+#		                             dat1_db_z_raw[k]**2  )
+#		                    for k in range( len( dat1_db_x_raw ) ) ] )/(
+#		            len( dat1_db_x_raw )*( sqrt( dat1_b_x_raw[j]**2 +
+#		                 dat1_b_y_raw[j]**2 + dat1_b_z_raw[j]**2   ) ) )
 
-		dat1_db_z_raw = dat1['b0_fields'][j]['but_bnd'][2]
+		dat1_db_x_raw = [
+		         dat1['b0_fields'][j]['raw_smt'][0][k] - dat1_b_x_raw[j]
+		                        for k in range( len(
+		                        dat1['b0_fields'][j]['raw_smt'][0] ) ) ]
+
+		dat1_db_y_raw = [
+		         dat1['b0_fields'][j]['raw_smt'][1][k] - dat1_b_y_raw[j]
+		                        for k in range( len( 
+		                         dat1['b0_fields'][j]['raw_smt'][0]) ) ]
+
+		dat1_db_z_raw = [
+		         dat1['b0_fields'][j]['raw_smt'][2][k] - dat1_b_z_raw[j]
+		                        for k in range( len( 
+		                        dat1['b0_fields'][j]['raw_smt'][0] ) ) ]
 
 		dat1_db[j]    = sum( [ sqrt( dat1_db_x_raw[k]**2 +
 		                             dat1_db_y_raw[k]**2 +
@@ -208,28 +230,6 @@ if ( 1 in n_data ) :
 		                    for k in range( len( dat1_db_x_raw ) ) ] )/(
 		            len( dat1_db_x_raw )*( sqrt( dat1_b_x_raw[j]**2 +
 		                 dat1_b_y_raw[j]**2 + dat1_b_z_raw[j]**2   ) ) )
-
-#		dat1_db_x_raw = [
-#		         dat1['b0_fields'][j]['raw_smt'][0][k] - dat1_b_x_raw[j]
-#		                        for k in range( len(
-#		                        dat1['b0_fields'][j]['raw_smt'][0] ) ) ]
-#
-#		dat1_db_y_raw = [
-#		         dat1['b0_fields'][j]['raw_smt'][1][k] - dat1_b_y_raw[j]
-#		                        for k in range( len( 
-#		                         dat1['b0_fields'][j]['raw_smt'][0]) ) ]
-#
-#		dat1_db_z_raw = [
-#		         dat1['b0_fields'][j]['raw_smt'][2][k] - dat1_b_z_raw[j]
-#		                        for k in range( len( 
-#		                        dat1['b0_fields'][j]['raw_smt'][0] ) ) ]
-#
-#		dat1_db[j]    = sum( [ sqrt( dat1_db_x_raw[k]**2 +
-#		                             dat1_db_y_raw[k]**2 +
-#		                             dat1_db_z_raw[k]**2  )
-#		                    for k in range( len( dat1_db_x_raw ) ) ] )/(
-#		            len( dat1_db_x_raw )*( sqrt( dat1_b_x_raw[j]**2 +
-#		                 dat1_b_y_raw[j]**2 + dat1_b_z_raw[j]**2   ) ) )
 
 		dat1_b_y_sig_rot[j] = np.array(
 		                    dat1['sig_b0_fields'][j]['sig_rot_smt'][1] )

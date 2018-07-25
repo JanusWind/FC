@@ -4,7 +4,7 @@ from matplotlib.pyplot import figure, axes, plot, xlabel, ylabel, title, \
 grid, savefig, show
 
 sizeOfFont = 12
-fontProperties = {'family':'serif','serif':['Helvetica'],
+fontProperties = {'family':['serif'],'serif':['Helvetica'],
     'weight' : 'normal', 'size' : sizeOfFont}
 ticks_font = font_manager.FontProperties(family='Helvetica', style='normal',
     size=sizeOfFont, weight='normal', stretch='normal')

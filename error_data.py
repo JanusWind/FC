@@ -853,16 +853,19 @@ for i in pop_ind :
 
 #plt.figure( )
 
+csfont = {'fontname':'cursive'}
+hfont = {'fontname':'Helvetica'}
+
 fig, ax1 = plt.subplots()
 
 ax1.plot( range( 24 ), dat_sig_fv_rng_avg/np.array( dat_alfvel ), marker='^',
-linewidth=0.5, color='r', label=r'$\sigma_V$ (running average)' )
+linewidth=2.0, color='r', label=r'$\sigma_V$ (running average)' )
 #ax1.plot( range( 24 ), dat_sig_fv_but_bnd, marker='*', linewidth=0.5,
 #color='g', label=r'$\sigma_V$ ( butterworth)' )
 #ax1.plot( range( 24 ), dat_sig_fv_smt_mag, marker='<', linewidth=0.5,
 #color='b', label=r'$\sigma_V$ (smoothed)' )
 ax1.plot( range( 24 ), dat_sig_fv_raw_mag/np.array( dat_alfvel ), marker='>',
-linewidth=0.5,color='c', label=r'$\sigma_V$ ( raw)' )
+linewidth=2.0,color='c', label=r'$\sigma_V$ ( raw)' )
 #ax1.plot( range( 24 ), dat_sig_fv_rot_mag, marker='.', linewidth=0.5,
 #color='m', label='rotated MF' )
 #ax1.plot( range( 24 ), dat_sig_fv_fit_smt, marker='o', linewidth=0.5,
@@ -871,10 +874,10 @@ linewidth=0.5,color='c', label=r'$\sigma_V$ ( raw)' )
 ax1.set_xlim( -0.5, 24 )
 ax1.set_ylim( 0, 0.009 )
 
-ax1.set_xlabel( 'Spectra number', fontsize=28 )
-ax1.set_ylabel( r'$\sigma_{\delta V}/V_A$', fontsize=28, color='r' )
+ax1.set_xlabel( 'Spectra number', fontsize=32, **hfont )
+ax1.set_ylabel( r'$\sigma_{\delta V}/V_A$', fontsize=32, color='r', **hfont )
 #ax1.set_title( 'Comparison of error for various MFI', fontsize=24 )
-ax1.legend( loc=2, fontsize=24 )
+ax1.legend( loc=2, fontsize=28 )
 
 #ax1.xticks([0, 5, 10, 15, 20, 25], fontsize=24 )
 
@@ -888,18 +891,18 @@ ax1.set_yticklabels( y1_ticks, fontsize=28 )
 
 ax2 = ax1.twinx( )
 
-ax2.plot( range( 24 ), dat_sig_bb_rng_avg, marker='*', linewidth=1.0, color='b',
+ax2.plot( range( 24 ), dat_sig_bb_rng_avg, marker='*', linewidth=2.0, color='b',
  label=r'$\delta B$' )
 #ax2.scatter( range( 24 ), dat_fv_but_bnd, marker='<', color='m', label='butterworth' )
 
-ax2.legend( loc=1, fontsize=28 )
+ax2.legend( loc=1, fontsize=32 )
 
 y2_ticks = [ 0.02, 0.04, 0.06, 0.08, 0.1 ]
 
 ax2.set_yticks( y2_ticks )
-ax2.set_yticklabels( y2_ticks, fontsize=20 )
+ax2.set_yticklabels( y2_ticks, fontsize=28 )
 
-ax2.set_ylabel( r'$\delta B / |\vec B|$', fontsize=28, color='b' )
+ax2.set_ylabel( r'$\delta B / |\vec B|$', fontsize=32, color='b' )
 fig.tight_layout( )
 
 plt.show( )
