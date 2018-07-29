@@ -3192,13 +3192,20 @@ class core( QObject ) :
 
 		prm_v0 = ( prm[0], prm[1], prm[2] )
 
-		prm_fv = prm[3]
+		k = 3
 
-		prm_fn = prm[4]
+		if( self.flc_n ) :
 
+			prm_fv = prm[3]
+			k =+ 1
+
+		if( self.flc_n ) :
+
+			prm_fn = prm[4]
+			k =+ 1
 #		prm_fb = ( prm[4]. prm[5]. prm[6] )
 
-		k = 5
+#		k = 5
 
 		for p in self.nln_gss_pop :
 
