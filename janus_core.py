@@ -3197,12 +3197,19 @@ class core( QObject ) :
 		if( self.flc_n ) :
 
 			prm_fv = prm[3]
-			k =+ 1
+			k += 1
+		else :
+			prm_fv = None
+			k += 1
 
 		if( self.flc_n ) :
 
 			prm_fn = prm[4]
 			k =+ 1
+		else :
+			prm_fn = None
+			k =+ 1
+
 #		prm_fb = ( prm[4]. prm[5]. prm[6] )
 
 #		k = 5
