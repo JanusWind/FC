@@ -3194,21 +3194,21 @@ class core( QObject ) :
 
 		k = 3
 
-		if( self.flc_n ) :
+		if( self.flc_v ) :
 
 			prm_fv = prm[3]
 			k += 1
-		else :
-			prm_fv = None
-			k += 1
+#		else :
+#			prm_fv = None
+#			k += 1
 
 		if( self.flc_n ) :
 
 			prm_fn = prm[4]
 			k =+ 1
-		else :
-			prm_fn = None
-			k =+ 1
+#		else :
+#			prm_fn = None
+#			k =+ 1
 
 #		prm_fb = ( prm[4]. prm[5]. prm[6] )
 
@@ -3464,26 +3464,30 @@ class core( QObject ) :
 		self.nln_res_plas['ogyro'] = ( 1.E-9 * const['q_p'] *
 		                         self.mfi_avg_mag_raw_smt )/const['m_p']
 
-		pop_v0_vec                    = [fit[0], fit[1], fit[2]]
-		self.nln_res_plas['v0_x']     =  fit[0]
-		self.nln_res_plas['v0_y']     =  fit[1]
-		self.nln_res_plas['v0_z']     =  fit[2]
-		self.nln_res_plas['sig_v0_x'] =  sig[0]
-		self.nln_res_plas['sig_v0_y'] =  sig[1]
-		self.nln_res_plas['sig_v0_z'] =  sig[2]
-		fv                            =  fit[3]
-		self.nln_res_plas['fv']       =  fit[3]
-		self.nln_res_plas['sig_fv']   =  sig[3]
-		fn                            =  fit[4]
-		self.nln_res_plas['fn']       =  fit[4]
-		self.nln_res_plas['sig_fn']   =  sig[4]
+		pop_v0_vec                          = [fit[0], fit[1], fit[2]]
+		self.nln_res_plas['v0_x']           =  fit[0]
+		self.nln_res_plas['v0_y']           =  fit[1]
+		self.nln_res_plas['v0_z']           =  fit[2]
+		self.nln_res_plas['sig_v0_x']       =  sig[0]
+		self.nln_res_plas['sig_v0_y']       =  sig[1]
+		self.nln_res_plas['sig_v0_z']       =  sig[2]
+
+		c = 3
+
+		if( self.flc_v ) :
+			fv                          =  fit[3]
+			self.nln_res_plas['fv']     =  fit[3]
+			self.nln_res_plas['sig_fv'] =  sig[3]
+		if( self.flc_n ) :
+			fn                          =  fit[4]
+			self.nln_res_plas['fn']     =  fit[4]
+			self.nln_res_plas['sig_fn'] =  sig[4]
 
 		print ('fv = ', " %.3f " % fit[3], " %.3f " % sig[3] ,
 		                     self.time_epc.time().strftime("%H-%M-%S") )
 		print ('fn = ', " %.3f " % fit[4], " %.3f " % sig[4] ,
 		                     self.time_epc.time().strftime("%H-%M-%S") )
 #		print self.nln_res_plas['fv'], sig[3]
-		c = 5
 
 		self.nln_res_curr_ion = []
 
