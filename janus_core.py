@@ -3604,20 +3604,20 @@ class core( QObject ) :
 
 		c = 3
 
-		if( self.flc_v ) :
-			fv                          =  fit[3]
-			self.nln_res_plas['fv']     =  fit[3]
-			self.nln_res_plas['sig_fv'] =  sig[3]
-		if( self.flc_n ) :
-			fn                          =  fit[4]
-			self.nln_res_plas['fn']     =  fit[4]
-			self.nln_res_plas['sig_fn'] =  sig[4]
-
-		print ('fv = ', " %.3f " % fit[3], " %.3f " % sig[3] ,
-		                     self.time_epc.time().strftime("%H-%M-%S") )
-		print ('fn = ', " %.3f " % fit[4], " %.3f " % sig[4] ,
-		                     self.time_epc.time().strftime("%H-%M-%S") )
-#		print self.nln_res_plas['fv'], sig[3]
+#		if( self.flc_v ) :
+#			fv                          =  fit[3]
+#			self.nln_res_plas['fv']     =  fit[3]
+#			self.nln_res_plas['sig_fv'] =  sig[3]
+#		if( self.flc_n ) :
+#			fn                          =  fit[4]
+#			self.nln_res_plas['fn']     =  fit[4]
+#			self.nln_res_plas['sig_fn'] =  sig[4]
+#
+#		print ('fv = ', " %.3f " % fit[3], " %.3f " % sig[3] ,
+#		                     self.time_epc.time().strftime("%H-%M-%S") )
+#		print ('fn = ', " %.3f " % fit[4], " %.3f " % sig[4] ,
+#		                     self.time_epc.time().strftime("%H-%M-%S") )
+##		print self.nln_res_plas['fv'], sig[3]
 
 		self.nln_res_curr_ion = []
 
@@ -3644,9 +3644,19 @@ class core( QObject ) :
 			# Add the population itself to the results.
 
 			pop_drift  = self.nln_plas.arr_pop[p]['drift']
+			pop_flcn   = self.nln_plas.arr_pop[p]['flcn' ]
+			pop_flcv   = self.nln_plas.arr_pop[p]['flcv' ]
 			pop_aniso  = self.nln_plas.arr_pop[p]['aniso']
 			pop_name   = self.nln_plas.arr_pop[p]['name' ]
 			pop_sym    = self.nln_plas.arr_pop[p]['sym'  ]
+
+			if ( pop_flcv ) :
+				pop_fv     = fit[c]
+				pop_sig_fv = sig[c]
+				c += 1
+			else :
+				pop_fv     = None
+				pop_sig_fv = None
 
 			pop_n      = fit[c]
 			pop_sig_n  = sig[c]
@@ -3657,6 +3667,14 @@ class core( QObject ) :
 #			print ( 'fn = ','%0.3f' % pop_fn, '%0.3f' % pop_sig_fn )
 
 			c += 1
+
+			if ( pop_flcn ) :
+				pop_fn     = fit[c]
+				pop_sig_fn = sig[c]
+				c += 1
+			else :
+				pop_fn     = None
+				pop_sig_fn = None
 
 			if ( pop_drift ) :
 				pop_dv     = fit[c]
@@ -3680,8 +3698,8 @@ class core( QObject ) :
 				c += 1
 
 			self.nln_res_plas.add_pop(
-			      spc=spc_name, drift=pop_drift,
-			      aniso=pop_aniso, name=pop_name,
+			      spc=spc_name, drift=pop_drift, flcn=pop_flcn,
+			      flcv=pop_flcv, aniso=pop_aniso, name=pop_name,
 			      sym=pop_sym, n=pop_n, dv=pop_dv,
 			      w=pop_w, sig_n=pop_sig_n,
 			      sig_dv=pop_sig_dv, sig_w=pop_sig_w,
@@ -3694,11 +3712,11 @@ class core( QObject ) :
 			     self.fc_spec.calc_curr (
 			                  self.nln_plas.arr_pop[p]['m'],
 			                  self.nln_plas.arr_pop[p]['q'],
-			                  pop_v0_vec, fv,
+			                  pop_v0_vec, pop_fv,
 		                          self.mfi_sig_vec_db_rng_avg,
 #			                  self.mfi_avg_mag_raw_smt,
 #			                  self.b0_avg_fields[self.mfi_set_key],
-			                  pop_n, fn, pop_dv, pop_w,
+			                  pop_n, pop_fn, pop_dv, pop_w,
 			                  self.mfi_set_key                   ) )
 
 		# Save the results of the this non-linear analysis to the
