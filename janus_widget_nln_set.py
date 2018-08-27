@@ -91,29 +91,35 @@ class widget_nln_set( QWidget ) :
 		self.hdr_gss  = QLabel( 'Initial-Guess Generation' )
 		self.hdr_sel  = QLabel( 'Data Selection' )
 
-		self.hdr_gss_n = QLabel( 'n/n_m'  )
-		self.hdr_gss_d = QLabel( 'dv/v_m' )
-		self.hdr_gss_w = QLabel( 'w/w_m'  )
+		self.hdr_gss_n  = QLabel( 'n/n_m'  )
+		self.hdr_gss_fn = QLabel( 'fn/n_m' )
+		self.hdr_gss_fv = QLabel( 'fv/n_m' )
+		self.hdr_gss_d  = QLabel( 'dv/v_m' )
+		self.hdr_gss_w  = QLabel( 'w/w_m'  )
 
 		self.hdr_sel_a = QLabel( 'w_-/w' )
 		self.hdr_sel_b = QLabel( 'w_+/w' )
 
-		self.arr_name  = tile( None, self.core.nln_n_pop )
-		self.arr_gss_n = tile( None, self.core.nln_n_pop )
-		self.arr_gss_d = tile( None, self.core.nln_n_pop )
-		self.arr_gss_w = tile( None, self.core.nln_n_pop )
-		self.arr_sel_a = tile( None, self.core.nln_n_pop )
-		self.arr_sel_b = tile( None, self.core.nln_n_pop )
+		self.arr_name   = tile( None, self.core.nln_n_pop )
+		self.arr_gss_n  = tile( None, self.core.nln_n_pop )
+		self.arr_gss_fn = tile( None, self.core.nln_n_pop )
+		self.arr_gss_fv = tile( None, self.core.nln_n_pop )
+		self.arr_gss_d  = tile( None, self.core.nln_n_pop )
+		self.arr_gss_w  = tile( None, self.core.nln_n_pop )
+		self.arr_sel_a  = tile( None, self.core.nln_n_pop )
+		self.arr_sel_b  = tile( None, self.core.nln_n_pop )
 
 		for i in range( self.core.nln_n_pop ) :
 
 			txt_i = str( i )
 
-			self.arr_name[i]  = QLabel( '' )
-			self.arr_gss_n[i] = event_LineEdit( self, 'gn'+txt_i )
-			self.arr_gss_w[i] = event_LineEdit( self, 'gw'+txt_i )
-			self.arr_sel_a[i] = event_LineEdit( self, 's-'+txt_i )
-			self.arr_sel_b[i] = event_LineEdit( self, 's+'+txt_i )
+			self.arr_name[i]   = QLabel( '' )
+			self.arr_gss_n[i]  = event_LineEdit( self, 'gn'+txt_i )
+			self.arr_gss_fn[i] = event_LineEdit( self, 'fn'+txt_i )
+			self.arr_gss_fv[i] = event_LineEdit( self, 'fv'+txt_i )
+			self.arr_gss_w[i]  = event_LineEdit( self, 'gw'+txt_i )
+			self.arr_sel_a[i]  = event_LineEdit( self, 's-'+txt_i )
+			self.arr_sel_b[i]  = event_LineEdit( self, 's+'+txt_i )
 
 			if ( i != 0 ) :
 				self.arr_gss_d[i] =\
@@ -126,11 +132,20 @@ class widget_nln_set( QWidget ) :
 		self.grd.addWidget( self.hdr_gss , 0, 2, 1, 3, Qt.AlignCenter )
 		self.grd.addWidget( self.hdr_sel , 0, 5, 1, 2, Qt.AlignCenter )
 
-		self.grd.addWidget( self.hdr_gss_n, 1, 2, 1, 1, Qt.AlignCenter )
-		self.grd.addWidget( self.hdr_gss_d, 1, 3, 1, 1, Qt.AlignCenter )
-		self.grd.addWidget( self.hdr_gss_w, 1, 4, 1, 1, Qt.AlignCenter )
-		self.grd.addWidget( self.hdr_sel_a, 1, 5, 1, 1, Qt.AlignCenter )
-		self.grd.addWidget( self.hdr_sel_b, 1, 6, 1, 1, Qt.AlignCenter )
+		self.grd.addWidget( self.hdr_gss_n,  1, 2, 1, 1, 
+		                                               Qt.AlignCenter )
+		self.grd.addWidget( self.hdr_gss_fn, 1, 3, 1, 1, 
+		                                               Qt.AlignCenter )
+		self.grd.addWidget( self.hdr_gss_fv, 1, 4, 1, 1, 
+		                                               Qt.AlignCenter )
+		self.grd.addWidget( self.hdr_gss_d,  1, 5, 1, 1, 
+		                                               Qt.AlignCenter )
+		self.grd.addWidget( self.hdr_gss_w,  1, 6, 1, 1, 
+		                                               Qt.AlignCenter )
+		self.grd.addWidget( self.hdr_sel_a,  1, 7, 1, 1, 
+		                                               Qt.AlignCenter )
+		self.grd.addWidget( self.hdr_sel_b,  1, 8, 1, 1, 
+		                                               Qt.AlignCenter )
 
 		for i in range( self.core.nln_n_pop ) :
 
@@ -142,21 +157,29 @@ class widget_nln_set( QWidget ) :
 				self.grd.addWidget( self.arr_gss_n[i],
 				                    ( i + 2 ), 2, 1, 1 )
 
+			if ( self.arr_gss_fn[i] is not None ) :
+				self.grd.addWidget( self.arr_gss_fn[i],
+				                    ( i + 2 ), 3, 1, 1 )
+
+			if ( self.arr_gss_fv[i] is not None ) :
+				self.grd.addWidget( self.arr_gss_fv[i],
+				                    ( i + 2 ), 4, 1, 1 )
+
 			if ( self.arr_gss_d[i] is not None ) :
 				self.grd.addWidget( self.arr_gss_d[i],
-				                    ( i + 2 ), 3, 1, 1 )
+				                    ( i + 2 ), 5, 1, 1 )
 
 			if ( self.arr_gss_w[i] is not None ) :
 				self.grd.addWidget( self.arr_gss_w[i],
-				                    ( i + 2 ), 4, 1, 1 )
+				                    ( i + 2 ), 6, 1, 1 )
 
 			if ( self.arr_sel_a[i] is not None ) :
 				self.grd.addWidget( self.arr_sel_a[i],
-				                    ( i + 2 ), 5, 1, 1 )
+				                    ( i + 2 ), 7, 1, 1 )
 
 			if ( self.arr_sel_b[i] is not None ) :
 				self.grd.addWidget( self.arr_sel_b[i],
-				                    ( i + 2 ), 6, 1, 1 )
+				                    ( i + 2 ), 8, 1, 1 )
 
 		# Regularize the grid spacing.
 
@@ -192,10 +215,20 @@ class widget_nln_set( QWidget ) :
 				self.arr_gss_n[p].setTextUpdate(
 				             str( self.core.nln_set_gss_n[p] ) )
 
+			if ( ( self.arr_gss_fn[p]          is not None ) and
+			     ( self.core.nln_set_gss_fn[p] is not None )     ) :
+				self.arr_gss_fn[p].setTextUpdate(
+				            str( self.core.nln_set_gss_fn[p] ) )
+
+			if ( ( self.arr_gss_fv[p]          is not None ) and
+			     ( self.core.nln_set_gss_fv[p] is not None )     ) :
+				self.arr_gss_fv[p].setTextUpdate(
+				            str( self.core.nln_set_gss_fv[p] ) )
+
 			if ( ( self.arr_gss_d[p]          is not None ) and
 			     ( self.core.nln_set_gss_dv[p] is not None )     ) :
 				self.arr_gss_d[p].setTextUpdate(
-				             str( self.core.nln_set_gss_dv[p] ) )
+				            str( self.core.nln_set_gss_dv[p] ) )
 
 			if ( ( self.arr_gss_w[p]          is not None ) and
 			     ( self.core.nln_set_gss_w[p] is not None )     ) :
@@ -218,17 +251,19 @@ class widget_nln_set( QWidget ) :
 			# considered.
 
 			if ( self.core.nln_pop_use[p] ) :
-				ss_gss_n = 'background-color: white;\n'
-				ss_gss_d = 'background-color: white;\n'
-				ss_gss_w = 'background-color: white;\n'
-				ss_sel_a = 'background-color: white;\n'
-				ss_sel_b = 'background-color: white;\n'
+				ss_gss_n  = 'background-color: white;\n'
+				ss_gss_fn = 'background-color: white;\n'
+				ss_gss_fv = 'background-color: white;\n'
+				ss_gss_d  = 'background-color: white;\n'
+				ss_gss_w  = 'background-color: white;\n'
+				ss_sel_a  = 'background-color: white;\n'
+				ss_sel_b  = 'background-color: white;\n'
 			else :
-				ss_gss_n = 'background-color: gray;\n'
-				ss_gss_d = 'background-color: gray;\n'
-				ss_gss_w = 'background-color: gray;\n'
-				ss_sel_a = 'background-color: gray;\n'
-				ss_sel_b = 'background-color: gray;\n'
+				ss_gss_n  = 'background-color: gray;\n'
+				ss_gss_d  = 'background-color: gray;\n'
+				ss_gss_w  = 'background-color: gray;\n'
+				ss_sel_a  = 'background-color: gray;\n'
+				ss_sel_b  = 'background-color: gray;\n'
 
 			if ( not self.core.nln_plas.arr_pop[p]['drift'] ) :
 				ss_gss_d = 'background-color: gray;\n'
@@ -242,6 +277,20 @@ class widget_nln_set( QWidget ) :
 				ss_gss_n += 'color: red;'
 			else :
 				ss_gss_n += 'color: black;'
+
+			if ( ( self.core.nln_set_gss_fn[p] is None     ) and
+			     ( self.arr_gss_fn[p]          is not None ) and
+			     ( len( self.arr_gss_fn[p].text( ) ) > 0   )     ) :
+				ss_gss_fn += 'color: red;'
+			else :
+				ss_gss_fn += 'color: black;'
+
+			if ( ( self.core.nln_set_gss_fv[p] is None     ) and
+			     ( self.arr_gss_fv[p]          is not None ) and
+			     ( len( self.arr_gss_fv[p].text( ) ) > 0   )     ) :
+				ss_gss_fv += 'color: red;'
+			else :
+				ss_gss_fn += 'color: black;'
 
 			if ( ( self.core.nln_set_gss_dv[p] is None     ) and
 			     ( self.arr_gss_d[p]          is not None ) and
@@ -275,6 +324,12 @@ class widget_nln_set( QWidget ) :
 
 			if ( self.arr_gss_n[p] is not None ) :
 				self.arr_gss_n[p].setStyleSheet( ss_gss_n )
+
+			if ( self.arr_gss_fn[p] is not None ) :
+				self.arr_gss_fn[p].setStyleSheet( ss_gss_fn )
+
+			if ( self.arr_gss_fv[p] is not None ) :
+				self.arr_gss_fv[p].setStyleSheet( ss_gss_fv )
 
 			if ( self.arr_gss_d[p] is not None ) :
 				self.arr_gss_d[p].setStyleSheet( ss_gss_d )
@@ -314,6 +369,24 @@ class widget_nln_set( QWidget ) :
 
 			try :
 				val = float( self.arr_gss_n[i].text( ) )
+			except :
+				val = None
+
+		if   ( fnc[0:2] == 'fn' ) :
+
+			param = 'gss_fn'
+
+			try :
+				val = float( self.arr_gss_fn[i].text( ) )
+			except :
+				val = None
+
+		if   ( fnc[0:2] == 'fv' ) :
+
+			param = 'gss_fv'
+
+			try :
+				val = float( self.arr_gss_fv[i].text( ) )
 			except :
 				val = None
 

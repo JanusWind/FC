@@ -366,12 +366,14 @@ class widget_fm_moments( QWidget ) :
 #		y_raw = self.core.mfi_vec_but_bnd
 #		y_smt = self.core.mfi_vec_raw
 
-		if( self.core.b0_fields[self.key] is None ) :
-
-			print self.core.b0_fields[self.key]
-
-			return
-		else :
+#		if( self.core.b0_fields[self.key] is None ) :
+#
+#			print 'Hello'
+#			print self.core.mfi_set_key
+#			print self.key
+#
+#			return
+		try :
 			y_raw = [ self.core.b0_fields[self.key][0][N:NN],
 			          self.core.b0_fields[self.key][1][N:NN],
 			          self.core.b0_fields[self.key][2][N:NN] ]
@@ -396,6 +398,9 @@ class widget_fm_moments( QWidget ) :
 				     self.core.b0_db_fields[self.key][0][N:NN],
 				     self.core.b0_db_fields[self.key][1][N:NN],
 				     self.core.b0_db_fields[self.key][2][N:NN] ]
+
+		except :
+			return
 
 		# For each plot in the grid, generate and display a fit curve
 		# based on the results of the analysis.

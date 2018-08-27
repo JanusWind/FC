@@ -79,10 +79,10 @@ class widget_nln_pop( QWidget ) :
 
 		self.setLayout( self.grd )
 
-		# |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |
-		# +-----+-----+-----+-----+-----+-----+-----+-----+
-		# |Use? |Species    |Pop. Name  | Sym |Drft?|Anis?|
-		# |Check|           |LineE      |LineE|Check|Check|
+		# |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |
+		# +-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+
+		# |Use? |Species    |Pop. Name  | Sym |Drft?|Anis?|Flcn?|Flcv?|
+		# |Check|           |LineE      |LineE|Check|Check|Check|Check|
 
 		# Initialize the labels, check boxes, and text areas that 
 		# comprise this widget.
@@ -93,6 +93,8 @@ class widget_nln_pop( QWidget ) :
 		self.hdr_sym   = QLabel( 'Symbol'    )
 		self.hdr_drift = QLabel( 'Drift'     )
 		self.hdr_aniso = QLabel( 'Aniso'     )
+		self.hdr_flcn  = QLabel( 'FL N'      )
+		self.hdr_flcv  = QLabel( 'FL V'      )
 
 		self.arr_use   = tile( None, self.core.nln_n_pop )
 		self.arr_ion   = tile( None, self.core.nln_n_pop )
@@ -100,6 +102,8 @@ class widget_nln_pop( QWidget ) :
 		self.arr_sym   = tile( None, self.core.nln_n_pop )
 		self.arr_drift = tile( None, self.core.nln_n_pop )
 		self.arr_aniso = tile( None, self.core.nln_n_pop )
+		self.arr_flcn  = tile( None, self.core.nln_n_pop )
+		self.arr_flcv  = tile( None, self.core.nln_n_pop )
 
 		for i in range( self.core.nln_n_pop ) :
 
@@ -109,6 +113,8 @@ class widget_nln_pop( QWidget ) :
 			self.arr_name[i]  = event_LineEdit( self, 'n'+txt_i )
 			self.arr_sym[i]   = event_LineEdit( self, 's'+txt_i )
 			self.arr_aniso[i] = event_CheckBox( self, 'a'+txt_i )
+			self.arr_flcn[i]  = event_CheckBox( self, 'f'+txt_i )
+			self.arr_flcv[i]  = event_CheckBox( self, 'g'+txt_i )
 
 			if ( i == 0 ) :
 				continue
@@ -125,6 +131,8 @@ class widget_nln_pop( QWidget ) :
 		self.grd.addWidget( self.hdr_sym  , 0, 5, 1, 1, Qt.AlignCenter )
 		self.grd.addWidget( self.hdr_drift, 0, 6, 1, 1, Qt.AlignCenter )
 		self.grd.addWidget( self.hdr_aniso, 0, 7, 1, 1, Qt.AlignCenter )
+		self.grd.addWidget( self.hdr_flcn,  0, 8, 1, 1, Qt.AlignCenter )
+		self.grd.addWidget( self.hdr_flcv,  0, 9, 1, 1, Qt.AlignCenter )
 
 		for i in range( self.core.nln_n_pop ) :
 
@@ -156,9 +164,19 @@ class widget_nln_pop( QWidget ) :
 				                    i+1, 7, 1, 1,
 				                    Qt.AlignCenter     )
 
+			if ( self.arr_flcn[i] is not None ) :
+				self.grd.addWidget( self.arr_flcn[i],
+				                    i+1, 8, 1, 1,
+				                    Qt.AlignCenter     )
+
+			if ( self.arr_flcv[i] is not None ) :
+				self.grd.addWidget( self.arr_flcv[i],
+				                    i+1, 9, 1, 1,
+				                    Qt.AlignCenter     )
+
 		# Regularize the grid spacing.
 
-		for i in range( 8 ) :
+		for i in range( 10 ) :
 			self.grd.setColumnStretch( i, 1 )
 
 		for i in range( self.core.nln_n_pop + 1 ) :
@@ -187,6 +205,8 @@ class widget_nln_pop( QWidget ) :
 			tmp_sym   = self.core.nln_plas.arr_pop[i]['sym']
 			tmp_drift = self.core.nln_plas.arr_pop[i]['drift']
 			tmp_aniso = self.core.nln_plas.arr_pop[i]['aniso']
+			tmp_flcn  = self.core.nln_plas.arr_pop[i]['flcn' ]
+			tmp_flcv  = self.core.nln_plas.arr_pop[i]['flcv' ]
 
 			# Construct the list of ion-species names/symbols.
 
@@ -230,6 +250,12 @@ class widget_nln_pop( QWidget ) :
 
 			if ( self.arr_aniso[i] is not None ) :
 				self.arr_aniso[i].setChecked( tmp_aniso )
+
+			if ( self.arr_flcn[i] is not None ) :
+				self.arr_flcn[i].setChecked( tmp_flcn )
+
+			if ( self.arr_flcv[i] is not None ) :
+				self.arr_flcv[i].setChecked( tmp_flcv )
 
 			# Update each "ComboBox" widget.
 
@@ -357,6 +383,16 @@ class widget_nln_pop( QWidget ) :
 
 			param = 'aniso'
 			val   = self.arr_aniso[i].isChecked( )
+
+		elif ( fnc[0] == 'f' ) :
+
+			param = 'flcn'
+			val   = self.arr_flcn[i].isChecked( )
+
+		elif ( fnc[0] == 'g' ) :
+
+			param = 'flcv'
+			val   = self.arr_flcv[i].isChecked( )
 
 		else :
 

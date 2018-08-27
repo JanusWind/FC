@@ -459,25 +459,29 @@ class core( QObject ) :
 					self.nln_pop_vld[p] = True
 					self.nln_plas.add_pop(
 					        'p', name='Core', sym='c',
-					        drift=False, aniso=True    )
+					        drift=False, flcn=True,
+				                flcv=True,   aniso=True    )
 				elif ( p == 1 ) :
 					self.nln_pop_use[p] = True
 					self.nln_pop_vld[p] = True
 					self.nln_plas.add_pop(
 					        'p', name='Beam', sym='b',
-					        drift=True , aniso=True    )
+					        drift=True, flcn=True,
+				                flcv=True,  aniso=True    )
 				elif ( p == 2 ) :
 					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = True
 					self.nln_plas.add_pop(
 					        'a', name='Core', sym='c',
-					        drift=True , aniso=True    )
+					        drift=True, flcn=True,
+				                flcv=True,  aniso=True    )
 				elif ( p == 3 ) :
 					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = True
 					self.nln_plas.add_pop(
 					        'a', name='Beam', sym='b',
-					        drift=True , aniso=False   )
+					        drift=True, flcn=True,
+				                flcv=True,  aniso=False   )
 				else :
 					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = False
@@ -504,6 +508,16 @@ class core( QObject ) :
 			self.nln_set_gss_n[1]   =  0.30
 			self.nln_set_gss_n[2]   =  0.02
 			self.nln_set_gss_n[3]   =  0.01
+
+			self.nln_set_gss_fn[0]  =  0.00
+			self.nln_set_gss_fn[1]  =  0.00
+			self.nln_set_gss_fn[2]  =  0.00
+			self.nln_set_gss_fn[3]  =  0.00
+
+			self.nln_set_gss_fv[0]  =  0.00
+			self.nln_set_gss_fv[1]  =  0.00
+			self.nln_set_gss_fv[2]  =  0.00
+			self.nln_set_gss_fv[3]  =  0.00
 
 			self.nln_set_gss_dv[1]  =  0.10
 			self.nln_set_gss_dv[2]  =  0.01
@@ -2275,13 +2289,11 @@ class core( QObject ) :
 
 		self.mom_res['v0_vec'] = mom_v_vec
 
-#		self.mom_res['fn_p_c'] = 0.0
-		self.mom_res['fv']     = 0.0
-		self.mom_res['fn']     = 0.0
 		self.mom_res.add_spec( name='Proton', sym='p', m=1., q=1. )
 
 		self.mom_res.add_pop( 'p',
-		                      drift=False, aniso=False,
+		                      drift=False, flcn=False,
+		                      flcv=False,  aniso=False,
 		                      name='Core', sym='c',
 		                      n=mom_n,     w=mom_w          )
 
@@ -2291,17 +2303,15 @@ class core( QObject ) :
 		self.mom_curr = self.fc_spec.calc_curr(
 		                           self.mom_res['m_p'],
 		                           self.mom_res['q_p'],
-		                           self.mom_res['v0_vec'],
-		                           self.mom_res['fv'],
+		                           self.mom_res['v0_vec'], 0.,
 		                           self.mfi_sig_vec_db_rng_avg,
 #			                   self.mfi_avg_mag_raw_smt,
 #		                           self.b0_avg_fields[self.mfi_set_key],
-		                           self.mom_res['n_p_c'],
-#		                           self.mom_res['fn_p_c'], 0.,
-		                           self.mom_res['fn'], 0.,
+		                           self.mom_res['n_p_c'], 0., 0.,
 		                           self.mom_res['w_p_c'],
 		                           self.mfi_set_key                    )
 
+		print self.mom_res['v0_vec']
 		# Message the user that the moments analysis has completed.
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mom' )
@@ -2609,13 +2619,13 @@ class core( QObject ) :
 		else :
 			self.nln_set_gss_vld[i] = True
 
-		elif ( ( self.nln_plas.arr_pop[i]['flcn'] ) and
+		if ( ( self.nln_plas.arr_pop[i]['flcn'] ) and
 		       ( self.nln_set_gss_fn[i] is None     )     ) :
 			self.nln_set_gss_vld[i] = False
 		else :
 			self.nln_set_gss_vld[i] = True
 
-		elif ( ( self.nln_plas.arr_pop[i]['flcv'] ) and
+		if ( ( self.nln_plas.arr_pop[i]['flcv'] ) and
 		       ( self.nln_set_gss_fv[i] is None     )     ) :
 			self.nln_set_gss_vld[i] = False
 		else :

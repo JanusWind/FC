@@ -105,10 +105,10 @@ class widget_mom_res( format_TextEdit ) :
 		if ( self.core.opt['res_par_v'] ) :
 
 			self.prnt_htm( '<i>v<sub>p</sub></i> = ' )
-			self.prnt_dcm( self.core.mom_res['v_p_c'], 0, 'km/s' )
+			self.prnt_dcm( self.core.mom_res['v0_p_c'], 0, 'km/s' )
 			self.prnt_brk( )
 
-			v_vec = self.core.mom_res['v_vec_p_c']
+			v_vec = self.core.mom_res['v0_vec_p_c']
 	
 			self.prnt_tab( 1 )
 			self.prnt_htm( '<i>v<sub>xp</sub></i> = ' )

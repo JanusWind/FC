@@ -588,21 +588,21 @@ class plas( object ) :
 				if ( value[2] is not None ) :
 					self.v0_z = float( value[2] )
 
-#		elif ( key == 'fv' ) :
-#
-#			self.fv = None
-#
-#			if ( value is not None ) :
-#
-#				self.fv = float( value )
-#
-#		elif ( key == 'fn' ) :
-#
-#			self.fn = None
-#
-#			if ( value is not None ) :
-#
-#				self.fn = float( value )
+		elif ( key == 'fv' ) :
+
+			self.fv = None
+
+			if ( value is not None ) :
+
+				self.fv = float( value )
+
+		elif ( key == 'fn' ) :
+
+			self.fn = None
+
+			if ( value is not None ) :
+
+				self.fn = float( value )
 
 		elif ( key == 'sig_v0_x' ) :
 
@@ -628,21 +628,21 @@ class plas( object ) :
 
 				self.sig_v0_z = float( value )
 
-#		elif ( key == 'sig_fv' ) :
-#
-#			self.sig_fv = None
-#
-#			if ( value is not None ) :
-#
-#				self.sig_fv = float( value )
-#
-#		elif ( key == 'sig_fn' ) :
-#
-#			self.sig_fn = None
-#
-#			if ( value is not None ) :
-#
-#				self.sig_fn = float( value )
+		elif ( key == 'sig_fv' ) :
+
+			self.sig_fv = None
+
+			if ( value is not None ) :
+
+				self.sig_fv = float( value )
+
+		elif ( key == 'sig_fn' ) :
+
+			self.sig_fn = None
+
+			if ( value is not None ) :
+
+				self.sig_fn = float( value )
 
 		elif   ( key == 'b0_x' ) :
 
@@ -886,7 +886,7 @@ class plas( object ) :
 
 	def add_pop( self, spc,
 	             drift=False, flcn= False, flcv=False, aniso=False,
-	             name=None, sym=None, n=None, dv=None,
+	             name=None, sym=None, n=None, fn=None, fv=None, dv=None,
 	             w=None, w_per=None, w_par=None,
 	             sig_n=None, sig_fn=None, sig_dv=None, sig_w=None,
 	             sig_w_per=None, sig_w_par=None       ) :
@@ -896,7 +896,7 @@ class plas( object ) :
 		                          drift=drift, flcn=flcn,
 		                          flcv=flcv, aniso=aniso,
 		                          name=name, sym=sym,
-		                          n=n, fn=fn, dv=dv, w=w,
+					  n=n, fn=fn, fv=fv, dv=dv, w=w,
 		                          w_per=w_per, w_par=w_par,
 		                          sig_n=sig_n, sig_fn=sig_fn,
 		                          sig_dv=sig_dv, sig_w=sig_w,
@@ -2457,8 +2457,8 @@ class pop( object ) :
 
 			if ( not self.flcn ) :
 
-				raise KeyError( 'Population has no density 
-				                 fluctuation.'              )
+				raise KeyError(
+				 'Population has no density fluctuation.' )
 
 				return
 
@@ -2474,8 +2474,8 @@ class pop( object ) :
 
 			if ( not self.flcv ) :
 
-				raise KeyError( 'Population has no velocity
-				                 fluctuation.'              )
+				raise KeyError(
+				     'Population has no velocity fluctuation.' )
 
 				return
 
@@ -2534,8 +2534,7 @@ class pop( object ) :
 
 						self.w = None
 
-						raise ValueError( 'Thermal speed
-						     enforced to be positive.' )
+						raise ValueError( 'Thermal speed enforced to be positive.' )
 
 					else :
 

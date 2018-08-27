@@ -234,7 +234,7 @@ class fc_dat( ) :
 #		                                   for i in range( len( db ) ) ]
 
 		if ( fv is None ) :
-			fv = [ 0., 0., 0 ]
+			fv_vec = [ 0., 0., 0 ]
 		else :
 			fv_vec = [ ( 1.e-15 * fv * s_db[i]*db_nrm[i] /\
 			             sqrt( const['mu_0'] * const['m_p'] * nn ) )
