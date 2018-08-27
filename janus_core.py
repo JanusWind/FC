@@ -490,9 +490,9 @@ class core( QObject ) :
 		if ( var_nln_set ) :
 
 			self.nln_set_gss_n   = tile( None , self.nln_n_pop )
+			self.nln_set_gss_dv  = tile( None , self.nln_n_pop )
 			self.nln_set_gss_fn  = tile( None , self.nln_n_pop )
 			self.nln_set_gss_fv  = tile( None , self.nln_n_pop )
-			self.nln_set_gss_dv  = tile( None , self.nln_n_pop )
 			self.nln_set_gss_w   = tile( None , self.nln_n_pop )
 			self.nln_set_gss_vld = tile( False, self.nln_n_pop )
 
@@ -508,6 +508,16 @@ class core( QObject ) :
 			self.nln_set_gss_dv[1]  =  0.10
 			self.nln_set_gss_dv[2]  =  0.01
 			self.nln_set_gss_dv[3]  =  0.05
+
+			self.nln_set_gss_fn[0]  =  0.0
+			self.nln_set_gss_fn[1]  =  0.0
+			self.nln_set_gss_fn[2]  =  0.0
+			self.nln_set_gss_fn[3]  =  0.0
+
+			self.nln_set_gss_fv[0]  =  0.0
+			self.nln_set_gss_fv[1]  =  0.0
+			self.nln_set_gss_fv[2]  =  0.0
+			self.nln_set_gss_fv[3]  =  0.0
 
 			self.nln_set_gss_w[0]   =  1.00
 			self.nln_set_gss_w[1]   =  1.25
@@ -2278,7 +2288,7 @@ class core( QObject ) :
 		# Calculate the expected currents based on the results of the
 		# (linear) moments analysis.
 
-		self.mom_curr = self.fc_spec.calc_curr( self.flc_n, self.flc_v,
+		self.mom_curr = self.fc_spec.calc_curr(
 		                           self.mom_res['m_p'],
 		                           self.mom_res['q_p'],
 		                           self.mom_res['v0_vec'],
@@ -2457,6 +2467,20 @@ class core( QObject ) :
 			except :
 				self.nln_plas.arr_pop[i]['drift'] = None
 
+		if ( param == 'flcn' ) :
+
+			try :
+				self.nln_plas.arr_pop[i]['flcn'] = bool( val )
+			except :
+				self.nln_plas.arr_pop[i]['flcn'] = None
+
+		if ( param == 'flcv' ) :
+
+			try :
+				self.nln_plas.arr_pop[i]['flcv'] = bool( val )
+			except :
+				self.nln_plas.arr_pop[i]['flcv'] = None
+
 		if ( param == 'aniso' ) :
 
 			try :
@@ -2527,6 +2551,20 @@ class core( QObject ) :
 			except :
 				self.nln_set_gss_dv[i] = None
 
+		elif ( param == 'gss_fn' ) :
+
+			try :
+				self.nln_set_gss_fn[i] = float( val )
+			except :
+				self.nln_set_gss_fn[i] = None
+
+		elif ( param == 'gss_fv' ) :
+
+			try :
+				self.nln_set_gss_fv[i] = float( val )
+			except :
+				self.nln_set_gss_fv[i] = None
+
 		elif ( param == 'gss_w' ) :
 
 			try :
@@ -2567,6 +2605,18 @@ class core( QObject ) :
 
 		elif ( ( self.nln_plas.arr_pop[i]['drift'] ) and
 		       ( self.nln_set_gss_dv[i] is None     )     ) :
+			self.nln_set_gss_vld[i] = False
+		else :
+			self.nln_set_gss_vld[i] = True
+
+		elif ( ( self.nln_plas.arr_pop[i]['flcn'] ) and
+		       ( self.nln_set_gss_fn[i] is None     )     ) :
+			self.nln_set_gss_vld[i] = False
+		else :
+			self.nln_set_gss_vld[i] = True
+
+		elif ( ( self.nln_plas.arr_pop[i]['flcv'] ) and
+		       ( self.nln_set_gss_fv[i] is None     )     ) :
 			self.nln_set_gss_vld[i] = False
 		else :
 			self.nln_set_gss_vld[i] = True
@@ -2646,10 +2696,10 @@ class core( QObject ) :
 		try :
 			self.nln_plas['v0_vec'] = [
 			         round( v, 1 ) for v in self.mom_res['v0_vec'] ]
-			self.nln_plas['fv'] = 0.#.05*norm( self.nln_plas['v0_vec'])
+#			self.nln_plas['fn'] = 0.
+#			self.nln_plas['fv'] = 0.#.05*norm( self.nln_plas['v0_vec'])
 #			self.nln_plas['fv'] = 10**-15*self.mfi_avg_mag_but_low/\
 #			  sqrt( const['mu_0']*const['m_p']*self.mom_res['n_p'] )
-			self.nln_plas['fn'] = 0.
 		except :
 
 			pass
@@ -2694,10 +2744,24 @@ class core( QObject ) :
 						sgn = 1.
 					self.nln_plas.arr_pop[i]['dv'] = \
 					    round_sig( 
-					        sgn * self.mom_res['v0_mag']
-					            * self.nln_set_gss_dv[i], 4 )
+					       sgn * self.mom_res['v0_mag']
+					           * self.nln_set_gss_dv[i], 4 )
 				except :
 					self.nln_plas.arr_pop[i]['dv'] = None
+
+			if ( self.nln_plas.arr_pop[i]['flcn'] ) :
+				try :
+					self.nln_plas.arr_pop[i]['fn'] = \
+					  round_sig( self.nln_set_gss_fn[i], 4 )
+				except :
+					self.nln_plas.arr_pop[i]['fn'] = None
+
+			if ( self.nln_plas.arr_pop[i]['flcv'] ) :
+				try :
+					self.nln_plas.arr_pop[i]['fv'] = \
+					  round_sig( self.nln_set_gss_fv[i], 4 )
+				except :
+					self.nln_plas.arr_pop[i]['fn'] = None
 
 			# Generate the initial guess of this population's
 			# thermal speed(s).
@@ -2784,6 +2848,20 @@ class core( QObject ) :
 			except :
 				self.nln_plas.arr_pop[i]['dv'] = None
 
+		elif ( param == 'fn' ) :
+
+			try :
+				self.nln_plas.arr_pop[i]['fn'] = val
+			except :
+				self.nln_plas.arr_pop[i]['fn'] = None
+
+		elif ( param == 'fv' ) :
+
+			try :
+				self.nln_plas.arr_pop[i]['fv'] = val
+			except :
+				self.nln_plas.arr_pop[i]['fv'] = None
+
 		elif ( param == 'w' ) :
 
 			try :
@@ -2867,24 +2945,26 @@ class core( QObject ) :
 
 		pop_v0_vec = self.nln_plas['v0_vec']
 
-		fv = self.nln_plas['fv']
+#		fv = self.nln_plas['fv']
 
-		fn = self.nln_plas['fn']
+#		fn = self.nln_plas['fn']
 
 		self.nln_gss_prm = list( pop_v0_vec )
 
-		self.nln_gss_prm.append( fv )
+#		self.nln_gss_prm.append( fv )
 
-		self.nln_gss_prm.append( fn )
+#		self.nln_gss_prm.append( fn )
 
 		self.nln_gss_curr_ion = [ ]
 
 		for p in self.nln_gss_pop :
 
-			# Extract the drift and anisotropy states of the
-			# population
+			# Extract the drift, density and velocity fluctuation
+			# and anisotropy states of the population.
 
 			pop_drift = self.nln_plas.arr_pop[p]['drift']
+			pop_flcn  = self.nln_plas.arr_pop[p]['flcn' ]
+			pop_flcv  = self.nln_plas.arr_pop[p]['flcv' ]
 			pop_aniso = self.nln_plas.arr_pop[p]['aniso']
 
 			# Extract the population's density and add it to the
@@ -2913,6 +2993,30 @@ class core( QObject ) :
 			else :
 				pop_dv = 0.
 
+			# If the population's density is fluctuating, extract
+			# its fluctuation and add it to the parameter array.
+			# Otherwise, set the flcutuation as zero.
+
+			if ( pop_flcn ) :
+
+				pop_fn = self.nln_plas.arr_pop[p]['fn']
+
+				self.nln_gss_prm.append( pop_fn )
+			else :
+				pop_fn = 0.
+
+			# If the population's velocity is fluctuating, extract
+			# its fluctuation and add it to the parameter array.
+			# Otherwise, set the flcutuation as zero.
+
+			if ( pop_flcv ) :
+
+				pop_fv = self.nln_plas.arr_pop[p]['fv']
+
+				self.nln_gss_prm.append( pop_fv )
+			else :
+				pop_fv = 0.
+
 			# If the population is anisotropic, extract its
 			# perpendicular and parallel thermal-speeds and add them
 			# to the parameter array.  Otherwise, extract its scalar
@@ -2934,14 +3038,14 @@ class core( QObject ) :
 			# current from each population.
 #			print fv
 			self.nln_gss_curr_ion.append(
-			     self.fc_spec.calc_curr( self.flc_n, self.flc_v,
+			     self.fc_spec.calc_curr( 
 			                   self.nln_plas.arr_pop[p]['m'],
 			                   self.nln_plas.arr_pop[p]['q'],
-			                   pop_v0_vec, fv,
+			                   pop_v0_vec, pop_fv,
 		                           self.mfi_sig_vec_db_rng_avg,
 #			                   self.mfi_avg_mag_raw_smt,
 #				           self.b0_avg_fields[self.mfi_set_key],
-			                   pop_n, fn, pop_dv, pop_w,
+			                   pop_n, pop_fn, pop_dv, pop_w,
 			                   self.mfi_set_key                  ) )
 
 		# Alter the axis order of the array of currents.
@@ -3056,18 +3160,22 @@ class core( QObject ) :
 				# magnitude thereof) of this ion species (based
 				# on the initial guess).
 
-				vel = array( self.nln_plas['vec_v0'] ) - \
-				      ( sqrt( 2 ) *  self.nln_plas['fv'] *
-				        array( self.mfi_sig_vec_db_rng_avg ) )/\
-				               self.mfi_avg_mag_but_low
+#				vel = array( self.nln_plas['vec_v0'] ) - \
+#				      ( sqrt( 2 ) *  self.nln_plas['fv'] *
+#				        array( self.mfi_sig_vec_db_rng_avg ) )/\
+#				               self.mfi_avg_mag_but_low
 
-#				vel = array( self.nln_plas['vec_v0'] ) -\
+				vel = array( self.nln_plas['vec_v0'] )# -\
 #				      ( self.mfi_avg_nrm/self.mfi_avg_mag ) * \
 #				                    array( self.nln_plas['fv'] )
 
 				if ( self.nln_plas.arr_pop[i]['drift'] ) :
 					vel += self.mfi_avg_nrm * \
 					          self.nln_plas.arr_pop[i]['dv']
+
+				if ( self.nln_plas.arr_pop[i]['flcv'] ) :
+					vel += self.mfi_avg_nrm * \
+					          self.nln_plas.arr_pop[i]['fv']
 
 				v = sqrt( vel[0]**2 + vel[1]**2 + vel[2]**2 )
 
@@ -3194,21 +3302,21 @@ class core( QObject ) :
 
 		k = 3
 
-		if( self.flc_v ) :
-
-			prm_fv = prm[3]
-			k += 1
-		else :
-			prm_fv = 0.
+#		if( self.flc_v ) :
+#
+#			prm_fv = prm[3]
 #			k += 1
-
-		if( self.flc_n ) :
-
-			prm_fn = prm[4]
-			k =+ 1
-		else :
-			prm_fn = 0.
+#		else :
+#			prm_fv = 0.
+##			k += 1
+#
+#		if( self.flc_n ) :
+#
+#			prm_fn = prm[4]
 #			k =+ 1
+#		else :
+#			prm_fn = 0.
+##			k =+ 1
 
 #		prm_fb = ( prm[4]. prm[5]. prm[6] )
 
@@ -3216,12 +3324,35 @@ class core( QObject ) :
 
 		for p in self.nln_gss_pop :
 
+			# Extract the fluctuating velocity of population "p"
+
+			if ( self.nln_plas.arr_pop[p]['flcv'] ) :
+
+				prm_fv = prm[k]
+
+				k += 1
+
+			else :
+
+				prm_fv = 0.
+
 			# Extract the density of population "p".
 
 			prm_n  = prm[k]
-#			prm_fn = prm[k+1]
 
 			k += 1
+
+			# Extract the fluctuating density of population "p"
+
+			if ( self.nln_plas.arr_pop[p]['flcn'] ) :
+
+				prm_fn = prm[k]
+
+				k += 1
+
+			else :
+
+				prm_fn = 0.
 
 			# Determine the bulk velocity of population "p",
 			# extracting (if necessary) the population's drift.
@@ -3255,8 +3386,7 @@ class core( QObject ) :
 
 			for d in range( len( dat ) ) :
 
-				curr[d] += dat[d].calc_curr( self.flc_n,
-				                             self.flc_v,
+				curr[d] += dat[d].calc_curr(
 				           self.nln_plas.arr_pop[p]['m'],
 				           self.nln_plas.arr_pop[p]['q'],
 				           prm_v0, prm_fv,
@@ -3561,7 +3691,7 @@ class core( QObject ) :
 			# current from each population.
 
 			self.nln_res_curr_ion.append(
-			     self.fc_spec.calc_curr ( self.flc_n, self.flc_v,
+			     self.fc_spec.calc_curr (
 			                  self.nln_plas.arr_pop[p]['m'],
 			                  self.nln_plas.arr_pop[p]['q'],
 			                  pop_v0_vec, fv,
