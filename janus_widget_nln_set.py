@@ -260,13 +260,21 @@ class widget_nln_set( QWidget ) :
 				ss_sel_b  = 'background-color: white;\n'
 			else :
 				ss_gss_n  = 'background-color: gray;\n'
+				ss_gss_fn = 'background-color: gray;\n'
+				ss_gss_fv = 'background-color: gray;\n'
 				ss_gss_d  = 'background-color: gray;\n'
 				ss_gss_w  = 'background-color: gray;\n'
 				ss_sel_a  = 'background-color: gray;\n'
 				ss_sel_b  = 'background-color: gray;\n'
 
+			if ( not self.core.nln_plas.arr_pop[p]['flcn'] ) :
+				ss_gss_fn = 'background-color: gray;\n'
+
+			if ( not self.core.nln_plas.arr_pop[p]['flcv'] ) :
+				ss_gss_fv = 'background-color: gray;\n'
+
 			if ( not self.core.nln_plas.arr_pop[p]['drift'] ) :
-				ss_gss_d = 'background-color: gray;\n'
+				ss_gss_d  = 'background-color: gray;\n'
 
 			# Select the text color based on the validity of the
 			# printed parameter value.

@@ -194,7 +194,7 @@ class fc_dat( ) :
 	# DEFINE THE FUNCTION TO CALCULATE EXPECTED MAXWELLIAN CURRENT.
 	#-----------------------------------------------------------------------
 
-	def calc_curr( self, m, q, v0, fv, s_db, n, fn, dv, w, key=None ) :
+	def calc_curr( self, m, q, v0, n, dv, w, fv, fn, s_db, key=None ) :
 
 		if ( n <= 0. ) :
 			return 0.

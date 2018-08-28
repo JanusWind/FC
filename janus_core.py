@@ -2303,15 +2303,13 @@ class core( QObject ) :
 		self.mom_curr = self.fc_spec.calc_curr(
 		                           self.mom_res['m_p'],
 		                           self.mom_res['q_p'],
-		                           self.mom_res['v0_vec'], 0.,
-		                           self.mfi_sig_vec_db_rng_avg,
-#			                   self.mfi_avg_mag_raw_smt,
-#		                           self.b0_avg_fields[self.mfi_set_key],
-		                           self.mom_res['n_p_c'], 0., 0.,
+		                           self.mom_res['v0_vec'],
+		                           self.mom_res['n_p_c'], 0.,
 		                           self.mom_res['w_p_c'],
+		                           0., 0.,
+		                           self.mfi_sig_vec_db_rng_avg,
 		                           self.mfi_set_key                    )
 
-		print self.mom_res['v0_vec']
 		# Message the user that the moments analysis has completed.
 
 		self.emit( SIGNAL('janus_mesg'), 'core', 'end', 'mom' )
@@ -3051,12 +3049,10 @@ class core( QObject ) :
 			     self.fc_spec.calc_curr( 
 			                   self.nln_plas.arr_pop[p]['m'],
 			                   self.nln_plas.arr_pop[p]['q'],
-			                   pop_v0_vec, pop_fv,
+			                   pop_v0_vec, pop_n, pop_dv,
+			                   pop_w, pop_fv, pop_fn,
 		                           self.mfi_sig_vec_db_rng_avg,
-#			                   self.mfi_avg_mag_raw_smt,
-#				           self.b0_avg_fields[self.mfi_set_key],
-			                   pop_n, pop_fn, pop_dv, pop_w,
-			                   self.mfi_set_key                  ) )
+			                   self.mfi_set_key  ) )
 
 		# Alter the axis order of the array of currents.
 
@@ -3399,11 +3395,9 @@ class core( QObject ) :
 				curr[d] += dat[d].calc_curr(
 				           self.nln_plas.arr_pop[p]['m'],
 				           self.nln_plas.arr_pop[p]['q'],
-				           prm_v0, prm_fv,
+				           prm_v0, prm_n, prm_dv,
+				           prm_w, prm_fv, prm_fn,
 		                           self.mfi_sig_vec_db_rng_avg,
-#			                   self.mfi_avg_mag_raw_smt,
-#				           self.b0_avg_fields[self.mfi_set_key],
-				           prm_n, prm_fn, prm_dv, prm_w,
 				           self.mfi_set_key                    )
 
 		# Return the list of total currents from all modeled ion
@@ -3670,12 +3664,6 @@ class core( QObject ) :
 
 			pop_n      = fit[c]
 			pop_sig_n  = sig[c]
-
-#			pop_fn     = fit[c+1]
-#			pop_sig_fn = sig[c+1]
-
-#			print ( 'fn = ','%0.3f' % pop_fn, '%0.3f' % pop_sig_fn )
-
 			c += 1
 
 			if ( pop_flcn ) :
@@ -3722,11 +3710,9 @@ class core( QObject ) :
 			     self.fc_spec.calc_curr (
 			                  self.nln_plas.arr_pop[p]['m'],
 			                  self.nln_plas.arr_pop[p]['q'],
-			                  pop_v0_vec, pop_fv,
+			                  pop_v0_vec, pop_n, pop_dv,
+			                  pop_w, pop_fv, pop_fn,
 		                          self.mfi_sig_vec_db_rng_avg,
-#			                  self.mfi_avg_mag_raw_smt,
-#			                  self.b0_avg_fields[self.mfi_set_key],
-			                  pop_n, pop_fn, pop_dv, pop_w,
 			                  self.mfi_set_key                   ) )
 
 		# Save the results of the this non-linear analysis to the
