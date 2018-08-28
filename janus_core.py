@@ -2953,15 +2953,7 @@ class core( QObject ) :
 
 		pop_v0_vec = self.nln_plas['v0_vec']
 
-#		fv = self.nln_plas['fv']
-
-#		fn = self.nln_plas['fn']
-
 		self.nln_gss_prm = list( pop_v0_vec )
-
-#		self.nln_gss_prm.append( fv )
-
-#		self.nln_gss_prm.append( fn )
 
 		self.nln_gss_curr_ion = [ ]
 
@@ -2982,13 +2974,6 @@ class core( QObject ) :
 
 			self.nln_gss_prm.append( pop_n )
 
-#			# Extract the population's fluctuating density and add
-#			# add it to the parameter array.
-#
-#			pop_fn = self.nln_plas.arr_pop[p]['fn']
-#
-#			self.nln_gss_prm.append( pop_fn )
-#
 			# If the population is drifting, extract its drift and
 			# add it to the parameter array.  Otherwise, set the
 			# drift as zero.
@@ -3166,14 +3151,7 @@ class core( QObject ) :
 				# magnitude thereof) of this ion species (based
 				# on the initial guess).
 
-#				vel = array( self.nln_plas['vec_v0'] ) - \
-#				      ( sqrt( 2 ) *  self.nln_plas['fv'] *
-#				        array( self.mfi_sig_vec_db_rng_avg ) )/\
-#				               self.mfi_avg_mag_but_low
-
-				vel = array( self.nln_plas['vec_v0'] )# -\
-#				      ( self.mfi_avg_nrm/self.mfi_avg_mag ) * \
-#				                    array( self.nln_plas['fv'] )
+				vel = array( self.nln_plas['vec_v0'] )
 
 				if ( self.nln_plas.arr_pop[i]['drift'] ) :
 					vel += self.mfi_avg_nrm * \
@@ -3307,26 +3285,6 @@ class core( QObject ) :
 		prm_v0 = ( prm[0], prm[1], prm[2] )
 
 		k = 3
-
-#		if( self.flc_v ) :
-#
-#			prm_fv = prm[3]
-#			k += 1
-#		else :
-#			prm_fv = 0.
-##			k += 1
-#
-#		if( self.flc_n ) :
-#
-#			prm_fn = prm[4]
-#			k =+ 1
-#		else :
-#			prm_fn = 0.
-##			k =+ 1
-
-#		prm_fb = ( prm[4]. prm[5]. prm[6] )
-
-#		k = 5
 
 		for p in self.nln_gss_pop :
 
