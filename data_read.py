@@ -36,7 +36,7 @@ i = 0
 
 #for file in glob.glob("janus_2008-11-04-12-00-41_2008-11-04-12-52-53.jns"):
 #for file in glob.glob("janus_2008-11-04-10-45-35_2008-11-04-12-33-18.jns"):
-for file in glob.glob("janus_2008-11-04-10-45-35_2008-11-04-12-23-31_fm.jns"):
+for file in glob.glob("flcv_flcn.jns"):
 	fname.append( file )
 
 dat    = [0]*len(fname)

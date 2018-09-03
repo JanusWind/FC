@@ -459,28 +459,28 @@ class core( QObject ) :
 					self.nln_pop_vld[p] = True
 					self.nln_plas.add_pop(
 					        'p', name='Core', sym='c',
-					        drift=False, flcn=True,
+					        drift=False, flcn=False,
 				                flcv=True,   aniso=True    )
 				elif ( p == 1 ) :
 					self.nln_pop_use[p] = True
 					self.nln_pop_vld[p] = True
 					self.nln_plas.add_pop(
 					        'p', name='Beam', sym='b',
-					        drift=True, flcn=True,
+					        drift=True, flcn=False,
 				                flcv=True,  aniso=True    )
 				elif ( p == 2 ) :
 					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = True
 					self.nln_plas.add_pop(
 					        'a', name='Core', sym='c',
-					        drift=True, flcn=True,
+					        drift=True, flcn=False,
 				                flcv=True,  aniso=True    )
 				elif ( p == 3 ) :
 					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = True
 					self.nln_plas.add_pop(
 					        'a', name='Beam', sym='b',
-					        drift=True, flcn=True,
+					        drift=True, flcn=False,
 				                flcv=True,  aniso=False   )
 				else :
 					self.nln_pop_use[p] = False
@@ -2856,20 +2856,6 @@ class core( QObject ) :
 			except :
 				self.nln_plas.arr_pop[i]['dv'] = None
 
-		elif ( param == 'fn' ) :
-
-			try :
-				self.nln_plas.arr_pop[i]['fn'] = val
-			except :
-				self.nln_plas.arr_pop[i]['fn'] = None
-
-		elif ( param == 'fv' ) :
-
-			try :
-				self.nln_plas.arr_pop[i]['fv'] = val
-			except :
-				self.nln_plas.arr_pop[i]['fv'] = None
-
 		elif ( param == 'w' ) :
 
 			try :
@@ -2890,6 +2876,20 @@ class core( QObject ) :
 				self.nln_plas.arr_pop[i]['w_par'] = val
 			except :
 				self.nln_plas.arr_pop[i]['w_par'] = None
+
+		elif ( param == 'fn' ) :
+
+			try :
+				self.nln_plas.arr_pop[i]['fn'] = val
+			except :
+				self.nln_plas.arr_pop[i]['fn'] = None
+
+		elif ( param == 'fv' ) :
+
+			try :
+				self.nln_plas.arr_pop[i]['fv'] = val
+			except :
+				self.nln_plas.arr_pop[i]['fv'] = None
 
 		# Run the "make_nln_gss" function to update the "self.nln_gss_"
 		# arrays, widgets, etc.
@@ -2963,9 +2963,9 @@ class core( QObject ) :
 			# and anisotropy states of the population.
 
 			pop_drift = self.nln_plas.arr_pop[p]['drift']
+			pop_aniso = self.nln_plas.arr_pop[p]['aniso']
 			pop_flcn  = self.nln_plas.arr_pop[p]['flcn' ]
 			pop_flcv  = self.nln_plas.arr_pop[p]['flcv' ]
-			pop_aniso = self.nln_plas.arr_pop[p]['aniso']
 
 			# Extract the population's density and add it to the
 			# parameter array.
@@ -2985,6 +2985,23 @@ class core( QObject ) :
 				self.nln_gss_prm.append( pop_dv )
 			else :
 				pop_dv = 0.
+
+			# If the population is anisotropic, extract its
+			# perpendicular and parallel thermal-speeds and add them
+			# to the parameter array.  Otherwise, extract its scalar
+			# thermal speed and add it to the parameter array.
+
+			if ( pop_aniso ) :
+
+				pop_w     = ( self.nln_plas.arr_pop[p]['w_per'],
+				              self.nln_plas.arr_pop[p]['w_par'])
+
+				self.nln_gss_prm.append( pop_w[0] )
+				self.nln_gss_prm.append( pop_w[1] )
+			else :
+				pop_w     = self.nln_plas.arr_pop[p]['w']
+
+				self.nln_gss_prm.append( pop_w )
 
 			# If the population's density is fluctuating, extract
 			# its fluctuation and add it to the parameter array.
@@ -3010,23 +3027,6 @@ class core( QObject ) :
 			else :
 				pop_fv = 0.
 
-			# If the population is anisotropic, extract its
-			# perpendicular and parallel thermal-speeds and add them
-			# to the parameter array.  Otherwise, extract its scalar
-			# thermal speed and add it to the parameter array.
-
-			if ( pop_aniso ) :
-
-				pop_w     = ( self.nln_plas.arr_pop[p]['w_per'],
-				              self.nln_plas.arr_pop[p]['w_par'])
-
-				self.nln_gss_prm.append( pop_w[0] )
-				self.nln_gss_prm.append( pop_w[1] )
-			else :
-				pop_w     = self.nln_plas.arr_pop[p]['w']
-
-				self.nln_gss_prm.append( pop_w )
-
 			# For each datum in the spectrum, compute the expected
 			# current from each population.
 #			print fv
@@ -3035,7 +3035,7 @@ class core( QObject ) :
 			                   self.nln_plas.arr_pop[p]['m'],
 			                   self.nln_plas.arr_pop[p]['q'],
 			                   pop_v0_vec, pop_n, pop_dv,
-			                   pop_w, pop_fv, pop_fn,
+			                   pop_w, pop_fn, pop_fv,
 		                           self.mfi_sig_vec_db_rng_avg,
 			                   self.mfi_set_key  ) )
 
@@ -3288,35 +3288,11 @@ class core( QObject ) :
 
 		for p in self.nln_gss_pop :
 
-			# Extract the fluctuating velocity of population "p"
-
-			if ( self.nln_plas.arr_pop[p]['flcv'] ) :
-
-				prm_fv = prm[k]
-
-				k += 1
-
-			else :
-
-				prm_fv = 0.
-
 			# Extract the density of population "p".
 
 			prm_n  = prm[k]
 
 			k += 1
-
-			# Extract the fluctuating density of population "p"
-
-			if ( self.nln_plas.arr_pop[p]['flcn'] ) :
-
-				prm_fn = prm[k]
-
-				k += 1
-
-			else :
-
-				prm_fn = 0.
 
 			# Determine the bulk velocity of population "p",
 			# extracting (if necessary) the population's drift.
@@ -3345,6 +3321,30 @@ class core( QObject ) :
 
 				k += 1
 
+			# Extract the fluctuating density of population "p"
+
+			if ( self.nln_plas.arr_pop[p]['flcn'] ) :
+
+				prm_fn = prm[k]
+
+				k += 1
+
+			else :
+
+				prm_fn = 0.
+
+			# Extract the fluctuating velocity of population "p"
+
+			if ( self.nln_plas.arr_pop[p]['flcv'] ) :
+
+				prm_fv = prm[k]
+
+				k += 1
+
+			else :
+
+				prm_fv = 0.
+
 			# Add the contribution of this ion species to
 			# the total currents.
 
@@ -3354,7 +3354,7 @@ class core( QObject ) :
 				           self.nln_plas.arr_pop[p]['m'],
 				           self.nln_plas.arr_pop[p]['q'],
 				           prm_v0, prm_n, prm_dv,
-				           prm_w, prm_fv, prm_fn,
+				           prm_w, prm_fn, prm_fv,
 		                           self.mfi_sig_vec_db_rng_avg,
 				           self.mfi_set_key                    )
 
@@ -3605,32 +3605,16 @@ class core( QObject ) :
 
 			# Add the population itself to the results.
 
-			pop_drift  = self.nln_plas.arr_pop[p]['drift']
-			pop_flcn   = self.nln_plas.arr_pop[p]['flcn' ]
-			pop_flcv   = self.nln_plas.arr_pop[p]['flcv' ]
-			pop_aniso  = self.nln_plas.arr_pop[p]['aniso']
 			pop_name   = self.nln_plas.arr_pop[p]['name' ]
 			pop_sym    = self.nln_plas.arr_pop[p]['sym'  ]
-
-			if ( pop_flcv ) :
-				pop_fv     = fit[c]
-				pop_sig_fv = sig[c]
-				c += 1
-			else :
-				pop_fv     = None
-				pop_sig_fv = None
+			pop_drift  = self.nln_plas.arr_pop[p]['drift']
+			pop_aniso  = self.nln_plas.arr_pop[p]['aniso']
+			pop_flcn   = self.nln_plas.arr_pop[p]['flcn' ]
+			pop_flcv   = self.nln_plas.arr_pop[p]['flcv' ]
 
 			pop_n      = fit[c]
 			pop_sig_n  = sig[c]
 			c += 1
-
-			if ( pop_flcn ) :
-				pop_fn     = fit[c]
-				pop_sig_fn = sig[c]
-				c += 1
-			else :
-				pop_fn     = None
-				pop_sig_fn = None
 
 			if ( pop_drift ) :
 				pop_dv     = fit[c]
@@ -3653,13 +3637,41 @@ class core( QObject ) :
 				pop_sig_w_par = None
 				c += 1
 
+			if ( pop_flcn ) :
+				pop_fn     = fit[c]
+				pop_sig_fn = sig[c]
+				c += 1
+			else :
+				pop_fn     = None
+				pop_sig_fn = None
+
+			if ( pop_flcv ) :
+				pop_fv     = fit[c]
+				pop_sig_fv = sig[c]
+				c += 1
+			else :
+				pop_fv     = None
+				pop_sig_fv = None
+
+#		print ('fv = ', " %.3f " % fit[3], " %.3f " % sig[3] ,
+#		                     self.time_epc.time().strftime("%H-%M-%S") )
+#		print ('fn = ', " %.3f " % fit[4], " %.3f " % sig[4] ,
+#		                     self.time_epc.time().strftime("%H-%M-%S") )
 			self.nln_res_plas.add_pop(
 			      spc=spc_name, drift=pop_drift, flcn=pop_flcn,
 			      flcv=pop_flcv, aniso=pop_aniso, name=pop_name,
 			      sym=pop_sym, n=pop_n, dv=pop_dv,
-			      w=pop_w, sig_n=pop_sig_n,
-			      sig_dv=pop_sig_dv, sig_w=pop_sig_w,
+			      fn=pop_fn, fv=pop_fv,
+			      w=pop_w, sig_n=pop_sig_n, sig_fn=pop_sig_fn,
+			      sig_fv=pop_sig_fv, sig_dv=pop_sig_dv,
+			      sig_w=pop_sig_w,
 			      sig_w_per=pop_sig_w_per, sig_w_par=pop_sig_w_par )
+
+			if( pop_flcv ) :
+				print self.nln_res_plas.arr_pop[p]['fv'], fit[c-1]
+
+			if( pop_flcn ) :
+				print self.nln_res_plas.arr_pop[p]['fn'], fit[c-2]
 
 			# For each datum in the spectrum, compute the expected
 			# current from each population.
@@ -3669,7 +3681,7 @@ class core( QObject ) :
 			                  self.nln_plas.arr_pop[p]['m'],
 			                  self.nln_plas.arr_pop[p]['q'],
 			                  pop_v0_vec, pop_n, pop_dv,
-			                  pop_w, pop_fv, pop_fn,
+			                  pop_w, pop_fn, pop_fv,
 		                          self.mfi_sig_vec_db_rng_avg,
 			                  self.mfi_set_key                   ) )
 

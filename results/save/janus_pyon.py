@@ -31,8 +31,8 @@ from janus_const import const
 ## DEFINE THE LIST OF RESERVED NAMES.
 ################################################################################
 
-PARAM = [ 'b0', 'v0', 'fv', 'n', 'v', 'dv', 'w', 'w2', 'r', 't', 'beta', 'time',
-          's', 'm','q', 'k', 'beta', 'beta', 'alfvel', 'oplas', 'ocycl',
+PARAM = [ 'b0', 'v0', 'fv', 'n', 'fn', 'v', 'dv', 'w', 'w2', 'r', 't', 'beta',
+          'time', 's', 'm','q', 'k', 'beta', 'beta', 'alfvel', 'oplas', 'ocycl',
           'ogyro'                                                              ]
 
 COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat', 'fields' ]
@@ -156,7 +156,6 @@ class plas( object ) :
 		self.v0_y = None
 		self.v0_z = None
 
-		self.sig_fv   = None
 		self.sig_v0_x = None
 		self.sig_v0_y = None
 		self.sig_v0_z = None
@@ -394,12 +393,9 @@ class plas( object ) :
 				elif ( elem['comp'] == 'y' ) :
 					return self.b0_y
 				elif ( elem['comp'] == 'z' ) :
-					print elem['comp']
 					return self.b0_z
 				elif ( elem['comp'] == 'fields' ) :
 
-					print elem['comp']
-					print elem['comp2'], 1
 					if( elem['comp2'] == 'raw' ) :
 						return self.b0_fields_raw
 					elif( elem['comp2'] == 'smt' ) :
@@ -408,9 +404,7 @@ class plas( object ) :
 						return self.b0_fields_avg
 					elif( elem['comp2'] == 'db' ) :
 						return self.b0_fields_db
-					print elem['comp2']
 				else :
-					print 'Hello'
 					return None
 
 			else :
@@ -457,18 +451,31 @@ class plas( object ) :
 				else :
 					return None
 
-		elif ( elem['param'] == 'fv' ) :
-
-			if ( elem['sigma'] is None ) :
-
-				if ( ( elem['comp'] is None  ) or
-				     ( elem['comp'] == 'mag' )    ) :
-					return self.fv
-				else :
-					return None
-
-			else :
-				return self.sig_fv
+#		elif ( elem['param'] == 'fv' ) :
+#
+#			if ( elem['sigma'] is None ) :
+#
+#				if ( ( elem['comp'] is None  ) or
+#				     ( elem['comp'] == 'mag' )    ) :
+#					return self.fv
+#				else :
+#					return None
+#
+#			else :
+#				return self.sig_fv
+#
+#		elif ( elem['param'] == 'fn' ) :
+#
+#			if ( elem['sigma'] is None ) :
+#
+#				if ( ( elem['comp'] is None  ) or
+#				     ( elem['comp'] == 'mag' )    ) :
+#					return self.fn
+#				else :
+#					return None
+#
+#			else :
+#				return self.sig_fn
 
 		elif ( elem['param'] == 'oplas' ) :
 
@@ -588,6 +595,14 @@ class plas( object ) :
 
 				self.fv = float( value )
 
+		elif ( key == 'fn' ) :
+
+			self.fn = None
+
+			if ( value is not None ) :
+
+				self.fn = float( value )
+
 		elif ( key == 'sig_v0_x' ) :
 
 			self.sig_v0_x = None
@@ -611,6 +626,14 @@ class plas( object ) :
 			if ( value is not None ) :
 
 				self.sig_v0_z = float( value )
+
+		elif ( key == 'sig_fn' ) :
+
+			self.sig_fn = None
+
+			if ( value is not None ) :
+
+				self.sig_fn = float( value )
 
 		elif ( key == 'sig_fv' ) :
 
@@ -861,20 +884,23 @@ class plas( object ) :
 	#-----------------------------------------------------------------------
 
 	def add_pop( self, spc,
-	             drift=False, aniso=False,
-	             name=None, sym=None, n=None, dv=None,
+	             drift=False, flcn= False, flcv=False, aniso=False,
+	             name=None, sym=None, n=None, fn=None, fv=None, dv=None,
 	             w=None, w_per=None, w_par=None,
-	             sig_n=None, sig_dv=None, sig_w=None,
-	             sig_w_per=None, sig_w_par=None       ) :
+	             sig_n=None, sig_fn=None, sig_fv=None, sig_dv=None,
+	             sig_w=None, sig_w_per=None, sig_w_par=None       ) :
 
 		self.arr_pop.append( pop( self,
 		                          self.get_spec( spc ),
-		                          drift=drift, aniso=aniso,
+		                          drift=drift, flcn=flcn,
+		                          flcv=flcv, aniso=aniso,
 		                          name=name, sym=sym,
-		                          n=n, dv=dv, w=w,
+					  n=n, fn=fn, fv=fv, dv=dv, w=w,
 		                          w_per=w_per, w_par=w_par,
-		                          sig_n=sig_n, sig_dv=sig_dv,
-		                          sig_w=sig_w, sig_w_per=sig_w_per,
+		                          sig_n=sig_n, sig_fn=sig_fn,
+		                          sig_fv=sig_fv, sig_dv=sig_dv,
+		                          sig_w=sig_w,
+		                          sig_w_per=sig_w_per,
 		                          sig_w_par=sig_w_par ) )
 
 	#-----------------------------------------------------------------------
@@ -1065,6 +1091,23 @@ class spec( object ) :
 
 			return sum( arr_n )
 
+		elif ( key == 'fn' ) :
+
+			arr_pop = self.my_plas.lst_pop( self )
+
+			if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+				return None
+
+			arr_n  = [ p['n']  for p in arr_pop ]
+			arr_fn = [ p['fn'] for p in arr_pop ]
+
+			if ( None in arr_n ) :
+				return None
+
+			return sum( [ x*y/sum( arr_n )
+			              for x,y in zip( arr_n, arr_fn ) ] )
+
+
 		elif ( ( key == 'dv' ) or ( key == 'dv_mag' )
 		                       or ( key == 'dv_par' ) ) :
 
@@ -1104,11 +1147,49 @@ class spec( object ) :
 			         dv_mag * b0_hat[1],
 			         dv_mag * b0_hat[2]  )
 
+		elif ( key == 'fv' ) :
+
+			arr_pop = self.my_plas.lst_pop( self )
+
+			if ( ( arr_pop is None ) or ( len( arr_pop ) == 0 ) ) :
+				return None
+
+			arr_v  = [ p['v']  for p in arr_pop ]
+			arr_fv = [ p['fv'] for p in arr_pop ]
+
+			if ( None in arr_v ) :
+				return None
+
+			return sum( [ x*y/sum( arr_v )
+			              for x,y in zip( arr_v, arr_fv ) ] )
+
+		elif ( key == 'fv_vec' ) :
+
+			fv_mag = self['fv']
+
+			if   ( fv_mag is None ) :
+				return None
+			elif ( fv_mag == 0. ) :
+				return ( 0., 0., 0. )
+
+			b0_hat = self.my_plas.get_b0_hat( )
+
+			if ( b0_hat is None ) :
+				return None
+
+			return ( fv_mag * b0_hat[0],
+			         fv_mag * b0_hat[1],
+			         fv_mag * b0_hat[2]  )
+
 		elif ( key == 'v_vec' ) :
 
 			dv_vec = self['dv_vec']
+			fv_vec = self['fv_vec']
 
 			if ( dv_vec is None ) :
+				return None
+
+			if ( fv_vec is None ) :
 				return None
 
 			v0_vec = self.my_plas.get_v0_vec( )
@@ -1116,9 +1197,9 @@ class spec( object ) :
 			if ( v0_vec is None ) :
 				return None
 
-			return ( dv_vec[0] + v0_vec[0],
-			         dv_vec[1] + v0_vec[1],
-			         dv_vec[2] + v0_vec[2]  )
+			return ( fv_vec[0] + dv_vec[0] + v0_vec[0],
+			         fv_vec[1] + dv_vec[1] + v0_vec[1],
+			         fv_vec[2] + dv_vec[2] + v0_vec[2]  )
 
 		elif ( ( key == 'v' ) or ( key == 'v_mag' ) ) :
 
@@ -1340,7 +1421,7 @@ class spec( object ) :
 			n    = sum( arr_n )
 
 			ret  = ( b0 / 1.E12 )
-			ret /= ( n * 1.E6 * const['m_p'] * const['mu_0'] )**0.5
+#			ret /= ( n * 1.E6 * const['m_p'] * const['mu_0'] )**0.5
 
 			return  ret
 
@@ -1638,26 +1719,32 @@ class pop( object ) :
 	#-----------------------------------------------------------------------
 
 	def __init__( self, my_plas, my_spec,
-	              drift=False, aniso=False,
+	              drift=False, flcn=False, flcv=False, aniso=False,
 	              name=None, sym=None,
-	              n=None, fv=None, dv=None, w=None,
+	              n=None, fn=None, fv=None, dv=None, w=None,
 	              w_per=None, w_par=None,
-	              sig_n=None, sig_fv=None, sig_dv=None, sig_w=None,
-	              sig_w_per=None, sig_w_par=None, oplas=None       ) :
+	              sig_n=None, sig_fn=None, sig_fv=None, sig_dv=None,
+	              sig_w=None, sig_w_per=None, sig_w_par=None, oplas=None ) :
 
 		self.my_plas = my_plas
 		self.my_spec = my_spec
 		self.drift   = bool( drift )
+		self.flcn    = bool( flcn )
+		self.flcv    = bool( flcv )
 		self.aniso   = bool( aniso )
 
 		self.name      = None
 		self.sym       = None
 		self.n         = None
+		self.fn        = None
 		self.dv        = None
+		self.fv        = None
 		self.w         = None
 		self.w_per     = None
 		self.w_par     = None
 		self.sig_n     = None
+		self.sig_fn    = None
+		self.sig_fv    = None
 		self.sig_dv    = None
 		self.sig_w     = None
 		self.sig_w_per = None
@@ -1670,8 +1757,12 @@ class pop( object ) :
 			self['sym'] = sym
 		if ( n is not None ) :
 			self['n'] = n
+		if ( fn is not None ) :
+			self['fn'] = fn
 		if ( dv is not None ) :
 			self['dv'] = dv
+		if ( fv is not None ) :
+			self['fv'] = fv
 		if ( w is not None ) :
 			self['w'] = w
 		if ( w_per is not None ) :
@@ -1680,6 +1771,10 @@ class pop( object ) :
 			self['w_par'] = w_par
 		if ( sig_n is not None ) :
 			self['sig_n'] = sig_n
+		if ( sig_fn is not None ) :
+			self['sig_fn'] = sig_fn
+		if ( sig_fv is not None ) :
+			self['sig_fv'] = sig_fv
 		if ( sig_dv is not None ) :
 			self['sig_dv'] = sig_dv
 		if ( sig_w is not None ) :
@@ -1725,6 +1820,14 @@ class pop( object ) :
 		elif ( key == 'drift' ) :
 
 			return self.drift
+
+		elif ( key == 'flcn' ) :
+
+			return self.flcn
+
+		elif ( key == 'flcv' ) :
+
+			return self.flcv
 
 		elif ( key == 'aniso' ) :
 
@@ -1792,6 +1895,35 @@ class pop( object ) :
 
 			return self.n
 
+		elif ( key == 'fn' ) :
+
+			return self.fn
+
+		elif ( ( key == 'fv' ) or ( key == 'fv_mag' )
+		                       or ( key == 'fv_per' ) ) :
+
+			if ( self.flcv ) :
+				return self.fv
+			else :
+				return 0.
+
+		elif ( key == 'fv_vec' ) :
+
+			if ( not self.flcv ) :
+				return ( 0., 0., 0. )
+
+			if ( self.dv is None ) :
+				return None
+
+			b0_hat = self.my_plas.get_b0_hat( )
+
+			if ( b0_hat is None ) :
+				return None
+
+			return ( b0_hat[0] * self.fv,
+			         b0_hat[1] * self.fv,
+			         b0_hat[2] * self.fv  )
+
 		elif ( ( key == 'dv' ) or ( key == 'dv_mag' )
 		                       or ( key == 'dv_per' ) ) :
 
@@ -1827,9 +1959,9 @@ class pop( object ) :
 			if ( ( dv_vec is None ) or ( v0_vec is None ) ) :
 				return None
 
-			return ( v0_vec[0] + dv_vec[0],
-			         v0_vec[1] + dv_vec[1],
-			         v0_vec[2] + dv_vec[2]  )
+			return ( v0_vec[0] + fv_vec[0]+ dv_vec[0],
+			         v0_vec[1] + fv_vec[1]+ dv_vec[1],
+			         v0_vec[2] + fv_vec[2]+ dv_vec[2]  )
 
 		elif ( ( key == 'v' ) or ( key == 'v_mag' ) ) :
 
@@ -1974,6 +2106,20 @@ class pop( object ) :
 
 			return self.sig_n
 
+		elif ( key == 'sig_fn' ) :
+
+			if ( self.flcn ) :
+				return self.sig_fn
+			else :
+				return None
+
+		elif ( key == 'sig_fv' ) :
+
+			if ( self.flcv ) :
+				return self.sig_fv
+			else :
+				return None
+
 		elif ( key == 'sig_dv' ) :
 
 			if ( self.drift ) :
@@ -2033,7 +2179,7 @@ class pop( object ) :
 			n    = self['n']
 
 			ret  = ( b0 / 1.E12 )
-			ret /= ( n * 1.E6 * const['m_p'] * const['mu_0'] )**0.5
+#			ret /= ( n * 1.E6 * const['m_p'] * const['mu_0'] )**0.5
 
 			return  ret
 
@@ -2114,6 +2260,28 @@ class pop( object ) :
 
 			if ( val_err ) :
 				raise ValueError( 'Name/symbol in use.' )
+
+		elif ( key == 'flcn' ) :
+
+			value = bool( value )
+
+			if ( self.flcn == value ) :
+				return
+
+			self.flcn = value
+
+			self.fn = 0. if ( self.flcn ) else None
+
+		elif ( key == 'flcv' ) :
+
+			value = bool( value )
+
+			if ( self.flcv == value ) :
+				return
+
+			self.flcv = value
+
+			self.fv = 0. if ( self.flcv ) else None
 
 		elif ( key == 'drift' ) :
 
@@ -2260,6 +2428,62 @@ class pop( object ) :
 
 			self.n = value
 
+#		elif ( key == 'fn' ) :
+#
+#			if ( value is None ) :
+#
+#				self.fn = None
+#
+#				return
+#
+#			value = float( value )
+#
+#			if ( ( self.my_plas.enforce ) and
+#			     ( value < 0           )     ) :
+#
+#				self.fn = None
+#
+#				raise ValueError(
+#				            'Density enforced to be positive.' )
+#
+#				return
+#
+#			self.fn = value
+
+		elif ( key == 'fn' ) :
+
+			if ( value is None ) :
+
+				self.fn = None
+
+				return
+
+			if ( not self.flcn ) :
+
+				raise KeyError(
+				 'Population has no density fluctuation.' )
+
+				return
+
+			self.fn = float( value )
+
+		elif ( key == 'fv' ) :
+
+			if ( value is None ) :
+
+				self.fv = None
+
+				return
+
+			if ( not self.flcv ) :
+
+				raise KeyError(
+				     'Population has no velocity fluctuation.' )
+
+				return
+
+			self.fv = float( value )
+
 		elif ( key == 'dv' ) :
 
 			if ( value is None ) :
@@ -2384,6 +2608,20 @@ class pop( object ) :
 			else :
 				self.sig_n = float( value )
 
+		elif ( key == 'sig_fn' ) :
+
+			if ( value is None ) :
+				self.sig_fn = None
+			else :
+				self.sig_fn = float( value )
+
+		elif ( key == 'sig_fv' ) :
+
+			if ( value is None ) :
+				self.sig_fv = None
+			else :
+				self.sig_fv = float( value )
+
 		elif ( key == 'sig_dv' ) :
 
 			if ( value is None ) :
@@ -2492,6 +2730,16 @@ class pop( object ) :
 		# "False".
 
 		if ( self.n is None ) :
+
+			return False
+
+		if ( ( self.flcn      ) and
+		     ( self.fn is None )     ) :
+
+			return False
+
+		if ( ( self.flcv      ) and
+		     ( self.fv is None )     ) :
 
 			return False
 

@@ -85,6 +85,8 @@ class widget_nln_gss( QWidget ) :
 
 		self.hdr_name = QLabel( 'Ion Population' )
 		self.hdr_n    = QLabel( 'n [cm^-3]'      )
+		self.hdr_fn   = QLabel( 'fn [cm^-3]'     )
+		self.hdr_fv   = QLabel( 'fv [km/s]'      )
 		self.hdr_d    = QLabel( 'dv [km/s]'      )
 		self.hdr_w    = QLabel( 'w [km/s]'       )
 
@@ -100,6 +102,8 @@ class widget_nln_gss( QWidget ) :
 
 		self.arr_name = tile( None, self.core.nln_n_pop )
 		self.arr_n    = tile( None, self.core.nln_n_pop )
+		self.arr_fn   = tile( None, self.core.nln_n_pop )
+		self.arr_fv   = tile( None, self.core.nln_n_pop )
 		self.arr_d    = tile( None, self.core.nln_n_pop )
 		self.arr_ws   = tile( None, self.core.nln_n_pop )
 		self.arr_we   = tile( None, self.core.nln_n_pop )
@@ -110,43 +114,49 @@ class widget_nln_gss( QWidget ) :
 			txt_i = str( i )
 
 			self.arr_name[i] = QLabel( '' )
-			self.arr_n[i]    = event_LineEdit( self, 'nn'+txt_i )
-			self.arr_d[i]    = event_LineEdit( self, 'dd'+txt_i )
-			self.arr_ws[i]   = event_LineEdit( self, 'ws'+txt_i )
-			self.arr_we[i]   = event_LineEdit( self, 'we'+txt_i )
-			self.arr_wa[i]   = event_LineEdit( self, 'wa'+txt_i )
+			self.arr_n[i]    = event_LineEdit( self, 'nn'+txt_i  )
+			self.arr_fn[i]   = event_LineEdit( self, 'ffn'+txt_i )
+			self.arr_fv[i]   = event_LineEdit( self, 'ffv'+txt_i )
+			self.arr_d[i]    = event_LineEdit( self, 'dd'+txt_i  )
+			self.arr_ws[i]   = event_LineEdit( self, 'ws'+txt_i  )
+			self.arr_we[i]   = event_LineEdit( self, 'we'+txt_i  )
+			self.arr_wa[i]   = event_LineEdit( self, 'wa'+txt_i  )
 
 		# Row by row, add the labels, check boxes, and text areas, to
 		# this widget's grid.
 
-		self.grd.addWidget( self.hdr_name, 0, 0, 1, 4 )
-		self.grd.addWidget( self.hdr_n   , 0, 4, 1, 2, Qt.AlignCenter )
-		self.grd.addWidget( self.hdr_d   , 0, 6, 1, 2, Qt.AlignCenter )
-		self.grd.addWidget( self.hdr_w   , 0, 8, 1, 4, Qt.AlignCenter )
+		self.grd.addWidget( self.hdr_name, 0, 0,  1, 4 )
+		self.grd.addWidget( self.hdr_n   , 0, 4,  1, 2, Qt.AlignCenter )
+		self.grd.addWidget( self.hdr_fn  , 0, 6,  1, 2, Qt.AlignCenter )
+		self.grd.addWidget( self.hdr_fv  , 0, 8,  1, 2, Qt.AlignCenter )
+		self.grd.addWidget( self.hdr_d   , 0, 10, 1, 2, Qt.AlignCenter )
+		self.grd.addWidget( self.hdr_w   , 0, 12, 1, 4, Qt.AlignCenter )
 
 		for i in range( self.core.nln_n_pop ) :
 
 			self.grd.addWidget( self.arr_name[i], i+1,  0, 1, 4 )
 			self.grd.addWidget( self.arr_n[i]   , i+1,  4, 1, 2 )
-			self.grd.addWidget( self.arr_d[i]   , i+1,  6, 1, 2 )
-			self.grd.addWidget( self.arr_ws[i]  , i+1,  9, 1, 2 )
-			self.grd.addWidget( self.arr_wa[i]  , i+1,  8, 1, 2 )
-			self.grd.addWidget( self.arr_we[i]  , i+1, 10, 1, 2 )
+			self.grd.addWidget( self.arr_fn[i]  , i+1,  6, 1, 2 )
+			self.grd.addWidget( self.arr_fv[i]  , i+1,  8, 1, 2 )
+			self.grd.addWidget( self.arr_d[i]   , i+1,  10, 1, 2 )
+			self.grd.addWidget( self.arr_ws[i]  , i+1,  13, 1, 2 )
+			self.grd.addWidget( self.arr_wa[i]  , i+1,  12, 1, 2 )
+			self.grd.addWidget( self.arr_we[i]  , i+1,  14, 1, 2 )
 
 		i = self.core.nln_n_pop + 1
 
-		self.grd.addWidget( self.hline, i, 0, 1, 12 )
+		self.grd.addWidget( self.hline, i, 0, 1, 16 )
 
 		i = self.core.nln_n_pop + 2
 
-		self.grd.addWidget( self.vel_lab, i, 0, 1, 4, Qt.AlignRight  )
-		self.grd.addWidget( self.vel_x  , i, 4, 1, 2, Qt.AlignCenter )
-		self.grd.addWidget( self.vel_y  , i, 6, 1, 2, Qt.AlignCenter )
-		self.grd.addWidget( self.vel_z  , i, 8, 1, 2, Qt.AlignCenter )
+		self.grd.addWidget( self.vel_lab, i, 0,  1, 4, Qt.AlignRight  )
+		self.grd.addWidget( self.vel_x  , i, 5,  1, 2, Qt.AlignCenter )
+		self.grd.addWidget( self.vel_y  , i, 9,  1, 2, Qt.AlignCenter )
+		self.grd.addWidget( self.vel_z  , i, 13, 1, 2, Qt.AlignCenter )
 
 		# Regularize the grid spacing.
 
-		for i in range( 12 ) :
+		for i in range( 16 ) :
 			self.grd.setColumnStretch( i, 1 )
 
 		for i in range( self.core.nln_n_pop + 3 ) :
@@ -188,6 +198,8 @@ class widget_nln_gss( QWidget ) :
 			# parameters.
 
 			val_n  = self.core.nln_plas.arr_pop[i]['n']
+			val_fn = self.core.nln_plas.arr_pop[i]['fn']
+			val_fv = self.core.nln_plas.arr_pop[i]['fv']
 			val_d  = self.core.nln_plas.arr_pop[i]['dv']
 			val_ws = self.core.nln_plas.arr_pop[i]['w']
 			val_we = self.core.nln_plas.arr_pop[i]['w_per']
@@ -199,6 +211,16 @@ class widget_nln_gss( QWidget ) :
 				self.arr_n[i].setTextUpdate( str( val_n ) )
 			elif ( self.core.dyn_gss ) :
 				self.arr_n[i].setTextUpdate( '' )
+
+			if ( val_fn is not None ) :
+				self.arr_fn[i].setTextUpdate( str( val_fn ) )
+			elif ( self.core.dyn_gss ) :
+				self.arr_fn[i].setTextUpdate( '' )
+
+			if ( val_fv is not None ) :
+				self.arr_fv[i].setTextUpdate( str( val_fv ) )
+			elif ( self.core.dyn_gss ) :
+				self.arr_fv[i].setTextUpdate( '' )
 
 			if ( val_d is not None ) :
 				self.arr_d[i].setTextUpdate( str( val_d ) )
@@ -222,6 +244,16 @@ class widget_nln_gss( QWidget ) :
 
 			# Determine which text boxes should be visible.
 
+			if ( self.core.nln_plas.arr_pop[i]['flcn'] ) :
+				self.arr_fn[i].show( )
+			else :
+				self.arr_fn[i].hide( )
+
+			if ( self.core.nln_plas.arr_pop[i]['flcv'] ) :
+				self.arr_fv[i].show( )
+			else :
+				self.arr_fv[i].hide( )
+
 			if ( self.core.nln_plas.arr_pop[i]['drift'] ) :
 				self.arr_d[i].show( )
 			else :
@@ -244,12 +276,16 @@ class widget_nln_gss( QWidget ) :
 			     ( ( self.core.nln_set_gss_vld[i] ) or
 			       ( not self.core.dyn_gss        )    )     ) :
 				ss_n  = 'background-color: white;\n'
+				ss_fn = 'background-color: white;\n'
+				ss_fv = 'background-color: white;\n'
 				ss_d  = 'background-color: white;\n'
 				ss_ws = 'background-color: white;\n'
 				ss_we = 'background-color: white;\n'
 				ss_wa = 'background-color: white;\n'
 			else :
 				ss_n  = 'background-color: gray;\n'
+				ss_fn = 'background-color: gray;\n'
+				ss_fv = 'background-color: gray;\n'
 				ss_d  = 'background-color: gray;\n'
 				ss_ws = 'background-color: gray;\n'
 				ss_we = 'background-color: gray;\n'
@@ -327,6 +363,24 @@ class widget_nln_gss( QWidget ) :
 
 			try :
 				val = float( self.arr_n[i].text( ) )
+			except :
+				val = None
+
+		elif ( prfx == 'ffn' ) :
+
+			param = 'fn'
+
+			try :
+				val = float( self.arr_fn[i].text( ) )
+			except :
+				val = None
+
+		if   ( prfx == 'ffv' ) :
+
+			param = 'fv'
+
+			try :
+				val = float( self.arr_fv[i].text( ) )
 			except :
 				val = None
 

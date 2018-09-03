@@ -156,7 +156,6 @@ class plas( object ) :
 		self.v0_y = None
 		self.v0_z = None
 
-#		self.sig_fv   = None
 		self.sig_v0_x = None
 		self.sig_v0_y = None
 		self.sig_v0_z = None
@@ -628,14 +627,6 @@ class plas( object ) :
 
 				self.sig_v0_z = float( value )
 
-		elif ( key == 'sig_fv' ) :
-
-			self.sig_fv = None
-
-			if ( value is not None ) :
-
-				self.sig_fv = float( value )
-
 		elif ( key == 'sig_fn' ) :
 
 			self.sig_fn = None
@@ -643,6 +634,14 @@ class plas( object ) :
 			if ( value is not None ) :
 
 				self.sig_fn = float( value )
+
+		elif ( key == 'sig_fv' ) :
+
+			self.sig_fv = None
+
+			if ( value is not None ) :
+
+				self.sig_fv = float( value )
 
 		elif   ( key == 'b0_x' ) :
 
@@ -888,8 +887,8 @@ class plas( object ) :
 	             drift=False, flcn= False, flcv=False, aniso=False,
 	             name=None, sym=None, n=None, fn=None, fv=None, dv=None,
 	             w=None, w_per=None, w_par=None,
-	             sig_n=None, sig_fn=None, sig_dv=None, sig_w=None,
-	             sig_w_per=None, sig_w_par=None       ) :
+	             sig_n=None, sig_fn=None, sig_fv=None, sig_dv=None,
+	             sig_w=None, sig_w_per=None, sig_w_par=None       ) :
 
 		self.arr_pop.append( pop( self,
 		                          self.get_spec( spc ),
@@ -899,7 +898,8 @@ class plas( object ) :
 					  n=n, fn=fn, fv=fv, dv=dv, w=w,
 		                          w_per=w_per, w_par=w_par,
 		                          sig_n=sig_n, sig_fn=sig_fn,
-		                          sig_dv=sig_dv, sig_w=sig_w,
+		                          sig_fv=sig_fv, sig_dv=sig_dv,
+		                          sig_w=sig_w,
 		                          sig_w_per=sig_w_per,
 		                          sig_w_par=sig_w_par ) )
 
@@ -1744,6 +1744,7 @@ class pop( object ) :
 		self.w_par     = None
 		self.sig_n     = None
 		self.sig_fn    = None
+		self.sig_fv    = None
 		self.sig_dv    = None
 		self.sig_w     = None
 		self.sig_w_per = None
@@ -1772,6 +1773,8 @@ class pop( object ) :
 			self['sig_n'] = sig_n
 		if ( sig_fn is not None ) :
 			self['sig_fn'] = sig_fn
+		if ( sig_fv is not None ) :
+			self['sig_fv'] = sig_fv
 		if ( sig_dv is not None ) :
 			self['sig_dv'] = sig_dv
 		if ( sig_w is not None ) :
@@ -2611,6 +2614,13 @@ class pop( object ) :
 				self.sig_fn = None
 			else :
 				self.sig_fn = float( value )
+
+		elif ( key == 'sig_fv' ) :
+
+			if ( value is None ) :
+				self.sig_fv = None
+			else :
+				self.sig_fv = float( value )
 
 		elif ( key == 'sig_dv' ) :
 
