@@ -3668,7 +3668,7 @@ class core( QObject ) :
 			      sig_w_per=pop_sig_w_per, sig_w_par=pop_sig_w_par )
 
 			if( pop_flcv ) :
-				print self.nln_res_plas.arr_pop[p]['fv'], fit[c-1]
+				print self.nln_res_plas.arr_pop[p]['fv'], sig[c-1]
 
 			if( pop_flcn ) :
 				print self.nln_res_plas.arr_pop[p]['fn'], fit[c-2]
