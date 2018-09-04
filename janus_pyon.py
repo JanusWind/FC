@@ -1421,7 +1421,7 @@ class spec( object ) :
 			n    = sum( arr_n )
 
 			ret  = ( b0 / 1.E12 )
-#			ret /= ( n * 1.E6 * const['m_p'] * const['mu_0'] )**0.5
+			ret /= ( n * 1.E6 * const['m_p'] * const['mu_0'] )**0.5
 
 			return  ret
 
@@ -2179,7 +2179,7 @@ class pop( object ) :
 			n    = self['n']
 
 			ret  = ( b0 / 1.E12 )
-#			ret /= ( n * 1.E6 * const['m_p'] * const['mu_0'] )**0.5
+			ret /= ( n * 1.E6 * const['m_p'] * const['mu_0'] )**0.5
 
 			return  ret
 
