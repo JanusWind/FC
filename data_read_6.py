@@ -31,7 +31,7 @@ os.chdir("/home/ahmadr/Desktop/GIT/fm_development/data/edited")
 
 # Define the names of files to be analysed.
 
-fname1 = 'janus_raw_mag_med_flt_21_fv_pbc_2008-11-04-12-01_2008-11-04-13-01.jns'
+fname1 = 'janus_raw_mag_med_flt_21_fv_pcb_2008-11-04-12-01_2008-11-04-13-01.jns'
 
 dat1 = [0]*len( fname1 )
 dat1 = pickle.load( open( fname1, 'rb' ) )
