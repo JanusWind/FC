@@ -3667,11 +3667,11 @@ class core( QObject ) :
 			      sig_w=pop_sig_w,
 			      sig_w_per=pop_sig_w_per, sig_w_par=pop_sig_w_par )
 
-			if( pop_flcv ) :
-				print self.nln_res_plas.arr_pop[p]['fv'], sig[c-1]
-
-			if( pop_flcn ) :
-				print self.nln_res_plas.arr_pop[p]['fn'], fit[c-2]
+#			if( pop_flcv ) :
+#				print self.nln_res_plas.arr_pop[p]['fv'], sig[c-1]
+#
+#			if( pop_flcn ) :
+#				print self.nln_res_plas.arr_pop[p]['fn'], fit[c-2]
 
 			# For each datum in the spectrum, compute the expected
 			# current from each population.
