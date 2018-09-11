@@ -93,7 +93,7 @@ class widget_nln_set( QWidget ) :
 
 		self.hdr_gss_n  = QLabel( 'n/n_m'  )
 		self.hdr_gss_fn = QLabel( 'fn/n_m' )
-		self.hdr_gss_fv = QLabel( 'fv'     )
+		self.hdr_gss_fv = QLabel( 'fv/v_m' )
 		self.hdr_gss_d  = QLabel( 'dv/v_m' )
 		self.hdr_gss_w  = QLabel( 'w/w_m'  )
 
@@ -115,8 +115,8 @@ class widget_nln_set( QWidget ) :
 
 			self.arr_name[i]   = QLabel( '' )
 			self.arr_gss_n[i]  = event_LineEdit( self, 'gn'+txt_i )
-			self.arr_gss_fn[i] = event_LineEdit( self, 'gf'+txt_i )
-			self.arr_gss_fv[i] = event_LineEdit( self, 'gh'+txt_i )
+			self.arr_gss_fn[i] = event_LineEdit( self, 'fn'+txt_i )
+			self.arr_gss_fv[i] = event_LineEdit( self, 'fv'+txt_i )
 			self.arr_gss_w[i]  = event_LineEdit( self, 'gw'+txt_i )
 			self.arr_sel_a[i]  = event_LineEdit( self, 's-'+txt_i )
 			self.arr_sel_b[i]  = event_LineEdit( self, 's+'+txt_i )
@@ -380,7 +380,7 @@ class widget_nln_set( QWidget ) :
 			except :
 				val = None
 
-		if   ( fnc[0:2] == 'gf' ) :
+		if   ( fnc[0:2] == 'fn' ) :
 
 			param = 'gss_fn'
 
@@ -389,7 +389,7 @@ class widget_nln_set( QWidget ) :
 			except :
 				val = None
 
-		if   ( fnc[0:2] == 'gh' ) :
+		if   ( fnc[0:2] == 'fv' ) :
 
 			param = 'gss_fv'
 

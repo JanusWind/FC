@@ -115,8 +115,8 @@ class widget_nln_gss( QWidget ) :
 
 			self.arr_name[i] = QLabel( '' )
 			self.arr_n[i]    = event_LineEdit( self, 'nn'+txt_i  )
-			self.arr_fn[i]   = event_LineEdit( self, 'gn'+txt_i  )
-			self.arr_fv[i]   = event_LineEdit( self, 'gv'+txt_i  )
+			self.arr_fn[i]   = event_LineEdit( self, 'fn'+txt_i  )
+			self.arr_fv[i]   = event_LineEdit( self, 'fv'+txt_i  )
 			self.arr_d[i]    = event_LineEdit( self, 'dd'+txt_i  )
 			self.arr_ws[i]   = event_LineEdit( self, 'ws'+txt_i  )
 			self.arr_we[i]   = event_LineEdit( self, 'we'+txt_i  )
@@ -366,6 +366,7 @@ class widget_nln_gss( QWidget ) :
 
 		print prfx
 
+		print fnc
 		if ( prfx[0] == 'v' ) :
 			i = None
 		else :
@@ -382,7 +383,7 @@ class widget_nln_gss( QWidget ) :
 			except :
 				val = None
 
-		elif ( prfx == 'gn' ) :
+		elif ( prfx == 'fn' ) :
 
 			param = 'fn'
 
@@ -391,7 +392,7 @@ class widget_nln_gss( QWidget ) :
 			except :
 				val = None
 
-		if   ( prfx == 'gv' ) :
+		if   ( prfx == 'fv' ) :
 
 			param = 'fv'
 
@@ -470,9 +471,6 @@ class widget_nln_gss( QWidget ) :
 		# Instruct the core to update its ion parameters 
 		# appropriately.
 
-		print i, param
-		print 'Hello'
-		print val
 		Thread( target=thread_chng_nln_gss,
 		        args=( self.core, i, param, val ) ).start()
 

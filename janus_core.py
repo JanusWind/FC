@@ -2721,16 +2721,12 @@ class core( QObject ) :
 			# Generate the initial guess for this population's
 			# density.
 
-#			try :
-			self.nln_plas.arr_pop[i]['n'] = round_sig(
-			                      self.nln_set_gss_n[i]
-			                      * self.mom_res['n_p'], 4 )
-#				self.nln_plas.arr_pop[i]['fn'] = 0.00*round_sig(
-#				                      self.nln_set_gss_n[i]
-#				                      * self.mom_res['n_p'], 4 )
-#			except :
-#				self.nln_plas.arr_pop[i]['n']  = None
-#				self.nln_plas.arr_pop[i]['fn'] = None
+			try :
+				self.nln_plas.arr_pop[i]['n'] = round_sig(
+				                      self.nln_set_gss_n[i]
+				                      * self.mom_res['n_p'], 4 )
+			except :
+				self.nln_plas.arr_pop[i]['n']  = None
 
 			# Generate (if necessary) the initial guess for this
 			# population's differential flow.
@@ -2752,16 +2748,18 @@ class core( QObject ) :
 			if ( self.nln_plas.arr_pop[i]['flcn'] ) :
 				try :
 					self.nln_plas.arr_pop[i]['fn'] = \
-					  round_sig( self.nln_set_gss_fn[i], 4 )
+					  round_sig( self.nln_set_gss_fn[i] *
+					                self.mom_res['n_p'], 4 )
 				except :
 					self.nln_plas.arr_pop[i]['fn'] = None
 
 			if ( self.nln_plas.arr_pop[i]['flcv'] ) :
 				try :
 					self.nln_plas.arr_pop[i]['fv'] = \
-					  round_sig( self.nln_set_gss_fv[i], 4 )
+					  round_sig( self.nln_set_gss_fv[i] *
+					             self.mom_res['v0_mag'], 4 )
 				except :
-					self.nln_plas.arr_pop[i]['fn'] = None
+					self.nln_plas.arr_pop[i]['fv'] = None
 
 			# Generate the initial guess of this population's
 			# thermal speed(s).
