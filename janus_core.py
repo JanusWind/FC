@@ -3683,6 +3683,15 @@ class core( QObject ) :
 			                  pop_v0_vec, pop_n, pop_dv,
 			                  pop_w, pop_fn, pop_fv,
 		                          self.mfi_sig_vec_db_rng_avg,
+
+
+
+
+
+
+
+
+
 			                  self.mfi_set_key                   ) )
 
 		# Save the results of the this non-linear analysis to the
