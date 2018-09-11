@@ -1509,7 +1509,7 @@ class core( QObject ) :
 		def but_bnd_pss(lowcut, highcut, fs, order=5):
 
 		    nyq = 0.5 * fs
-		    low = lowcut / nyq
+		    low = max( [ lowcut / nyq, 10E-5 ] )
 		    high = highcut / nyq
 		    b, a = butter( order, [ low, high ], btype='band' )
 

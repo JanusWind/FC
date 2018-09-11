@@ -380,7 +380,7 @@ class widget_nln_set( QWidget ) :
 			except :
 				val = None
 
-		if   ( fnc[0:2] == 'fn' ) :
+		elif ( fnc[0:2] == 'fn' ) :
 
 			param = 'gss_fn'
 
@@ -389,7 +389,7 @@ class widget_nln_set( QWidget ) :
 			except :
 				val = None
 
-		if   ( fnc[0:2] == 'fv' ) :
+		elif ( fnc[0:2] == 'fv' ) :
 
 			param = 'gss_fv'
 
