@@ -37,7 +37,7 @@ if( data_run=='y' ):
 
 	# Define the names of files to be analysed.
 
-	fname1 = 'janus_rng_avg_med_flt_21_fvb_pcb_2008-11-04-12-01_2008-11-04-13-01.jns'
+	fname1 = 'janus_rng_avg_med_flt_21_fv_pcb_aniso_2008-11-04-12-01_2008-11-04-13-01.jns'
 
 	print 'Currently reading file ==> {}  '.format( fname1 )
 	print '\n'
@@ -177,7 +177,7 @@ axs1[0].axhline( 0, marker='None', ls='--', color='gray', lw='0.5' )
 axs1[0].legend( )
 
 axs1[1].errorbar( dat1_s_db, dat1_fv_p_c, xerr=None, yerr=dat1_sig_fv_p_c,
-fmt='*', ecolor='g', marker='*', color='b', label='Proton Core' )
+fmt='*', ecolor='g', marker='', color='b', label='Proton Core' )
 
 axs1[1].legend( )
 
@@ -196,7 +196,13 @@ plt.suptitle( 'MFI Type = ' + fname1[6:13], color='r', fontsize=20 )
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development/figures")
 
-plt.savefig( fname1[6:32] + '.pdf', bbox_inches='tight', dpi=500 )
+if( 'aniso' in fname1 ) :
+
+	plt.savefig( fname1[6:38] + '.pdf', bbox_inches='tight', dpi=500 )
+
+else:
+
+	plt.savefig( fname1[6:32] + '.pdf', bbox_inches='tight', dpi=500 )
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
 
@@ -218,7 +224,13 @@ plt.suptitle( 'MFI Type = ' + fname1[6:13], color='r', fontsize=20 )
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development/figures")
 
-plt.savefig( 'C_' + fname1[6:32] + '.pdf', bbox_inches='tight', dpi=500 )
+if( 'aniso' in fname1 ) :
+
+	plt.savefig( 'C_' + fname1[6:38] + '.pdf', bbox_inches='tight', dpi=500 )
+
+else:
+
+	plt.savefig( 'C_' + fname1[6:32] + '.pdf', bbox_inches='tight', dpi=500 )
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
 
