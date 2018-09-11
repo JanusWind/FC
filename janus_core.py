@@ -523,16 +523,6 @@ class core( QObject ) :
 			self.nln_set_gss_dv[2]  =  0.01
 			self.nln_set_gss_dv[3]  =  0.05
 
-			self.nln_set_gss_fn[0]  =  0.0
-			self.nln_set_gss_fn[1]  =  0.0
-			self.nln_set_gss_fn[2]  =  0.0
-			self.nln_set_gss_fn[3]  =  0.0
-
-			self.nln_set_gss_fv[0]  =  0.0
-			self.nln_set_gss_fv[1]  =  0.0
-			self.nln_set_gss_fv[2]  =  0.0
-			self.nln_set_gss_fv[3]  =  0.0
-
 			self.nln_set_gss_w[0]   =  1.00
 			self.nln_set_gss_w[1]   =  1.25
 			self.nln_set_gss_w[2]   =  1.00
@@ -568,6 +558,8 @@ class core( QObject ) :
 
 			for p in range( self.nln_n_pop ) :
 				self.nln_plas.arr_pop[p]['n']     = None
+				self.nln_plas.arr_pop[p]['fn']    = None
+				self.nln_plas.arr_pop[p]['fv']    = None
 				self.nln_plas.arr_pop[p]['dv']    = None
 				self.nln_plas.arr_pop[p]['w']     = None
 				self.nln_plas.arr_pop[p]['w_per'] = None
@@ -2729,15 +2721,15 @@ class core( QObject ) :
 			# Generate the initial guess for this population's
 			# density.
 
-			try :
-				self.nln_plas.arr_pop[i]['n'] = round_sig(
-				                      self.nln_set_gss_n[i]
-				                      * self.mom_res['n_p'], 4 )
+#			try :
+			self.nln_plas.arr_pop[i]['n'] = round_sig(
+			                      self.nln_set_gss_n[i]
+			                      * self.mom_res['n_p'], 4 )
 #				self.nln_plas.arr_pop[i]['fn'] = 0.00*round_sig(
 #				                      self.nln_set_gss_n[i]
 #				                      * self.mom_res['n_p'], 4 )
-			except :
-				self.nln_plas.arr_pop[i]['n']  = None
+#			except :
+#				self.nln_plas.arr_pop[i]['n']  = None
 #				self.nln_plas.arr_pop[i]['fn'] = None
 
 			# Generate (if necessary) the initial guess for this
@@ -2849,6 +2841,20 @@ class core( QObject ) :
 			except :
 				self.nln_plas.arr_pop[i]['n'] = None
 
+		elif ( param == 'fn' ) :
+
+			try :
+				self.nln_plas.arr_pop[i]['fn'] = val
+			except :
+				self.nln_plas.arr_pop[i]['fn'] = None
+
+		elif ( param == 'fv' ) :
+
+			try :
+				self.nln_plas.arr_pop[i]['fv'] = val
+			except :
+				self.nln_plas.arr_pop[i]['fv'] = None
+
 		elif ( param == 'dv' ) :
 
 			try :
@@ -2876,20 +2882,6 @@ class core( QObject ) :
 				self.nln_plas.arr_pop[i]['w_par'] = val
 			except :
 				self.nln_plas.arr_pop[i]['w_par'] = None
-
-		elif ( param == 'fn' ) :
-
-			try :
-				self.nln_plas.arr_pop[i]['fn'] = val
-			except :
-				self.nln_plas.arr_pop[i]['fn'] = None
-
-		elif ( param == 'fv' ) :
-
-			try :
-				self.nln_plas.arr_pop[i]['fv'] = val
-			except :
-				self.nln_plas.arr_pop[i]['fv'] = None
 
 		# Run the "make_nln_gss" function to update the "self.nln_gss_"
 		# arrays, widgets, etc.

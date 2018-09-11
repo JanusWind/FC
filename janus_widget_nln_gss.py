@@ -115,8 +115,8 @@ class widget_nln_gss( QWidget ) :
 
 			self.arr_name[i] = QLabel( '' )
 			self.arr_n[i]    = event_LineEdit( self, 'nn'+txt_i  )
-			self.arr_fn[i]   = event_LineEdit( self, 'ffn'+txt_i )
-			self.arr_fv[i]   = event_LineEdit( self, 'ffv'+txt_i )
+			self.arr_fn[i]   = event_LineEdit( self, 'gn'+txt_i  )
+			self.arr_fv[i]   = event_LineEdit( self, 'gv'+txt_i  )
 			self.arr_d[i]    = event_LineEdit( self, 'dd'+txt_i  )
 			self.arr_ws[i]   = event_LineEdit( self, 'ws'+txt_i  )
 			self.arr_we[i]   = event_LineEdit( self, 'we'+txt_i  )
@@ -300,6 +300,18 @@ class widget_nln_gss( QWidget ) :
 			else :
 				ss_n += 'color: black;'
 
+			if ( ( val_fn is None                    ) and
+			     ( len( self.arr_fn[i].text( ) ) > 0 )     ) :
+				ss_fn += 'color: red;'
+			else :
+				ss_fn += 'color: black;'
+
+			if ( ( val_fv is None                    ) and
+			     ( len( self.arr_fv[i].text( ) ) > 0 )     ) :
+				ss_fv += 'color: red;'
+			else :
+				ss_fv += 'color: black;'
+
 			if ( ( val_d is None                    ) and
 			     ( len( self.arr_d[i].text( ) ) > 0 )     ) :
 				ss_d += 'color: red;'
@@ -327,6 +339,8 @@ class widget_nln_gss( QWidget ) :
 			# Apply the changes to the style sheets.
 
 			self.arr_n[ i].setStyleSheet( ss_n  )
+			self.arr_fn[i].setStyleSheet( ss_fn )
+			self.arr_fv[i].setStyleSheet( ss_fv )
 			self.arr_d[ i].setStyleSheet( ss_d  )
 			self.arr_ws[i].setStyleSheet( ss_ws )
 			self.arr_we[i].setStyleSheet( ss_we )
@@ -350,6 +364,8 @@ class widget_nln_gss( QWidget ) :
 
 		prfx = fnc[0:2]
 
+		print prfx
+
 		if ( prfx[0] == 'v' ) :
 			i = None
 		else :
@@ -366,7 +382,7 @@ class widget_nln_gss( QWidget ) :
 			except :
 				val = None
 
-		elif ( prfx == 'ffn' ) :
+		elif ( prfx == 'gn' ) :
 
 			param = 'fn'
 
@@ -375,7 +391,7 @@ class widget_nln_gss( QWidget ) :
 			except :
 				val = None
 
-		if   ( prfx == 'ffv' ) :
+		if   ( prfx == 'gv' ) :
 
 			param = 'fv'
 
@@ -454,6 +470,9 @@ class widget_nln_gss( QWidget ) :
 		# Instruct the core to update its ion parameters 
 		# appropriately.
 
+		print i, param
+		print 'Hello'
+		print val
 		Thread( target=thread_chng_nln_gss,
 		        args=( self.core, i, param, val ) ).start()
 

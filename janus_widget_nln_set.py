@@ -93,7 +93,7 @@ class widget_nln_set( QWidget ) :
 
 		self.hdr_gss_n  = QLabel( 'n/n_m'  )
 		self.hdr_gss_fn = QLabel( 'fn/n_m' )
-		self.hdr_gss_fv = QLabel( 'fv/n_m' )
+		self.hdr_gss_fv = QLabel( 'fv'     )
 		self.hdr_gss_d  = QLabel( 'dv/v_m' )
 		self.hdr_gss_w  = QLabel( 'w/w_m'  )
 

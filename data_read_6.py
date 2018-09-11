@@ -37,7 +37,7 @@ if( data_run=='y' ):
 
 	# Define the names of files to be analysed.
 
-	fname1 = 'janus_rng_avg_med_flt_21_fv_pcb_aniso_2008-11-04-12-01_2008-11-04-13-01.jns'
+	fname1 = 'janus_raw_mag_med_flt_21_fv_pc_2008-11-04-12-01_2008-11-04-13-01.jns'
 
 	print 'Currently reading file ==> {}  '.format( fname1 )
 	print '\n'
@@ -112,53 +112,44 @@ if( data_run=='y' ):
 		 mean( dat1['b0_fields_avg'][j]['mfi_set_rng_avg'][0] )**2 +
 		 mean( dat1['b0_fields_avg'][j]['mfi_set_rng_avg'][0] )**2 ) )
 
-#		try :
+		try :
 
-		dat1_n_p_c.append( dat1['n_p_c'][j] )
-		dat1_n_p_b.append( dat1['n_p_b'][j] )
-		dat1_n_p.append( dat1['n_p'][j] )
+			dat1_n_p_c.append( dat1['n_p_c'][j] )
+			dat1_n_p_b.append( dat1['n_p_b'][j] )
+			dat1_n_p.append( dat1['n_p'][j] )
+	
+			dat1_fv_p_c.append( dat1['fv_p_c'][j] )
+			dat1_fv_p_b.append( dat1['fv_p_b'][j] )
+			dat1_sig_fv_p_c.append( dat1['sig_fv_p_c'][j] )
+			dat1_sig_fv_p_b.append( dat1['sig_fv_p_b'][j] )
+	
+			dat1_alfvel.append( dat1['alfvel_p'][j] )	
+	
+			dat1_s_fv_p_c.append( dat1_fv_p_c[j]/dat1_alfvel[j] )
+			dat1_s_fv_p_b.append( dat1_fv_p_b[j]/dat1_alfvel[j] )
+			dat1_s_sig_fv_p_c.append( dat1_sig_fv_p_c[j]/dat1_alfvel[j] )
+			dat1_s_sig_fv_p_b.append( dat1_sig_fv_p_b[j]/dat1_alfvel[j] )
+	
+			dat1_w_fv_p.append( ( dat1_fv_p_c[j] * dat1_n_p_c[j] + 
+			           dat1_fv_p_c[j] * dat1_n_p_c[j] )/dat1_n_p[j] )
 
-		dat1_fv_p_c.append( dat1['fv_p_c'][j] )
-		dat1_fv_p_b.append( dat1['fv_p_b'][j] )
-		dat1_sig_fv_p_c.append( dat1['sig_fv_p_c'][j] )
-		dat1_sig_fv_p_b.append( dat1['sig_fv_p_b'][j] )
+		except:
 
-		dat1_alfvel.append( dat1['alfvel_p'][j] )	
-
-		dat1_s_fv_p_c.append( dat1_fv_p_c[j]/dat1_alfvel[j] )
-		dat1_s_fv_p_b.append( dat1_fv_p_b[j]/dat1_alfvel[j] )
-		dat1_s_sig_fv_p_c.append( dat1_sig_fv_p_c[j]/dat1_alfvel[j] )
-		dat1_s_sig_fv_p_b.append( dat1_sig_fv_p_b[j]/dat1_alfvel[j] )
-
-		dat1_w_fv_p.append( ( dat1_fv_p_c[j] * dat1_n_p_c[j] + 
-		           dat1_fv_p_c[j] * dat1_n_p_c[j] )/dat1_n_p[j] )
-
-#		except:
-
-#			pass
+			pass
 	
 		dat1_s_db.append( dat1_db_rng_avg[j]/dat1_b_avg[j] )
 
-	for key in keys :
+	try :
+		for key in keys :
 
-		[ key.pop( i ) for i in r_ind ]
+			[ key.pop( i ) for i in r_ind ]
+	except :
+
+		pass
 
 else:
 	print 'Data not read, running plotting algorithm.'
 
-
-#[ dat1_time.pop( i ) for i in r_ind ]
-#
-#
-#[ dat1_b_
-#[ dat1_n_p_c.pop( i ) for i in r_ind ]
-#[ dat1_n_p_b.pop( i ) for i in r_ind ]
-#
-#[ dat1_fv_p_c.pop( i ) for i in r_ind ]
-#[ dat1_fv_p_b.pop( i ) for i in r_ind ]
-#
-#[ dat1_sig_fv_p_c.pop( i ) for i in r_ind ]
-#[ dat1_sig_fv_p_b.pop( i ) for i in r_ind ]
 
 rcParams['figure.figsize'] = 20, 10
 
@@ -174,23 +165,31 @@ marker='v', color='r', fmt='o', ecolor='m', label='Proton Beam' )
 
 axs1[0].axhline( 0, marker='None', ls='--', color='gray', lw='0.5' )
 
+axs1[0].set_ylabel( 'Velocity(km/s)', fontsize=18 )
+
 axs1[0].legend( )
 
 axs1[1].errorbar( dat1_s_db, dat1_fv_p_c, xerr=None, yerr=dat1_sig_fv_p_c,
-fmt='*', ecolor='g', marker='', color='b', label='Proton Core' )
+marker='*', color='b', fmt='o', ecolor='g', label='Proton Core' )
 
 axs1[1].legend( )
 
 axs1[1].axhline( 0, marker='None', ls='--', color='gray', lw='0.5' )
 
+axs1[1].set_ylabel( 'Velocity(km/s)', fontsize=18 )
+
 #if( fname1[20] == 'b' ) :
 
 axs1[2].errorbar( dat1_s_db, dat1_fv_p_b, xerr=None, yerr=dat1_sig_fv_p_b,
-fmt='v', ecolor='m', marker='v', color='r', label='Proton Beam' )
+marker='v', color='r', fmt='v', ecolor='m', label='Proton Beam' )
 
 axs1[2].legend( )
 
 axs1[2].axhline( 0, marker='None', ls='--', color='gray', lw='0.5' )
+
+axs1[2].set_ylabel( 'Velocity(km/s)', fontsize=18 )
+
+axs1[2].set_xlabel( r'$\Delta B / B$', fontsize=18 )
 
 plt.suptitle( 'MFI Type = ' + fname1[6:13], color='r', fontsize=20 )
 
@@ -219,6 +218,10 @@ axs2.scatter( dat1_s_db, dat1_fv_p_b, marker='v', color='m', label='Beam fv' )
 axs2.axhline( 0, marker='None', ls='--', color='gray', lw='0.5' )
 
 axs2.legend( )
+
+axs2.set_ylabel( 'Velocity(km/s)', fontsize=18 )
+
+axs2.set_xlabel( r'$\Delta B / B$', fontsize=18 )
 
 plt.suptitle( 'MFI Type = ' + fname1[6:13], color='r', fontsize=20 )
 
