@@ -44,6 +44,7 @@ if( data_run=='y' ):
 
 	if( len( fname1) > 15 ) :
 		print 'Whoaaaa! Thats a big file name!'
+		print '\n'
 
 	dat1 = [0]*len( fname1 )
 	dat1 = pickle.load( open( fname1, 'rb' ) )
