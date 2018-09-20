@@ -897,7 +897,7 @@ class core( QObject ) :
 		                      + self.mfi_b_y[i]**2.0 )
 		                        for i in range( len( self.mfi_b_x ) ) ]
 
-		mfi_b_colat       = arctan2( self.mfi_b_z, mfi_b_rho )
+		mfi_b_colat       = arctan2( mfi_b_rho, self.mfi_b_z )
 		mfi_b_lon         = arctan2( self.mfi_b_y, self.mfi_b_x )
 
 		self.mfi_b_colat  = rad2deg( mfi_b_colat )
