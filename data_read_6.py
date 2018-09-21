@@ -11,6 +11,7 @@ import pickle
 import numpy as np
 from numpy import mean, sqrt, corrcoef
 import matplotlib.pyplot as plt
+import matplotlib.backends.backend_pdf
 from matplotlib import gridspec, rc
 from pylab import rcParams
 from scipy.optimize import curve_fit
@@ -37,7 +38,7 @@ if( data_run=='y' ):
 
 	# Define the names of files to be analysed.
 
-	fname1 = 'janus_raw_mag_med_flt_21_fv_pc_2008-11-04-12-01_2008-11-04-13-01.jns'
+	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-12-57-46_man_rngavg_21_600.jns'
 
 	print 'Currently reading file ==> {}  '.format( fname1 )
 	print '\n'
@@ -58,9 +59,6 @@ if( data_run=='y' ):
 
 	dat1_time         = []
 
-#	dat1_db_x_rng_avg = []
-#	dat1_db_y_rng_avg = []
-#	dat1_db_z_rng_avg = []
 	dat1_db_rng_avg   = []
 
 	dat1_b_avg        = []
@@ -95,11 +93,11 @@ if( data_run=='y' ):
 
 	# Exaract the data from '.jns' file.
 
+	dat1_time.append( [ x.time().strftime("%H-%M") 
+	                                              for x in  dat1['time'] ] )
+
 	for j in range( nd1 ) :
-
-
-		dat1_time.append( dat1['time'][j].time().strftime("%H-%M") )
-
+	
 		db_x_rng_avg = dat1['b0_fields_db'][j]['mfi_set_rng_avg'][0]
 		db_y_rng_avg = dat1['b0_fields_db'][j]['mfi_set_rng_avg'][1]
 		db_z_rng_avg = dat1['b0_fields_db'][j]['mfi_set_rng_avg'][2]
@@ -113,131 +111,188 @@ if( data_run=='y' ):
 		 mean( dat1['b0_fields_avg'][j]['mfi_set_rng_avg'][0] )**2 +
 		 mean( dat1['b0_fields_avg'][j]['mfi_set_rng_avg'][0] )**2 ) )
 
-		try :
-
-			dat1_n_p_c.append( dat1['n_p_c'][j] )
-			dat1_n_p_b.append( dat1['n_p_b'][j] )
-			dat1_n_p.append( dat1['n_p'][j] )
-	
-			dat1_fv_p_c.append( dat1['fv_p_c'][j] )
-			dat1_fv_p_b.append( dat1['fv_p_b'][j] )
-			dat1_sig_fv_p_c.append( dat1['sig_fv_p_c'][j] )
-			dat1_sig_fv_p_b.append( dat1['sig_fv_p_b'][j] )
-	
-			dat1_alfvel.append( dat1['alfvel_p'][j] )	
-	
-			dat1_s_fv_p_c.append( dat1_fv_p_c[j]/dat1_alfvel[j] )
-			dat1_s_fv_p_b.append( dat1_fv_p_b[j]/dat1_alfvel[j] )
-			dat1_s_sig_fv_p_c.append( dat1_sig_fv_p_c[j]/dat1_alfvel[j] )
-			dat1_s_sig_fv_p_b.append( dat1_sig_fv_p_b[j]/dat1_alfvel[j] )
-	
-			dat1_w_fv_p.append( ( dat1_fv_p_c[j] * dat1_n_p_c[j] + 
-			           dat1_fv_p_c[j] * dat1_n_p_c[j] )/dat1_n_p[j] )
-
-		except:
-
-			pass
-	
 		dat1_s_db.append( dat1_db_rng_avg[j]/dat1_b_avg[j] )
 
-	try :
-		for key in keys :
+#		try :
 
-			[ key.pop( i ) for i in r_ind ]
-	except :
+	dat1_n_p.append( dat1['n_p'] )
+	dat1_n_p_c.append( dat1['n_p_c'] )
+	dat1_n_p_b.append( dat1['n_p_b'] )
+	
+	dat1_fv_p_c.append( dat1['fv_p_c'] )
+	dat1_fv_p_b.append( dat1['fv_p_b'] )
+	dat1_sig_fv_p_c.append( [ x for x in dat1['sig_fv_p_c'] if x!=None ] )
+	dat1_sig_fv_p_b.append( [ x for x in dat1['sig_fv_p_b'] if x!=None ] )
+	
+	dat1_alfvel.append( dat1['alfvel_p'] )
+	
+	dat1_s_fv_p_c.append( [ dat1_fv_p_c[0][k]/dat1_alfvel[0][k] 
+	                         for k in range( len( dat1_fv_p_c[0] ) ) ] )
+	dat1_s_fv_p_b.append( [ dat1_fv_p_b[0][k]/dat1_alfvel[0][k] 
+	                         for k in range( len( dat1_fv_p_b[0] ) ) ] )
+	dat1_s_sig_fv_p_c.append( [ dat1_sig_fv_p_c[0][k]/dat1_alfvel[0][k] 
+	                         for k in range( len( dat1_sig_fv_p_c[0] ) ) ] )
+	dat1_s_sig_fv_p_b.append( [ dat1_sig_fv_p_b[0][k]/dat1_alfvel[0][k] 
+	                         for k in range( len( dat1_sig_fv_p_b[0] ) ) ] )
+	
+	dat1_w_fv_p.append( [ ( dat1_fv_p_c[0][j] * dat1_n_p_c[0][j] + 
+	                 dat1_fv_p_b[0][j] * dat1_n_p_b[0][j] )/dat1_n_p[0][j] 
+	                             for j in range( len( dat1_fv_p_c[0] ) ) ] )
 
-		pass
+#		except:
+
+#			pass
+	
+#	try :
+#		for key in keys :
+#
+#			[ key.pop( i ) for i in r_ind ]
+#	except :
+#
+#		pass
 
 else:
 	print 'Data not read, running plotting algorithm.'
 
+# Define figure paramaters
 
-rcParams['figure.figsize'] = 20, 10
+dpi = 40 # DPI of the saved plots
 
-f1, axs1 = plt.subplots( 3, 1, squeeze=True, sharex=False )
+s = 10 # Marker size
 
-axs1[0].errorbar( range( len( dat1_time ) ), dat1_fv_p_c, yerr=dat1_sig_fv_p_c,
-marker='*', color='b', fmt='o', ecolor='g', label='Proton Core' )
+legend_transparency = 0.50 # Transparency of legend
 
-#if( fname1[20] == 'b' ) :
-
-axs1[0].errorbar( range( len( dat1_time ) ), dat1_fv_p_b, yerr=dat1_sig_fv_p_b,
-marker='v', color='r', fmt='o', ecolor='m', label='Proton Beam' )
-
-axs1[0].axhline( 0, marker='None', ls='--', color='gray', lw='0.5' )
-
-axs1[0].set_ylabel( 'Velocity(km/s)', fontsize=18 )
-
-axs1[0].legend( )
-
-axs1[1].errorbar( dat1_s_db, dat1_fv_p_c, xerr=None, yerr=dat1_sig_fv_p_c,
-marker='*', color='b', fmt='o', ecolor='g', label='Proton Core' )
-
-axs1[1].legend( )
-
-axs1[1].axhline( 0, marker='None', ls='--', color='gray', lw='0.5' )
-
-axs1[1].set_ylabel( 'Velocity(km/s)', fontsize=18 )
-
-#if( fname1[20] == 'b' ) :
-
-axs1[2].errorbar( dat1_s_db, dat1_fv_p_b, xerr=None, yerr=dat1_sig_fv_p_b,
-marker='v', color='r', fmt='v', ecolor='m', label='Proton Beam' )
-
-axs1[2].legend( )
-
-axs1[2].axhline( 0, marker='None', ls='--', color='gray', lw='0.5' )
-
-axs1[2].set_ylabel( 'Velocity(km/s)', fontsize=18 )
-
-axs1[2].set_xlabel( r'$\Delta B / B$', fontsize=18 )
-
-plt.suptitle( 'MFI Type = ' + fname1[6:13], color='r', fontsize=20 )
-
-os.chdir("/home/ahmadr/Desktop/GIT/fm_development/figures")
-
-if( 'aniso' in fname1 ) :
-
-	plt.savefig( fname1[6:38] + '.pdf', bbox_inches='tight', dpi=500 )
-
-else:
-
-	plt.savefig( fname1[6:32] + '.pdf', bbox_inches='tight', dpi=500 )
-
-os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
+ncol = 1 # Number of columns for legend
 
 rcParams['figure.figsize'] = 10, 10
 
-f2, axs2 = plt.subplots( 1, 1, squeeze=True, sharex=False )
+ind = [ 5*i for i in range( 1 +  len( dat1_time[0] )/5 ) ]
 
-axs2.scatter( dat1_s_db, dat1_w_fv_p, marker='*', color='r', label='Weighted fv' )
+labels = [ dat1_time[0][j] for j in ind ]
 
-axs2.scatter( dat1_s_db, dat1_fv_p_c, marker='d', color='b', label='Core fv' )
 
-axs2.scatter( dat1_s_db, dat1_fv_p_b, marker='v', color='m', label='Beam fv' )
+###############################################################################
+## First Figure
+###############################################################################
 
-axs2.axhline( 0, marker='None', ls='--', color='gray', lw='0.5' )
+if( len( dat1_sig_fv_p_b[0] ) != 0 ) :
 
+	f, axs1 = plt.subplots( 3, 1, squeeze=True, sharex=False )
+
+else :
+
+	f, axs1 = plt.subplots( 2, 1, squeeze=True, sharex=False )
+
+axs1[0].errorbar( range( len( dat1_time[0] ) ), dat1_fv_p_c[0],
+yerr=dat1_sig_fv_p_c[0], marker='*', color='b', fmt='o', ecolor='g',
+                                                           label='Proton Core' )
+
+if( len( dat1_sig_fv_p_b[0] ) != 0 ) :
+
+	axs1[0].errorbar( range( len( dat1_time[0] ) ), dat1_fv_p_b[0],
+	yerr=dat1_sig_fv_p_b[0], marker='v', color='r', fmt='o',
+	                                       ecolor='g', label='Proton Beam' )
+
+else :
+
+	axs1[0].scatter( range( len( dat1_time[0] ) ), dat1_fv_p_b[0],
+	                       marker='v', s=s, color='r', label='Proton Beam' )
+
+
+axs1[0].axhline( 0, marker='None', ls='--', color='c', lw='0.5' )
+axs1[0].set_xlabel( 'Spectra number', fontsize=18 )
+axs1[0].set_ylabel( r'$f_v$ (km/s)', fontsize=18 )
+axs1[0].legend( ncol=ncol, framealpha=legend_transparency, loc=1, fontsize=18 )
+
+axs1[1].errorbar( dat1_s_db, dat1_fv_p_c[0], xerr=None, yerr=dat1_sig_fv_p_c[0],
+marker='*', color='b', fmt='o', ecolor='g', label='Proton Core' )
+
+axs1[1].legend( ncol=ncol, framealpha=legend_transparency, loc=1, fontsize=18 )
+
+axs1[1].axhline( 0, marker='None', ls='--', color='c', lw='0.5' )
+
+axs1[1].set_xlabel( r'$|\Delta B /B_0|$', fontsize=18 )
+axs1[1].set_ylabel( r'$f_v$ (km/s)', fontsize=18 )
+
+if( len( dat1_sig_fv_p_b[0] ) != 0 ) :
+
+	axs1[2].errorbar( dat1_s_db, dat1_fv_p_b[0], xerr=None,
+	yerr=dat1_sig_fv_p_b[0], marker='v', s=s, color='r', fmt='v',
+	ecolor='m', label='Proton Beam' )
+	axs1[2].legend( )
+	axs1[2].axhline( 0, marker='None', ls='--', color='gray', lw='0.5' )
+	axs1[2].set_ylabel( 'Velocity(km/s)', fontsize=18 )
+	axs1[2].set_xlabel( r'$\Delta B / B$', fontsize=18 )
+
+axs1[0].set_title( 'MFI Type = ' + fname1[-21:-11], color='r', fontsize=20 )
+
+plt.tight_layout()
+plt.subplots_adjust(left=0.1, right=.99, bottom=0.1, top=0.95, wspace=0, hspace=0.2)
+
+# Managing tick marks and all
+
+for a in axs1 :
+	for tick in a.xaxis.get_major_ticks() :
+		tick.label.set_fontsize( 16 )
+
+	tick_labels = a.get_xticklabels()
+	a.set_xticklabels( tick_labels )
+
+for a in axs1 :
+	for tick in a.yaxis.get_major_ticks() :
+		tick.label.set_fontsize( 16 )
+
+	tick_labels = a.get_yticklabels()
+	a.set_yticklabels( tick_labels )
+
+rcParams['figure.figsize'] = 10, 10
+
+###############################################################################
+## Second Figure
+###############################################################################
+
+f, axs2 = plt.subplots( 1, 1, squeeze=True, sharex=False )
+
+axs2.scatter( dat1_s_db, dat1_w_fv_p[0], marker='*', color='r',
+                                                           label='Weighted fv' )
+axs2.scatter( dat1_s_db, dat1_fv_p_c[0], marker='d', color='b',
+                                                               label='Core fv' )
+axs2.scatter( dat1_s_db, dat1_fv_p_b[0], marker='v', color='m',
+                                                               label='Beam fv' )
+axs2.axhline( 0, marker='None', ls='--', color='c', lw='0.5' )
 axs2.legend( )
-
 axs2.set_ylabel( 'Velocity(km/s)', fontsize=18 )
-
 axs2.set_xlabel( r'$\Delta B / B$', fontsize=18 )
 
-plt.suptitle( 'MFI Type = ' + fname1[6:13], color='r', fontsize=20 )
+axs2.set_title( 'MFI Type = ' + fname1[-21:-11], color='r', fontsize=20 )
+
+plt.tight_layout()
+plt.subplots_adjust(left=0.1, right=.99, bottom=0.1, top=0.95, wspace=0, hspace=0.2)
+
+# Managing tick marks and all
+
+for tick in axs2.xaxis.get_major_ticks() :
+	tick.label.set_fontsize( 16 )
+
+tick_labels = axs2.get_xticklabels()
+axs2.set_xticklabels( tick_labels )
+
+for tick in axs2.yaxis.get_major_ticks() :
+	tick.label.set_fontsize( 16 )
+
+tick_labels = axs2.get_yticklabels()
+axs2.set_yticklabels( tick_labels )
+
+# Save all the figures in one single file
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development/figures")
 
-if( 'aniso' in fname1 ) :
+pdf = matplotlib.backends.backend_pdf.PdfPages( fname1 + ".pdf" )
 
-	plt.savefig( 'C_' + fname1[6:38] + '.pdf', bbox_inches='tight', dpi=500 )
-
-else:
-
-	plt.savefig( 'C_' + fname1[6:32] + '.pdf', bbox_inches='tight', dpi=500 )
+for fig in xrange(1, f.number+1 ): ## will open an empty extra figure :(
+	pdf.savefig( fig )
+pdf.close()
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
-
-#plt.show()
 
 print ('It took','%.6f'% (time.time()-start), 'seconds.')
