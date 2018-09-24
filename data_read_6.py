@@ -38,7 +38,7 @@ if( data_run=='y' ):
 
 	# Define the names of files to be analysed.
 
-	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-12-57-46_man_rngavg_21_600.jns'
+	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-12-57-46_man_rngavg_21_600_fvpcb.jns'
 
 	print 'Currently reading file ==> {}  '.format( fname1 )
 	print '\n'
@@ -175,13 +175,13 @@ labels = [ dat1_time[0][j] for j in ind ]
 ## First Figure
 ###############################################################################
 
-if( len( dat1_sig_fv_p_b[0] ) != 0 ) :
+#if( len( dat1_sig_fv_p_b[0] ) != 0 ) :
+#
+#	f, axs1 = plt.subplots( 3, 1, squeeze=True, sharex=False )
+#
+#else :
 
-	f, axs1 = plt.subplots( 3, 1, squeeze=True, sharex=False )
-
-else :
-
-	f, axs1 = plt.subplots( 2, 1, squeeze=True, sharex=False )
+f, axs1 = plt.subplots( 2, 1, squeeze=True, sharex=False )
 
 axs1[0].errorbar( range( len( dat1_time[0] ) ), dat1_fv_p_c[0],
 yerr=dat1_sig_fv_p_c[0], marker='*', color='b', fmt='o', ecolor='g',
@@ -214,15 +214,15 @@ axs1[1].axhline( 0, marker='None', ls='--', color='c', lw='0.5' )
 axs1[1].set_xlabel( r'$|\Delta B /B_0|$', fontsize=18 )
 axs1[1].set_ylabel( r'$f_v$ (km/s)', fontsize=18 )
 
-if( len( dat1_sig_fv_p_b[0] ) != 0 ) :
-
-	axs1[2].errorbar( dat1_s_db, dat1_fv_p_b[0], xerr=None,
-	yerr=dat1_sig_fv_p_b[0], marker='v', s=s, color='r', fmt='v',
-	ecolor='m', label='Proton Beam' )
-	axs1[2].legend( )
-	axs1[2].axhline( 0, marker='None', ls='--', color='gray', lw='0.5' )
-	axs1[2].set_ylabel( 'Velocity(km/s)', fontsize=18 )
-	axs1[2].set_xlabel( r'$\Delta B / B$', fontsize=18 )
+#if( len( dat1_sig_fv_p_b[0] ) != 0 ) :
+#
+#	axs1[2].errorbar( dat1_s_db, dat1_fv_p_b[0], xerr=None,
+#	yerr=dat1_sig_fv_p_b[0], marker='v', color='r', fmt='v',
+#	ecolor='m', label='Proton Beam' )
+#	axs1[2].legend( )
+#	axs1[2].axhline( 0, marker='None', ls='--', color='gray', lw='0.5' )
+#	axs1[2].set_ylabel( 'Velocity(km/s)', fontsize=18 )
+#	axs1[2].set_xlabel( r'$\Delta B / B$', fontsize=18 )
 
 axs1[0].set_title( 'MFI Type = ' + fname1[-21:-11], color='r', fontsize=20 )
 
@@ -287,7 +287,7 @@ axs2.set_yticklabels( tick_labels )
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development/figures")
 
-pdf = matplotlib.backends.backend_pdf.PdfPages( fname1 + ".pdf" )
+pdf = matplotlib.backends.backend_pdf.PdfPages( fname1[0:-4] + ".pdf" )
 
 for fig in xrange(1, f.number+1 ): ## will open an empty extra figure :(
 	pdf.savefig( fig )
