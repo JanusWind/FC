@@ -184,7 +184,7 @@ labels = [ dat1_time[0][j] for j in ind ]
 f, axs1 = plt.subplots( 2, 1, squeeze=True, sharex=False )
 
 axs1[0].errorbar( range( len( dat1_time[0] ) ), dat1_fv_p_c[0],
-yerr=dat1_sig_fv_p_c[0], marker='*', color='b', fmt='o', ecolor='g',
+yerr=dat1_sig_fv_p_c[0], marker='*', color='r', fmt='o', ecolor='g',
                                                            label='Proton Core' )
 
 if( len( dat1_sig_fv_p_b[0] ) != 0 ) :
@@ -201,8 +201,9 @@ else :
 
 axs1[0].axhline( 0, marker='None', ls='--', color='c', lw='0.5' )
 axs1[0].set_xlabel( 'Spectra number', fontsize=18 )
-axs1[0].set_ylabel( r'$f_v$ (km/s)', fontsize=18 )
+axs1[0].set_ylabel( r'$f_v$', fontsize=18 )
 axs1[0].legend( ncol=ncol, framealpha=legend_transparency, loc=1, fontsize=18 )
+axs1[0].set_xlim( [ 0, max( range( len( dat1_time[0] ) ) ) ] )
 
 axs1[1].errorbar( dat1_s_db, dat1_fv_p_c[0], xerr=None, yerr=dat1_sig_fv_p_c[0],
 marker='*', color='r', fmt='o', ecolor='g', label='Proton Core' )
@@ -212,8 +213,8 @@ axs1[1].legend( ncol=ncol, framealpha=legend_transparency, loc=1, fontsize=18 )
 axs1[1].axhline( 0, marker='None', ls='--', color='c', lw='0.5' )
 
 axs1[1].set_xlabel( r'$|\Delta B /B_0|$', fontsize=18 )
-axs1[1].set_ylabel( r'$f_v$ (km/s)', fontsize=18 )
-
+axs1[1].set_ylabel( r'$f_v$', fontsize=18 )
+axs1[1].set_xlim( [ 0, 0.5 ] )
 #if( len( dat1_sig_fv_p_b[0] ) != 0 ) :
 #
 #	axs1[2].errorbar( dat1_s_db, dat1_fv_p_b[0], xerr=None,
@@ -224,10 +225,10 @@ axs1[1].set_ylabel( r'$f_v$ (km/s)', fontsize=18 )
 #	axs1[2].set_ylabel( 'Velocity(km/s)', fontsize=18 )
 #	axs1[2].set_xlabel( r'$\Delta B / B$', fontsize=18 )
 
-axs1[0].set_title( 'MFI Type = ' + fname1[-21:-11], color='r', fontsize=20 )
+axs1[0].set_title( 'MFI Type = ' + fname1[-22:-16], color='r', fontsize=20 )
 
 plt.tight_layout()
-plt.subplots_adjust(left=0.1, right=.99, bottom=0.1, top=0.95, wspace=0, hspace=0.2)
+plt.subplots_adjust(left=0.1, right=.97, bottom=0.1, top=0.95, wspace=0, hspace=0.2)
 
 # Managing tick marks and all
 

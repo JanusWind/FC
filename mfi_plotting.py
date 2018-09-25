@@ -162,52 +162,73 @@ if( download == 'y' ) :
 
 	omega_p = mfi_avg_mag*const['q_p']/const['m_p']
 
-rcParams['figure.figsize'] = 30, 10
+rcParams['figure.figsize'] = 40, 20
 
-f, ax = plt.subplots( 4, 1, squeeze=True, sharex=True )
+f, axs = plt.subplots( 4, 1, squeeze=True, sharex=True )
 
-plt.subplots_adjust( hspace = 0. )
+plt.subplots_adjust( wspace=0., hspace = 0. )
 
-ax[0].plot( mfi_s, mfi_b,   color='k', label='B', lw=0.2 )
-ax[0].set_xlim( min( mfi_s ), max( mfi_s ) )
-ax[0].legend( loc=1, fontsize=22 )
+axs[0].plot( mfi_s, mfi_b,   color='k', label='B', lw=0.2 )
+axs[0].set_xlim( min( mfi_s ), max( mfi_s ) )
+axs[0].legend( loc=4, fontsize=22 )
 
-ax[1].plot( mfi_s, mfi_b_x, color='b', label=r'$B_x$', lw=0.2 )
-ax[1].set_xlim( min( mfi_s ), max( mfi_s ) )
-ax[1].legend( loc=1, fontsize=22 )
+axs[1].plot( mfi_s, mfi_b_x, color='r', label=r'$B_x$', lw=0.2 )
+axs[1].set_xlim( min( mfi_s ), max( mfi_s ) )
+axs[1].legend( loc=1, fontsize=22 )
 
-ax[2].plot( mfi_s, mfi_b_y, color='g', label=r'$B_y$', lw=0.2 )
-ax[2].set_xlim( min( mfi_s ), max( mfi_s ) )
-ax[2].legend( loc=1, fontsize=22 )
+axs[2].plot( mfi_s, mfi_b_y, color='g', label=r'$B_y$', lw=0.2 )
+axs[2].set_xlim( min( mfi_s ), max( mfi_s ) )
+axs[2].legend( loc=4, fontsize=22 )
 
-ax[3].plot( mfi_s, mfi_b_z, color='r', label=r'$B_z$', lw=0.2 )
-ax[3].set_xlim( min( mfi_s ), max( mfi_s ) )
-ax[3].set_xlabel( 'Time' )
-ax[3].legend( loc=1, fontsize=22 )
-
-plt.tight_layout( )
-
-f, ax2 = plt.subplots( 1, 1, squeeze=True, sharex=True )
-
-plt.subplots_adjust( hspace = 0. )
-
-ax2.plot( mfi_s, mfi_b,   color='k', label='B', lw=0.2 )
-ax2.set_xlim( min( mfi_s ), max( mfi_s ) )
-
-ax2.plot( mfi_s, mfi_b_x, color='b', label=r'$B_x$', lw=0.2 )
-ax2.set_xlim( min( mfi_s ), max( mfi_s ) )
-
-ax2.plot( mfi_s, mfi_b_y, color='g', label=r'$B_y$', lw=0.2 )
-ax2.set_xlim( min( mfi_s ), max( mfi_s ) )
-
-ax2.plot( mfi_s, mfi_b_z, color='r', label=r'$B_z$', lw=0.2 )
-ax2.set_xlim( min( mfi_s ), max( mfi_s ) )
-ax2.set_xlabel( 'Time' )
-ax2.legend( loc=1, fontsize=22 )
+axs[3].plot( mfi_s, mfi_b_z, color='b', label=r'$B_z$', lw=0.2 )
+axs[3].set_xlim( min( mfi_s ), max( mfi_s ) )
+axs[3].set_xlabel( 'Time', fontsize=22 )
+axs[3].legend( loc=1, fontsize=22 )
 
 plt.tight_layout( )
 
-plt.show( )
+for a in axs :
+	for tick in a.yaxis.get_major_ticks() :
+		tick.label.set_fontsize( 16 )
+
+#	tick_labels = a.get_yticklabels()
+#	tick_labels[0]  = ""
+#	tick_labels[-1] = ""
+#	a.set_yticklabels( tick_labels )
+
+for tick in axs[3].xaxis.get_major_ticks() :
+	tick.label.set_fontsize( 16 )
+
+f, axs2 = plt.subplots( 1, 1, squeeze=True, sharex=True )
+
+plt.subplots_adjust( wspace=0., hspace = 0. )
+
+axs2.plot( mfi_s, mfi_b,   color='k', label='B', lw=0.2 )
+axs2.set_xlim( min( mfi_s ), max( mfi_s ) )
+
+axs2.plot( mfi_s, mfi_b_x, color='r', label=r'$B_x$', lw=0.2 )
+axs2.set_xlim( min( mfi_s ), max( mfi_s ) )
+
+axs2.plot( mfi_s, mfi_b_y, color='g', label=r'$B_y$', lw=0.2 )
+axs2.set_xlim( min( mfi_s ), max( mfi_s ) )
+
+axs2.plot( mfi_s, mfi_b_z, color='b', label=r'$B_z$', lw=0.2 )
+axs2.set_xlim( min( mfi_s ), max( mfi_s ) )
+axs2.set_xlabel( 'Time', fontsize=22 )
+axs2.set_ylabel( 'Magnetic Fields', fontsize=22 )
+axs2.legend( loc=2, ncol=4, fontsize=28 )
+
+plt.tight_layout( )
+
+# Managing tick marks and all
+
+for tick in axs2.xaxis.get_major_ticks() :
+	tick.label.set_fontsize( 16 )
+
+for tick in axs2.yaxis.get_major_ticks() :
+	tick.label.set_fontsize( 16 )
+
+#plt.show( )
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development/figures")
 
@@ -403,7 +424,12 @@ for i in range( len( orders ) ) :
 	ax3[0].set_title( 'Raw magnetic field and time moving average for window size = 10sec' )
 
 	plt.tight_layout( )
-	plt.show( )
+	for a in axs1 :
+		for tick in a.yaxis.get_major_ticks() :
+			tick.label.set_fontsize( 16 )
+
+
+#	plt.show( )
 	'''
 
 
@@ -427,6 +453,6 @@ ax[0].legend( legend[0], loc = 1 )
 ax[1].legend( legend[1], loc = 1 )
 ax[2].legend( legend[2], loc = 1 )
 
-plt.show( )
+#plt.show( )
 
 '''

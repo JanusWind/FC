@@ -1,7 +1,0 @@
-This file contains details of some of the python files and other random
-informations.
-
-1. data_file_details.ods : Contains the details of saved files ( types of 
-magnetic field used, size of filter, etc etc).
-
-2. 
