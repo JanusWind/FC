@@ -80,7 +80,7 @@ date = '2014-01-01-23-00-00'
 dur  =  3600*4.0
 dur  = dur
 
-filter_length = 11
+filter_length = 109
 
 if( download == 'y' ) :
 
@@ -134,6 +134,7 @@ if( download == 'y' ) :
 	                  mfi_b_z[i] ) /mfi_b[i]
 	                  for i in range( len( mfi_b ) ) ]
 
+	mfi_b_filt   = medfilt( mfi_b,   filter_length )
 	mfi_b_x_filt = medfilt( mfi_b_x, filter_length )
 	mfi_b_y_filt = medfilt( mfi_b_y, filter_length )
 	mfi_b_z_filt = medfilt( mfi_b_z, filter_length )
@@ -162,34 +163,37 @@ if( download == 'y' ) :
 
 	omega_p = mfi_avg_mag*const['q_p']/const['m_p']
 
-rcParams['figure.figsize'] = 40, 20
+rcParams['figure.figsize'] = 50, 25
 
 f, axs = plt.subplots( 4, 1, squeeze=True, sharex=True )
 
-plt.subplots_adjust( wspace=0., hspace = 0. )
-
-axs[0].plot( mfi_s, mfi_b,   color='k', label='B', lw=0.2 )
+axs[0].plot( mfi_s, mfi_b_filt,   color='k', label='b', lw=0.2 )
 axs[0].set_xlim( min( mfi_s ), max( mfi_s ) )
-axs[0].legend( loc=4, fontsize=22 )
+axs[0].legend( loc=4, fontsize=32 )
 
-axs[1].plot( mfi_s, mfi_b_x, color='r', label=r'$B_x$', lw=0.2 )
+axs[1].plot( mfi_s, mfi_b_x_filt, color='r', label=r'$B_x$', lw=0.2 )
+axs[1].axhline( 0, color='c', linewidth=1 )
 axs[1].set_xlim( min( mfi_s ), max( mfi_s ) )
-axs[1].legend( loc=1, fontsize=22 )
+axs[1].legend( loc=1, fontsize=32 )
 
-axs[2].plot( mfi_s, mfi_b_y, color='g', label=r'$B_y$', lw=0.2 )
+axs[2].plot( mfi_s, mfi_b_y_filt, color='g', label=r'$B_y$', lw=0.2 )
+axs[2].axhline( 0, color='c', linewidth=1 )
 axs[2].set_xlim( min( mfi_s ), max( mfi_s ) )
-axs[2].legend( loc=4, fontsize=22 )
+axs[2].legend( loc=4, fontsize=32 )
 
-axs[3].plot( mfi_s, mfi_b_z, color='b', label=r'$B_z$', lw=0.2 )
+axs[3].plot( mfi_s, mfi_b_z_filt, color='b', label=r'$B_z$', lw=0.2 )
+axs[3].axhline( 0, color='c', linewidth=1 )
 axs[3].set_xlim( min( mfi_s ), max( mfi_s ) )
-axs[3].set_xlabel( 'Time', fontsize=22 )
-axs[3].legend( loc=1, fontsize=22 )
+axs[3].set_xlabel( 'Time', fontsize=32 )
+axs[3].legend( loc=1, fontsize=32 )
 
 plt.tight_layout( )
 
+plt.subplots_adjust( left=0.020, right=.99, bottom=0.040, top=0.99, wspace=0., hspace = 0. )
+
 for a in axs :
 	for tick in a.yaxis.get_major_ticks() :
-		tick.label.set_fontsize( 16 )
+		tick.label.set_fontsize( 32 )
 
 #	tick_labels = a.get_yticklabels()
 #	tick_labels[0]  = ""
@@ -197,36 +201,41 @@ for a in axs :
 #	a.set_yticklabels( tick_labels )
 
 for tick in axs[3].xaxis.get_major_ticks() :
-	tick.label.set_fontsize( 16 )
+	tick.label.set_fontsize( 32 )
 
 f, axs2 = plt.subplots( 1, 1, squeeze=True, sharex=True )
 
-plt.subplots_adjust( wspace=0., hspace = 0. )
-
-axs2.plot( mfi_s, mfi_b,   color='k', label='B', lw=0.2 )
+axs2.plot( mfi_s, mfi_b_filt,   color='k', label='B', lw=0.2 )
 axs2.set_xlim( min( mfi_s ), max( mfi_s ) )
 
-axs2.plot( mfi_s, mfi_b_x, color='r', label=r'$B_x$', lw=0.2 )
+axs2.plot( mfi_s, mfi_b_x_filt, color='r', label=r'$B_x$', lw=0.2 )
+axs2.axhline( 0, color='c', linewidth=1 )
 axs2.set_xlim( min( mfi_s ), max( mfi_s ) )
 
-axs2.plot( mfi_s, mfi_b_y, color='g', label=r'$B_y$', lw=0.2 )
+axs2.plot( mfi_s, mfi_b_y_filt, color='g', label=r'$B_y$', lw=0.2 )
 axs2.set_xlim( min( mfi_s ), max( mfi_s ) )
 
-axs2.plot( mfi_s, mfi_b_z, color='b', label=r'$B_z$', lw=0.2 )
+axs2.plot( mfi_s, mfi_b_z_filt, color='b', label=r'$B_z$', lw=0.2 )
 axs2.set_xlim( min( mfi_s ), max( mfi_s ) )
-axs2.set_xlabel( 'Time', fontsize=22 )
-axs2.set_ylabel( 'Magnetic Fields', fontsize=22 )
-axs2.legend( loc=2, ncol=4, fontsize=28 )
+
+axs2.plot( mfi_s, -mfi_b_filt,   color='k', lw=0.2 )
+axs2.set_xlim( min( mfi_s ), max( mfi_s ) )
+
+axs2.set_xlabel( 'Time', fontsize=32 )
+axs2.set_ylabel( 'Magnetic Fields', fontsize=32 )
+axs2.legend( loc=2, ncol=4, fontsize=32 )
 
 plt.tight_layout( )
+
+plt.subplots_adjust( left=0.035, right=.99, bottom=0.040, top=0.99, wspace=0., hspace = 0. )
 
 # Managing tick marks and all
 
 for tick in axs2.xaxis.get_major_ticks() :
-	tick.label.set_fontsize( 16 )
+	tick.label.set_fontsize( 32 )
 
 for tick in axs2.yaxis.get_major_ticks() :
-	tick.label.set_fontsize( 16 )
+	tick.label.set_fontsize( 32 )
 
 #plt.show( )
 
