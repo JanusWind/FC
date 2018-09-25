@@ -48,6 +48,7 @@ from scipy.optimize    import curve_fit
 from scipy.stats       import pearsonr, spearmanr
 from scipy.signal      import medfilt, butter, lfilter
 from pylab import rcParams
+import matplotlib.backends.backend_pdf
 
 from janus_helper import round_sig
 
@@ -69,12 +70,16 @@ import pickle
 
 from copy import deepcopy
 
+plt.close('all')
+
 start = time.time( )
 
 download = raw_input('Download the data ==>  ')
 
-date = '2008-11-04-11-57-25'
-dur  =  100
+date = '2014-01-01-23-00-00'
+dur  =  3600*4.0
+dur  = dur
+
 filter_length = 11
 
 if( download == 'y' ) :
@@ -157,6 +162,65 @@ if( download == 'y' ) :
 
 	omega_p = mfi_avg_mag*const['q_p']/const['m_p']
 
+rcParams['figure.figsize'] = 30, 10
+
+f, ax = plt.subplots( 4, 1, squeeze=True, sharex=True )
+
+plt.subplots_adjust( hspace = 0. )
+
+ax[0].plot( mfi_s, mfi_b,   color='k', label='B', lw=0.2 )
+ax[0].set_xlim( min( mfi_s ), max( mfi_s ) )
+ax[0].legend( loc=1, fontsize=22 )
+
+ax[1].plot( mfi_s, mfi_b_x, color='b', label=r'$B_x$', lw=0.2 )
+ax[1].set_xlim( min( mfi_s ), max( mfi_s ) )
+ax[1].legend( loc=1, fontsize=22 )
+
+ax[2].plot( mfi_s, mfi_b_y, color='g', label=r'$B_y$', lw=0.2 )
+ax[2].set_xlim( min( mfi_s ), max( mfi_s ) )
+ax[2].legend( loc=1, fontsize=22 )
+
+ax[3].plot( mfi_s, mfi_b_z, color='r', label=r'$B_z$', lw=0.2 )
+ax[3].set_xlim( min( mfi_s ), max( mfi_s ) )
+ax[3].set_xlabel( 'Time' )
+ax[3].legend( loc=1, fontsize=22 )
+
+plt.tight_layout( )
+
+f, ax2 = plt.subplots( 1, 1, squeeze=True, sharex=True )
+
+plt.subplots_adjust( hspace = 0. )
+
+ax2.plot( mfi_s, mfi_b,   color='k', label='B', lw=0.2 )
+ax2.set_xlim( min( mfi_s ), max( mfi_s ) )
+
+ax2.plot( mfi_s, mfi_b_x, color='b', label=r'$B_x$', lw=0.2 )
+ax2.set_xlim( min( mfi_s ), max( mfi_s ) )
+
+ax2.plot( mfi_s, mfi_b_y, color='g', label=r'$B_y$', lw=0.2 )
+ax2.set_xlim( min( mfi_s ), max( mfi_s ) )
+
+ax2.plot( mfi_s, mfi_b_z, color='r', label=r'$B_z$', lw=0.2 )
+ax2.set_xlim( min( mfi_s ), max( mfi_s ) )
+ax2.set_xlabel( 'Time' )
+ax2.legend( loc=1, fontsize=22 )
+
+plt.tight_layout( )
+
+plt.show( )
+
+os.chdir("/home/ahmadr/Desktop/GIT/fm_development/figures")
+
+pdf = matplotlib.backends.backend_pdf.PdfPages( 'Magnetic_field' + date + str(dur) + ".pdf" )
+
+for fig in xrange(1, f.number+1 ): ## will open an empty extra figure :(
+	pdf.savefig( fig )
+pdf.close()
+
+os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
+
+
+'''
 ###############################################################################
 ## Defining Butterworth bandpass filter.
 ###############################################################################
@@ -255,7 +319,7 @@ for i in range( len( orders ) ) :
 	lw = 0.75
 	lbl = [ 'non-filtered', 'band-pass', 'low-pass', 'residue' ]
 
-	'''
+
 	f, ax2 = plt.subplots( 3, 1, sharex = True )
 
 	rcParams['figure.figsize'] = 20, 10
@@ -314,7 +378,7 @@ for i in range( len( orders ) ) :
 	plt.ylabel( 'Magnetic Field', fontsize=24 )
 	plt.title( 'Different components of MF against Time', fontsize=24 )
 	plt.legend( )
-	'''	
+
 
 	f, ax3 = plt.subplots( 3, 1, sharex=True )
 
@@ -340,6 +404,8 @@ for i in range( len( orders ) ) :
 
 	plt.tight_layout( )
 	plt.show( )
+	'''
+
 
 '''
 f, ax = plt.subplots( 3, 1, sharex = True )

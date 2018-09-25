@@ -3479,56 +3479,56 @@ class core( QObject ) :
 #		                               'but_bnd': self.mfi_vec_but_bnd,
 #		                               'but_low': self.mfi_vec_but_low }
 
-		self.nln_res_plas[ 'sig_b0_fields'] = {
-		                'sig_raw'    : self.mfi_vec_raw_sig,
-		                'sig_rot'    : self.mfi_vec_rot_sig,
-		                'sig_fit'    : self.mfi_vec_fit_sig,
-		                'sig_raw_smt': self.mfi_vec_raw_smt_sig,
-		                'sig_rot_smt': self.mfi_vec_rot_smt_sig,
-		                'sig_fit_smt': self.mfi_vec_fit_smt_sig        }
+#		self.nln_res_plas[ 'sig_b0_fields'] = {
+#		                'sig_raw'    : self.mfi_vec_raw_sig,
+#		                'sig_rot'    : self.mfi_vec_rot_sig,
+#		                'sig_fit'    : self.mfi_vec_fit_sig,
+#		                'sig_raw_smt': self.mfi_vec_raw_smt_sig,
+#		                'sig_rot_smt': self.mfi_vec_rot_smt_sig,
+#		                'sig_fit_smt': self.mfi_vec_fit_smt_sig        }
 
-		self.nln_res_plas['b0_fields_raw'] = {
-		                'mfi_set_raw'    : self.mfi_vec_raw,
-		                'mfi_set_rot'    : self.mfi_vec_rot,
-		                'mfi_set_fit'    : self.mfi_vec_fit,
-		                'mfi_set_raw_smt': self.mfi_vec_raw_smt,
-		                'mfi_set_rot_smt': self.mfi_vec_rot_smt,
-		                'mfi_set_fit_smt': self.mfi_vec_fit_smt,
-		                'mfi_set_but_bnd': self.mfi_vec_but_bnd,
-		                'mfi_set_but_low': self.mfi_vec_but_low,
-		                'mfi_set_rng_avg': self.mfi_vec_raw            }
+#		self.nln_res_plas['b0_fields_raw'] = {
+#		                'mfi_set_raw'    : self.mfi_vec_raw,
+#		                'mfi_set_rot'    : self.mfi_vec_rot,
+#		                'mfi_set_fit'    : self.mfi_vec_fit,
+#		                'mfi_set_raw_smt': self.mfi_vec_raw_smt,
+#		                'mfi_set_rot_smt': self.mfi_vec_rot_smt,
+#		                'mfi_set_fit_smt': self.mfi_vec_fit_smt,
+#		                'mfi_set_but_bnd': self.mfi_vec_but_bnd,
+#		                'mfi_set_but_low': self.mfi_vec_but_low,
+#		                'mfi_set_rng_avg': self.mfi_vec_raw            }
 
-		self.nln_res_plas['b0_fields_smt'] = {
-		                'mfi_set_raw'    : self.mfi_vec_raw_smt, 
-		                'mfi_set_rot'    : self.mfi_vec_rot_smt, 
-		                'mfi_set_fit'    : self.mfi_vec_fit_smt, 
-		                'mfi_set_raw_smt': self.mfi_vec_raw_smt,
-		                'mfi_set_rot_smt': self.mfi_vec_rot_smt,
-		                'mfi_set_fit_smt': self.mfi_vec_fit_smt,
-		                'mfi_set_but_bnd': self.mfi_vec_but_bnd_smt,
-		                'mfi_set_but_low': self.mfi_vec_but_bnd_smt,
-		                'mfi_set_rng_avg': self.mfi_vec_raw_smt        }
+#		self.nln_res_plas['b0_fields_smt'] = {
+#		                'mfi_set_raw'    : self.mfi_vec_raw_smt, 
+#		                'mfi_set_rot'    : self.mfi_vec_rot_smt, 
+#		                'mfi_set_fit'    : self.mfi_vec_fit_smt, 
+#		                'mfi_set_raw_smt': self.mfi_vec_raw_smt,
+#		                'mfi_set_rot_smt': self.mfi_vec_rot_smt,
+#		                'mfi_set_fit_smt': self.mfi_vec_fit_smt,
+#		                'mfi_set_but_bnd': self.mfi_vec_but_bnd_smt,
+#		                'mfi_set_but_low': self.mfi_vec_but_bnd_smt,
+#		                'mfi_set_rng_avg': self.mfi_vec_raw_smt        }
 
 		self.nln_res_plas['b0_fields_avg'] = {
-		                'mfi_set_raw'    : self.mfi_avg_vec_arr,
-		                'mfi_set_rot'    : self.mfi_avg_vec_rot_smt_arr,
-		                'mfi_set_fit'    : self.mfi_avg_vec_fit_smt_arr,
-		                'mfi_set_raw_smt': self.mfi_avg_vec_raw_smt_arr,
-		                'mfi_set_rot_smt': self.mfi_avg_vec_rot_smt_arr,
-		                'mfi_set_fit_smt': self.mfi_avg_vec_fit_smt_arr,
-		                'mfi_set_but_bnd': self.mfi_vec_but_low,
-		                'mfi_set_but_low': self.mfi_vec_but_low,
+#		                'mfi_set_raw'    : self.mfi_avg_vec_arr,
+#		                'mfi_set_rot'    : self.mfi_avg_vec_rot_smt_arr,
+#		                'mfi_set_fit'    : self.mfi_avg_vec_fit_smt_arr,
+#		                'mfi_set_raw_smt': self.mfi_avg_vec_raw_smt_arr,
+#		                'mfi_set_rot_smt': self.mfi_avg_vec_rot_smt_arr,
+#		                'mfi_set_fit_smt': self.mfi_avg_vec_fit_smt_arr,
+#		                'mfi_set_but_bnd': self.mfi_vec_but_low,
+#		                'mfi_set_but_low': self.mfi_vec_but_low,
 		                'mfi_set_rng_avg': self.mfi_vec_rng_avg        }
 
 		self.nln_res_plas['b0_fields_db'] = {
-		                'mfi_set_raw'    : self.mfi_db_vec_raw,
-		                'mfi_set_rot'    : self.mfi_db_vec_rot,
-		                'mfi_set_fit'    : self.mfi_db_vec_fit,
-		                'mfi_set_raw_smt': self.mfi_db_vec_raw_smt,
-		                'mfi_set_rot_smt': self.mfi_db_vec_rot_smt,
-		                'mfi_set_fit_smt': self.mfi_db_vec_fit_smt,
-		                'mfi_set_but_bnd': self.mfi_db_vec_but_bnd,
-		                'mfi_set_but_low': self.mfi_db_vec_but_bnd,
+#		                'mfi_set_raw'    : self.mfi_db_vec_raw,
+#		                'mfi_set_rot'    : self.mfi_db_vec_rot,
+#		                'mfi_set_fit'    : self.mfi_db_vec_fit,
+#		                'mfi_set_raw_smt': self.mfi_db_vec_raw_smt,
+#		                'mfi_set_rot_smt': self.mfi_db_vec_rot_smt,
+#		                'mfi_set_fit_smt': self.mfi_db_vec_fit_smt,
+#		                'mfi_set_but_bnd': self.mfi_db_vec_but_bnd,
+#		                'mfi_set_but_low': self.mfi_db_vec_but_bnd,
 		                'mfi_set_rng_avg': self.mfi_db_vec_rng_avg     }
 
 

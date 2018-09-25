@@ -505,5 +505,5 @@ raxs[1].set_xlabel('Linear Frequency (Hz) ')
 #rfaxs[1].legend(loc="upper right")
 
 plt.show( )
-'''
+
 print 'Computation time = ','%.6f'% (time.time()-start), 'seconds.'

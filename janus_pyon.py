@@ -172,44 +172,44 @@ class plas( object ) :
 		self.oplas = None
 		self.ogyro = None
 
-		self.b0_fields_raw = dict.fromkeys( [ 'mfi_set_raw', 
-		                                      'mfi_set_rot',    
-		                                      'mfi_set_fit',    
-		                                      'mfi_set_raw_smt',
-		                                      'mfi_set_rot_smt',
-		                                      'mfi_set_fit_smt',
-		                                      'mfi_set_but_bnd',
-		                                      'mfi_set_but_low',
+#		self.b0_fields_raw = dict.fromkeys( [ 'mfi_set_raw', 
+#		                                      'mfi_set_rot',    
+#		                                      'mfi_set_fit',    
+#		                                      'mfi_set_raw_smt',
+#		                                      'mfi_set_rot_smt',
+#		                                      'mfi_set_fit_smt',
+#		                                      'mfi_set_but_bnd',
+#		                                      'mfi_set_but_low',
+#		                                      'mfi_set_rng_avg' ] )
+
+#		self.b0_fields_smt = dict.fromkeys( [ 'mfi_set_raw', 
+#		                                      'mfi_set_rot',    
+#		                                      'mfi_set_fit',    
+#		                                      'mfi_set_raw_smt',
+#		                                      'mfi_set_rot_smt',
+#		                                      'mfi_set_fit_smt',
+#		                                      'mfi_set_but_bnd',
+#		                                      'mfi_set_but_low',
+#		                                      'mfi_set_rng_avg' ] )
+
+		self.b0_fields_avg = dict.fromkeys( [ #'mfi_set_raw', 
+#		                                      'mfi_set_rot',    
+#		                                      'mfi_set_fit',    
+#		                                      'mfi_set_raw_smt',
+#		                                      'mfi_set_rot_smt',
+#		                                      'mfi_set_fit_smt',
+#		                                      'mfi_set_but_bnd',
+#		                                      'mfi_set_but_low',
 		                                      'mfi_set_rng_avg' ] )
 
-		self.b0_fields_smt = dict.fromkeys( [ 'mfi_set_raw', 
-		                                      'mfi_set_rot',    
-		                                      'mfi_set_fit',    
-		                                      'mfi_set_raw_smt',
-		                                      'mfi_set_rot_smt',
-		                                      'mfi_set_fit_smt',
-		                                      'mfi_set_but_bnd',
-		                                      'mfi_set_but_low',
-		                                      'mfi_set_rng_avg' ] )
-
-		self.b0_fields_avg = dict.fromkeys( [ 'mfi_set_raw', 
-		                                      'mfi_set_rot',    
-		                                      'mfi_set_fit',    
-		                                      'mfi_set_raw_smt',
-		                                      'mfi_set_rot_smt',
-		                                      'mfi_set_fit_smt',
-		                                      'mfi_set_but_bnd',
-		                                      'mfi_set_but_low',
-		                                      'mfi_set_rng_avg' ] )
-
-		self.b0_fields_db  = dict.fromkeys( [ 'mfi_set_raw', 
-		                                      'mfi_set_rot',    
-		                                      'mfi_set_fit',    
-		                                      'mfi_set_raw_smt',
-		                                      'mfi_set_rot_smt',
-		                                      'mfi_set_fit_smt',
-		                                      'mfi_set_but_bnd',
-		                                      'mfi_set_but_low',
+		self.b0_fields_db  = dict.fromkeys( [ #'mfi_set_raw', 
+#		                                      'mfi_set_rot',    
+#		                                      'mfi_set_fit',    
+#		                                      'mfi_set_raw_smt',
+#		                                      'mfi_set_rot_smt',
+#		                                      'mfi_set_fit_smt',
+#		                                      'mfi_set_but_bnd',
+#		                                      'mfi_set_but_low',
 		                                      'mfi_set_rng_avg' ] )
 
 

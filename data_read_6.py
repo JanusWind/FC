@@ -38,7 +38,7 @@ if( data_run=='y' ):
 
 	# Define the names of files to be analysed.
 
-	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-12-57-46_man_rngavg_21_600_fvpcb.jns'
+	fname1 = 'janus_2014-01-01-22-59-37_2014-01-02-03-32-12_man_rngavg_21_600_fvpc.jns'
 
 	print 'Currently reading file ==> {}  '.format( fname1 )
 	print '\n'
@@ -115,14 +115,14 @@ if( data_run=='y' ):
 
 #		try :
 
-	dat1_n_p.append( dat1['n_p'] )
-	dat1_n_p_c.append( dat1['n_p_c'] )
-	dat1_n_p_b.append( dat1['n_p_b'] )
+	dat1_n_p.append(   [ x if x!=None else 0. for x in  dat1['n_p']   ] )
+	dat1_n_p_c.append( [ x if x!=None else 0. for x in  dat1['n_p_c'] ] )
+	dat1_n_p_b.append( [ x if x!=None else 0. for x in  dat1['n_p_b'] ] )
 	
-	dat1_fv_p_c.append( dat1['fv_p_c'] )
-	dat1_fv_p_b.append( dat1['fv_p_b'] )
-	dat1_sig_fv_p_c.append( [ x for x in dat1['sig_fv_p_c'] if x!=None ] )
-	dat1_sig_fv_p_b.append( [ x for x in dat1['sig_fv_p_b'] if x!=None ] )
+	dat1_fv_p_c.append( [ x if x!=None else 0. for x in dat1['fv_p_c'] ] )
+	dat1_fv_p_b.append( [ x if x!=None else 0. for x in dat1['fv_p_b'] ] )
+	dat1_sig_fv_p_c.append( [ x if x!=None else 0. for x in dat1['sig_fv_p_c'] ] )
+	dat1_sig_fv_p_b.append( [ x if x!=None else 0. for x in dat1['sig_fv_p_b'] ] )
 	
 	dat1_alfvel.append( dat1['alfvel_p'] )
 	
@@ -190,13 +190,13 @@ yerr=dat1_sig_fv_p_c[0], marker='*', color='b', fmt='o', ecolor='g',
 if( len( dat1_sig_fv_p_b[0] ) != 0 ) :
 
 	axs1[0].errorbar( range( len( dat1_time[0] ) ), dat1_fv_p_b[0],
-	yerr=dat1_sig_fv_p_b[0], marker='v', color='r', fmt='o',
+	yerr=dat1_sig_fv_p_b[0], marker='v', color='b', fmt='o',
 	                                       ecolor='g', label='Proton Beam' )
 
 else :
 
 	axs1[0].scatter( range( len( dat1_time[0] ) ), dat1_fv_p_b[0],
-	                       marker='v', s=s, color='r', label='Proton Beam' )
+	                       marker='v', s=s, color='b', label='Proton Beam' )
 
 
 axs1[0].axhline( 0, marker='None', ls='--', color='c', lw='0.5' )
@@ -205,7 +205,7 @@ axs1[0].set_ylabel( r'$f_v$ (km/s)', fontsize=18 )
 axs1[0].legend( ncol=ncol, framealpha=legend_transparency, loc=1, fontsize=18 )
 
 axs1[1].errorbar( dat1_s_db, dat1_fv_p_c[0], xerr=None, yerr=dat1_sig_fv_p_c[0],
-marker='*', color='b', fmt='o', ecolor='g', label='Proton Core' )
+marker='*', color='r', fmt='o', ecolor='g', label='Proton Core' )
 
 axs1[1].legend( ncol=ncol, framealpha=legend_transparency, loc=1, fontsize=18 )
 
@@ -253,11 +253,11 @@ rcParams['figure.figsize'] = 10, 10
 
 f, axs2 = plt.subplots( 1, 1, squeeze=True, sharex=False )
 
-axs2.scatter( dat1_s_db, dat1_w_fv_p[0], marker='*', color='r',
+axs2.scatter( dat1_s_db, dat1_w_fv_p[0], marker='*', color='m',
                                                            label='Weighted fv' )
-axs2.scatter( dat1_s_db, dat1_fv_p_c[0], marker='d', color='b',
+axs2.scatter( dat1_s_db, dat1_fv_p_c[0], marker='d', color='r',
                                                                label='Core fv' )
-axs2.scatter( dat1_s_db, dat1_fv_p_b[0], marker='v', color='m',
+axs2.scatter( dat1_s_db, dat1_fv_p_b[0], marker='v', color='b',
                                                                label='Beam fv' )
 axs2.axhline( 0, marker='None', ls='--', color='c', lw='0.5' )
 axs2.legend( )
