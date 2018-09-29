@@ -262,6 +262,8 @@ class core( QObject ) :
 			self.fc_spec  = None
 
 			self.time_epc = None
+			self.timemin = None
+			self.timemax = None
 			self.time_val = None
 			self.time_txt = ''
 			self.time_vld = True
@@ -3410,6 +3412,9 @@ class core( QObject ) :
 
 		# Extract the data selection.
 
+		self.timemin = datetime( 9999, 1, 1, 0, 0, 0 )
+		self.timemax = datetime( 1, 1, 1, 0, 0, 0 )
+
 		x = [ ]
 
 		for c in range( self.fc_spec['n_cup'] ) :
@@ -3423,13 +3428,19 @@ class core( QObject ) :
 						x.append(
 						     self.fc_spec.arr[c][d][b] )
 
+						if( self.fc_spec.arr[c][d][b]['time'] < self.timemin ) :
+							self.timemin = self.fc_spec.arr[c][d][b]['time']
+
+						if( self.fc_spec.arr[c][d][b]['time'] > self.timemax ) :
+							self.timemax = self.fc_spec.arr[c][d][b]['time']
+
 		y = [ xx['curr'] for xx in x ]
 
 		# Compute the uncertainties.
 
 		sigma = [ sqrt( yy ) for yy in y ]
 
-#		print sigma
+#		print self.time_min, self.time_max
 		# Attempt to perform the non-linear fit.  If this fails, reset
 		# the associated variables and abort.
 
@@ -3458,6 +3469,11 @@ class core( QObject ) :
 		self.nln_res_plas.covar       = covar.copy( )
 
 		self.nln_res_plas['time']     = self.time_epc
+
+		self.nln_res_plas['timemin'] = self.timemin
+
+
+		self.nln_res_plas['timemax'] = self.timemax
 
 		self.nln_res_plas['b0_x']     = self.mfi_avg_vec_rot_smt[0]
 		self.nln_res_plas['b0_y']     = self.mfi_avg_vec_rot_smt[1]

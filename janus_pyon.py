@@ -32,8 +32,8 @@ from janus_const import const
 ################################################################################
 
 PARAM = [ 'b0', 'v0', 'fv', 'n', 'fn', 'v', 'dv', 'w', 'w2', 'r', 't', 'beta',
-          'time', 's', 'm','q', 'k', 'beta', 'beta', 'alfvel', 'oplas', 'ocycl',
-          'ogyro'                                                              ]
+          'time', 'timemin', 'timemax', 's', 'm','q', 'k', 'beta', 'beta', 'alfvel',
+          'oplas', 'ocycl', 'ogyro' ]
 
 COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat', 'fields' ]
 
@@ -146,6 +146,10 @@ class plas( object ) :
 	def __init__( self, time=None, enforce=False ) :
 
 		self.time = time
+
+		self.timemin = None
+
+		self.timemax = None
 
 		self.arr_spec = [ ]
 		self.arr_pop  = [ ]
@@ -377,6 +381,14 @@ class plas( object ) :
 
 			return self.time
 
+		elif   ( elem['param'] == 'timemin' ) :
+
+			return self.timemin
+
+		elif   ( elem['param'] == 'timemax' ) :
+
+			return self.timemax
+
 		elif ( elem['param'] == 'b0' ) :
 
 			if ( elem['sigma'] is None ) :
@@ -543,6 +555,26 @@ class plas( object ) :
 				self.time = None
 			elif ( type( value ) == datetime ) :
 				self.time = value
+			else :
+				raise TypeError(
+				     'Type "datetime" required for timestamp.' )
+
+		elif ( key == 'timemin' ) :
+
+			if ( value is None ) :
+				self.timemin = None
+			elif ( type( value ) == datetime ) :
+				self.timemin = value
+			else :
+				raise TypeError(
+				     'Type "datetime" required for timestamp.' )
+
+		elif ( key == 'timemax' ) :
+
+			if ( value is None ) :
+				self.timemax = None
+			elif ( type( value ) == datetime ) :
+				self.timemax = value
 			else :
 				raise TypeError(
 				     'Type "datetime" required for timestamp.' )

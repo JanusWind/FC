@@ -442,12 +442,6 @@ class fc_spec( ) :
 		           interp1d( mfi_s, mfi_db[1] ), 
 		           interp1d( mfi_s, mfi_db[2] ) ]
 
-#		print type(mfi_s)
-#		print type(mfi_db), type(mfi_db[0])
-#		print type(mfi_b), type(mfi_b[0])
-#
-#		print fnc_b[0]( 0. )
-
 		try :
 
 			for c in range( self['n_cup'] ) :

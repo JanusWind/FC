@@ -38,7 +38,8 @@ if( data_run=='y' ):
 
 	# Define the names of files to be analysed.
 
-	fname1 = 'janus_2014-01-01-22-59-37_2014-01-02-03-32-12_man_rngavg_21_600_fvpc.jns'
+	fname1 = 'test13.jns'
+#	fname1 = 'janus_2014-01-01-22-59-37_2014-01-02-03-32-12_man_rngavg_21_600_fvpc.jns'
 
 	print 'Currently reading file ==> {}  '.format( fname1 )
 	print '\n'
@@ -170,7 +171,7 @@ ind = [ 5*i for i in range( 1 +  len( dat1_time[0] )/5 ) ]
 
 labels = [ dat1_time[0][j] for j in ind ]
 
-
+'''
 ###############################################################################
 ## First Figure
 ###############################################################################
@@ -295,5 +296,5 @@ for fig in xrange(1, f.number+1 ): ## will open an empty extra figure :(
 pdf.close()
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
-
+'''
 print ('It took','%.6f'% (time.time()-start), 'seconds.')
