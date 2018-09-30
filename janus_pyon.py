@@ -32,8 +32,8 @@ from janus_const import const
 ################################################################################
 
 PARAM = [ 'b0', 'v0', 'fv', 'n', 'fn', 'v', 'dv', 'w', 'w2', 'r', 't', 'beta',
-          'time', 'timemin', 'timemax', 's', 'm','q', 'k', 'beta', 'beta', 'alfvel',
-          'oplas', 'ocycl', 'ogyro' ]
+          'time', 'mfitime','timemin', 'timemax', 's', 'm','q', 'k', 'beta',
+          'alfvel', 'oplas', 'ocycl', 'ogyro' ]
 
 COMP = [ 'x', 'y', 'z', 'per', 'par', 'vec', 'mag', 'hat', 'fields' ]
 
@@ -146,6 +146,8 @@ class plas( object ) :
 	def __init__( self, time=None, enforce=False ) :
 
 		self.time = time
+
+		self.mfitime    = None
 
 		self.timemin = None
 
@@ -381,6 +383,10 @@ class plas( object ) :
 
 			return self.time
 
+		elif   ( elem['param'] == 'mfitime' ) :
+
+			return self.mfitime
+
 		elif   ( elem['param'] == 'timemin' ) :
 
 			return self.timemin
@@ -558,6 +564,13 @@ class plas( object ) :
 			else :
 				raise TypeError(
 				     'Type "datetime" required for timestamp.' )
+
+		elif ( key == 'mfitime' ) :
+
+			if ( value is None ) :
+				self.mfitime = None
+			else :
+				self.mfitime = value
 
 		elif ( key == 'timemin' ) :
 

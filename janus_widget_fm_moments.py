@@ -355,24 +355,7 @@ class widget_fm_moments( QWidget ) :
 		NN = -int ( self.core.opt['mom_run_win']/2-1 )
 
 		x     = self.core.mfi_s[N:NN]
-#		y_raw = [ self.core.mfi_vec_raw[0][N:NN],
-#		          self.core.mfi_vec_raw[1][N:NN],
-#		          self.core.mfi_vec_raw[2][N:NN] ]
-#
-#		y_smt = [ self.core.mfi_vec_raw_smt[0][N:NN],
-#		          self.core.mfi_vec_raw_smt[1][N:NN],
-#		          self.core.mfi_vec_raw_smt[2][N:NN] ]
 
-#		y_raw = self.core.mfi_vec_but_bnd
-#		y_smt = self.core.mfi_vec_raw
-
-#		if( self.core.b0_fields[self.key] is None ) :
-#
-#			print 'Hello'
-#			print self.core.mfi_set_key
-#			print self.key
-#
-#			return
 		try :
 			y_raw = [ self.core.b0_fields[self.key][0][N:NN],
 			          self.core.b0_fields[self.key][1][N:NN],
@@ -458,80 +441,61 @@ class widget_fm_moments( QWidget ) :
 
 			try :
 
-#				print 'Point 1'
 				# Adjust the individual axes to the new limits.
 
 				self.make_lim( d )
-#				print 'Point 1a'
 
 				self.plt[j,i].setRange( xRange=self.lim_x,
 				                        yRange=self.lim_y,
 				                        padding=0.         )
-#				print 'Point 1b'
 
 				self.axs_x[i].setRange( self.lim_x[0],
 				                        self.lim_x[1] )
-#				print 'Point 1c'
 				self.axs_y[j].setRange( self.lim_y[0],
 				                        self.lim_y[1] )
 #				self.axs_y[j].set_yticks( range( self.lim_y[0],
 #				                                 self.lim_y[1]),
 #				           ( self.lim_y[1] - self.lim_y[0] )/6 )
-#				print 'Point 1d'
 
 				self.lbl[j,i].setPos( self.lim_x[1],
 				                      self.lim_y[1] )
-#				print 'Point 1e'
 
 				self.crv_raw[j,i] = PlotDataItem( x,
 				               y_raw[d], pen = self.pen_crv[4] )
-#				print 'Point 1f'
 
 				self.plt[j,i].addItem( self.crv_raw[j][i] )
-#				print 'Point 1g'
 
 				self.crv_smt[j,i] = PlotDataItem( x, y_smt[d],
 				                         pen = self.pen_crv[5] )
-#				print 'Point 1h'
 
 				self.plt[j,i].addItem( self.crv_smt[j][i] )
-#				print 'Point 1i'
 
 				try:
-#					print 'Point 2'
 					self.crv_bgd[j,i] = PlotDataItem( x,
 					       y_bgd[d], pen = self.pen_crv[0] )
 				except:
-#					print 'Point 3'
 					pass
 				try :
-#					print 'Point 4'
 					self.plt[j,i].addItem(
 					                    self.crv_bgd[j][i] )
 				except:
-#					print 'Point 5'
 					pass
 #			except :
 #				raise TypeError('Median filter length must be odd')
 #				pass
 
 				try:
-#					print 'Point 6'
 					self.crv_fit[j,i] = PlotDataItem( x,
 					       y_fit[d], pen = self.pen_crv[1] )
 				except:
-#					print 'Point 7'
 					pass
 				try :
-#					print 'Point 8'
 					self.plt[j,i].addItem(
 					                    self.crv_fit[j][i] )
 				except:
-#					print 'Point 9'
 					pass
 			except :
 #				raise TypeError('Median filter length must be odd')
-				print 'Point 10'
 				pass
 
 	#-----------------------------------------------------------------------

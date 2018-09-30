@@ -401,7 +401,7 @@ class widget_fc_cup( QWidget ) :
 		# For each plot in the grid, adjust its limits, add a histogram,
 		# and add a direction label.
 
-		for d in range( min( self.core.fc_spec['n_dir'], self.n_plt ) ) :
+		for d in range( min( self.core.fc_spec['n_dir'], self.n_plt ) ):
 
 			# Determine the location of this plot within the grid
 			# layout.

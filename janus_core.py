@@ -262,8 +262,9 @@ class core( QObject ) :
 			self.fc_spec  = None
 
 			self.time_epc = None
-			self.timemin = None
-			self.timemax = None
+			self.mfitime  = None
+			self.timemin  = None
+			self.timemax  = None
 			self.time_val = None
 			self.time_txt = ''
 			self.time_vld = True
@@ -3470,8 +3471,9 @@ class core( QObject ) :
 
 		self.nln_res_plas['time']     = self.time_epc
 
-		self.nln_res_plas['timemin'] = self.timemin
+		self.nln_res_plas['mfitime']  = self.mfi_t
 
+		self.nln_res_plas['timemin'] = self.timemin
 
 		self.nln_res_plas['timemax'] = self.timemax
 

@@ -103,9 +103,10 @@ if( data_run=='y' ):
 		db_y_rng_avg = dat1['b0_fields_db'][j]['mfi_set_rng_avg'][1]
 		db_z_rng_avg = dat1['b0_fields_db'][j]['mfi_set_rng_avg'][2]
 
-		dat1_db_rng_avg.append( sqrt( 2 * ( std( db_x_rng_avg )**2 +
-		                                    std( db_x_rng_avg )**2 +
-		                                    std( db_x_rng_avg )**2 ) ) )
+		dat1_db_rng_avg.append( sqrt( 2 * ( 
+		                   std( db_x_rng_avg[ind_min:ind_max] )**2 +
+		                   std( db_x_rng_avg[ind_min:ind_max] )**2 +
+		                   std( db_x_rng_avg[ind_min:ind_max] )**2 ) ) )
 
 		dat1_b_avg.append( sqrt(
 		 mean( dat1['b0_fields_avg'][j]['mfi_set_rng_avg'][0] )**2 +

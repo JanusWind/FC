@@ -76,11 +76,11 @@ start = time.time( )
 
 download = raw_input('Download the data ==>  ')
 
-date = '2014-01-01-23-00-00'
-dur  =  3600*4.0
+date = '2008-11-04-12-00-40.5'
+dur  =  90
 dur  = dur
 
-filter_length = 109
+filter_length = 1
 
 if( download == 'y' ) :
 
@@ -168,22 +168,27 @@ rcParams['figure.figsize'] = 50, 25
 f, axs = plt.subplots( 4, 1, squeeze=True, sharex=True )
 
 axs[0].plot( mfi_s, mfi_b_filt,   color='k', label='b', lw=0.2 )
-axs[0].set_xlim( min( mfi_s ), max( mfi_s ) )
+#axs[0].set_ylim( 3., 3.5 )
+#axs[0].set_xlim( min( mfi_s ), max( mfi_s ) )
 axs[0].legend( loc=4, fontsize=32 )
 
 axs[1].plot( mfi_s, mfi_b_x_filt, color='r', label=r'$B_x$', lw=0.2 )
 axs[1].axhline( 0, color='c', linewidth=1 )
-axs[1].set_xlim( min( mfi_s ), max( mfi_s ) )
+axs[1].set_ylim( 3., 3.5 )
+#axs[1].set_xlim( min( mfi_s ), max( mfi_s ) )
 axs[1].legend( loc=1, fontsize=32 )
 
 axs[2].plot( mfi_s, mfi_b_y_filt, color='g', label=r'$B_y$', lw=0.2 )
 axs[2].axhline( 0, color='c', linewidth=1 )
-axs[2].set_xlim( min( mfi_s ), max( mfi_s ) )
+axs[2].set_ylim( -0.8, 0.2 )
+#axs[2].set_xlim( min( mfi_s ), max( mfi_s ) )
 axs[2].legend( loc=4, fontsize=32 )
 
 axs[3].plot( mfi_s, mfi_b_z_filt, color='b', label=r'$B_z$', lw=0.2 )
 axs[3].axhline( 0, color='c', linewidth=1 )
-axs[3].set_xlim( min( mfi_s ), max( mfi_s ) )
+axs[3].set_xlim( 300, 400 )
+axs[3].set_ylim( -0.6, 1 )
+#axs[3].set_xlim( min( mfi_s ), max( mfi_s ) )
 axs[3].set_xlabel( 'Time', fontsize=32 )
 axs[3].legend( loc=1, fontsize=32 )
 
@@ -206,7 +211,7 @@ for tick in axs[3].xaxis.get_major_ticks() :
 f, axs2 = plt.subplots( 1, 1, squeeze=True, sharex=True )
 
 axs2.plot( mfi_s, mfi_b_filt,   color='k', label='B', lw=0.2 )
-axs2.set_xlim( min( mfi_s ), max( mfi_s ) )
+#axs2.set_xlim( min( mfi_s ), max( mfi_s ) )
 
 axs2.plot( mfi_s, mfi_b_x_filt, color='r', label=r'$B_x$', lw=0.2 )
 axs2.axhline( 0, color='c', linewidth=1 )
@@ -219,6 +224,7 @@ axs2.plot( mfi_s, mfi_b_z_filt, color='b', label=r'$B_z$', lw=0.2 )
 axs2.set_xlim( min( mfi_s ), max( mfi_s ) )
 
 axs2.plot( mfi_s, -mfi_b_filt,   color='k', lw=0.2 )
+axs2.set_xlim( 300, 400 )
 axs2.set_xlim( min( mfi_s ), max( mfi_s ) )
 
 axs2.set_xlabel( 'Time', fontsize=32 )
@@ -241,7 +247,7 @@ for tick in axs2.yaxis.get_major_ticks() :
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development/figures")
 
-pdf = matplotlib.backends.backend_pdf.PdfPages( 'Magnetic_field' + date + str(dur) + ".pdf" )
+pdf = matplotlib.backends.backend_pdf.PdfPages( 'newMagnetic_field' + date + str(dur) + ".pdf" )
 
 for fig in xrange(1, f.number+1 ): ## will open an empty extra figure :(
 	pdf.savefig( fig )
