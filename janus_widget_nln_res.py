@@ -217,10 +217,10 @@ class widget_nln_res( format_TextEdit ) :
 						self.prnt_dcm( pop['sig_n'], 3 )
 					self.prnt_htm( 'cm<sup>-3</sup>' )
 
-					self.prnt_brk( )
-					self.prnt_tab( 3 )
-
 					if( pop['flcn'] ) :
+
+						self.prnt_brk( )
+						self.prnt_tab( 3 )
 
 						self.prnt_htm( lab_fn + ' = ' )
 						self.prnt_dcm( pop['fn'], 3 )
@@ -294,20 +294,21 @@ class widget_nln_res( format_TextEdit ) :
 						               'sig_v0_z'], 3  )
 						self.prnt_htm( ' km/s'         )
 
-						if ( pop['flcv'] ) :
+						if ( pop['flcv'] and
+						 self.core.opt['res_par_fv'] ) :
 							self.prnt_brk( )
 							self.prnt_tab( 3 )
 							self.prnt_htm( lab_fv +
 							                 ' = ' )
 							self.prnt_dcm( pop[
 							               'fv'],3 )
-						if ( sig_disp ) :
-
+						if ( sig_disp and 
+						  self.core.opt['res_par_fv']) :
 							self.prnt_htm(
 						        '&nbsp;&plusmn;&nbsp;' )
 							self.prnt_dcm( pop[
 						                 'sig_fv'], 3  )
-						self.prnt_htm( ' km/s'         )
+							self.prnt_htm( ' km/s' )
 
 				elif ( pop['drift'] ) :
 
@@ -318,13 +319,14 @@ class widget_nln_res( format_TextEdit ) :
 						                 ' = ' )
 						self.prnt_dcm( pop[
 						               'fv'],3 )
-					if ( sig_disp ) :
+
+					if ( sig_disp and pop['flcv'] ) :
 
 						self.prnt_htm(
 					        '&nbsp;&plusmn;&nbsp;' )
 						self.prnt_dcm( pop[
 					                 'sig_fv'], 3  )
-					self.prnt_htm( ' km/s'         )
+						self.prnt_htm( ' km/s'         )
 
 					if ( self.core.opt['res_par_d'] ) :
 						self.prnt_brk( )

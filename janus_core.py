@@ -470,21 +470,21 @@ class core( QObject ) :
 					self.nln_plas.add_pop(
 					        'p', name='Beam', sym='b',
 					        drift=True, flcn=False,
-				                flcv=True,  aniso=True    )
+				                flcv=False, aniso=True    )
 				elif ( p == 2 ) :
 					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = True
 					self.nln_plas.add_pop(
 					        'a', name='Core', sym='c',
 					        drift=True, flcn=False,
-				                flcv=True,  aniso=True    )
+				                flcv=False, aniso=True    )
 				elif ( p == 3 ) :
 					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = True
 					self.nln_plas.add_pop(
 					        'a', name='Beam', sym='b',
 					        drift=True, flcn=False,
-				                flcv=True,  aniso=False   )
+				                flcv=False, aniso=False   )
 				else :
 					self.nln_pop_use[p] = False
 					self.nln_pop_vld[p] = False
@@ -744,35 +744,35 @@ class core( QObject ) :
 
 			return
 
-		if ( str( time_req ).lower( ) == 'flcn' ) :
-
-			self.emit( SIGNAL('janus_chng_spc') )
-
-			if ( self.flc_n ) :
-				self.flc_n = False
-				self.emit( SIGNAL('janus_mesg'),
-			           'core', 'end', 'flcn' )
-			else :
-				self.flc_n = True
-				self.emit( SIGNAL('janus_mesg'),
-			           'core', 'begin', 'flcn' )
-
-			return
-
-		if ( str( time_req ).lower( ) == 'flcv' ) :
-
-			self.emit( SIGNAL('janus_chng_spc') )
-
-			if ( self.flc_v ) :
-				self.flc_v = False
-				self.emit( SIGNAL('janus_mesg'),
-			           'core', 'end', 'flcv' )
-			else :
-				self.flc_v = True
-				self.emit( SIGNAL('janus_mesg'),
-			           'core', 'begin', 'flcv' )
-
-			return
+#		if ( str( time_req ).lower( ) == 'flcn' ) :
+#
+#			self.emit( SIGNAL('janus_chng_spc') )
+#
+#			if ( self.flc_n ) :
+#				self.flc_n = False
+#				self.emit( SIGNAL('janus_mesg'),
+#			           'core', 'end', 'flcn' )
+#			else :
+#				self.flc_n = True
+#				self.emit( SIGNAL('janus_mesg'),
+#			           'core', 'begin', 'flcn' )
+#
+#			return
+#
+#		if ( str( time_req ).lower( ) == 'flcv' ) :
+#
+#			self.emit( SIGNAL('janus_chng_spc') )
+#
+#			if ( self.flc_v ) :
+#				self.flc_v = False
+#				self.emit( SIGNAL('janus_mesg'),
+#			           'core', 'end', 'flcv' )
+#			else :
+#				self.flc_v = True
+#				self.emit( SIGNAL('janus_mesg'),
+#			           'core', 'begin', 'flcv' )
+#
+#			return
 
 		# Convert the argument "time_req" into the standard, second-
 		# precision, string format.  If this conversion returns "None",
@@ -3691,15 +3691,6 @@ class core( QObject ) :
 			                  pop_v0_vec, pop_n, pop_dv,
 			                  pop_w, pop_fn, pop_fv,
 		                          self.mfi_sig_vec_db_rng_avg,
-
-
-
-
-
-
-
-
-
 			                  self.mfi_set_key                   ) )
 
 		# Save the results of the this non-linear analysis to the

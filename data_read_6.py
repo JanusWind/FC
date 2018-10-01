@@ -60,6 +60,9 @@ if( data_run=='y' ):
 
 	dat1_time         = []
 
+	ii                = [] # Initial index
+	fi                = [] # Final index
+
 	dat1_db_rng_avg   = []
 
 	dat1_b_avg        = []
@@ -98,20 +101,22 @@ if( data_run=='y' ):
 	                                              for x in  dat1['time'] ] )
 
 	for j in range( nd1 ) :
-	
+
+		ii = where( [ dat1['timemin'][1] < x for x in dat1['mfitime'][1] ] )[0][0]
+		fi = where( [ dat1['timemax'][0] > x for x in dat1['mfitime'][0] ] )[0][-1]
 		db_x_rng_avg = dat1['b0_fields_db'][j]['mfi_set_rng_avg'][0]
 		db_y_rng_avg = dat1['b0_fields_db'][j]['mfi_set_rng_avg'][1]
 		db_z_rng_avg = dat1['b0_fields_db'][j]['mfi_set_rng_avg'][2]
 
-		dat1_db_rng_avg.append( sqrt( 2 * ( 
-		                   std( db_x_rng_avg[ind_min:ind_max] )**2 +
-		                   std( db_x_rng_avg[ind_min:ind_max] )**2 +
-		                   std( db_x_rng_avg[ind_min:ind_max] )**2 ) ) )
+		dat1_db_rng_avg.append( sqrt( 2 * (
+		                   std( db_x_rng_avg[ii:fi] )**2 +
+		                   std( db_x_rng_avg[ii:fi] )**2 +
+		                   std( db_x_rng_avg[ii:fi] )**2 ) ) )
 
 		dat1_b_avg.append( sqrt(
-		 mean( dat1['b0_fields_avg'][j]['mfi_set_rng_avg'][0] )**2 +
-		 mean( dat1['b0_fields_avg'][j]['mfi_set_rng_avg'][0] )**2 +
-		 mean( dat1['b0_fields_avg'][j]['mfi_set_rng_avg'][0] )**2 ) )
+		mean( dat1['b0_fields_avg'][j]['mfi_set_rng_avg'][0][ii:fi] )**2 +
+		mean( dat1['b0_fields_avg'][j]['mfi_set_rng_avg'][0][ii:fi] )**2 +
+		mean( dat1['b0_fields_avg'][j]['mfi_set_rng_avg'][0][ii:fi] )**2 ) )
 
 		dat1_s_db.append( dat1_db_rng_avg[j]/dat1_b_avg[j] )
 
@@ -298,4 +303,4 @@ pdf.close()
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
 '''
-print ('It took','%.6f'% (time.time()-start), 'seconds.')
+print 'It took','%.6f'% (time.time()-start), 'seconds.'
