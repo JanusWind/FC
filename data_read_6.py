@@ -9,7 +9,7 @@ os.system('cls' if os.name == 'nt' else 'clear') # Clear the screen
 import glob
 import pickle
 import numpy as np
-from numpy import mean, sqrt, corrcoef
+from numpy import mean, sqrt, corrcoef, where
 import matplotlib.pyplot as plt
 import matplotlib.backends.backend_pdf
 from matplotlib import gridspec, rc
@@ -20,8 +20,8 @@ from numpy import linspace, pi, sqrt, exp, std
 
 from janus_const import const
 
-plt.clf()
-plt.close('all')
+#plt.clf()
+#plt.close('all')
 
 #n_data = raw_input('Which file numbers do you want to run the code for ==>  ')
 #n_data = [ int( n_data[j] ) for j in range( len( n_data ) ) ]
@@ -38,8 +38,7 @@ if( data_run=='y' ):
 
 	# Define the names of files to be analysed.
 
-	fname1 = 'test13.jns'
-#	fname1 = 'janus_2014-01-01-22-59-37_2014-01-02-03-32-12_man_rngavg_21_600_fvpc.jns'
+	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-12-57-46_man_rngavg_21_600_fvpc.jns'
 
 	print 'Currently reading file ==> {}  '.format( fname1 )
 	print '\n'
@@ -71,6 +70,7 @@ if( data_run=='y' ):
 	dat1_n_p_b        = []
 	dat1_n_p          = []
 
+	dat1_del_v_p_c    = []
 	dat1_fv_p_c       = []
 	dat1_fv_p_b       = []
 	dat1_sig_fv_p_c   = []
@@ -86,6 +86,7 @@ if( data_run=='y' ):
 	dat1_s_sig_fv_p_b = []
 
 	dat1_s_db         = []
+	dat1_s_db_rng_avg = []
 
 	r_ind = [ 4, 7, 16, 25 ]
 
@@ -102,21 +103,22 @@ if( data_run=='y' ):
 
 	for j in range( nd1 ) :
 
-		ii = where( [ dat1['timemin'][1] < x for x in dat1['mfitime'][1] ] )[0][0]
-		fi = where( [ dat1['timemax'][0] > x for x in dat1['mfitime'][0] ] )[0][-1]
+#		ii = where( [ dat1['timemin'][j] < x for x in dat1['mfitime'][j] ] )[0][0]
+#		fi = where( [ dat1['timemax'][j] > x for x in dat1['mfitime'][j] ] )[0][-1]
+
 		db_x_rng_avg = dat1['b0_fields_db'][j]['mfi_set_rng_avg'][0]
 		db_y_rng_avg = dat1['b0_fields_db'][j]['mfi_set_rng_avg'][1]
 		db_z_rng_avg = dat1['b0_fields_db'][j]['mfi_set_rng_avg'][2]
 
 		dat1_db_rng_avg.append( sqrt( 2 * (
-		                   std( db_x_rng_avg[ii:fi] )**2 +
-		                   std( db_x_rng_avg[ii:fi] )**2 +
-		                   std( db_x_rng_avg[ii:fi] )**2 ) ) )
+		                   std( db_x_rng_avg )**2 +
+		                   std( db_x_rng_avg )**2 +
+		                   std( db_x_rng_avg )**2 ) ) )
 
 		dat1_b_avg.append( sqrt(
-		mean( dat1['b0_fields_avg'][j]['mfi_set_rng_avg'][0][ii:fi] )**2 +
-		mean( dat1['b0_fields_avg'][j]['mfi_set_rng_avg'][0][ii:fi] )**2 +
-		mean( dat1['b0_fields_avg'][j]['mfi_set_rng_avg'][0][ii:fi] )**2 ) )
+		mean( dat1['b0_fields_avg'][j]['mfi_set_rng_avg'][0] )**2 +
+		mean( dat1['b0_fields_avg'][j]['mfi_set_rng_avg'][0] )**2 +
+		mean( dat1['b0_fields_avg'][j]['mfi_set_rng_avg'][0] )**2 ) )
 
 		dat1_s_db.append( dat1_db_rng_avg[j]/dat1_b_avg[j] )
 
@@ -133,18 +135,30 @@ if( data_run=='y' ):
 	
 	dat1_alfvel.append( dat1['alfvel_p'] )
 	
-	dat1_s_fv_p_c.append( [ dat1_fv_p_c[0][k]/dat1_alfvel[0][k] 
+	dat1_del_v_p_c.append( [ dat1_fv_p_c[0][k] *
+	                                        dat1_db_rng_avg[k]/dat1_b_avg[k]
+	                             for k in range( len( dat1_fv_p_c[0] ) ) ] )
+
+	dat1_s_fv_p_c.append( [ dat1_del_v_p_c[0][k]/dat1_alfvel[0][k] 
 	                         for k in range( len( dat1_fv_p_c[0] ) ) ] )
+
 	dat1_s_fv_p_b.append( [ dat1_fv_p_b[0][k]/dat1_alfvel[0][k] 
 	                         for k in range( len( dat1_fv_p_b[0] ) ) ] )
-	dat1_s_sig_fv_p_c.append( [ dat1_sig_fv_p_c[0][k]/dat1_alfvel[0][k] 
+
+	dat1_s_sig_fv_p_c.append( [ dat1_sig_fv_p_c[0][k] * dat1_db_rng_avg[k] /
+	                                     ( dat1_b_avg[k]*dat1_alfvel[0][k] )
 	                         for k in range( len( dat1_sig_fv_p_c[0] ) ) ] )
-	dat1_s_sig_fv_p_b.append( [ dat1_sig_fv_p_b[0][k]/dat1_alfvel[0][k] 
-	                         for k in range( len( dat1_sig_fv_p_b[0] ) ) ] )
-	
-	dat1_w_fv_p.append( [ ( dat1_fv_p_c[0][j] * dat1_n_p_c[0][j] + 
-	                 dat1_fv_p_b[0][j] * dat1_n_p_b[0][j] )/dat1_n_p[0][j] 
-	                             for j in range( len( dat1_fv_p_c[0] ) ) ] )
+
+	dat1_s_sig_fv_p_b.append( [ dat1_sig_fv_p_b[0][k] * dat1_db_rng_avg[k] /
+	                                     ( dat1_b_avg[k]*dat1_alfvel[0][k] )
+	                         for k in range( len( dat1_sig_fv_p_c[0] ) ) ] )
+
+	dat1_w_fv_p.append( [ ( dat1_fv_p_c[0][k] * dat1_n_p_c[0][k] + 
+	                 dat1_fv_p_b[0][k] * dat1_n_p_b[0][k] )/dat1_n_p[0][k]
+	                             for k in range( len( dat1_fv_p_c[0] ) ) ] )
+
+	dat1_s_db_rng_avg.append( [ dat1_db_rng_avg[k]/dat1_b_avg[k]
+	                             for k in range( len( dat1_fv_p_c[0] ) ) ] )
 
 #		except:
 
@@ -229,6 +243,7 @@ axs1[1].set_xlim( [ 0, 0.5 ] )
 #	ecolor='m', label='Proton Beam' )
 #	axs1[2].legend( )
 #	axs1[2].axhline( 0, marker='None', ls='--', color='gray', lw='0.5' )
+
 #	axs1[2].set_ylabel( 'Velocity(km/s)', fontsize=18 )
 #	axs1[2].set_xlabel( r'$\Delta B / B$', fontsize=18 )
 
