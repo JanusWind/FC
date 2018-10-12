@@ -31,7 +31,7 @@ print '\n'
 
 if( data_run=='y' ):
 
-	print 'Please wait. The computer is running the data! We appreciate your patience \n'
+	print 'Please wait. The computer is running the code! We appreciate your patience \n'
 	# Change the directory in which the saved file exists.
 
 	os.chdir("/home/ahmadr/Desktop/GIT/fm_development/data/edited")

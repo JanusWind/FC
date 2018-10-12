@@ -108,7 +108,7 @@ if ( data_run == 'y' ) :
 	else :
 
 		os.chdir("/home/ahmadr/Desktop/GIT/Personal/Janus")
-
+'''
 	nd[0] = sum( [ len(dat[0][i]['b0'] ) for i in range ( len( fname[0] ) ) ] )
 	nd[1] = sum( [ len(dat[1][i]['b0'] ) for i in range ( len( fname[1] ) ) ] )
 
@@ -816,7 +816,7 @@ if ( data_run == 'y' ) :
 
 else :
 	print 'Data not read, just running the plotting algorithm'
-
+'''
 '''
 from scipy.stats import pearsonr
 a = range(-40, 40)
@@ -840,7 +840,7 @@ for i in range(700):
 					corr_n_p_2.append( t_p_n[1][i] )
 print pearsonr(corr_n_p_1, corr_n_p_2)
 '''
-
+'''
 if ( data_run == 'y' ) :
 
 	fz = 21 # Median filter size ( should be an odd number )
@@ -1306,7 +1306,7 @@ legend_transparency = 0.50 # Transparency of legend
 ncol = 1 # Number of columns for legend
 
 xmax = len( t_hr[n] )# - 26 # Maximum value of x-axis
-
+'''
 '''
 ###############################################################################
 ## First Figure
