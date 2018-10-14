@@ -3441,26 +3441,46 @@ class core( QObject ) :
 
 		sigma = [ sqrt( yy ) for yy in y ]
 
-#		print self.time_min, self.time_max
+		# Set magnetic field to each datum based on the new time limits
+
+		ii = where( [ self.timemin < self.mfi_t[i]
+		                  for i in range( len( self.mfi_t ) ) ] )[0][0]
+
+		fi = where( [ self.timemax < self.mfi_t[i]
+		                  for i in range( len( self.mfi_t ) ) ] )[0][-1]
+
+		avg_mag_new = [ mean( self.mfi_b_x[ii:fi] ),
+		                mean( self.mfi_b_y[ii:fi] ),
+		                mean( self.mfi_b_z[ii:fi] ) ]
+
+		avg_mag_arr = [ [xx]*len( self.b0_db_fields[self.mfi_set_key][0] )
+		                        for xx in avg_mag_new ]
+
+		self.fc_spec.set_mag( self.mfi_t, self.mfi_avg_mag_raw_smt,
+#		                      self.b0_avg_fields[self.mfi_set_key],
+		                      avg_mag_arr,
+		                      self.b0_db_fields[self.mfi_set_key],
+		                      self.mfi_set_key, self.opt['mom_run_win'])
+
 		# Attempt to perform the non-linear fit.  If this fails, reset
 		# the associated variables and abort.
 
-		#try :
+#		try :
 
 		( fit, covar ) = curve_fit( model, x, y, 
-		                            self.nln_gss_prm,
-		                            sigma=sigma, maxfev=15000       )
+		                       self.nln_gss_prm,
+		                       sigma=sigma, maxfev=15000       )
 		sig = sqrt( diag( covar ) )
 
-		#except :
+#		except :
 
-		#	self.emit( SIGNAL('janus_mesg'), 'core', 'fail', 'nln' )
+#			self.emit( SIGNAL('janus_mesg'), 'core', 'fail', 'nln' )
 
-		#	self.rset_var( var_nln_res=True )
+#			self.rset_var( var_nln_res=True )
 
-		#	self.emit( SIGNAL('janus_chng_nln_res') )
+#			self.emit( SIGNAL('janus_chng_nln_res') )
 
-		#	return
+#			return
 
 		# Save the properties and fit parameters for each ion species
 		# used in this analysis.

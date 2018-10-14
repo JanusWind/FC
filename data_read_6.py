@@ -38,7 +38,7 @@ if( data_run=='y' ):
 
 	# Define the names of files to be analysed.
 
-	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-12-57-46_man_rngavg_21_600_fvpc.jns'
+	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-12-59-24_man_rng_avg_21_600_fvpc.jns'
 
 	print 'Currently reading file ==> {}  '.format( fname1 )
 	print '\n'
@@ -103,8 +103,8 @@ if( data_run=='y' ):
 
 	for j in range( nd1 ) :
 
-#		ii = where( [ dat1['timemin'][j] < x for x in dat1['mfitime'][j] ] )[0][0]
-#		fi = where( [ dat1['timemax'][j] > x for x in dat1['mfitime'][j] ] )[0][-1]
+		ii = where( [ dat1['timemin'][j] < x for x in dat1['mfitime'][j] ] )[0][0]
+		fi = where( [ dat1['timemax'][j] > x for x in dat1['mfitime'][j] ] )[0][-1]
 
 		db_x_rng_avg = dat1['b0_fields_db'][j]['mfi_set_rng_avg'][0]
 		db_y_rng_avg = dat1['b0_fields_db'][j]['mfi_set_rng_avg'][1]

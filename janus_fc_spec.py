@@ -432,6 +432,7 @@ class fc_spec( ) :
 
 
 		if( key == 'mfi_set_rng_avg' ) :
+
 			mfi_s = mfi_s[ N/2: - ( N/2-1 ) ]
 
 		fnc_b  = [ interp1d( mfi_s, mfi_b[0] ),
