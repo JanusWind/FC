@@ -2213,7 +2213,10 @@ class core( QObject ) :
 		# analysis) to calculate the best-fit bulk speed for the solar
 		# wind.
 
-		mom_v_vec = lstsq( eta_dlk, eta_v )[0]
+		# Note: Had to put 'rcond=None' in order to supress the 'Future
+		# Warning' from the 'lstsq' algorithm!
+
+		mom_v_vec = lstsq( eta_dlk, eta_v, rcond=None )[0]
 
 		# For each of the selected look directions, use the derived
 		# value of "mom_v_vec" to estimate its effective collecting

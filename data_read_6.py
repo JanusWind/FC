@@ -20,8 +20,8 @@ from numpy import linspace, pi, sqrt, exp, std
 
 from janus_const import const
 
-#plt.clf()
-#plt.close('all')
+plt.clf()
+plt.close('all')
 
 #n_data = raw_input('Which file numbers do you want to run the code for ==>  ')
 #n_data = [ int( n_data[j] ) for j in range( len( n_data ) ) ]
@@ -38,7 +38,7 @@ if( data_run=='y' ):
 
 	# Define the names of files to be analysed.
 
-	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-12-59-24_man_rng_avg_21_600_fvpc.jns'
+	fname1 = 'janus_2014-01-01-23-16-02_2014-01-02-01-37-15_man_ang_avg_fvpc.jns'
 
 	print 'Currently reading file ==> {}  '.format( fname1 )
 	print '\n'
@@ -175,6 +175,8 @@ if( data_run=='y' ):
 else:
 	print 'Data not read, running plotting algorithm.'
 
+dat1_s_fv_pc = [ xx/yy for xx,yy in zip( dat1_fv_p_c[0], dat1_alfvel[0]) ]
+dat1_s_sig_fv_pc = [ xx/yy for xx,yy in zip( dat1_sig_fv_p_c[0], dat1_alfvel[0]) ]
 # Define figure paramaters
 
 dpi = 40 # DPI of the saved plots
@@ -191,7 +193,7 @@ ind = [ 5*i for i in range( 1 +  len( dat1_time[0] )/5 ) ]
 
 labels = [ dat1_time[0][j] for j in ind ]
 
-'''
+
 ###############################################################################
 ## First Figure
 ###############################################################################
@@ -204,8 +206,8 @@ labels = [ dat1_time[0][j] for j in ind ]
 
 f, axs1 = plt.subplots( 2, 1, squeeze=True, sharex=False )
 
-axs1[0].errorbar( range( len( dat1_time[0] ) ), dat1_fv_p_c[0],
-yerr=dat1_sig_fv_p_c[0], marker='*', color='r', fmt='o', ecolor='g',
+axs1[0].errorbar( range( len( dat1_time[0] ) ), dat1_s_fv_p_c[0],
+yerr=dat1_s_sig_fv_p_c[0], marker='*', color='r', fmt='o', ecolor='g',
                                                            label='Proton Core' )
 
 if( len( dat1_sig_fv_p_b[0] ) != 0 ) :
@@ -226,7 +228,7 @@ axs1[0].set_ylabel( r'$f_v$', fontsize=18 )
 axs1[0].legend( ncol=ncol, framealpha=legend_transparency, loc=1, fontsize=18 )
 axs1[0].set_xlim( [ 0, max( range( len( dat1_time[0] ) ) ) ] )
 
-axs1[1].errorbar( dat1_s_db, dat1_fv_p_c[0], xerr=None, yerr=dat1_sig_fv_p_c[0],
+axs1[1].errorbar( dat1_s_db, dat1_s_fv_p_c[0], xerr=None, yerr=dat1_s_sig_fv_p_c[0],
 marker='*', color='r', fmt='o', ecolor='g', label='Proton Core' )
 
 axs1[1].legend( ncol=ncol, framealpha=legend_transparency, loc=1, fontsize=18 )
@@ -235,7 +237,7 @@ axs1[1].axhline( 0, marker='None', ls='--', color='c', lw='0.5' )
 
 axs1[1].set_xlabel( r'$|\Delta B /B_0|$', fontsize=18 )
 axs1[1].set_ylabel( r'$f_v$', fontsize=18 )
-axs1[1].set_xlim( [ 0, 0.5 ] )
+axs1[1].set_xlim( [ 0, 0.35 ] )
 #if( len( dat1_sig_fv_p_b[0] ) != 0 ) :
 #
 #	axs1[2].errorbar( dat1_s_db, dat1_fv_p_b[0], xerr=None,
@@ -310,12 +312,12 @@ axs2.set_yticklabels( tick_labels )
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development/figures")
 
-pdf = matplotlib.backends.backend_pdf.PdfPages( fname1[0:-4] + ".pdf" )
+pdf = matplotlib.backends.backend_pdf.PdfPages( fname1[0:-4] + "old.pdf" )
 
 for fig in xrange(1, f.number+1 ): ## will open an empty extra figure :(
 	pdf.savefig( fig )
 pdf.close()
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
-'''
+
 print 'It took','%.6f'% (time.time()-start), 'seconds.'
