@@ -37,8 +37,10 @@ if( data_run=='y' ):
 	os.chdir("/home/ahmadr/Desktop/GIT/fm_development/data/edited")
 
 	# Define the names of files to be analysed.
+	fname1 = 'janus_2014-01-01-22-59-37_2014-01-02-03-32-12_man_rngavg_21_600_fvpc.jns'
 
-	fname1 = 'janus_2014-01-01-23-16-02_2014-01-02-01-37-15_man_ang_avg_fvpc.jns'
+#	fname1 = 'janus_2014-01-01-23-16-02_2014-01-02-01-37-15_man_rng_avg_21_600_fvpc.jns'
+
 
 	print 'Currently reading file ==> {}  '.format( fname1 )
 	print '\n'
@@ -103,8 +105,8 @@ if( data_run=='y' ):
 
 	for j in range( nd1 ) :
 
-		ii = where( [ dat1['timemin'][j] < x for x in dat1['mfitime'][j] ] )[0][0]
-		fi = where( [ dat1['timemax'][j] > x for x in dat1['mfitime'][j] ] )[0][-1]
+#		ii = where( [ dat1['timemin'][j] < x for x in dat1['mfitime'][j] ] )[0][0]
+#		fi = where( [ dat1['timemax'][j] > x for x in dat1['mfitime'][j] ] )[0][-1]
 
 		db_x_rng_avg = dat1['b0_fields_db'][j]['mfi_set_rng_avg'][0]
 		db_y_rng_avg = dat1['b0_fields_db'][j]['mfi_set_rng_avg'][1]
@@ -206,8 +208,8 @@ labels = [ dat1_time[0][j] for j in ind ]
 
 f, axs1 = plt.subplots( 2, 1, squeeze=True, sharex=False )
 
-axs1[0].errorbar( range( len( dat1_time[0] ) ), dat1_s_fv_p_c[0],
-yerr=dat1_s_sig_fv_p_c[0], marker='*', color='r', fmt='o', ecolor='g',
+axs1[0].errorbar( range( len( dat1_time[0] ) ), dat1_fv_p_c[0],
+yerr=dat1_sig_fv_p_c[0], marker='*', color='r', fmt='o', ecolor='g',
                                                            label='Proton Core' )
 
 if( len( dat1_sig_fv_p_b[0] ) != 0 ) :
@@ -228,7 +230,7 @@ axs1[0].set_ylabel( r'$f_v$', fontsize=18 )
 axs1[0].legend( ncol=ncol, framealpha=legend_transparency, loc=1, fontsize=18 )
 axs1[0].set_xlim( [ 0, max( range( len( dat1_time[0] ) ) ) ] )
 
-axs1[1].errorbar( dat1_s_db, dat1_s_fv_p_c[0], xerr=None, yerr=dat1_s_sig_fv_p_c[0],
+axs1[1].errorbar( dat1_s_db, dat1_fv_p_c[0], xerr=None, yerr=dat1_sig_fv_p_c[0],
 marker='*', color='r', fmt='o', ecolor='g', label='Proton Core' )
 
 axs1[1].legend( ncol=ncol, framealpha=legend_transparency, loc=1, fontsize=18 )
@@ -312,7 +314,7 @@ axs2.set_yticklabels( tick_labels )
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development/figures")
 
-pdf = matplotlib.backends.backend_pdf.PdfPages( fname1[0:-4] + "old.pdf" )
+pdf = matplotlib.backends.backend_pdf.PdfPages( fname1[0:-4] + "_old.pdf" )
 
 for fig in xrange(1, f.number+1 ): ## will open an empty extra figure :(
 	pdf.savefig( fig )
