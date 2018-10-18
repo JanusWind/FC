@@ -37,10 +37,15 @@ if( data_run=='y' ):
 	os.chdir("/home/ahmadr/Desktop/GIT/fm_development/data/edited")
 
 	# Define the names of files to be analysed.
-	fname1 = 'janus_2014-01-01-22-59-37_2014-01-02-03-32-12_man_rngavg_21_600_fvpc.jns'
+#	fname1 = 'janus_2014-01-01-22-59-37_2014-01-02-03-32-12_man_rngavg_21_600_fvpc.jns'
 
+#	fname1 = 'janus_raw_mag_2008-11-04-11-55-41_2008-11-04-12-57-46.jns'
+#	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-12-59-24_man_rng_avg_21_600_fvpc.jns'
+#	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-12-57-46_man_rngavg_21_600_fvpcb.jns'
 #	fname1 = 'janus_2014-01-01-23-16-02_2014-01-02-01-37-15_man_rng_avg_21_600_fvpc.jns'
 
+#	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-12-57-46_man_rngavg_21_600_fvpcb.jns'
+	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-13-01-02_man_rng_avg_21_600_fvpcb.jns'
 
 	print 'Currently reading file ==> {}  '.format( fname1 )
 	print '\n'
@@ -73,6 +78,7 @@ if( data_run=='y' ):
 	dat1_n_p          = []
 
 	dat1_del_v_p_c    = []
+	dat1_del_v_p_b    = []
 	dat1_fv_p_c       = []
 	dat1_fv_p_b       = []
 	dat1_sig_fv_p_c   = []
@@ -105,8 +111,8 @@ if( data_run=='y' ):
 
 	for j in range( nd1 ) :
 
-#		ii = where( [ dat1['timemin'][j] < x for x in dat1['mfitime'][j] ] )[0][0]
-#		fi = where( [ dat1['timemax'][j] > x for x in dat1['mfitime'][j] ] )[0][-1]
+		ii = where( [ dat1['timemin'][j] < x for x in dat1['mfitime'][j] ] )[0][0]
+		fi = where( [ dat1['timemax'][j] > x for x in dat1['mfitime'][j] ] )[0][-1]
 
 		db_x_rng_avg = dat1['b0_fields_db'][j]['mfi_set_rng_avg'][0]
 		db_y_rng_avg = dat1['b0_fields_db'][j]['mfi_set_rng_avg'][1]
@@ -140,6 +146,10 @@ if( data_run=='y' ):
 	dat1_del_v_p_c.append( [ dat1_fv_p_c[0][k] *
 	                                        dat1_db_rng_avg[k]/dat1_b_avg[k]
 	                             for k in range( len( dat1_fv_p_c[0] ) ) ] )
+
+	dat1_del_v_p_b.append( [ dat1_fv_p_b[0][k] *
+	                                        dat1_db_rng_avg[k]/dat1_b_avg[k]
+	                             for k in range( len( dat1_fv_p_b[0] ) ) ] )
 
 	dat1_s_fv_p_c.append( [ dat1_del_v_p_c[0][k]/dat1_alfvel[0][k] 
 	                         for k in range( len( dat1_fv_p_c[0] ) ) ] )
