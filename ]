@@ -1,0 +1,52 @@
+plt.close('all')
+
+f, axs= plt.subplots(2, 1)
+
+axs[0].errorbar(dat2_s_db, dat2_s_fv_p_c[0], dat2_s_sig_fv_p_c[0], fmt='o', ecolor='g', color='b', label='Proton Core')
+axs[0].errorbar(dat2_s_db, dat2_s_fv_p_b[0], dat2_s_sig_fv_p_b[0], fmt='o', ecolor='m', color='r', label='Proton Beam')
+axs[0].legend()
+axs[0].set_title( 'fixed beam')
+
+axs[0].set_xlabel( r'$\Delta{B}/|\vec B|$' )
+axs[0].set_ylabel( r'$V_f/V_A$' )
+
+pl, cl, bl = axs[1].errorbar(dat1_s_db, dat1_s_fv_p_c[0], dat1_s_sig_fv_p_c[0], fmt='o', ecolor='g', color='b', label='Proton Core')
+bl[0].set_linestyle("--")
+pl, cl, bl = axs[1].errorbar(dat1_s_db, dat1_s_fv_p_b[0], dat1_s_sig_fv_p_b[0], fmt='o', ecolor='m', color='r', label='Proton Beam')
+bl[0].set_linestyle("--")
+axs[1].legend()
+axs[1].set_title( 'fluctuating beam')
+
+axs[1].set_xlabel( r'$\Delta{B}/|\vec B|$' )
+axs[1].set_ylabel( r'$V_f/V_A$' )
+
+
+f, axs1 = plt.subplots(2, 1)
+
+pl, cl, bl = axs1[0].errorbar(range(len(dat2_s_db)), dat2_s_fv_p_c[0], dat2_s_sig_fv_p_c[0], fmt='o', ecolor='g', color='b', label='Proton Core')
+axs1[0].errorbar(range(len(dat2_s_db)), dat2_s_fv_p_b[0], dat2_s_sig_fv_p_b[0], fmt='o', ecolor='m', color='r', label='Proton Beam')
+bl[0].set_linestyle('--')
+axs1[0].legend()
+axs1[0].set_title( 'fixed beam')
+
+axs1[0].set_xlabel( 'Spectra Number' )
+axs1[0].set_ylabel( r'$V_f/V_A$' )
+
+pl, cl, bl = axs1[1].errorbar(range(len(dat1_s_db)), dat1_s_fv_p_c[0], dat1_s_sig_fv_p_c[0], fmt='o', ecolor='g', color='b', label='Proton Core')
+bl[0].set_linestyle("--")
+
+pl, cl, bl = axs1[1].errorbar(range(len(dat1_s_db)), dat1_s_fv_p_b[0], dat1_s_sig_fv_p_b[0], fmt='o', ecolor='m', color='r', label='Proton Beam')
+bl[0].set_linestyle("--")
+axs1[1].legend()
+axs1[1].set_title( 'fluctuating beam')
+
+axs1[1].set_xlabel( 'Spectra Number' )
+axs1[1].set_ylabel( r'$V_f/V_A$' )
+
+axlist = np.concatenate([axs, axs1])
+ymin = np.min([x.get_ylim()[0] for x in axlist])
+ymax = np.max([x.get_ylim()[1] for x in axlist])
+for ax in axlist:
+	ax.set_ylim(ymin, ymax)
+
+plt.show()

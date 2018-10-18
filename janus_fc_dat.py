@@ -241,8 +241,11 @@ class fc_dat( ) :
 #			fv_vec = [ fv * s_db[i]*db_nrm[i]/b_mag
 #			                           for i in range( len( db ) ) ]
 
+			if( dv is None ) :
+				dv = 0.0
+
 			fv_vec = [ ( fv * s_db[i]*db_nrm[i]/b_mag ) * ( 1- 
-			1.e15 *sqrt( const['mu_0'] * const['m_p'] * nn )/b_mag )
+			1.e15 *sqrt( const['mu_0'] * const['m_p'] * nn )*dv/b_mag )
 			                           for i in range( len( db ) ) ]
 
 #			fv_vec = [ ( 1.e-15 * fv * s_db[i]*db_nrm[i] /\
