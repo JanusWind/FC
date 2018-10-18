@@ -1,3 +1,5 @@
+from scipy import stats as st
+
 db = dat1_s_db
 
 y1p1 = dat1_s_fv_p_c[0]
@@ -78,10 +80,10 @@ axs3[0].set_title( 'fluctuating beam')
 axs3[0].set_xlabel( 'Spectra Number' )
 axs3[0].set_ylabel( r'$V_f/V_A$' )
 
-pl, cl, bl = axs3[1].errorbar(range(len(db)), y3p1, y3p1s, fmt='o', ecolor='g', color='b', label='Proton Core')
+pl, cl, bl = axs3[1].errorbar(range(len(db)), y1p1, y1p1s, fmt='o', ecolor='g', color='b', label='Proton Core')
 bl[0].set_linestyle("--")
 
-pl, cl, bl = axs3[1].errorbar(range(len(db)), y3p2, y3p2s, fmt='o', ecolor='m', color='r', label='Proton Beam')
+pl, cl, bl = axs3[1].errorbar(range(len(db)), y1p2, y1p2s, fmt='o', ecolor='m', color='r', label='Proton Beam')
 bl[0].set_linestyle("--")
 axs3[1].legend()
 axs3[1].set_title( 'fixed beam')
@@ -96,10 +98,17 @@ for ax in axlist:
 	ax.set_ylim(ymin, ymax)
 	ax.grid(True, which="major", axis="both")
 
+fit3 = st.linregress( db, y3p1 )
+m3 = fit3.slope
+
+y_fit = [ m3*xx for xx in db ]
+
 plt.figure()
 
 plt.errorbar( db, y3p1, y3p1s, fmt='o', ecolor='g', color='b', marker='^', label='Proton core')
+plt.plot( db, y_fit, marker='*', color='r', label='best fit line')
 
+plt.legend()
 plt.xlabel( r'$\Delta{B}/|\vec B|$' )
 plt.ylabel( r'$V_f/V_A$' )
 plt.xlim(0, 0.025)
@@ -109,6 +118,9 @@ plt.figure()
 
 plt.scatter( db, y3p1, color='b', marker='^', label='Proton core')
 
+plt.plot( db, y_fit, marker='*', color='r', label='best fit line')
+
+plt.legend()
 plt.xlabel( r'$\Delta{B}/|\vec B|$' )
 plt.ylabel( r'$V_f/V_A$' )
 plt.xlim(0, 0.025)
