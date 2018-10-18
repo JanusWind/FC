@@ -154,7 +154,7 @@ if( data_run=='y' ):
 	dat1_s_fv_p_c.append( [ dat1_del_v_p_c[0][k]/dat1_alfvel[0][k] 
 	                         for k in range( len( dat1_fv_p_c[0] ) ) ] )
 
-	dat1_s_fv_p_b.append( [ dat1_fv_p_b[0][k]/dat1_alfvel[0][k] 
+	dat1_s_fv_p_b.append( [ dat1_del_v_p_b[0][k]/dat1_alfvel[0][k] 
 	                         for k in range( len( dat1_fv_p_b[0] ) ) ] )
 
 	dat1_s_sig_fv_p_c.append( [ dat1_sig_fv_p_c[0][k] * dat1_db_rng_avg[k] /
