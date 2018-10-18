@@ -45,7 +45,7 @@ if( data_run=='y' ):
 #	fname1 = 'janus_2014-01-01-23-16-02_2014-01-02-01-37-15_man_rng_avg_21_600_fvpc.jns'
 
 #	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-12-57-46_man_rngavg_21_600_fvpcb.jns'
-	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-13-01-02_man_rng_avg_21_600_fvpcb.jns'
+	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-13-01-02_auto_rng_avg_21_600_fvpcb.jns'
 
 	print 'Currently reading file ==> {}  '.format( fname1 )
 	print '\n'
