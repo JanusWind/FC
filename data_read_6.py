@@ -15,6 +15,7 @@ import matplotlib.backends.backend_pdf
 from matplotlib import gridspec, rc
 from pylab import rcParams
 from scipy.optimize import curve_fit
+from scipy import stats
 
 from numpy import linspace, pi, sqrt, exp, std
 
@@ -189,6 +190,14 @@ else:
 
 dat1_s_fv_pc = [ xx/yy for xx,yy in zip( dat1_fv_p_c[0], dat1_alfvel[0]) ]
 dat1_s_sig_fv_pc = [ xx/yy for xx,yy in zip( dat1_sig_fv_p_c[0], dat1_alfvel[0]) ]
+
+fit = stats.linregress( dat1_s_db, dat1_s_fv_p_c[0])
+
+m = fit.slope
+c = fit.intercept
+r = fit.rvalue
+sigma = fit. stderr
+
 # Define figure paramaters
 
 dpi = 40 # DPI of the saved plots
@@ -205,7 +214,16 @@ ind = [ 5*i for i in range( 1 +  len( dat1_time[0] )/5 ) ]
 
 labels = [ dat1_time[0][j] for j in ind ]
 
+plt.figure()
 
+#plt.scatter(dat1_s_db, dat1_s_fv_p_c[0], marker='^', color='b')
+
+plt.errorbar( dat1_s_db, dat1_s_fv_p_c[0], dat1_s_sig_fv_p_c[0], fmt='o', ecolor='g', color='b', label='Proton Core')
+
+plt.xlabel( r'$\Delta{B}/|\vec B|$' )
+plt.ylabel( r'$V_f/V_A$' )
+
+plt.show()
 ###############################################################################
 ## First Figure
 ###############################################################################
