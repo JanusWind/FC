@@ -85,6 +85,9 @@ if( data_run=='y' ):
 	dat3_sig_fv_p_c   = []
 	dat3_sig_fv_p_b   = []
 
+	dat3_dv_p_b       = []
+	dat3_s_dv_p_b     = []
+
 	dat3_w_fv_p       = []
 
 	dat3_alfvel       = []
@@ -97,7 +100,7 @@ if( data_run=='y' ):
 	dat3_s_db         = []
 	dat3_s_db_rng_avg = []
 
-	r_ind = [ 4, 7, 16, 25 ]
+	r_ind = [ 4, 7, 16, 25, 25, 26, 30 ]
 
 	keys = [ dat3_time, dat3_db_rng_avg, dat3_b_avg,
 	         dat3_n_p_c, dat3_n_p_b, dat3_n_p, dat3_fv_p_c, dat3_fv_p_b,
@@ -142,6 +145,8 @@ if( data_run=='y' ):
 	dat3_sig_fv_p_c.append( [ x if x!=None else 0. for x in dat3['sig_fv_p_c'] ] )
 	dat3_sig_fv_p_b.append( [ x if x!=None else 0. for x in dat3['sig_fv_p_b'] ] )
 	
+	dat3_dv_p_b.append( [ x if x!=None else 0. for x in  dat3['dv_p_b'] ] )
+
 	dat3_alfvel.append( dat3['alfvel_p'] )
 	
 	dat3_del_v_p_c.append( [ dat3_fv_p_c[0][k] *
@@ -166,6 +171,9 @@ if( data_run=='y' ):
 	                                     ( dat3_b_avg[k]*dat3_alfvel[0][k] )
 	                         for k in range( len( dat3_sig_fv_p_c[0] ) ) ] )
 
+	dat3_s_dv_p_b.append( [ dat3_dv_p_b[0][k] / dat3_alfvel[0][k]
+	                         for k in range( len( dat3_sig_dv_p_c[0] ) ) ] )
+
 	dat3_w_fv_p.append( [ ( dat3_fv_p_c[0][k] * dat3_n_p_c[0][k] + 
 	                 dat3_fv_p_b[0][k] * dat3_n_p_b[0][k] )/dat3_n_p[0][k]
 	                             for k in range( len( dat3_fv_p_c[0] ) ) ] )
@@ -187,6 +195,22 @@ if( data_run=='y' ):
 
 else:
 	print 'Data not read, running plotting algorithm.'
+
+if( len( dat3_s_db) == 37 ) :
+
+	[ dat3_s_db.pop( i            ) for i in r_ind ]
+	[ dat3_time[0].pop( i         ) for i in r_ind ]
+	[ dat3_fv_p_c[0].pop( i       ) for i in r_ind ]
+	[ dat3_sig_fv_p_c[0].pop( i   ) for i in r_ind ]
+	[ dat3_s_fv_p_c[0].pop( i     ) for i in r_ind ]
+	[ dat3_s_sig_fv_p_c[0].pop( i ) for i in r_ind ]
+	[ dat3_fv_p_b[0].pop( i       ) for i in r_ind ]
+	[ dat3_sig_fv_p_b[0].pop( i   ) for i in r_ind ]
+	[ dat3_s_fv_p_b[0].pop( i     ) for i in r_ind ]
+	[ dat3_s_sig_fv_p_b[0].pop( i ) for i in r_ind ]
+	[ dat3_alfvel[0].pop( i       ) for i in r_ind ]
+	[ dat3_dv_p_b[0].pop( i       ) for i in r_ind ]
+	[ dat3_s_dv_p_b[0].pop( i     ) for i in r_ind ]
 
 dat3_s_fv_pc = [ xx/yy for xx,yy in zip( dat3_fv_p_c[0], dat3_alfvel[0]) ]
 dat3_s_sig_fv_pc = [ xx/yy for xx,yy in zip( dat3_sig_fv_p_c[0], dat3_alfvel[0]) ]
@@ -212,7 +236,7 @@ rcParams['figure.figsize'] = 10, 10
 
 ind = [ 5*i for i in range( 1 +  len( dat3_time[0] )/5 ) ]
 
-labels = [ dat3_time[0][j] for j in ind ]
+labels = [ dat3_time[0][j-1] for j in ind ]
 
 plt.figure()
 
@@ -234,6 +258,10 @@ plt.show()
 #
 #else :
 
+###############################################################################
+## Second Figure
+###############################################################################
+
 f, axs1 = plt.subplots( 2, 1, squeeze=True, sharex=False )
 
 axs1[0].errorbar( range( len( dat3_time[0] ) ), dat3_fv_p_c[0],
@@ -250,7 +278,10 @@ else :
 
 	axs1[0].scatter( range( len( dat3_time[0] ) ), dat3_fv_p_b[0],
 	                       marker='v', s=s, color='b', label='Proton Beam' )
+axs2 = axs1[0].twinx()
 
+axs2.scatter( range( len( dat3_time[0] ) ), dat3_dv_p_b[0],
+             marker='d', s=s, color='m', label='Proton beam Drift Velocity' )
 
 axs1[0].axhline( 0, marker='None', ls='--', color='c', lw='0.5' )
 axs1[0].set_xlabel( 'Spectra number', fontsize=18 )
@@ -261,13 +292,18 @@ axs1[0].set_xlim( [ 0, max( range( len( dat3_time[0] ) ) ) ] )
 axs1[1].errorbar( dat3_s_db, dat3_fv_p_c[0], xerr=None, yerr=dat3_sig_fv_p_c[0],
 marker='*', color='r', fmt='o', ecolor='g', label='Proton Core' )
 
+axs3 = axs1[1].twinx()
+
+axs3.scatter( dat3_s_db, dat3_dv_p_b[0],
+                  marker='d', color='m', label='Proton Beam Drift Velocity' )
+
 axs1[1].legend( ncol=ncol, framealpha=legend_transparency, loc=1, fontsize=18 )
 
 axs1[1].axhline( 0, marker='None', ls='--', color='c', lw='0.5' )
 
 axs1[1].set_xlabel( r'$|\Delta B /B_0|$', fontsize=18 )
 axs1[1].set_ylabel( r'$f_v$', fontsize=18 )
-axs1[1].set_xlim( [ 0, 0.35 ] )
+axs1[1].set_xlim( [ 0, 0.025 ] )
 #if( len( dat3_sig_fv_p_b[0] ) != 0 ) :
 #
 #	axs1[2].errorbar( dat3_s_db, dat3_fv_p_b[0], xerr=None,
@@ -279,7 +315,7 @@ axs1[1].set_xlim( [ 0, 0.35 ] )
 #	axs1[2].set_ylabel( 'Velocity(km/s)', fontsize=18 )
 #	axs1[2].set_xlabel( r'$\Delta B / B$', fontsize=18 )
 
-axs1[0].set_title( 'MFI Type = ' + fname1[-22:-16], color='r', fontsize=20 )
+#axs1[0].set_title( 'MFI Type = ' + fname1[-22:-16], color='r', fontsize=20 )
 
 plt.tight_layout()
 plt.subplots_adjust(left=0.1, right=.97, bottom=0.1, top=0.95, wspace=0, hspace=0.2)
@@ -301,7 +337,7 @@ for a in axs1 :
 	a.set_yticklabels( tick_labels )
 
 rcParams['figure.figsize'] = 10, 10
-
+'''
 ###############################################################################
 ## Second Figure
 ###############################################################################
@@ -347,6 +383,7 @@ pdf = matplotlib.backends.backend_pdf.PdfPages( fname1[0:-4] + "_old.pdf" )
 for fig in xrange(1, f.number+1 ): ## will open an empty extra figure :(
 	pdf.savefig( fig )
 pdf.close()
+'''
 
 os.chdir("/home/ahmadr/Desktop/GIT/fm_development")
 
