@@ -101,19 +101,19 @@ class widget_fmo_info( format_TextEdit ) :
 		self.prnt_tab( 3 )
 		self.prnt_htm( '<i><font color="#FF0000">A<sub>x\
 		                           </sub></font></i> = ' )
-		self.prnt_dcm( self.core.mfi_amp_x, 3, 'nT' )
+		self.prnt_dcm( self.core.mfi_amp_x, 4, 'nT' )
 		self.prnt_brk( )
 
 		self.prnt_tab( 3 )
 		self.prnt_htm( '<i><font color="#00FF00">A<sub>y\
 		                           </sub></font></i> = ' )
-		self.prnt_dcm( self.core.mfi_amp_y, 3, 'nT' )
+		self.prnt_dcm( self.core.mfi_amp_y, 4, 'nT' )
 		self.prnt_brk( )
 
 		self.prnt_tab( 3 )
 		self.prnt_htm( '<i><font color="#0000FF">A<sub>z\
 		                           </sub></font></i> = ' )
-		self.prnt_dcm( self.core.mfi_amp_z, 3, 'nT' )
+		self.prnt_dcm( self.core.mfi_amp_z, 4, 'nT' )
 		self.prnt_brk( )
 
 		self.prnt_htm( '<i>Frequency</i>' )
@@ -122,19 +122,19 @@ class widget_fmo_info( format_TextEdit ) :
 		self.prnt_tab( 3 )
 		self.prnt_htm( '<i><font color="#FF0000">&omega;<sub>x\
 		                           </sub></font></i> = ' )
-		self.prnt_dcm( self.core.mfi_frq_x, 3, 's <sup>-1<sup>' )
+		self.prnt_dcm( self.core.mfi_frq_x, 4, 's <sup>-1<sup>' )
 		self.prnt_brk( )
 
 		self.prnt_tab( 3 )
 		self.prnt_htm( '<i><font color="#00FF00">&omega;<sub>y\
 		                           </sub></font></i> = ' )
-		self.prnt_dcm( self.core.mfi_frq_y, 3, 's <sup>-1<sup>' )
+		self.prnt_dcm( self.core.mfi_frq_y, 4, 's <sup>-1<sup>' )
 		self.prnt_brk( )
 
 		self.prnt_tab( 3 )
 		self.prnt_htm( '<i><font color="#0000FF">&omega;<sub>z\
 		                           </sub></font></i> = ' )
-		self.prnt_dcm( self.core.mfi_frq_z, 3, 's <sup>-1<sup>' )
+		self.prnt_dcm( self.core.mfi_frq_z, 4, 's <sup>-1<sup>' )
 		self.prnt_brk( )
 
 		self.prnt_brk( )
@@ -145,19 +145,19 @@ class widget_fmo_info( format_TextEdit ) :
 		self.prnt_tab( 3 )
 		self.prnt_htm( '<i><font color="#FF0000">&phi;<sub>x\
 		                           </sub></font></i> = ' )
-		self.prnt_dcm( self.core.mfi_phs_x, 3, '<sup>o<sup>' )
+		self.prnt_dcm( self.core.mfi_phs_x, 2, '<sup>o<sup>' )
 		self.prnt_brk( )
 
 		self.prnt_tab( 3 )
 		self.prnt_htm( '<i><font color="#00FF00">&phi;<sub>y\
 		                           </sub></font></i> = ' )
-		self.prnt_dcm( self.core.mfi_phs_y, 3, '<sup>o<sup>' )
+		self.prnt_dcm( self.core.mfi_phs_y, 2, '<sup>o<sup>' )
 		self.prnt_brk( )
 
 		self.prnt_tab( 3 )
 		self.prnt_htm( '<i><font color="#0000FF">&phi;<sub>z\
 		                           </sub></font></i> = ' )
-		self.prnt_dcm( self.core.mfi_phs_z, 3, '<sup>o<sup>' )
+		self.prnt_dcm( self.core.mfi_phs_z, 2, '<sup>o<sup>' )
 		self.prnt_brk( )
 
 		self.prnt_brk( )

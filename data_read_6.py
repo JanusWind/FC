@@ -48,6 +48,7 @@ if( data_run=='y' ):
 #	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-12-57-46_man_rngavg_21_600_fvpcb.jns'
 	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-13-01-02_auto_rng_avg_21_600_fvpcb_n.jns'
 
+#	fname1 = 'janus_2008-11-04-12-00-41_2008-11-04-13-01-02_auto_rng_avg_21_300_fvcb.jns'
 	print 'Currently reading file ==> {}  '.format( fname1 )
 	print '\n'
 
@@ -172,7 +173,7 @@ if( data_run=='y' ):
 	                         for k in range( len( dat3_sig_fv_p_c[0] ) ) ] )
 
 	dat3_s_dv_p_b.append( [ dat3_dv_p_b[0][k] / dat3_alfvel[0][k]
-	                         for k in range( len( dat3_sig_dv_p_c[0] ) ) ] )
+	                         for k in range( len( dat3_sig_fv_p_c[0] ) ) ] )
 
 	dat3_w_fv_p.append( [ ( dat3_fv_p_c[0][k] * dat3_n_p_c[0][k] + 
 	                 dat3_fv_p_b[0][k] * dat3_n_p_b[0][k] )/dat3_n_p[0][k]
@@ -238,16 +239,32 @@ ind = [ 5*i for i in range( 1 +  len( dat3_time[0] )/5 ) ]
 
 labels = [ dat3_time[0][j-1] for j in ind ]
 
-plt.figure()
+#plt.figure()
 
 #plt.scatter(dat3_s_db, dat3_s_fv_p_c[0], marker='^', color='b')
 
-plt.errorbar( dat3_s_db, dat3_s_fv_p_c[0], dat3_s_sig_fv_p_c[0], fmt='o', ecolor='g', color='b', label='Proton Core')
+#plt.errorbar( dat3_s_db, dat3_s_fv_p_c[0], dat3_s_sig_fv_p_c[0], fmt='o', ecolor='g', color='b', label='Proton Core')
+#axs1[0].grid( True, which='major', axis='x', color='b', lw='0.1', ls='--' )
+#
+#
+#plt.xlabel( r'$\Delta{B}/|\vec B|$' )
+#plt.ylabel( r'$V_f/V_A$' )
 
-plt.xlabel( r'$\Delta{B}/|\vec B|$' )
-plt.ylabel( r'$V_f/V_A$' )
+#plt.xticks( [ dat3_time[0][j-1] for j in ind ], rotation=45, fontsize=16 )
+plt.figure()
+
+plt.scatter( dat3_s_db, dat3_s_fv_p_c[0], color='b', marker='^' )
+plt.xticks( rotation=45 )
+plt.grid( True, which='major', axis='x', color='b', lw='0.1', ls='--' )
+
+plt.figure()
+
+plt.scatter( dat3_time[0], dat3_s_fv_p_c[0], color='b', marker='^' )
+plt.grid( True, which='major', axis='x', color='b', lw='0.1', ls='--' )
+plt.xticks( rotation=45 )
 
 plt.show()
+
 ###############################################################################
 ## First Figure
 ###############################################################################
@@ -288,6 +305,7 @@ axs1[0].set_xlabel( 'Spectra number', fontsize=18 )
 axs1[0].set_ylabel( r'$f_v$', fontsize=18 )
 axs1[0].legend( ncol=ncol, framealpha=legend_transparency, loc=1, fontsize=18 )
 axs1[0].set_xlim( [ 0, max( range( len( dat3_time[0] ) ) ) ] )
+axs1[0].grid( True, which='major', axis='x', color='b', lw='0.1', ls='--' )
 
 axs1[1].errorbar( dat3_s_db, dat3_fv_p_c[0], xerr=None, yerr=dat3_sig_fv_p_c[0],
 marker='*', color='r', fmt='o', ecolor='g', label='Proton Core' )
@@ -304,6 +322,8 @@ axs1[1].axhline( 0, marker='None', ls='--', color='c', lw='0.5' )
 axs1[1].set_xlabel( r'$|\Delta B /B_0|$', fontsize=18 )
 axs1[1].set_ylabel( r'$f_v$', fontsize=18 )
 axs1[1].set_xlim( [ 0, 0.025 ] )
+axs1[1].grid( True, which='major', axis='x', color='b', lw='0.1', ls='--' )
+
 #if( len( dat3_sig_fv_p_b[0] ) != 0 ) :
 #
 #	axs1[2].errorbar( dat3_s_db, dat3_fv_p_b[0], xerr=None,
