@@ -193,7 +193,8 @@ class widget_mfi_ang_plot( QWidget ) :
 
 		# Set the range of the axis of each plot.
 
-		self.plt.setXRange( t_min, t_max, padding=0.0 )
+		self.plt.setXRange( 0, 90, padding=5.0 )
+#		self.plt.setXRange( t_min, t_max, padding=0.0 )
 		self.plt.setYRange( ang_min, ang_max, padding=0.0 )
 
 
