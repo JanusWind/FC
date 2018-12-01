@@ -13,6 +13,8 @@ from pathlib2 import Path
 # Load the modules necessary for handling dates and times.
 
 import time
+start = time.time()
+
 from time import sleep
 from datetime import datetime, timedelta
 from janus_time import calc_time_epc, calc_time_sec, calc_time_val
@@ -77,10 +79,25 @@ plt.close('all')
 
 start = time.time( )
 
-n_months = raw_input( 'Number of months to be downloaded ==>  ' )
+io = raw_input( 'Enter I for Interactive and D for default? ==>  ' )
 
-date1 = '2008-11-04-00-00-00'
-date2 = '2008-11-11-00-00-10'
+if ( io == 'i' ) :
+
+	n_months = raw_input( 'Number of months to be downloaded ==>  ' )
+else :
+
+	n_months = 1
+
+if ( io == 'i' ) :
+
+	date1 = raw_input( 'Enter the starting date ( format: \
+	                                          YYYY-MM-DD-HH-MM-SS) ==> ) ' )
+	date2 = raw_input( 'Enter the end date ( format: \
+	                                          YYYY-MM-DD-HH-MM-SS) ==> ) ' )
+
+else :
+	date1 = '2008-01-01-00-00-10'
+	date2 = '2008-01-01-23-59-00'
 
 i_date = datetime.strptime( date1, '%Y-%m-%d-%H-%M-%S')
 f_date = datetime.strptime( date2, '%Y-%m-%d-%H-%M-%S')
@@ -213,7 +230,7 @@ for i in range( int( n_months ) ) :
 
 		# Save the non-rotated data to 'wav' files
 		
-		os.chdir( '/home/ahmadr/Desktop/GIT/fm_development/data/wav_files' )
+#		os.chdir( '/home/ahmadr/Desktop/GIT/fm_development/data/wav_files' )
 		
 		files_raw = [ 'file_x_raw_', 'file_y_raw_', 'file_z_raw_' ]
 		
@@ -245,7 +262,7 @@ for i in range( int( n_months ) ) :
 		
 			write( file_n, 44100, data )
 		
-		os.chdir( '/home/ahmadr/Desktop/GIT/fm_development' )
+#		os.chdir( '/home/ahmadr/Desktop/GIT/fm_development' )
 
 '''
 plt.figure()
@@ -277,3 +294,5 @@ plt.legend()
 plt.show()
 
 '''
+
+print 'It took','%.6f'% (time.time()-start), 'seconds.'
