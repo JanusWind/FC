@@ -88,7 +88,7 @@ if ( io == 'i' ) :
 	n_months = raw_input( 'Number of months to be downloaded ==>  ' )
 else :
 
-	n_months = 10
+	n_months = 36
 
 if ( io == 'i' ) :
 
@@ -108,35 +108,6 @@ f_date = i_date
 
 download = raw_input( 'Download the data ==>  ' )
 
-if( download == 'y' ) :
-
-	mfi_t       = [ [] for x in range( int( n_months ) ) ]
-	mfi_b_x     = [ [] for x in range( int( n_months ) ) ]
-	mfi_b_y     = [ [] for x in range( int( n_months ) ) ]
-	mfi_b_z     = [ [] for x in range( int( n_months ) ) ]
-	
-	mfi_x_rot   = [ [] for x in range( int( n_months ) ) ]
-	mfi_y_rot   = [ [] for x in range( int( n_months ) ) ]
-	mfi_z_rot   = [ [] for x in range( int( n_months ) ) ]
-	
-	n_mfi       = [ [] for x in range( int( n_months ) ) ]
-	mfi_s       = [ [] for x in range( int( n_months ) ) ]
-	mfi_b_vec   = [ [] for x in range( int( n_months ) ) ]
-	mfi_b       = [ [] for x in range( int( n_months ) ) ]
-	rng_avg_vec = [ [] for x in range( int( n_months ) ) ]
-	rng_avg_x   = [ [] for x in range( int( n_months ) ) ]
-	rng_avg_y   = [ [] for x in range( int( n_months ) ) ]
-	rng_avg_z   = [ [] for x in range( int( n_months ) ) ]
-	cum_sum_x   = [ [0.] for x in range( int( n_months ) ) ]
-	cum_sum_y   = [ [0.] for x in range( int( n_months ) ) ]
-	cum_sum_z   = [ [0.] for x in range( int( n_months ) ) ]
-	rng_avg_mag = [ [] for x in range( int( n_months ) ) ]
-	rng_avg_nrm = [ [] for x in range( int( n_months ) ) ]
-
-e1 = [ [] for x in range( int( n_months ) ) ]
-e2 = [ [] for x in range( int( n_months ) ) ]
-e3 = [ [] for x in range( int( n_months ) ) ]
-
 for i in range( int( n_months ) ) :
 
 	if( download == 'y' ) :
@@ -146,131 +117,143 @@ for i in range( int( n_months ) ) :
 
 		dur = ( f_date - i_date ).total_seconds( )
 
+		print 'Downloading data for days from ', i_date, 'to', f_date
+
 		arcv = mfi_arcv_hres( )
 
-		mfi_t[i]   = arcv.load_rang( date1, dur )[0]
-		mfi_b_x[i] = arcv.load_rang( date1, dur )[1]
-		mfi_b_y[i] = arcv.load_rang( date1, dur )[2]
-		mfi_b_z[i] = arcv.load_rang( date1, dur )[3]
+		mfi_t   = arcv.load_rang( date1, dur )[0]
+		mfi_b_x = arcv.load_rang( date1, dur )[1]
+		mfi_b_y = arcv.load_rang( date1, dur )[2]
+		mfi_b_z = arcv.load_rang( date1, dur )[3]
+
+		print 'Data Downloaded, doing data rotations now'
 
 		# Establish the number of data.
 
-		n_mfi[i] = len( mfi_t[i] )
+		n_mfi = len( mfi_t )
 
 		# Compute and store derived paramters.
 
-		mfi_s[i] = [ ( t - mfi_t[i][0] ).total_seconds( )
-		                                       for t in mfi_t[i] ]
+		mfi_s = [ ( t - mfi_t[0] ).total_seconds( )
+		                                       for t in mfi_t ]
 
 		# Compute the vector magnetic field.
 
-		mfi_b_vec[i] = [ [ mfi_b_x[i][j], mfi_b_y[i][j], mfi_b_z[i][j] ]
-		                for j in range( len( mfi_s[i] ) )      ]
+		mfi_b_vec = [ [ mfi_b_x[j], mfi_b_y[j], mfi_b_z[j] ]
+		                for j in range( len( mfi_s ) )      ]
 
 		# Compute the magnetic field magnitude.
 
-		mfi_b[i] = [ sqrt( mfi_b_x[i][j]**2 +
-		                     mfi_b_y[i][j]**2 +
-		                     mfi_b_z[i][j]**2 )
-		                     for j in range( len( mfi_b_x[i] ) ) ]
+		mfi_b = [ sqrt( mfi_b_x[j]**2 +
+		                     mfi_b_y[j]**2 +
+		                     mfi_b_z[j]**2 )
+		                     for j in range( len( mfi_b_x ) ) ]
 
 		# Running average filter.
 
 		N = 600
 
-		
-		for j, xx in enumerate( mfi_b_x[i], 1 ) :
-		
-			cum_sum_x[i].append( cum_sum_x[i][j-1] + xx )
-		
+		cum_sum_x = [ 0. ]
+		cum_sum_y = [ 0. ]
+		cum_sum_z = [ 0. ]
+
+		rng_avg_x = []
+		rng_avg_y = []
+		rng_avg_z = []
+
+		for j, xx in enumerate( mfi_b_x, 1 ) :
+
+			cum_sum_x.append( cum_sum_x[j-1] + xx )
+
 			if j>=N:
-				avg_x = ( cum_sum_x[i][j] -
-				          cum_sum_x[i][j-N] )/N
+				avg_x = ( cum_sum_x[j] -
+				          cum_sum_x[j-N] )/N
 
-				rng_avg_x[i].append( avg_x )
+				rng_avg_x.append( avg_x )
 
-		for j, yy in enumerate( mfi_b_y[i], 1 ) :
-		
-			cum_sum_y[i].append( cum_sum_y[i][j-1] + yy )
-		
+		for j, yy in enumerate( mfi_b_y, 1 ) :
+
+			cum_sum_y.append( cum_sum_y[j-1] + yy )
+
 			if j>=N:
-				avg_y = ( cum_sum_y[i][j] -
-				          cum_sum_y[i][j-N] )/N
+				avg_y = ( cum_sum_y[j] -
+				          cum_sum_y[j-N] )/N
 
-				rng_avg_y[i].append( avg_y )
+				rng_avg_y.append( avg_y )
 
-		for j, zz in enumerate( mfi_b_z[i], 1 ) :
-		
-			cum_sum_z[i].append( cum_sum_z[i][j-1] + zz )
-		
+		for j, zz in enumerate( mfi_b_z, 1 ) :
+
+			cum_sum_z.append( cum_sum_z[j-1] + zz )
+
 			if j>=N:
-				avg_z = ( cum_sum_z[i][j] -
-				          cum_sum_z[i][j-N] )/N
+				avg_z = ( cum_sum_z[j] -
+				          cum_sum_z[j-N] )/N
 
-				rng_avg_z[i].append( avg_z )
+				rng_avg_z.append( avg_z )
 
-		rng_avg_vec[i] = [ [ rng_avg_x[i][j], rng_avg_y[i][j],
-		       rng_avg_z[i][j] ] for j in range( len( rng_avg_x[i] ) ) ]
+		rng_avg_vec = [ [ rng_avg_x[j], rng_avg_y[j],
+		       rng_avg_z[j] ] for j in range( len( rng_avg_x ) ) ]
 
 
-		rng_avg_mag[i] = [ sqrt( sum(
-		                 [ xx**2 for xx in( rng_avg_vec[i][j] ) ] ) )
+		rng_avg_mag = [ sqrt( sum(
+		                 [ xx**2 for xx in( rng_avg_vec[j] ) ] ) )
 			           for j in range( shape( rng_avg_vec)[1] ) ]
 
-		rng_avg_nrm[i] = [ xx/yy for xx,yy in zip( rng_avg_vec[0], rng_avg_mag[0]) ]
-#		rng_avg_nrm[i] = rng_avg_vec[i]/rng_avg_mag[i]
+		rng_avg_nrm = [ xx/yy for xx,yy in zip( rng_avg_vec, rng_avg_mag ) ]
+#		rng_avg_nrm = rng_avg_vec/rng_avg_mag
 
 		z     = [ 0., 0., 1. ]
-		e1[i] = rng_avg_nrm[i]
-		e2[i] = [ cross( z, xx )/ norm( cross( xx, z ) ) for xx in e1[i] ]
-		e3[i] = [ cross( xx, yy ) for xx,yy in zip( e1[i], e2[i] ) ]
+		e1 = rng_avg_nrm
+		e2 = [ cross( z, xx )/ norm( cross( xx, z ) ) for xx in e1 ]
+		e3 = [ cross( xx, yy ) for xx,yy in zip( e1, e2 ) ]
 
-		mfi_x_rot[i] = [ sum( xx*yy for xx,yy in zip(
-		                 mfi_b_vec[i][j + int( N/2. ) ], e1[i][j] ) )
-				                for j in range( len( e1[i] ) ) ]
-		mfi_y_rot[i] = [ sum( xx*yy for xx,yy in zip(
-		                 mfi_b_vec[i][j + int( N/2. ) ], e2[i][j] ) )
-				                for j in range( len( e1[i] ) ) ]
-		mfi_z_rot[i] = [ sum( xx*yy for xx,yy in zip(
-		                 mfi_b_vec[i][j + int( N/2. ) ], e3[i][j] ) )
-				                for j in range( len( e1[i] ) ) ]
+		mfi_x_rot = [ sum( xx*yy for xx,yy in zip(
+		                 mfi_b_vec[j + int( N/2. ) ], e1[j] ) )
+				                for j in range( len( e1 ) ) ]
+		mfi_y_rot = [ sum( xx*yy for xx,yy in zip(
+		                 mfi_b_vec[j + int( N/2. ) ], e2[j] ) )
+				                for j in range( len( e1 ) ) ]
+		mfi_z_rot = [ sum( xx*yy for xx,yy in zip(
+		                 mfi_b_vec[j + int( N/2. ) ], e3[j] ) )
+				                for j in range( len( e1 ) ) ]
 
 		# Save the non-rotated data to 'wav' files
-		
+
 		os.chdir( '/home/ahmadr/Desktop/GIT/fm_development/data/wav_files' )
-		
+
 		files_raw = [ 'file_x_raw_', 'file_y_raw_', 'file_z_raw_' ]
-		
-		data_raw = [ mfi_b_x[i], mfi_b_y[i], mfi_b_z[i] ]
-		
+
+		data_raw = [ mfi_b_x, mfi_b_y, mfi_b_z ]
+
 		for j in range( 3 ) :
-		
+
 			file_n = files_raw[j] + '_' +\
-		                 mfi_t[0][0 ].strftime( '%Y-%m-%d-%H-%M-%S' ) + '_'+\
-		                 mfi_t[0][-1].strftime( '%Y-%m-%d-%H-%M-%S' ) + '.wav'
-		
+		                 mfi_t[0 ].strftime( '%Y-%m-%d-%H-%M-%S' ) + '_'+\
+		                 mfi_t[-1].strftime( '%Y-%m-%d-%H-%M-%S' ) + '.wav'
+
 			data = int16( data_raw[j]/max(data_raw[j])*0.7*2**15 )
-		
+
 			write( file_n, 44100, data )
-		
+
 		# Save the rotated data to 'wav' files
-		
+
 		files_rot = [ 'file_x_rot_', 'file_y_rot_', 'file_z_rot_' ]
-		
-		data_rot = [ mfi_x_rot[i], mfi_y_rot[i], mfi_z_rot[i] ]
-		
+
+		data_rot = [ mfi_x_rot, mfi_y_rot, mfi_z_rot ]
+
 		for j in range( 3 ) :
-		
+
 			file_n = files_rot[j] + '_' +\
-		                 mfi_t[0][0 ].strftime( '%Y-%m-%d-%H-%M-%S' ) + '_'+\
-		                 mfi_t[0][-1].strftime( '%Y-%m-%d-%H-%M-%S' ) + '.wav'
-		
+		                 mfi_t[0 ].strftime( '%Y-%m-%d-%H-%M-%S' ) + '_'+\
+		                 mfi_t[-1].strftime( '%Y-%m-%d-%H-%M-%S' ) + '.wav'
+
 			data = int16( data_rot[j]/max(data_rot[j])*2**15 )
-		
+
 			write( file_n, 44100, data )
-		
+
 		os.chdir( '/home/ahmadr/Desktop/GIT/fm_development' )
 
+		print 'Data saved for ', i_date, 'to', f_date
 '''
 plt.figure()
 plt.plot( mfi_s[0], mfi_b_x[0], color='r', label='x' )
