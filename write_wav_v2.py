@@ -112,12 +112,14 @@ for i in range( int( n_days ) ) :
 
 	if( download == 'y' ) :
 
+		m_time = time.time( )
+
 		i_date = f_date
-		f_date = i_date + timedelta( days = 10 )
+		f_date = i_date + timedelta( days = 0.5)
 
 		dur = ( f_date - i_date ).total_seconds( )
 
-		print 'Downloading data for days from ', i_date, 'to', f_date
+		print 'Downloading data for days from ', i_date, 'to', f_date, '\n'
 
 		arcv = mfi_arcv_hres( )
 
@@ -126,7 +128,7 @@ for i in range( int( n_days ) ) :
 		mfi_b_y = arcv.load_rang( date1, dur )[2]
 		mfi_b_z = arcv.load_rang( date1, dur )[3]
 
-		print 'Data Downloaded, doing data rotations now'
+		print 'Data Downloaded, doing data rotations now \n'
 
 		# Establish the number of data.
 
@@ -253,7 +255,9 @@ for i in range( int( n_days ) ) :
 
 		os.chdir( '/home/ahmadr/Desktop/GIT/fm_development' )
 
-		print 'Data saved for ', i_date, 'to', f_date
+		print 'Data saved for ', i_date, 'to', f_date, '\n'
+		print 'It took','%.6f'% ( time.time()-m_time ), 'seconds.\n'
+		print '----------------------------------------------------------\n'
 '''
 plt.figure()
 plt.plot( mfi_s[0], mfi_b_x[0], color='r', label='x' )
