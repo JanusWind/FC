@@ -85,10 +85,10 @@ io = raw_input( 'Enter i for Interactive and d for default? ==>  ' )
 
 if ( io == 'i' ) :
 
-	n_months = raw_input( 'Number of months to be downloaded ==>  ' )
+	n_days = raw_input( 'Number of months to be downloaded ==>  ' )
 else :
 
-	n_months = 36
+	n_days = 30
 
 if ( io == 'i' ) :
 
@@ -108,7 +108,7 @@ f_date = i_date
 
 download = raw_input( 'Download the data ==>  ' )
 
-for i in range( int( n_months ) ) :
+for i in range( int( n_days ) ) :
 
 	if( download == 'y' ) :
 
@@ -121,10 +121,10 @@ for i in range( int( n_months ) ) :
 
 		arcv = mfi_arcv_hres( )
 
-		mfi_t   = arcv.load_rang( i_date, dur )[0]
-		mfi_b_x = arcv.load_rang( i_date, dur )[1]
-		mfi_b_y = arcv.load_rang( i_date, dur )[2]
-		mfi_b_z = arcv.load_rang( i_date, dur )[3]
+		mfi_t   = arcv.load_rang( date1, dur )[0]
+		mfi_b_x = arcv.load_rang( date1, dur )[1]
+		mfi_b_y = arcv.load_rang( date1, dur )[2]
+		mfi_b_z = arcv.load_rang( date1, dur )[3]
 
 		print 'Data Downloaded, doing data rotations now'
 
@@ -197,12 +197,12 @@ for i in range( int( n_months ) ) :
 
 		rng_avg_mag = [ sqrt( sum(
 		                 [ xx**2 for xx in( rng_avg_vec[j] ) ] ) )
-			           for j in range( shape( rng_avg_vec)[1] ) ]
+			           for j in range( shape( rng_avg_vec)[0] ) ]
 
 		rng_avg_nrm = [ xx/yy for xx,yy in zip( rng_avg_vec, rng_avg_mag ) ]
 #		rng_avg_nrm = rng_avg_vec/rng_avg_mag
 
-		z     = [ 0., 0., 1. ]
+		z  = [ 0., 0., 1. ]
 		e1 = rng_avg_nrm
 		e2 = [ cross( z, xx )/ norm( cross( xx, z ) ) for xx in e1 ]
 		e3 = [ cross( xx, yy ) for xx,yy in zip( e1, e2 ) ]
