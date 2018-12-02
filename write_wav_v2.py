@@ -121,10 +121,10 @@ for i in range( int( n_months ) ) :
 
 		arcv = mfi_arcv_hres( )
 
-		mfi_t   = arcv.load_rang( date1, dur )[0]
-		mfi_b_x = arcv.load_rang( date1, dur )[1]
-		mfi_b_y = arcv.load_rang( date1, dur )[2]
-		mfi_b_z = arcv.load_rang( date1, dur )[3]
+		mfi_t   = arcv.load_rang( i_date, dur )[0]
+		mfi_b_x = arcv.load_rang( i_date, dur )[1]
+		mfi_b_y = arcv.load_rang( i_date, dur )[2]
+		mfi_b_z = arcv.load_rang( i_date, dur )[3]
 
 		print 'Data Downloaded, doing data rotations now'
 
