@@ -39,7 +39,8 @@ if( data_run=='y' ):
 
 	# Define the names of files to be analysed.
 #	fname = 'janus_2008-11-04-12-00-41_2008-11-04-13-01-02_auto_rng_avg_21_600_fvpcb_n.jns'
-	fname = 'janus_2008-11-04-12-00-41_2008-11-04-16-00-32_auto_rng_avg_21_300_fvpc.jns'
+#	fname = 'janus_2008-11-04-12-00-41_2008-11-04-16-00-32_auto_rng_avg_21_300_fvpc.jns'
+	fname = 'janus_2008-11-04-10-17-51_2008-11-04-13-01-02_auto_rng_avg_21_300_fvpc.jns'
 
 	print 'Currently reading file ==> {}  \n'.format( fname )
 
@@ -127,18 +128,18 @@ if( data_run=='y' ):
 
 #		try :
 
-	dat_n_p.append(   [ x if x!=None else 0. for x in  dat['n_p']   ] )
-	dat_n_p_c.append( [ x if x!=None else 0. for x in  dat['n_p_c'] ] )
-	dat_n_p_b.append( [ x if x!=None else 0. for x in  dat['n_p_b'] ] )
+	dat_n_p.append(   [ x if x!=None else float('nan') for x in  dat['n_p']   ] )
+	dat_n_p_c.append( [ x if x!=None else float('nan') for x in  dat['n_p_c'] ] )
+	dat_n_p_b.append( [ x if x!=None else float('nan') for x in  dat['n_p_b'] ] )
 	
-	dat_fv_p_c.append( [ x if x!=None else 0. for x in dat['fv_p_c'] ] )
-	dat_fv_p_b.append( [ x if x!=None else 0. for x in dat['fv_p_b'] ] )
-	dat_sig_fv_p_c.append( [ x if x!=None else 0. for x in dat['sig_fv_p_c'] ] )
-	dat_sig_fv_p_b.append( [ x if x!=None else 0. for x in dat['sig_fv_p_b'] ] )
+	dat_fv_p_c.append( [ x if x!=None else float('nan') for x in dat['fv_p_c'] ] )
+	dat_fv_p_b.append( [ x if x!=None else float('nan') for x in dat['fv_p_b'] ] )
+	dat_sig_fv_p_c.append( [ x if x!=None else float('nan') for x in dat['sig_fv_p_c'] ] )
+	dat_sig_fv_p_b.append( [ x if x!=None else float('nan') for x in dat['sig_fv_p_b'] ] )
 	
-	dat_dv_p_b.append( [ x if x!=None else 0. for x in  dat['dv_p_b'] ] )
+	dat_dv_p_b.append( [ x if x!=None else float('nan') for x in  dat['dv_p_b'] ] )
 
-	dat_alfvel.append( dat['alfvel_p'] )
+	dat_alfvel.append( [ x if x!=None else float('nan') for x in dat['alfvel_p'] ] )
 	
 	dat_del_v_p_c.append( [ dat_fv_p_c[0][k] *
 	                                        dat_db_rng_avg[k]/dat_b_avg[k]
@@ -317,13 +318,13 @@ plt.tight_layout()
 
 plt.show()
 
-os.chdir("/home/ahmadr/Desktop/GIT/fm_development/figures")
-
-pdf = matplotlib.backends.backend_pdf.PdfPages( fname[0:-4] + "_ICS_AGU.pdf" )
-
-for fig in xrange(1, f.number+1 ): ## will open an empty extra figure :(
-	pdf.savefig( fig )
-pdf.close()
+#os.chdir("/home/ahmadr/Desktop/GIT/fm_development/figures")
+#
+#pdf = matplotlib.backends.backend_pdf.PdfPages( fname[0:-4] + "_ICS_AGU.pdf" )
+#
+#for fig in xrange(1, f.number+1 ): ## will open an empty extra figure :(
+#	pdf.savefig( fig )
+#pdf.close()
 
 '''
 ###############################################################################
