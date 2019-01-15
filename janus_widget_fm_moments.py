@@ -312,24 +312,31 @@ class widget_fm_moments( QWidget ) :
 
 			data1 = self.core.mfi_vec_raw[d]
 			data2 = self.core.b0_fields[self.key][d]
+			data3 = self.core.b0_db_fields[self.key][d]
 
 			if( d == 0) :
 
 				self.lim_y = [
-				        mean( data2 ) - 7*std( data2 )*2.**0.5,
-				        mean( data1 ) + 5*std( data1 )*2.**0.5 ]
+				 min(
+				    mean( data1 ) - 2*std( data1 )*2.**0.5,
+				    mean( data2 ) - 1.5*std( data2 )*2.**0.5 ),
+				 max(
+				    mean( data1 ) + 2*std( data1 )*2.**0.5,
+				    mean( data2 ) + 1.5*std( data2 )*2.**0.5 ) ]
+				print 'Works'
 
 			else :
 
-
 				self.lim_y = [
-				    1.1*mean( data1 ) - 2*std( data1 )*2.**0.5,
-				    1.1*mean( data2 ) + 5*std( data2 )*2.**0.5 ]
-
+				min( 
+				    mean( data2 ) - 2*std( data1 )*2.**0.5,
+				    mean( data3 ) - 1.5*std( data3 )*2.**0.5 ),
+				max(
+				    mean( data2 ) + 2*std( data1 )*2.**0.5,
+				    mean( data3 ) + 1.5*std( data3 )*2.**0.5 ) ]
+#
 
 			self.lim_x = [ -5, 95 ]
-#			self.lim_x = [ min( self.core.mfi_s ),
-#			               max( self.core.mfi_s ) ]
 
 	#-----------------------------------------------------------------------
 	# DEFINE THE FUNCTION FOR CREATING THE PLOTS' FIT CURVES.
