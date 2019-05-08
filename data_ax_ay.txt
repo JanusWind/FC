@@ -69,5 +69,3 @@ def fitlin( b1, v1, sigma1 ) :
 	         "offset"  : c1,
 	         "fitfunc" : fitfunc,
 	         "rawres"  : ( popt1,pcov1 ) }
-
-

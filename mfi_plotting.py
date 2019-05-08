@@ -76,9 +76,10 @@ start = time.time( )
 
 download = raw_input('Download the data ==>  ')
 
-date = '2008-11-04-00-00-00.0'
-dur  =  36000
-dur  = dur*2.4
+date = strt_time
+#date = '2008-11-04-00-00-00.0'
+dur  =  3600
+dur  = dur*2.
 
 filter_length = 1
 

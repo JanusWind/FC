@@ -323,7 +323,6 @@ class widget_fm_moments( QWidget ) :
 				 max(
 				    mean( data1 ) + 2*std( data1 )*2.**0.5,
 				    mean( data2 ) + 1.5*std( data2 )*2.**0.5 ) ]
-				print 'Works'
 
 			else :
 
