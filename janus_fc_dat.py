@@ -223,7 +223,6 @@ class fc_dat( ) :
 		else :
 			w_eff = w
 
-		print n
 		# Calculate the total velocity using drift
 
 		if ( dv is None ) :
