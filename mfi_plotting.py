@@ -76,7 +76,8 @@ start = time.time( )
 
 download = raw_input('Download the data ==>  ')
 
-date = strt_time
+date = raw_input('Enter date ==>' )
+#date = strt_time
 #date = '2008-11-04-00-00-00.0'
 dur  =  3600
 dur  = dur*2.
