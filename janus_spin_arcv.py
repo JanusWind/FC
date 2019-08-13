@@ -47,7 +47,7 @@ import os.path
 
 from glob import glob
 
-from ftplib import FTP
+from ftplib import FTP_TLS
 
 
 ################################################################################
@@ -225,7 +225,7 @@ class spin_arcv( object ) :
 
 				self.mesg_txt( 'ftp', date_str )
 
-				ftp = FTP( 'cdaweb.gsfc.nasa.gov' )
+				ftp = FTP_TLS( 'spdf.gsfc.nasa.gov' )
 
 				ftp.login( )
 

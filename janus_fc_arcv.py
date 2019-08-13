@@ -51,7 +51,7 @@ import os.path
 
 from glob import glob
 
-from ftplib import FTP
+from ftplib import FTP_TLS
 
 
 ################################################################################
@@ -322,7 +322,7 @@ class fc_arcv( object ) :
 		else :
 			try :
 				self.mesg_txt( 'ftp', date_str )
-				ftp = FTP( 'cdaweb.gsfc.nasa.gov' )
+				ftp = FTP_TLS( 'spdf.gsfc.nasa.gov' )
 				ftp.login( )
 				ftp.cwd( 'pub/data/wind/swe/swe_faraday/' )
 				ftp.cwd( str_year )
