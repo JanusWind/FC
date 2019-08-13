@@ -47,7 +47,7 @@ import os.path
 
 from glob import glob
 
-from ftplib import FTP
+from ftplib import FTP_TLS
 
 from scipy.io.idl import readsav
 
@@ -88,7 +88,7 @@ class mfi_arcv_hres( object ) :
 
 		self.path       = str( path )       if ( path  is not None )\
 		                                    else os.path.join( 
-		                                    os.path.dirname( __file__ ), 
+		                                    os.path.dirname( __file__ ),
 		                                    'data', 'mfi', 'hres' )
 
 		self.verbose    = bool( verbose )   if ( verbose is not None )\
@@ -229,6 +229,7 @@ class mfi_arcv_hres( object ) :
 			tk = where( self.date_str == date_str )[0]
 
 			if ( len( tk ) > 0 ) :
+
 				return
 
 		# Extract the year, month, day, and day of year of the requested
@@ -258,7 +259,7 @@ class mfi_arcv_hres( object ) :
 		else :
 			try :
 				self.mesg_txt( 'ftp', date_str )
-				ftp = FTP( 'cdaweb.gsfc.nasa.gov' )
+				ftp = FTP_TLS( 'spdf.gsfc.nasa.gov' )
 				ftp.login( )
 				ftp.cwd( 'pub/data/wind/mfi/' )
 				if ( self.use_h2 ) :
