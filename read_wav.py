@@ -20,7 +20,6 @@ from datetime import datetime, timedelta
 from janus_time import calc_time_epc, calc_time_sec, calc_time_val
 
 # Load the module necessary handling step functions.
-
 from janus_step import step
 
 # Load the dictionary of physical constants.
